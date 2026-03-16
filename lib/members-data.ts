@@ -6,6 +6,7 @@ export interface Member {
   role: MemberRole;
   country: string;
   city: string;
+  coordinates: [number, number]; // [lng, lat]
   bio: string;
   photo: string;
   designations: string[];
@@ -33,6 +34,7 @@ export const members: Member[] = [
     role: 'Teacher',
     country: 'India',
     city: 'Mysore',
+    coordinates: [76.6394, 12.2958],
     bio: 'A dedicated practitioner with over 15 years of experience in traditional Ashtanga Vinyasa. Priya studied under Sharath Jois at KPJAYI and brings an authentic, lineage-based approach to her teaching, helping students cultivate a sustainable daily practice rooted in the original methods.',
     photo: 'https://i.pravatar.cc/400?img=1',
     designations: ['E-RYT 500', 'YACEP'],
@@ -49,6 +51,7 @@ export const members: Member[] = [
     role: 'Teacher',
     country: 'United States',
     city: 'San Francisco',
+    coordinates: [-122.4194, 37.7749],
     bio: 'Sarah brings mindfulness and movement together in her Hatha and Yin classes. A former physical therapist turned yoga teacher, she specializes in therapeutic applications of yoga for injury recovery and chronic stress management in a busy urban setting.',
     photo: 'https://i.pravatar.cc/400?img=5',
     designations: ['E-RYT 200', 'RPYT'],
@@ -65,6 +68,7 @@ export const members: Member[] = [
     role: 'Teacher',
     country: 'Japan',
     city: 'Tokyo',
+    coordinates: [139.6917, 35.6895],
     bio: 'Kenji blends traditional Japanese Zen philosophy with modern Kundalini practice. His classes are meditative journeys that integrate breathwork, mantra, and movement to awaken inner awareness and quiet the relentless pace of modern city life.',
     photo: 'https://i.pravatar.cc/400?img=12',
     designations: ['E-RYT 500', 'YACEP'],
@@ -81,6 +85,7 @@ export const members: Member[] = [
     role: 'Teacher',
     country: 'Denmark',
     city: 'Copenhagen',
+    coordinates: [12.5683, 55.6761],
     bio: "Freya is passionate about making yoga accessible to all bodies and abilities. Her Restorative and Gentle Yoga classes are havens of calm in Copenhagen's busy urban landscape, welcoming seniors, beginners, and those with mobility limitations.",
     photo: 'https://i.pravatar.cc/400?img=9',
     designations: ['RYT 200', 'RCYT'],
@@ -96,6 +101,7 @@ export const members: Member[] = [
     role: 'Student',
     country: 'Italy',
     city: 'Florence',
+    coordinates: [11.2558, 43.7696],
     bio: "Marco discovered yoga during a challenging period in his life and has been a devoted student for three years. Currently preparing for his 200-hour teacher training, he practices Vinyasa and Ashtanga daily at sunrise before heading to his architecture studio.",
     photo: 'https://i.pravatar.cc/400?img=67',
     designations: ['GOYA Member'],
@@ -111,6 +117,7 @@ export const members: Member[] = [
     role: 'Student',
     country: 'South Korea',
     city: 'Seoul',
+    coordinates: [126.9780, 37.5665],
     bio: 'Ji-Yeon is a graduate student in kinesiology who practices yoga as both a movement discipline and a research subject. She is exploring the intersection of traditional yoga and modern sports science for her doctoral thesis.',
     photo: 'https://i.pravatar.cc/400?img=44',
     designations: ['GOYA Member'],
@@ -126,6 +133,7 @@ export const members: Member[] = [
     role: 'Student',
     country: 'Brazil',
     city: 'São Paulo',
+    coordinates: [-46.6333, -23.5505],
     bio: "Lucas began his yoga journey through surf culture and quickly fell in love with the deeper practices of pranayama and meditation. He trains under multiple teachers across São Paulo's vibrant yoga community and dreams of teaching one day.",
     photo: 'https://i.pravatar.cc/400?img=56',
     designations: ['GOYA Member'],
@@ -141,6 +149,7 @@ export const members: Member[] = [
     role: 'School',
     country: 'India',
     city: 'Rishikesh',
+    coordinates: [78.2676, 30.0869],
     bio: "One of Rishikesh's most respected yoga schools, offering immersive 200 and 500-hour teacher trainings rooted in classical Hatha and Raja Yoga. With over 2,000 graduates worldwide, we are committed to upholding the integrity of the yogic tradition.",
     photo: 'https://i.pravatar.cc/400?img=28',
     designations: ['RYS 500', 'RYS 300', 'RYS 200'],
@@ -157,6 +166,7 @@ export const members: Member[] = [
     role: 'School',
     country: 'United Kingdom',
     city: 'London',
+    coordinates: [-0.1276, 51.5074],
     bio: 'A welcoming community studio in East London offering yoga teacher training and continuing education workshops. Harmony specializes in trauma-sensitive yoga and inclusivity practices, training teachers to work with diverse and underserved populations.',
     photo: 'https://i.pravatar.cc/400?img=25',
     designations: ['RYS 200', 'YACEP'],
@@ -172,6 +182,7 @@ export const members: Member[] = [
     role: 'Wellness Practitioner',
     country: 'Ghana',
     city: 'Accra',
+    coordinates: [-0.1870, 5.5600],
     bio: 'Amara is a holistic wellness practitioner combining yoga, traditional Ghanaian healing practices, and Ayurveda. She runs community wellness programs in Accra and trains practitioners in Africa-centered approaches to wellbeing.',
     photo: 'https://i.pravatar.cc/400?img=32',
     designations: ['RYT 200', 'YACEP'],
@@ -188,6 +199,7 @@ export const members: Member[] = [
     role: 'Wellness Practitioner',
     country: 'Spain',
     city: 'Barcelona',
+    coordinates: [2.1734, 41.3851],
     bio: 'Elena integrates yoga, somatic movement, and nutrition coaching in her Barcelona-based practice. She works with corporate clients and individuals on burnout recovery and sustainable wellbeing, blending modern science with ancient wisdom.',
     photo: 'https://i.pravatar.cc/400?img=47',
     designations: ['RYT 200'],
@@ -203,6 +215,7 @@ export const members: Member[] = [
     role: 'Wellness Practitioner',
     country: 'Netherlands',
     city: 'Amsterdam',
+    coordinates: [4.9041, 52.3676],
     bio: 'Sophie combines mindfulness-based stress reduction (MBSR) with yoga for her clients in Amsterdam. A certified mindfulness teacher and yoga instructor, she specializes in working with anxiety, depression, and chronic pain using evidence-based approaches.',
     photo: 'https://i.pravatar.cc/400?img=49',
     designations: ['RYT 200', 'MBSR Certified'],
@@ -216,3 +229,4 @@ export const members: Member[] = [
 
 export const allCountries = ['All', ...Array.from(new Set(members.map(m => m.country))).sort()];
 export const allDesignations = Array.from(new Set(members.flatMap(m => m.designations))).filter(d => d !== 'GOYA Member').sort();
+export const allTeachingStyles = Array.from(new Set(members.flatMap(m => m.teachingStyles))).sort();
