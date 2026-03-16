@@ -25,6 +25,7 @@ export interface Member {
   };
   memberSince: string;
   featured?: boolean;
+  is_verified?: boolean;
 }
 
 export const members: Member[] = [
@@ -48,6 +49,7 @@ export const members: Member[] = [
     social: { website: 'https://jenwalsyoga.com', instagram: '@jen.walsh.yoga' },
     memberSince: '2019',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'michael-torres',
@@ -65,6 +67,7 @@ export const members: Member[] = [
     social: { instagram: '@michael.torres.yoga', youtube: 'MichaelTorresYoga' },
     memberSince: '2018',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'rachel-green',
@@ -114,6 +117,7 @@ export const members: Member[] = [
     social: { website: 'https://austinyogahouse.com', instagram: '@ashley.yoga.atx' },
     memberSince: '2019',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'tyler-brooks',
@@ -195,6 +199,7 @@ export const members: Member[] = [
     social: { website: 'https://mindfulyogaboston.com', instagram: '@chrislee.yoga.boston' },
     memberSince: '2019',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'megan-obrien',
@@ -244,6 +249,7 @@ export const members: Member[] = [
     social: { instagram: '@lauren.hayes.yoga', website: 'https://laurenhayesyoga.com' },
     memberSince: '2019',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'aaron-mitchell',
@@ -279,6 +285,7 @@ export const members: Member[] = [
     social: { website: 'https://sophiayogatoonto.ca', instagram: '@sophia.chen.yoga' },
     memberSince: '2019',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'ethan-murphy',
@@ -344,6 +351,7 @@ export const members: Member[] = [
     social: { website: 'https://isabellegyoga.ca', instagram: '@isabelle.gagnon.yoga' },
     memberSince: '2018',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'ryan-macdonald',
@@ -459,6 +467,7 @@ export const members: Member[] = [
     social: { website: 'https://charlottedaviesyoga.co.uk', instagram: '@charlotte.davies.yoga' },
     memberSince: '2017',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'james-harrison',
@@ -558,6 +567,7 @@ export const members: Member[] = [
     social: { instagram: '@jake.morrison.meditation' },
     memberSince: '2018',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'sienna-walsh',
@@ -643,6 +653,7 @@ export const members: Member[] = [
     social: { website: 'https://raviyoga.in', instagram: '@ravi.krishnan.yoga' },
     memberSince: '2017',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'deepa-nair',
@@ -660,6 +671,7 @@ export const members: Member[] = [
     social: { instagram: '@deepa.nair.yoga', website: 'https://deepanairyoga.com' },
     memberSince: '2017',
     featured: true,
+    is_verified: true,
   },
 
   // Italy – 1 teacher
@@ -1240,6 +1252,7 @@ export const members: Member[] = [
     social: { website: 'https://dianareeves.com', instagram: '@diana.wellness.santafe' },
     memberSince: '2019',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'kevin-park',
@@ -1289,6 +1302,7 @@ export const members: Member[] = [
     social: { website: 'https://niamhwellness.co.uk', instagram: '@niamh.yoga.bham' },
     memberSince: '2019',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'anna-hoffmann',
@@ -1325,6 +1339,7 @@ export const members: Member[] = [
     social: { website: 'https://anandayogaacademy.com', instagram: '@anandayoga.rishikesh', youtube: 'AnandaYogaAcademy' },
     memberSince: '2017',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'gateway-yoga-school',
@@ -1342,6 +1357,7 @@ export const members: Member[] = [
     social: { website: 'https://gatewayyoganyc.com', instagram: '@gateway.yoga.nyc' },
     memberSince: '2018',
     featured: true,
+    is_verified: true,
   },
   {
     id: 'north-shore-yoga-institute',

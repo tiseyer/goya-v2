@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 // ─── types & data ──────────────────────────────────────────────────────────────
 
@@ -60,11 +62,21 @@ const LABEL = 'block text-xs font-semibold text-slate-400 mb-2 uppercase trackin
 // ─── page ──────────────────────────────────────────────────────────────────────
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [role, setRole] = useState<Role | null>(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', password: '', country: '', agreed: false,
   });
+
+  useEffect(() => {
+    if (step === 3) {
+      const timer = setTimeout(() => router.push('/dashboard'), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [step, router]);
 
   const canProceed2 =
     form.firstName.trim() &&
@@ -283,6 +295,8 @@ export default function RegisterPage() {
                     </label>
                   </div>
 
+                  {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+
                   <div className="flex gap-3">
                     <button
                       onClick={() => setStep(1)}
@@ -291,11 +305,31 @@ export default function RegisterPage() {
                       ← Back
                     </button>
                     <button
-                      disabled={!canProceed2}
-                      onClick={() => setStep(3)}
+                      disabled={!canProceed2 || loading}
+                      onClick={async () => {
+                        setLoading(true);
+                        setError('');
+                        const { error } = await supabase.auth.signUp({
+                          email: form.email,
+                          password: form.password,
+                          options: {
+                            data: {
+                              full_name: `${form.firstName} ${form.lastName}`,
+                              role: role,
+                              country: form.country,
+                            },
+                          },
+                        });
+                        if (error) {
+                          setError(error.message);
+                          setLoading(false);
+                          return;
+                        }
+                        setStep(3);
+                      }}
                       className="flex-1 bg-[#2dd4bf] text-[#1a2744] py-3.5 rounded-xl font-bold text-sm hover:bg-[#14b8a6] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                      Create Account →
+                      {loading ? 'Creating Account…' : 'Create Account →'}
                     </button>
                   </div>
                 </>
@@ -349,7 +383,7 @@ export default function RegisterPage() {
         {step < 3 && (
           <p className="text-center text-slate-600 text-xs mt-6">
             Already have an account?{' '}
-            <Link href="/login" className="text-[#2dd4bf] hover:underline font-semibold">Sign in</Link>
+            <Link href="/sign-in" className="text-[#2dd4bf] hover:underline font-semibold">Sign in</Link>
           </p>
         )}
       </div>
