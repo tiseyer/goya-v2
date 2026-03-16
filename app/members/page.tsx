@@ -387,8 +387,8 @@ export default function MembersPage() {
 
       {/* Panels */}
       <div className="flex flex-1 overflow-hidden">
-        {/* LEFT: Filters + compact list */}
-        <div className="w-[280px] shrink-0 flex flex-col border-r border-slate-200 bg-white overflow-hidden">
+        {/* LEFT: Filters + compact list — 25% */}
+        <div className="shrink-0 flex flex-col border-r border-slate-200 bg-white overflow-hidden" style={{ width: '25%' }}>
           {/* Filters */}
           <div className="p-3 border-b border-slate-100 space-y-2 shrink-0">
             {/* Search */}
@@ -462,8 +462,8 @@ export default function MembersPage() {
           </div>
         </div>
 
-        {/* CENTER: card grid */}
-        <div className="flex-1 overflow-y-auto bg-slate-50 p-5 min-w-0">
+        {/* CENTER: card grid — 35% when map open, flex-1 when closed */}
+        <div className={`overflow-y-auto bg-slate-50 p-5 min-w-0 transition-all duration-300 ${mapOpen ? 'shrink-0' : 'flex-1'}`} style={mapOpen ? { width: '35%' } : {}}>
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-slate-400">
               <svg className="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -473,7 +473,7 @@ export default function MembersPage() {
               <button onClick={clearFilters} className="mt-2 text-xs text-[#2dd4bf] hover:underline">Clear filters</button>
             </div>
           ) : (
-            <div className={`grid gap-4 ${mapOpen ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3'}`}>
+            <div className={`grid gap-4 ${mapOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3'}`}>
               {filtered.map(m => (
                 <FullCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />
               ))}
@@ -481,10 +481,10 @@ export default function MembersPage() {
           )}
         </div>
 
-        {/* RIGHT: Map */}
+        {/* RIGHT: Map — 40% when open */}
         <div
           className="shrink-0 overflow-hidden transition-all duration-300 ease-in-out border-l border-slate-200"
-          style={{ width: mapOpen ? '420px' : '0px' }}
+          style={{ width: mapOpen ? '40%' : '0px' }}
         >
           <MapPanel
             allMembers={members}

@@ -54,6 +54,8 @@ export default function MapPanel({
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
     map.on('load', () => {
+      // Resize once the container has settled after the CSS transition
+      setTimeout(() => map.resize(), 350);
       allMembers.forEach(member => {
         const el = document.createElement('div');
         const color = ROLE_COLORS[member.role] ?? '#2dd4bf';
@@ -108,10 +110,10 @@ export default function MapPanel({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible]);
 
-  // Resize map when panel opens
+  // Resize map after the CSS transition completes (300ms) + buffer
   useEffect(() => {
     if (isVisible && mapRef.current) {
-      setTimeout(() => mapRef.current?.resize(), 50);
+      setTimeout(() => mapRef.current?.resize(), 350);
     }
   }, [isVisible]);
 
@@ -160,5 +162,9 @@ export default function MapPanel({
     );
   }
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div ref={containerRef} style={{ position: 'absolute', inset: 0 }} />
+    </div>
+  );
 }
