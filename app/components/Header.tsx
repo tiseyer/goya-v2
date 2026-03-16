@@ -20,14 +20,13 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-[#2dd4bf] flex items-center justify-center">
-              <span className="text-[#1a2744] font-black text-sm tracking-tight">G</span>
-            </div>
-            <span className="text-white font-bold text-xl tracking-tight">GOYA</span>
-            <span className="hidden sm:block text-[#2dd4bf] text-[10px] font-semibold uppercase tracking-widest border border-[#2dd4bf]/30 rounded px-1.5 py-0.5">
-              v2
-            </span>
+          <Link href="/" className="shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/GOYA Logo White.png"
+              alt="GOYA"
+              style={{ width: '120px', height: 'auto' }}
+            />
           </Link>
 
           {/* Desktop nav */}

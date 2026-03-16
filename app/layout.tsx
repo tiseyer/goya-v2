@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "GOYA — Global Online Yoga Association",
   description: "Connecting yoga teachers, students, schools, and wellness practitioners worldwide.",
+  icons: {
+    icon: "/images/Favicon.png",
+  },
 };
 
 export default async function RootLayout({

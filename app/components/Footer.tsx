@@ -7,11 +7,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-2">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#2dd4bf] flex items-center justify-center">
-                <span className="text-[#1a2744] font-black text-sm">G</span>
-              </div>
-              <span className="text-white font-bold text-xl tracking-tight">GOYA</span>
+            <div className="mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/GOYA Logo White.png"
+                alt="GOYA"
+                style={{ width: '120px', height: 'auto' }}
+              />
             </div>
             <p className="text-sm leading-relaxed max-w-sm">
               Global Online Yoga Association — connecting yoga teachers, students, schools, and
