@@ -319,7 +319,7 @@ export default function MembersPage() {
   const MobileLayout = (
     <div className="lg:hidden">
       {/* Mobile hero */}
-      <div className="bg-[#1a2744] py-10 px-4 sm:px-6">
+      <div className="bg-[#1a2744] pt-24 pb-10 px-4 sm:px-6">
         <h1 className="text-3xl font-bold text-white mb-2">Member Directory</h1>
         <p className="text-slate-300 text-sm">Yoga practitioners worldwide.</p>
       </div>
@@ -363,7 +363,7 @@ export default function MembersPage() {
 
   // ── Desktop three-panel layout ─────────────────────────────────────────────
   const DesktopLayout = (
-    <div className="hidden lg:flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
+    <div className="hidden lg:flex flex-col h-[calc(100vh-4rem)] mt-16 overflow-hidden">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 bg-white border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-3">
@@ -472,29 +472,31 @@ export default function MembersPage() {
           </div>
         </div>
 
-        {/* CENTER: card grid — 35% when map open, flex-1 when closed */}
-        <div className={`overflow-y-auto bg-slate-50 p-5 min-w-0 transition-all duration-300 ${mapOpen ? 'shrink-0' : 'flex-1'}`} style={mapOpen ? { width: '35%' } : {}}>
-          {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400">
-              <svg className="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <p className="font-medium text-sm">No members found</p>
-              <button onClick={clearFilters} className="mt-2 text-xs text-[#2dd4bf] hover:underline">Clear filters</button>
-            </div>
-          ) : (
-            <div className={`grid gap-4 ${mapOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3'}`}>
-              {filtered.map(m => (
-                <FullCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />
-              ))}
-            </div>
-          )}
-        </div>
+        {/* CENTER: card grid — hidden when map is open */}
+        {!mapOpen && (
+          <div className="flex-1 overflow-y-auto bg-slate-50 p-5 min-w-0">
+            {filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                <svg className="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <p className="font-medium text-sm">No members found</p>
+                <button onClick={clearFilters} className="mt-2 text-xs text-[#2dd4bf] hover:underline">Clear filters</button>
+              </div>
+            ) : (
+              <div className="grid gap-4 grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3">
+                {filtered.map(m => (
+                  <FullCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* RIGHT: Map — 40% when open */}
+        {/* RIGHT: Map — 75% when open (sidebar takes 25%) */}
         <div
           className="shrink-0 overflow-hidden transition-all duration-300 ease-in-out border-l border-slate-200"
-          style={{ width: mapOpen ? '40%' : '0px' }}
+          style={{ width: mapOpen ? '75%' : '0px' }}
         >
           <MapPanel
             allMembers={members}

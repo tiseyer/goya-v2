@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { events, allCategories, type EventCategory } from '@/lib/events-data';
 
 const CATEGORY_STYLES: Record<string, { badge: string; bg: string }> = {
@@ -63,7 +64,7 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-[#1a2744] py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-[#1a2744] pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -right-20 top-0 w-96 h-96 bg-[#2dd4bf] opacity-[0.04] rounded-full blur-3xl" />
         </div>
@@ -240,9 +241,9 @@ export default function EventsPage() {
                               <span className="text-[#1a2744] font-bold text-lg">${event.price}</span>
                             )}
                           </div>
-                          <button className="bg-[#2dd4bf] text-[#1a2744] px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#14b8a6] transition-colors whitespace-nowrap">
-                            Register →
-                          </button>
+                          <Link href={`/events/${event.id}`} className="bg-[#2dd4bf] text-[#1a2744] px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#14b8a6] transition-colors whitespace-nowrap">
+                            Learn More →
+                          </Link>
                         </div>
                       </div>
                     </div>

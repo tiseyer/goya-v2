@@ -13,6 +13,9 @@ export interface Course {
   iconColor: string;
   lessons: number;
   level: 'Beginner' | 'Intermediate' | 'Advanced' | 'All Levels';
+  userProgress?: number;
+  status?: 'not_started' | 'in_progress' | 'completed';
+  lastAccessed?: string;
 }
 
 export const courses: Course[] = [
@@ -28,6 +31,9 @@ export const courses: Course[] = [
     iconColor: 'text-teal-200',
     lessons: 12,
     level: 'Intermediate',
+    status: 'in_progress',
+    userProgress: 42,
+    lastAccessed: '2026-03-15T08:30:00Z',
   },
   {
     id: 'intro-to-yoga-nidra',
@@ -41,6 +47,9 @@ export const courses: Course[] = [
     iconColor: 'text-purple-200',
     lessons: 6,
     level: 'All Levels',
+    status: 'in_progress',
+    userProgress: 67,
+    lastAccessed: '2026-03-14T19:00:00Z',
   },
   {
     id: 'yoga-sutras-philosophy',
@@ -54,6 +63,9 @@ export const courses: Course[] = [
     iconColor: 'text-blue-200',
     lessons: 18,
     level: 'All Levels',
+    status: 'in_progress',
+    userProgress: 25,
+    lastAccessed: '2026-03-10T11:00:00Z',
   },
   {
     id: 'yin-yoga-beginners',
@@ -67,6 +79,9 @@ export const courses: Course[] = [
     iconColor: 'text-emerald-200',
     lessons: 8,
     level: 'Beginner',
+    status: 'completed',
+    userProgress: 100,
+    lastAccessed: '2026-03-01T16:00:00Z',
   },
   {
     id: 'healing-mantras',
@@ -80,6 +95,9 @@ export const courses: Course[] = [
     iconColor: 'text-amber-200',
     lessons: 15,
     level: 'All Levels',
+    status: 'completed',
+    userProgress: 100,
+    lastAccessed: '2026-02-20T09:00:00Z',
   },
   {
     id: 'science-of-breathwork',
@@ -122,6 +140,15 @@ export const courses: Course[] = [
   },
 ];
 
-export const allCourseCategories: Array<'All' | CourseCategory> = [
-  'All', 'Workshop', 'Yoga Sequence', 'Dharma Talk', 'Music Playlist', 'Research',
+export const allCourseCategories: Array<'All' | CourseCategory | 'In Progress' | 'Completed'> = [
+  'All', 'In Progress', 'Completed', 'Workshop', 'Yoga Sequence', 'Dharma Talk', 'Music Playlist', 'Research',
 ];
+
+export function getInProgressCourses() {
+  return courses.filter(c => c.status === 'in_progress')
+    .sort((a, b) => new Date(b.lastAccessed!).getTime() - new Date(a.lastAccessed!).getTime());
+}
+
+export function getCompletedCourses() {
+  return courses.filter(c => c.status === 'completed');
+}

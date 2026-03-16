@@ -16,6 +16,45 @@ const ROLE_BADGE: Record<string, string> = {
   moderator: 'bg-orange-100 text-orange-700',
 };
 
+const TEACHING_STYLES_LIST = ['Hatha Yoga','Vinyasa Yoga','Yin Yoga','Restorative Yoga','Ashtanga Yoga','Prenatal Yoga','Postnatal Yoga',"Children's Yoga",'Power Yoga','Kundalini Yoga','Hot Yoga','Gentle Yoga','Modern Contemporaries','Traditional Lineage-based','Trauma-informed Yoga','Iyengar Yoga','Somatic Yoga','Chair Yoga','Aerial Yoga','Karma Yoga'];
+const LINEAGES_LIST = ['Hatha Yoga','Raja Yoga','Ashtanga Yoga (Pattabhi Jois)','Iyengar Yoga','Sivananda Yoga','Bihar Yoga','Satyananda Yoga','Kundalini Yoga (Yogi Bhajan)','Integral Yoga (Swami Satchidananda)','Krishnamacharya (Mysore)','Tantric Yoga','Bhakti Yoga','Jnana Yoga','Modern & Contemporary','Mixed Influences'];
+const TEACHING_FOCUS_LIST = ['Strength & Stability','Flexibility & Mobility','Balance & Coordination','Relaxation & Stress Relief','Meditation & Mindfulness','Traditional Teachings','Breath Work','Daily Movement & Well-Being','Restorative & Recovery','Energy & Spiritual Exploration','Teaching & Skill Development'];
+const INFLUENCES_LIST = ['Traditional lineages','Eastern philosophy','Modern contemporaries','Yoga education & educators','Independent self-study'];
+const PROGRAMS_LIST = ['Teacher Training Program','Specialty & Continuing Education','Workshops','Retreats','Community Classes','Mentorship'];
+const YEARS_TEACHING_OPTIONS = ['0-1','1-2','2-3','3-5','5-10','10-15','15-20','20+'];
+
+function CheckboxGroup({ label, options, value, onChange, max }: {
+  label: string; options: string[]; value: string[]; onChange: (v: string[]) => void; max?: number
+}) {
+  const toggle = (opt: string) => {
+    if (value.includes(opt)) {
+      onChange(value.filter(x => x !== opt));
+    } else if (!max || value.length < max) {
+      onChange([...value, opt]);
+    }
+  };
+  return (
+    <div>
+      <label className={LABEL}>{label}{max ? ` (select up to ${max})` : ''}</label>
+      <div className="flex flex-wrap gap-2 mt-1.5">
+        {options.map(opt => {
+          const selected = value.includes(opt);
+          const disabled = !!max && !selected && value.length >= max;
+          return (
+            <button key={opt} type="button" onClick={() => toggle(opt)} disabled={disabled}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                selected ? 'bg-[#1a2744] text-white border-[#1a2744]'
+                : disabled ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed'
+                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+              }`}
+            >{opt}</button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function ProfileSettingsPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -33,6 +72,27 @@ export default function ProfileSettingsPage() {
   const [website, setWebsite]     = useState('');
   const [instagram, setInstagram] = useState('');
   const [youtube, setYoutube]     = useState('');
+
+  // Universal
+  const [introduction, setIntroduction] = useState('');
+  const [videoIntroUrl, setVideoIntroUrl] = useState('');
+
+  // Student
+  const [practiceLevel, setPracticeLevel] = useState('');
+  const [practiceStyles, setPracticeStyles] = useState<string[]>([]);
+
+  // Teacher
+  const [influences, setInfluences] = useState<string[]>([]);
+  const [yearsTeaching, setYearsTeaching] = useState('');
+  const [teachingStylesProfile, setTeachingStylesProfile] = useState<string[]>([]);
+  const [teachingFormat, setTeachingFormat] = useState('');
+  const [teachingFocus, setTeachingFocus] = useState<string[]>([]);
+  const [lineage, setLineage] = useState<string[]>([]);
+
+  // School
+  const [programsOffered, setProgramsOffered] = useState<string[]>([]);
+  const [schoolEstablished, setSchoolEstablished] = useState('');
+  const [deliveryFormat, setDeliveryFormat] = useState('');
 
   // Modal state
   const [showDeleteModal, setShowDeleteModal]   = useState(false);
@@ -56,6 +116,19 @@ export default function ProfileSettingsPage() {
         setWebsite(p.website ?? '');
         setInstagram(p.instagram ?? '');
         setYoutube(p.youtube ?? '');
+        setIntroduction(p.introduction ?? '');
+        setVideoIntroUrl(p.video_intro_url ?? '');
+        setPracticeLevel(p.practice_level ?? '');
+        setPracticeStyles(p.practice_styles ?? []);
+        setInfluences(p.influences ?? []);
+        setYearsTeaching(p.years_teaching ?? '');
+        setTeachingStylesProfile(p.teaching_styles_profile ?? []);
+        setTeachingFormat(p.teaching_format ?? '');
+        setTeachingFocus(p.teaching_focus ?? []);
+        setLineage(p.lineage ?? []);
+        setProgramsOffered(p.programs_offered ?? []);
+        setSchoolEstablished(p.established_year?.toString() ?? '');
+        setDeliveryFormat(p.delivery_format ?? '');
       }
       setLoading(false);
     }
@@ -73,6 +146,19 @@ export default function ProfileSettingsPage() {
     const { error } = await supabase.from('profiles').update({
       full_name: `${firstName} ${lastName}`.trim(),
       bio, location, website, instagram, youtube,
+      introduction,
+      video_intro_url: videoIntroUrl,
+      practice_level: practiceLevel,
+      practice_styles: practiceStyles,
+      influences,
+      years_teaching: yearsTeaching,
+      teaching_styles_profile: teachingStylesProfile,
+      teaching_format: teachingFormat,
+      teaching_focus: teachingFocus,
+      lineage,
+      programs_offered: programsOffered,
+      established_year: schoolEstablished ? parseInt(schoolEstablished) : null,
+      delivery_format: deliveryFormat,
     }).eq('id', user.id);
     setSaving(false);
     if (error) showToast(error.message, 'error');
@@ -142,6 +228,18 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
 
+          {/* Introduction tagline */}
+          <div>
+            <label className={LABEL}>Introduction <span className="normal-case text-slate-400 font-normal">({introduction.length}/120)</span></label>
+            <input className={INPUT} value={introduction} onChange={e => setIntroduction(e.target.value.slice(0, 120))} placeholder="Short tagline — e.g. 'Hatha teacher & wellness coach in Berlin'" />
+          </div>
+
+          {/* Video Introduction */}
+          <div>
+            <label className={LABEL}>Video Introduction (YouTube URL)</label>
+            <input className={INPUT} value={videoIntroUrl} onChange={e => setVideoIntroUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." />
+          </div>
+
           {/* Bio */}
           <div>
             <label className={LABEL}>Bio <span className="normal-case text-slate-400">({bio.length}/500)</span></label>
@@ -171,9 +269,93 @@ export default function ProfileSettingsPage() {
           </div>
 
           <button type="submit" disabled={saving} className="bg-[#2dd4bf] hover:bg-[#14b8a6] text-[#1a2744] font-bold px-6 py-2.5 rounded-xl transition-colors disabled:opacity-60 text-sm">
-            {saving ? 'Saving…' : 'Save Changes'}
+            {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </form>
+
+        {/* STUDENT: Practice Profile */}
+        {profile?.role === 'student' && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#1a2744]">Practice Profile</h2>
+
+            {/* Practice Level */}
+            <div>
+              <label className={LABEL}>Practice Level</label>
+              <div className="flex gap-3 mt-1.5">
+                {['Beginner', 'Intermediate', 'Advanced'].map(level => (
+                  <label key={level} className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="practiceLevel" value={level} checked={practiceLevel === level} onChange={() => setPracticeLevel(level)} className="accent-[#2dd4bf]" />
+                    <span className="text-sm text-slate-700">{level}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <CheckboxGroup label="Practice Styles" options={TEACHING_STYLES_LIST} value={practiceStyles} onChange={setPracticeStyles} />
+          </div>
+        )}
+
+        {/* TEACHER: Teaching Profile */}
+        {profile?.role === 'teacher' && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#1a2744]">Teaching Profile</h2>
+
+            {/* Years Teaching */}
+            <div>
+              <label className={LABEL}>Years Teaching</label>
+              <select className={INPUT} value={yearsTeaching} onChange={e => setYearsTeaching(e.target.value)}>
+                <option value="">Select range</option>
+                {YEARS_TEACHING_OPTIONS.map(y => <option key={y} value={y}>{y} years</option>)}
+              </select>
+            </div>
+
+            {/* Teaching Format */}
+            <div>
+              <label className={LABEL}>Teaching Format</label>
+              <div className="flex gap-4 mt-1.5">
+                {['In-Person', 'Online', 'Hybrid'].map(f => (
+                  <label key={f} className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="teachingFormat" value={f} checked={teachingFormat === f} onChange={() => setTeachingFormat(f)} className="accent-[#2dd4bf]" />
+                    <span className="text-sm text-slate-700">{f}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <CheckboxGroup label="Influences" options={INFLUENCES_LIST} value={influences} onChange={setInfluences} />
+            <CheckboxGroup label="Teaching Styles" options={TEACHING_STYLES_LIST} value={teachingStylesProfile} onChange={setTeachingStylesProfile} />
+            <CheckboxGroup label="Teaching Focus" options={TEACHING_FOCUS_LIST} value={teachingFocus} onChange={setTeachingFocus} />
+            <CheckboxGroup label="Lineage" options={LINEAGES_LIST} value={lineage} onChange={setLineage} max={3} />
+          </div>
+        )}
+
+        {/* SCHOOL: School Profile */}
+        {profile?.role === 'school' && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+            <h2 className="text-lg font-bold text-[#1a2744]">School Profile</h2>
+
+            <CheckboxGroup label="Programs Offered" options={PROGRAMS_LIST} value={programsOffered} onChange={setProgramsOffered} />
+
+            <div>
+              <label className={LABEL}>Year Established</label>
+              <input className={INPUT} value={schoolEstablished} onChange={e => setSchoolEstablished(e.target.value)} placeholder="e.g. 2015" maxLength={4} type="number" min={1900} max={2026} />
+            </div>
+
+            <div>
+              <label className={LABEL}>Course Delivery Format</label>
+              <div className="flex gap-4 mt-1.5">
+                {['In-Person', 'Online', 'Hybrid'].map(f => (
+                  <label key={f} className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="deliveryFormat" value={f} checked={deliveryFormat === f} onChange={() => setDeliveryFormat(f)} className="accent-[#2dd4bf]" />
+                    <span className="text-sm text-slate-700">{f}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <CheckboxGroup label="Lineage" options={LINEAGES_LIST} value={lineage} onChange={setLineage} max={3} />
+          </div>
+        )}
 
         {/* SECTION 2: Account Information */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">

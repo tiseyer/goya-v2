@@ -132,6 +132,9 @@ export default async function MemberProfile({
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight">
                 {member.name}
               </h1>
+              {member.introduction && (
+                <p className="text-slate-300 text-sm mt-1 italic">{member.introduction}</p>
+              )}
               <div className="flex items-center justify-center sm:justify-start gap-1.5 text-slate-400 text-sm mb-4">
                 <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -168,6 +171,20 @@ export default async function MemberProfile({
                 About
               </h2>
               <p className="text-slate-600 leading-relaxed text-[15px]">{member.bio}</p>
+
+              {member.videoIntroUrl && (
+                <div className="mt-6">
+                  <h3 className="text-base font-bold text-[#1a2744] mb-3">Video Introduction</h3>
+                  <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingTop: '56.25%' }}>
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={member.videoIntroUrl.replace('watch?v=', 'embed/')}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Teaching styles */}

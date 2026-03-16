@@ -1,26 +1,23 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { courses } from '@/lib/academy-data';
+import { useState } from 'react';
 
-export async function generateStaticParams() {
-  return courses.map(c => ({ id: c.id }));
-}
-
-export default async function CoursePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default function CoursePage() {
+  const { id } = useParams<{ id: string }>();
   const course = courses.find(c => c.id === id);
-  if (!course) notFound();
+  const [markedComplete, setMarkedComplete] = useState(false);
+
+  if (!course) return null;
 
   const related = courses.filter(c => c.id !== course.id && c.category === course.category).slice(0, 3);
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="bg-[#1a2744] py-10 px-4 sm:px-6 lg:px-8">
+      <div className="bg-[#1a2744] pt-24 pb-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <Link
             href="/academy"
@@ -74,15 +71,42 @@ export default async function CoursePage({
           {/* Main: video player */}
           <div className="lg:col-span-2 space-y-6">
             {/* Vimeo embed */}
-            <div className="bg-black rounded-2xl overflow-hidden shadow-lg aspect-video">
+            <div className="relative w-full rounded-2xl overflow-hidden shadow-lg" style={{ paddingTop: '56.25%' }}>
               <iframe
-                src="https://player.vimeo.com/video/76979871?autoplay=0&title=0&byline=0&portrait=0"
-                className="w-full h-full"
+                className="absolute inset-0 w-full h-full"
+                src="https://player.vimeo.com/video/76979871"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
-                title={course.title}
               />
             </div>
+
+            {/* Progress display */}
+            {course.status === 'in_progress' && !markedComplete && (
+              <div className="mt-4 p-4 bg-white rounded-xl border border-slate-100">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-slate-700">Your Progress</span>
+                  <span className="text-sm font-bold text-[#2dd4bf]">{course.userProgress}%</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-2">
+                  <div className="bg-[#2dd4bf] h-2 rounded-full transition-all" style={{ width: `${course.userProgress}%` }} />
+                </div>
+              </div>
+            )}
+
+            {/* Mark as complete */}
+            {(course.status === 'in_progress' || course.status === 'completed' || markedComplete) && (
+              <button
+                onClick={() => setMarkedComplete(true)}
+                disabled={course.status === 'completed' || markedComplete}
+                className={`w-full mt-4 py-3 font-bold rounded-xl transition-colors ${
+                  course.status === 'completed' || markedComplete
+                    ? 'bg-green-500 text-white cursor-default'
+                    : 'bg-[#2dd4bf] text-[#1a2744] hover:bg-[#14b8a6]'
+                }`}
+              >
+                {course.status === 'completed' || markedComplete ? '✓ Completed' : '✓ Mark as Complete'}
+              </button>
+            )}
 
             {/* Course info */}
             <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-100 shadow-sm">

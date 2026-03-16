@@ -33,17 +33,19 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function AcademyPage() {
-  const [categoryFilter, setCategoryFilter] = useState<'All' | CourseCategory>('All');
+  const [activeFilter, setActiveFilter] = useState<string>('All');
 
   const filtered = useMemo(() => {
-    if (categoryFilter === 'All') return courses;
-    return courses.filter(c => c.category === categoryFilter);
-  }, [categoryFilter]);
+    if (activeFilter === 'In Progress') return courses.filter(c => c.status === 'in_progress');
+    if (activeFilter === 'Completed') return courses.filter(c => c.status === 'completed');
+    if (activeFilter !== 'All') return courses.filter(c => c.category === activeFilter);
+    return courses;
+  }, [activeFilter]);
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="bg-[#1a2744] py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-[#1a2744] pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -right-20 top-0 w-96 h-96 bg-[#2dd4bf] opacity-[0.04] rounded-full blur-3xl" />
         </div>
@@ -64,15 +66,15 @@ export default function AcademyPage() {
           {allCourseCategories.map(cat => (
             <button
               key={cat}
-              onClick={() => setCategoryFilter(cat)}
+              onClick={() => setActiveFilter(cat)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
-                categoryFilter === cat
+                activeFilter === cat
                   ? 'bg-[#1a2744] text-white border-[#1a2744]'
                   : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
               }`}
             >
-              {cat !== 'All' && (
-                <span className={categoryFilter === cat ? 'text-white' : 'text-slate-400'}>
+              {cat !== 'All' && cat !== 'In Progress' && cat !== 'Completed' && (
+                <span className={activeFilter === cat ? 'text-white' : 'text-slate-400'}>
                   {CATEGORY_ICONS[cat]}
                 </span>
               )}
@@ -110,6 +112,12 @@ export default function AcademyPage() {
                     {course.access}
                   </span>
                 </div>
+                {course.status === 'completed' && (
+                  <div className="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                    Completed
+                  </div>
+                )}
                 {/* Category */}
                 <div className="absolute bottom-3 left-3">
                   <span className="text-[10px] font-semibold bg-white/20 text-white backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/20">
@@ -141,6 +149,17 @@ export default function AcademyPage() {
                     course.level === 'Advanced' ? 'text-rose-500' : 'text-slate-400'
                   }`}>{course.level}</span>
                 </div>
+                {course.status === 'in_progress' && (
+                  <div className="mt-3 pt-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-slate-500">Progress</span>
+                      <span className="text-xs font-semibold text-[#2dd4bf]">{course.userProgress}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-full h-1.5">
+                      <div className="bg-[#2dd4bf] h-1.5 rounded-full" style={{ width: `${course.userProgress}%` }} />
+                    </div>
+                  </div>
+                )}
               </div>
             </Link>
           ))}

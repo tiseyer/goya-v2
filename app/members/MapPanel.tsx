@@ -44,7 +44,7 @@ export default function MapPanel({
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
+      style: 'mapbox://styles/mapbox/streets-v12',
       center: [20, 25],
       zoom: 1.4,
       attributionControl: false,
@@ -81,10 +81,10 @@ export default function MapPanel({
           closeButton: false,
           className: 'goya-popup',
         }).setHTML(`
-          <div style="background:#1e2e56;color:#fff;padding:8px 10px;border-radius:8px;font-size:12px;line-height:1.4;min-width:130px;">
+          <div style="background:#ffffff;color:#1a2744;padding:8px 10px;border-radius:8px;font-size:12px;line-height:1.4;min-width:130px;border:1px solid #e2e8f0;">
             <div style="font-weight:700;margin-bottom:2px;">${member.name}</div>
-            <div style="color:#2dd4bf;font-size:10px;">${member.role}</div>
-            <div style="color:#94a3b8;font-size:10px;margin-top:2px;">${member.city}, ${member.country}</div>
+            <div style="color:#0e9f8a;font-size:10px;">${member.role}</div>
+            <div style="color:#64748b;font-size:10px;margin-top:2px;">${member.city}, ${member.country}</div>
           </div>
         `);
 
@@ -164,7 +164,7 @@ export default function MapPanel({
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <div ref={containerRef} style={{ position: 'absolute', inset: 0 }} />
+      <div ref={containerRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
     </div>
   );
 }
