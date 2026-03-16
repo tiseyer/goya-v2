@@ -47,8 +47,6 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold text-xs mb-5 uppercase tracking-widest">Organization</h4>
             <ul className="space-y-3 text-sm">
-              <li><Link href="#" className="hover:text-[#2dd4bf] transition-colors">About GOYA</Link></li>
-              <li><Link href="#" className="hover:text-[#2dd4bf] transition-colors">Standards & Ethics</Link></li>
               <li><Link href="/privacy" className="hover:text-[#2dd4bf] transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-[#2dd4bf] transition-colors">Terms of Use</Link></li>
             </ul>
@@ -57,7 +55,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs">© 2025 Global Online Yoga Association. All rights reserved.</p>
-          <p className="text-xs">Built with intention for the global yoga community.</p>
+          <a href="https://zier-seyer-marketing.de" target="_blank" rel="noopener noreferrer" className="text-xs hover:text-[#2dd4bf] transition-colors">Powered by Zier Marketing</a>
         </div>
       </div>
     </footer>

@@ -7,8 +7,7 @@ import { usePathname } from 'next/navigation';
 const navLinks = [
   { href: '/members', label: 'Members' },
   { href: '#', label: 'Events' },
-  { href: '#', label: 'Resources' },
-  { href: '#', label: 'About' },
+  { href: '#', label: 'Academy' },
 ];
 
 export default function Header() {
