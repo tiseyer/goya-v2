@@ -242,7 +242,7 @@ export default function OnboardingClient({ userId, initialProfile, initialState 
       }
 
       if (currentStep === 2) {
-        const result = await saveOnboardingStep({ step: 2, data: { role: profile.role } })
+        const result = await saveOnboardingStep({ step: 2, data: { role: profile.role as 'Student' | 'Teacher' | 'Wellness Practitioner' } })
         applyServerStep(result)
         return
       }
