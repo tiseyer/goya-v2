@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ClientProviders from "./components/ClientProviders";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,11 +38,13 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-slate-50 text-slate-900 flex flex-col`}
       >
-        {!hideNav && <Header />}
-        <main className={`${!hideNav ? "pt-16" : ""} flex-1`}>
-          {children}
-        </main>
-        <Footer />
+        <ClientProviders>
+          {!hideNav && <Header />}
+          <main className={`${!hideNav ? "pt-16" : ""} flex-1`}>
+            {children}
+          </main>
+          <Footer />
+        </ClientProviders>
       </body>
     </html>
   );

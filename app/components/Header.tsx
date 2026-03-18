@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { useCart } from '@/app/context/CartContext';
 
 // ─── config ───────────────────────────────────────────────────────────────────
 
@@ -11,6 +12,7 @@ const NAV_LINKS = [
   { href: '/members', label: 'Members' },
   { href: '/events',  label: 'Events'  },
   { href: '/academy', label: 'Academy' },
+  { href: '/addons',  label: 'Add-Ons' },
 ];
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -259,6 +261,38 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
   );
 }
 
+// ─── Cart helpers ─────────────────────────────────────────────────────────────
+
+function CartBadge() {
+  const { itemCount } = useCart();
+  if (itemCount === 0) return null;
+  return (
+    <span className="bg-[#8b1a1a] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+      {itemCount > 9 ? '9+' : itemCount}
+    </span>
+  );
+}
+
+function CartIcon() {
+  const { itemCount } = useCart();
+  return (
+    <Link
+      href="/addons"
+      className="relative w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+      aria-label={`Cart (${itemCount} items)`}
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      {itemCount > 0 && (
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#8b1a1a] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+          {itemCount > 9 ? '9+' : itemCount}
+        </span>
+      )}
+    </Link>
+  );
+}
+
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 export default function Header() {
@@ -334,11 +368,13 @@ export default function Header() {
               <>
                 <SearchWidget />
                 <MessagesWidget />
+                <CartIcon />
                 <div className="w-px h-5 bg-white/15 mx-1" />
                 <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} onLogout={handleLogout} />
               </>
             ) : (
               <>
+                <CartIcon />
                 <Link href="/sign-in" className="text-slate-300 hover:text-white text-sm font-medium transition-colors px-3 py-2">
                   Sign In
                 </Link>
@@ -369,6 +405,20 @@ export default function Header() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-[#1e2e56] border-t border-white/10 px-4 py-4 space-y-1">
+          {/* Mobile cart link */}
+          <Link
+            href="/addons"
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center justify-between px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Cart
+            </span>
+            <CartBadge />
+          </Link>
           {NAV_LINKS.map(({ href, label }) => (
             <Link
               key={label}
