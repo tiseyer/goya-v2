@@ -52,7 +52,7 @@ function AddonCard({ addon }: { addon: Addon }) {
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault();
-    addItem({ id: addon.id, name: addon.name, price: addon.price, priceType: addon.priceType, signupFee: addon.signupFee });
+    addItem({ id: addon.id, name: addon.name, acronym: addon.acronym, badgeLines: addon.badgeLines, price: addon.price, priceType: addon.priceType, signUpFee: addon.signupFee });
   }
 
   return (
