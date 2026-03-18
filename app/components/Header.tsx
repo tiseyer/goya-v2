@@ -346,12 +346,12 @@ export default function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5">
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={label}
                 href={href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                   pathname === href
                     ? 'text-white bg-white/10'
                     : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -363,7 +363,7 @@ export default function Header() {
           </nav>
 
           {/* Right side */}
-          <div className="hidden md:flex items-center gap-2 ml-auto">
+          <div className="hidden lg:flex items-center gap-2 ml-auto">
             {isLoggedIn ? (
               <>
                 <SearchWidget />
@@ -388,7 +388,7 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-slate-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+            className="lg:hidden text-slate-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
             aria-label="Toggle menu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -404,7 +404,7 @@ export default function Header() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-[#1e2e56] border-t border-white/10 px-4 py-4 space-y-1">
+        <div className="lg:hidden bg-[#1e2e56] border-t border-white/10 px-4 py-4 space-y-1">
           {/* Mobile cart link */}
           <Link
             href="/addons"
