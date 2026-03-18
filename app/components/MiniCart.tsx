@@ -32,19 +32,28 @@ export default function MiniCart({ onClose }: MiniCartProps) {
 
       {items.length === 0 ? (
         /* Empty state */
-        <div className="px-4 py-10 text-center">
+        <div className="px-4 py-8 text-center">
           <svg className="w-10 h-10 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
           <p className="text-sm font-medium text-slate-400 mb-1">Your cart is empty</p>
-          <p className="text-xs text-slate-600 mb-4">Add designations and upgrades to get started.</p>
-          <Link
-            href="/addons"
-            onClick={onClose}
-            className="inline-block text-xs font-semibold text-[#2dd4bf] hover:underline"
-          >
-            Browse Add-Ons →
-          </Link>
+          <p className="text-xs text-slate-600 mb-5">Add designations and upgrades to get started.</p>
+          <div className="flex flex-col gap-2 px-2">
+            <Link
+              href="/cart"
+              onClick={onClose}
+              className="block w-full text-center py-2.5 rounded-lg border border-white/15 text-xs font-semibold text-slate-300 hover:text-white hover:border-white/30 transition-colors"
+            >
+              View Cart
+            </Link>
+            <Link
+              href="/addons"
+              onClick={onClose}
+              className="block w-full text-center py-2.5 rounded-lg bg-[#1e3a5f] text-xs font-semibold text-white hover:bg-[#2a4f7f] transition-colors"
+            >
+              Browse Add-Ons
+            </Link>
+          </div>
         </div>
       ) : (
         <>

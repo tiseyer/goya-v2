@@ -40,14 +40,17 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    if (typeof window === 'undefined') return [];
+  const [items, setItems] = useState<CartItem[]>([]);
+
+  // Load from localStorage after hydration (SSR-safe)
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('goya-cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch { return []; }
-  });
+      if (saved) setItems(JSON.parse(saved));
+    } catch { /* ignore */ }
+  }, []);
 
+  // Persist to localStorage on change
   useEffect(() => {
     localStorage.setItem('goya-cart', JSON.stringify(items));
   }, [items]);
