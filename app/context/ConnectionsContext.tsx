@@ -127,10 +127,10 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!supabaseUserId) return;
 
-    const channel = supabase
-      .channel(`notifications:${supabaseUserId}`)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const channel = (supabase.channel(`notifications:${supabaseUserId}`) as any)
       .on(
-        'postgres_changes' as Parameters<typeof channel.on>[0],
+        'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
