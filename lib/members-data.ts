@@ -5429,7 +5429,32 @@ export const members: Member[] = [
     credits: { CE: 82, Community: 146, Karma: 171, Practice: 1245 },
     social: { website: 'https://kaiamartin.com', instagram: '@kaia.martin' },
     memberSince: '2022',
-  }
+  },
+
+  // ── FEATURED TEACHER ─────────────────────────────────────────────────────────
+  {
+    id: 'juan-villegas',
+    name: 'Juan Villegas',
+    role: 'Teacher',
+    country: 'Colombia',
+    city: 'Medellín',
+    coordinates: [-75.5636, 6.2442],
+    bio: 'Juan is a Colombian yoga teacher and movement educator with over 15 years of practice spanning Ashtanga, Kundalini, and traditional Hatha lineages. Trained in Mysore and Rishikesh, he integrates ancestral wisdom with a modern understanding of the body. Based in Medellín, Juan leads teacher trainings, retreats, and community classes across Latin America.',
+    photo: 'https://randomuser.me/api/portraits/men/45.jpg',
+    designations: ['E-RYT 500', 'YACEP', 'GOYA Member', 'Prenatal Yoga Certified'],
+    teachingStyles: ['Ashtanga', 'Kundalini', 'Hatha', 'Yin Yoga'],
+    specialties: ['Teacher Training', 'Philosophy', 'Pranayama', 'Meditation', 'Latin American Yoga Community'],
+    credits: { CE: 310, Community: 180, Karma: 225, Practice: 3200 },
+    social: {
+      website: 'https://juanvillegas.yoga',
+      instagram: '@juan.villegas.yoga',
+      youtube: 'Juan Villegas Yoga',
+    },
+    memberSince: '2019',
+    featured: true,
+    is_verified: true,
+    introduction: 'Bridging ancestral wisdom and modern movement science.',
+  },
 ];
 
 export const allCountries = ['All', ...Array.from(new Set(members.map(m => m.country))).sort()];

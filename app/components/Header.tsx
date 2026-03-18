@@ -6,6 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useCart } from '@/app/context/CartContext';
 import MiniCart from './MiniCart';
+import { useConnections } from '@/app/context/ConnectionsContext';
+import type { NotifRecord } from '@/app/context/ConnectionsContext';
 
 // ─── config ───────────────────────────────────────────────────────────────────
 
@@ -124,41 +126,167 @@ function SearchWidget() {
   );
 }
 
-// ─── Messages ─────────────────────────────────────────────────────────────────
+// ─── Relative time helper ─────────────────────────────────────────────────────
+
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+// ─── Single notification item ─────────────────────────────────────────────────
+
+function NotifItem({ notif, onAccept, onDecline }: {
+  notif: NotifRecord;
+  onAccept: () => void;
+  onDecline: () => void;
+}) {
+  if (notif.type === 'connection_request') {
+    return (
+      <div className={`px-4 py-3 flex gap-3 items-start ${notif.read ? '' : 'bg-[#00B5A3]/5'}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={notif.fromPhoto} alt={notif.fromName} className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-slate-200" />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-[#374151] leading-snug mb-2">
+            <span className="font-semibold text-[#1B3A5C]">{notif.fromName}</span> wants to connect with you
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={onAccept}
+              className="flex-1 bg-[#00B5A3] text-white text-xs font-semibold py-1.5 rounded-lg hover:bg-[#009E8E] transition-colors"
+            >
+              Accept
+            </button>
+            <button
+              onClick={onDecline}
+              className="flex-1 border border-[#E5E7EB] text-[#6B7280] text-xs font-semibold py-1.5 rounded-lg hover:bg-slate-50 transition-colors"
+            >
+              Decline
+            </button>
+          </div>
+        </div>
+        <span className="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">{relativeTime(notif.createdAt)}</span>
+      </div>
+    );
+  }
+
+  if (notif.type === 'connection_accepted') {
+    return (
+      <div className="px-4 py-3 flex gap-3 items-start">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={notif.fromPhoto} alt={notif.fromName} className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-slate-200" />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-[#374151] leading-snug">
+            <span className="font-semibold text-[#1B3A5C]">{notif.fromName}</span>
+            {' '}accepted your connection request
+            {' '}<svg className="w-3.5 h-3.5 text-emerald-500 inline-block ml-0.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+          </p>
+        </div>
+        <span className="text-[10px] text-slate-400 shrink-0">{relativeTime(notif.createdAt)}</span>
+      </div>
+    );
+  }
+
+  if (notif.type === 'connection_declined') {
+    return (
+      <div className="px-4 py-3 flex gap-3 items-start">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={notif.fromPhoto} alt={notif.fromName} className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-slate-200" />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-[#374151] leading-snug">
+            <span className="font-semibold text-[#1B3A5C]">{notif.fromName}</span>
+            {' '}declined your connection request
+          </p>
+        </div>
+        <span className="text-[10px] text-slate-400 shrink-0">{relativeTime(notif.createdAt)}</span>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+// ─── Notifications / Messages widget ─────────────────────────────────────────
 
 function MessagesWidget() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { notifications, unreadCount, acceptRequest, declineRequest, markAllRead } = useConnections();
   useClickOutside(ref, () => setOpen(false));
+
+  function handleOpen() {
+    setOpen(o => !o);
+  }
 
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen(o => !o)}
-        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+        onClick={handleOpen}
+        className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
           open ? 'bg-[#00B5A3] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
         }`}
-        aria-label="Messages"
+        aria-label={`Notifications (${unreadCount} unread)`}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
       </button>
 
       {open && (
-        <Dropdown>
+        <div className="absolute right-0 top-full mt-2 z-50 w-[340px] bg-white border border-[#E5E7EB] rounded-xl shadow-xl overflow-hidden">
+          {/* Header */}
           <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between">
-            <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">Messages</p>
-            <span className="text-[10px] bg-slate-100 text-[#6B7280] px-2 py-0.5 rounded-full">0</span>
+            <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">
+              Notifications
+              {unreadCount > 0 && (
+                <span className="ml-2 bg-[#00B5A3] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                  {unreadCount} new
+                </span>
+              )}
+            </p>
+            {notifications.length > 0 && (
+              <button
+                onClick={markAllRead}
+                className="text-[10px] text-[#00B5A3] hover:text-[#009E8E] font-semibold transition-colors"
+              >
+                Mark all read
+              </button>
+            )}
           </div>
-          <div className="px-4 py-8 text-center">
-            <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0l-8 5-8-5" />
-            </svg>
-            <p className="text-sm text-[#6B7280] font-medium">No messages yet</p>
-            <p className="text-xs text-slate-400 mt-1">Your inbox is empty.</p>
+
+          {/* Notification list */}
+          <div className="max-h-96 overflow-y-auto divide-y divide-[#E5E7EB]">
+            {notifications.length === 0 ? (
+              <div className="px-4 py-8 text-center">
+                <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0l-8 5-8-5" />
+                </svg>
+                <p className="text-sm text-[#6B7280] font-medium">No notifications yet</p>
+                <p className="text-xs text-slate-400 mt-1">Connection requests will appear here.</p>
+              </div>
+            ) : (
+              notifications.map(notif => (
+                <NotifItem
+                  key={notif.id}
+                  notif={notif}
+                  onAccept={() => { acceptRequest(notif.connectionId, notif.fromSlug); }}
+                  onDecline={() => { declineRequest(notif.connectionId, notif.fromSlug); }}
+                />
+              ))
+            )}
           </div>
-        </Dropdown>
+        </div>
       )}
     </div>
   );

@@ -114,3 +114,63 @@ create policy "avatars_auth_insert" on storage.objects
 
 create policy "avatars_auth_update" on storage.objects
   for update using (bucket_id = 'avatars' and auth.uid() = owner);
+
+-- ── Connections ───────────────────────────────────────────────────────────────
+
+create table if not exists public.connections (
+  id uuid primary key default gen_random_uuid(),
+  requester_id uuid not null references public.profiles(user_id) on delete cascade,
+  receiver_id uuid not null references public.profiles(user_id) on delete cascade,
+  status text not null check (status in ('pending', 'accepted', 'declined')) default 'pending',
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  unique(requester_id, receiver_id)
+);
+
+drop trigger if exists connections_set_updated_at on public.connections;
+create trigger connections_set_updated_at
+before update on public.connections
+for each row execute procedure public.set_updated_at();
+
+alter table public.connections enable row level security;
+
+-- Users can see any connection they are part of
+create policy "connections_select_participant" on public.connections
+  for select using (auth.uid() = requester_id or auth.uid() = receiver_id);
+
+-- Only the requester can insert
+create policy "connections_insert_requester" on public.connections
+  for insert with check (auth.uid() = requester_id);
+
+-- Either participant can update (accept / decline)
+create policy "connections_update_participant" on public.connections
+  for update using (auth.uid() = requester_id or auth.uid() = receiver_id);
+
+-- ── Notifications ─────────────────────────────────────────────────────────────
+
+create table if not exists public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(user_id) on delete cascade,
+  type text not null check (type in ('connection_request', 'connection_accepted', 'connection_declined')),
+  from_user_id uuid not null references public.profiles(user_id) on delete cascade,
+  connection_id uuid references public.connections(id) on delete cascade,
+  read boolean not null default false,
+  created_at timestamptz default now()
+);
+
+alter table public.notifications enable row level security;
+
+-- Users can only read their own notifications
+create policy "notifications_select_own" on public.notifications
+  for select using (auth.uid() = user_id);
+
+-- Server-side inserts only (service role); authenticated users cannot self-insert
+create policy "notifications_insert_service" on public.notifications
+  for insert with check (false);
+
+-- Users can mark their own notifications as read
+create policy "notifications_update_own" on public.notifications
+  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Enable Realtime for notifications table
+alter publication supabase_realtime add table public.notifications;
