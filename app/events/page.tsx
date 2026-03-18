@@ -64,13 +64,10 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-[#1a2744] pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -right-20 top-0 w-96 h-96 bg-[#2dd4bf] opacity-[0.04] rounded-full blur-3xl" />
-        </div>
+      <div className="bg-[#F7F8FA] pt-20 pb-8 px-4 sm:px-6 lg:px-8 border-b border-[#E5E7EB]">
         <div className="relative max-w-7xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">Events</h1>
-          <p className="text-slate-300 text-lg max-w-2xl">
+          <h1 className="text-4xl sm:text-5xl font-bold text-[#1B3A5C] mb-4">Events</h1>
+          <p className="text-[#6B7280] text-lg max-w-2xl">
             Workshops, teacher trainings, dharma talks, and conferences from the global GOYA community.
           </p>
         </div>
@@ -89,7 +86,7 @@ export default function EventsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
-                <span className="text-sm font-semibold text-[#1a2744]">
+                <span className="text-sm font-semibold text-[#1B3A5C]">
                   {MONTHS[calMonth]} {calYear}
                 </span>
                 <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors text-slate-500">
@@ -118,11 +115,11 @@ export default function EventsPage() {
                       key={day}
                       onClick={() => setSelectedDate(isSelected ? null : iso)}
                       className={`relative flex flex-col items-center justify-center h-8 w-full rounded-lg text-xs font-medium transition-colors
-                        ${isSelected ? 'bg-[#1a2744] text-white' : isToday ? 'bg-[#2dd4bf]/15 text-[#0e9f8a]' : hasEvent ? 'hover:bg-slate-100 text-slate-700' : 'text-slate-400 cursor-default'}`}
+                        ${isSelected ? 'bg-[#1B3A5C] text-white' : isToday ? 'bg-[#00B5A3]/15 text-[#009E8E]' : hasEvent ? 'hover:bg-slate-100 text-slate-700' : 'text-slate-400 cursor-default'}`}
                     >
                       {day}
                       {hasEvent && !isSelected && (
-                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#2dd4bf]" />
+                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#00B5A3]" />
                       )}
                     </button>
                   );
@@ -131,7 +128,7 @@ export default function EventsPage() {
               {selectedDate && (
                 <button
                   onClick={() => setSelectedDate(null)}
-                  className="mt-3 w-full text-xs text-[#2dd4bf] hover:text-[#14b8a6] font-semibold text-center transition-colors"
+                  className="mt-3 w-full text-xs text-[#00B5A3] hover:text-[#009E8E] font-semibold text-center transition-colors"
                 >
                   Clear date filter
                 </button>
@@ -148,7 +145,7 @@ export default function EventsPage() {
                     onClick={() => setCategoryFilter(cat)}
                     className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       categoryFilter === cat
-                        ? 'bg-[#1a2744] text-white'
+                        ? 'bg-[#1B3A5C] text-white'
                         : 'text-slate-600 hover:bg-slate-100'
                     }`}
                   >
@@ -191,9 +188,9 @@ export default function EventsPage() {
                       className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col sm:flex-row"
                     >
                       {/* Date block */}
-                      <div className="bg-[#1a2744] text-white flex flex-row sm:flex-col items-center justify-center sm:justify-start gap-3 sm:gap-0 px-5 py-4 sm:py-6 sm:w-20 shrink-0 sm:text-center">
+                      <div className="bg-[#1B3A5C] text-white flex flex-row sm:flex-col items-center justify-center sm:justify-start gap-3 sm:gap-0 px-5 py-4 sm:py-6 sm:w-20 shrink-0 sm:text-center">
                         <div className="text-2xl font-bold leading-none">{event.date.split('-')[2]}</div>
-                        <div className="text-[10px] font-semibold uppercase tracking-widest text-[#2dd4bf]">
+                        <div className="text-[10px] font-semibold uppercase tracking-widest text-[#00B5A3]">
                           {MONTHS[parseInt(event.date.split('-')[1]) - 1].slice(0, 3)}
                         </div>
                       </div>
@@ -209,7 +206,7 @@ export default function EventsPage() {
                               <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Online</span>
                             )}
                           </div>
-                          <h3 className="font-semibold text-[#1a2744] text-base mb-1">{event.title}</h3>
+                          <h3 className="font-semibold text-[#1B3A5C] text-base mb-1">{event.title}</h3>
                           <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 mb-2">{event.description}</p>
                           <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
                             <span className="flex items-center gap-1">
@@ -238,10 +235,10 @@ export default function EventsPage() {
                             {event.price === 'Free' ? (
                               <span className="text-emerald-600 font-bold text-sm">Free</span>
                             ) : (
-                              <span className="text-[#1a2744] font-bold text-lg">${event.price}</span>
+                              <span className="text-[#1B3A5C] font-bold text-lg">${event.price}</span>
                             )}
                           </div>
-                          <Link href={`/events/${event.id}`} className="bg-[#2dd4bf] text-[#1a2744] px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#14b8a6] transition-colors whitespace-nowrap">
+                          <Link href={`/events/${event.id}`} className="bg-[#00B5A3] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#009E8E] transition-colors whitespace-nowrap">
                             Learn More →
                           </Link>
                         </div>

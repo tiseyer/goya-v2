@@ -44,27 +44,27 @@ export default function Home() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-[#1a2744] min-h-[90vh] flex items-center relative overflow-hidden">
+      <section className="bg-[#F7F8FA] min-h-[90vh] flex items-center relative overflow-hidden">
         {/* Background blobs */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-[#2dd4bf] opacity-[0.04] rounded-full blur-3xl translate-x-1/3" />
-          <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-[#2dd4bf] opacity-[0.04] rounded-full blur-3xl translate-y-1/3" />
+          <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-[#00B5A3] opacity-[0.06] rounded-full blur-3xl translate-x-1/3" />
+          <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-[#00B5A3] opacity-[0.04] rounded-full blur-3xl translate-y-1/3" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-[#2dd4bf]/10 border border-[#2dd4bf]/20 rounded-full px-4 py-1.5 text-[#2dd4bf] text-sm font-medium mb-8">
-              <span className="w-2 h-2 bg-[#2dd4bf] rounded-full animate-pulse" />
+            <div className="inline-flex items-center gap-2 bg-[#00B5A3]/10 border border-[#00B5A3]/20 rounded-full px-4 py-1.5 text-[#00B5A3] text-sm font-medium mb-8">
+              <span className="w-2 h-2 bg-[#00B5A3] rounded-full animate-pulse" />
               Global Yoga Community Platform
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1B3A5C] leading-[1.05] mb-6">
               Connect. Grow.
               <br />
-              <span className="text-[#2dd4bf]">Practice Together.</span>
+              <span className="text-[#00B5A3]">Practice Together.</span>
             </h1>
 
-            <p className="text-slate-300 text-lg sm:text-xl leading-relaxed mb-10 max-w-2xl">
+            <p className="text-[#6B7280] text-lg sm:text-xl leading-relaxed mb-10 max-w-2xl">
               GOYA brings together yoga teachers, students, schools, and wellness practitioners
               from around the world. Discover community, track your practice, and grow your credentials.
             </p>
@@ -72,7 +72,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/members"
-                className="bg-[#2dd4bf] text-[#1a2744] px-8 py-4 rounded-xl text-base font-semibold hover:bg-[#14b8a6] transition-colors inline-flex items-center gap-2"
+                className="bg-[#00B5A3] text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-[#009E8E] transition-colors inline-flex items-center gap-2"
               >
                 Explore Members
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/register"
-                className="border border-white/20 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-white/10 transition-colors"
+                className="border border-[#E5E7EB] text-[#374151] px-8 py-4 rounded-xl text-base font-semibold hover:bg-white hover:border-slate-300 transition-colors"
               >
                 Join for Free
               </Link>
@@ -91,13 +91,13 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      <section className="bg-[#1e2e56] py-14 border-y border-white/5">
+      <section className="bg-white py-14 border-y border-[#E5E7EB]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map(stat => (
               <div key={stat.label} className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-[#2dd4bf] mb-1.5">{stat.value}</div>
-                <div className="text-slate-400 text-sm">{stat.label}</div>
+                <div className="text-3xl sm:text-4xl font-bold text-[#00B5A3] mb-1.5">{stat.value}</div>
+                <div className="text-[#6B7280] text-sm">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -108,22 +108,22 @@ export default function Home() {
       <section className="bg-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a2744] mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1B3A5C] mb-4">
               Everything your practice needs
             </h2>
-            <p className="text-slate-500 text-lg max-w-2xl mx-auto">
+            <p className="text-[#6B7280] text-lg max-w-2xl mx-auto">
               A modern platform built for the global yoga community — no matter where you are on your journey.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map(feature => (
-              <div key={feature.title} className="group p-8 rounded-2xl border border-slate-100 hover:border-[#2dd4bf]/30 hover:shadow-lg transition-all duration-200">
-                <div className="w-12 h-12 bg-[#2dd4bf]/10 rounded-xl flex items-center justify-center text-[#2dd4bf] mb-6 group-hover:bg-[#2dd4bf] group-hover:text-white transition-colors">
+              <div key={feature.title} className="group p-8 rounded-2xl border border-slate-100 hover:border-[#00B5A3]/30 hover:shadow-lg transition-all duration-200">
+                <div className="w-12 h-12 bg-[#00B5A3]/10 rounded-xl flex items-center justify-center text-[#00B5A3] mb-6 group-hover:bg-[#00B5A3] group-hover:text-white transition-colors">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-[#1a2744] mb-3">{feature.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-semibold text-[#1B3A5C] mb-3">{feature.title}</h3>
+                <p className="text-[#6B7280] text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -131,16 +131,16 @@ export default function Home() {
       </section>
 
       {/* Featured Members */}
-      <section className="bg-slate-50 py-24">
+      <section className="bg-[#F7F8FA] py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-12">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#1a2744] mb-3">Featured Members</h2>
-              <p className="text-slate-500">Inspiring practitioners from our global community.</p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-[#1B3A5C] mb-3">Featured Members</h2>
+              <p className="text-[#6B7280]">Inspiring practitioners from our global community.</p>
             </div>
             <Link
               href="/members"
-              className="hidden sm:inline-flex items-center gap-1.5 text-[#2dd4bf] hover:text-[#14b8a6] text-sm font-semibold transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 text-[#00B5A3] hover:text-[#009E8E] text-sm font-semibold transition-colors"
             >
               View all members
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,7 +154,7 @@ export default function Home() {
               <Link
                 key={member.id}
                 href={`/members/${member.id}`}
-                className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg border border-slate-100 hover:border-[#2dd4bf]/20 transition-all duration-200"
+                className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg border border-slate-100 hover:border-[#00B5A3]/20 transition-all duration-200"
               >
                 <div className="flex items-center gap-4 mb-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -164,7 +164,7 @@ export default function Home() {
                     className="w-14 h-14 rounded-full object-cover ring-2 ring-slate-100"
                   />
                   <div>
-                    <h3 className="font-semibold text-slate-900 group-hover:text-[#1a2744] transition-colors">
+                    <h3 className="font-semibold text-slate-900 group-hover:text-[#1B3A5C] transition-colors">
                       {member.name}
                     </h3>
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -176,10 +176,10 @@ export default function Home() {
                     </span>
                   </div>
                 </div>
-                <p className="text-slate-500 text-sm leading-relaxed line-clamp-2 mb-4">{member.bio}</p>
+                <p className="text-[#6B7280] text-sm leading-relaxed line-clamp-2 mb-4">{member.bio}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-400">{member.city}, {member.country}</span>
-                  <span className="text-xs font-medium text-[#2dd4bf] group-hover:text-[#14b8a6] flex items-center gap-1 transition-colors">
+                  <span className="text-xs font-medium text-[#00B5A3] group-hover:text-[#009E8E] flex items-center gap-1 transition-colors">
                     View
                     <svg className="w-3 h-3 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -193,7 +193,7 @@ export default function Home() {
           <div className="text-center mt-10 sm:hidden">
             <Link
               href="/members"
-              className="inline-flex items-center gap-1.5 text-[#2dd4bf] hover:text-[#14b8a6] text-sm font-semibold transition-colors"
+              className="inline-flex items-center gap-1.5 text-[#00B5A3] hover:text-[#009E8E] text-sm font-semibold transition-colors"
             >
               View all members
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,7 +205,7 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#1a2744] py-20">
+      <section className="bg-[#1B3A5C] py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to join the community?</h2>
           <p className="text-slate-300 text-lg mb-10 max-w-xl mx-auto">
@@ -213,7 +213,7 @@ export default function Home() {
           </p>
           <Link
             href="/register"
-            className="bg-[#2dd4bf] text-[#1a2744] px-10 py-4 rounded-xl text-base font-semibold hover:bg-[#14b8a6] transition-colors inline-flex items-center gap-2"
+            className="bg-[#00B5A3] text-white px-10 py-4 rounded-xl text-base font-semibold hover:bg-[#009E8E] transition-colors inline-flex items-center gap-2"
           >
             Get Started — It&apos;s Free
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

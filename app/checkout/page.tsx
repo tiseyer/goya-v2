@@ -162,20 +162,20 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header band */}
-      <div className="bg-[#1e3a5f] pt-10 pb-8 px-4 sm:px-6 lg:px-8">
+      <div className="bg-[#F7F8FA] pt-20 pb-8 px-4 sm:px-6 lg:px-8 border-b border-[#E5E7EB]">
         <div className="max-w-7xl mx-auto">
-          <nav className="flex items-center gap-2 text-xs text-slate-400 mb-4">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <nav className="flex items-center gap-2 text-xs text-[#6B7280] mb-4">
+            <Link href="/" className="hover:text-[#1B3A5C] transition-colors">Home</Link>
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            <Link href="/cart" className="hover:text-white transition-colors">Cart</Link>
+            <Link href="/cart" className="hover:text-[#1B3A5C] transition-colors">Cart</Link>
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            <span className="text-slate-300">Checkout</span>
+            <span className="text-[#374151]">Checkout</span>
           </nav>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Checkout</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#1B3A5C]">Checkout</h1>
         </div>
       </div>
 

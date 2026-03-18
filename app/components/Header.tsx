@@ -43,7 +43,7 @@ function useClickOutside(ref: React.RefObject<HTMLElement | null>, cb: () => voi
 
 function Dropdown({ children }: { children: React.ReactNode }) {
   return (
-    <div className="absolute right-0 top-full mt-2 z-50 min-w-[220px] bg-[#1e2e56] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+    <div className="absolute right-0 top-full mt-2 z-50 min-w-[220px] bg-white border border-[#E5E7EB] rounded-xl shadow-xl overflow-hidden">
       {children}
     </div>
   );
@@ -76,7 +76,7 @@ function SearchWidget() {
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Search GOYA…"
-          className="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-1.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#2dd4bf] focus:ring-1 focus:ring-[#2dd4bf]/40 mr-2"
+          className="w-full bg-slate-50 border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-sm text-[#1B3A5C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#00B5A3] focus:ring-1 focus:ring-[#00B5A3]/40 mr-2"
         />
       </div>
 
@@ -84,7 +84,7 @@ function SearchWidget() {
       <button
         onClick={toggle}
         className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-          open ? 'bg-[#2dd4bf] text-[#1a2744]' : 'text-slate-300 hover:text-white hover:bg-white/10'
+          open ? 'bg-[#00B5A3] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
         }`}
         aria-label="Search"
       >
@@ -102,19 +102,19 @@ function SearchWidget() {
       {/* Results dropdown */}
       {open && (
         <Dropdown>
-          <div className="px-4 py-3 border-b border-white/8">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Search</p>
+          <div className="px-4 py-3 border-b border-[#E5E7EB]">
+            <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">Search</p>
           </div>
           <div className="px-4 py-6 text-center">
             {query.trim() === '' ? (
-              <p className="text-sm text-slate-500">Start typing to search…</p>
+              <p className="text-sm text-[#6B7280]">Start typing to search…</p>
             ) : (
               <>
-                <svg className="w-8 h-8 text-slate-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <p className="text-sm text-slate-400 font-medium">No results yet</p>
-                <p className="text-xs text-slate-600 mt-1">Search is coming soon.</p>
+                <p className="text-sm text-[#6B7280] font-medium">No results yet</p>
+                <p className="text-xs text-slate-400 mt-1">Search is coming soon.</p>
               </>
             )}
           </div>
@@ -136,7 +136,7 @@ function MessagesWidget() {
       <button
         onClick={() => setOpen(o => !o)}
         className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-          open ? 'bg-[#2dd4bf] text-[#1a2744]' : 'text-slate-300 hover:text-white hover:bg-white/10'
+          open ? 'bg-[#00B5A3] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
         }`}
         aria-label="Messages"
       >
@@ -147,16 +147,16 @@ function MessagesWidget() {
 
       {open && (
         <Dropdown>
-          <div className="px-4 py-3 border-b border-white/8 flex items-center justify-between">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Messages</p>
-            <span className="text-[10px] bg-white/10 text-slate-400 px-2 py-0.5 rounded-full">0</span>
+          <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between">
+            <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">Messages</p>
+            <span className="text-[10px] bg-slate-100 text-[#6B7280] px-2 py-0.5 rounded-full">0</span>
           </div>
           <div className="px-4 py-8 text-center">
-            <svg className="w-8 h-8 text-slate-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0l-8 5-8-5" />
             </svg>
-            <p className="text-sm text-slate-400 font-medium">No messages yet</p>
-            <p className="text-xs text-slate-600 mt-1">Your inbox is empty.</p>
+            <p className="text-sm text-[#6B7280] font-medium">No messages yet</p>
+            <p className="text-xs text-slate-400 mt-1">Your inbox is empty.</p>
           </div>
         </Dropdown>
       )}
@@ -183,16 +183,16 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
       <button
         onClick={() => setOpen(o => !o)}
         className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-colors ${
-          open ? 'bg-white/10' : 'hover:bg-white/10'
+          open ? 'bg-slate-100' : 'hover:bg-slate-100'
         }`}
         aria-label="User menu"
       >
         {/* Avatar */}
-        <div className="w-7 h-7 rounded-full bg-[#2dd4bf] flex items-center justify-center shrink-0">
-          <span className="text-[#1a2744] text-[10px] font-black">{userInitials}</span>
+        <div className="w-7 h-7 rounded-full bg-[#00B5A3] flex items-center justify-center shrink-0">
+          <span className="text-white text-[10px] font-black">{userInitials}</span>
         </div>
-        <span className="text-sm font-medium text-slate-200 hidden lg:block">{userName}</span>
-        <svg className={`w-3.5 h-3.5 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <span className="text-sm font-medium text-[#1B3A5C] hidden lg:block">{userName}</span>
+        <svg className={`w-3.5 h-3.5 text-[#6B7280] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
@@ -200,13 +200,13 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
       {open && (
         <Dropdown>
           {/* User header */}
-          <div className="px-4 py-4 border-b border-white/8 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#2dd4bf] flex items-center justify-center shrink-0">
-              <span className="text-[#1a2744] text-xs font-black">{userInitials}</span>
+          <div className="px-4 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#00B5A3] flex items-center justify-center shrink-0">
+              <span className="text-white text-xs font-black">{userInitials}</span>
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">{userName}</p>
-              {userMrn && <p className="text-[11px] text-slate-400">MRN: {userMrn}</p>}
+              <p className="text-sm font-semibold text-[#1B3A5C]">{userName}</p>
+              {userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>}
             </div>
           </div>
 
@@ -217,9 +217,9 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
                 key={item.label}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/8 transition-colors"
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
               >
-                <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={item.icon} />
                 </svg>
                 {item.label}
@@ -229,13 +229,13 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
 
           {/* Admin Settings */}
           {(userRole === 'admin' || userRole === 'moderator') && (
-            <div className="border-t border-white/8 py-1.5">
+            <div className="border-t border-[#E5E7EB] py-1.5">
               <Link
                 href="/admin"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/8 transition-colors"
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
               >
-                <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -245,10 +245,10 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
           )}
 
           {/* Logout */}
-          <div className="border-t border-white/8 py-1.5">
+          <div className="border-t border-[#E5E7EB] py-1.5">
             <button
               onClick={() => { setOpen(false); onLogout(); }}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/8 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
             >
               <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -270,7 +270,7 @@ function MobileCartLink({ onClose }: { onClose: () => void }) {
     <Link
       href="/cart"
       onClick={onClose}
-      className="flex items-center justify-between px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors"
+      className="flex items-center justify-between px-4 py-2.5 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm font-medium transition-colors"
     >
       <span className="flex items-center gap-2">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -307,7 +307,7 @@ function CartWidget() {
       <button
         onClick={() => setOpen(o => !o)}
         className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-          open ? 'bg-[#2dd4bf] text-[#1a2744]' : 'text-slate-300 hover:text-white hover:bg-white/10'
+          open ? 'bg-[#00B5A3] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
         }`}
         aria-label={`Cart (${itemCount} items)`}
       >
@@ -367,14 +367,14 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#1a2744] shadow-lg">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E7EB] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
 
           {/* Logo */}
           <Link href="/" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/GOYA Logo White.png" alt="GOYA" style={{ width: '120px', height: 'auto' }} />
+            <img src="/images/GOYA Logo Black.png" alt="GOYA" style={{ width: '120px', height: 'auto' }} />
           </Link>
 
           {/* Desktop nav */}
@@ -385,8 +385,8 @@ export default function Header() {
                 href={href}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                   pathname === href
-                    ? 'text-white bg-white/10'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'text-[#1B3A5C] bg-slate-100'
+                    : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
                 }`}
               >
                 {label}
@@ -401,16 +401,16 @@ export default function Header() {
                 <SearchWidget />
                 <MessagesWidget />
                 <CartWidget />
-                <div className="w-px h-5 bg-white/15 mx-1" />
+                <div className="w-px h-5 bg-[#E5E7EB] mx-1" />
                 <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} onLogout={handleLogout} />
               </>
             ) : (
               <>
                 <CartWidget />
-                <Link href="/sign-in" className="text-slate-300 hover:text-white text-sm font-medium transition-colors px-3 py-2">
+                <Link href="/sign-in" className="text-[#374151] hover:text-[#1B3A5C] text-sm font-medium transition-colors px-3 py-2">
                   Sign In
                 </Link>
-                <Link href="/register" className="bg-[#2dd4bf] text-[#1a2744] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#14b8a6] transition-colors">
+                <Link href="/register" className="bg-[#00B5A3] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#009E8E] transition-colors">
                   Join GOYA
                 </Link>
               </>
@@ -420,7 +420,7 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="lg:hidden text-slate-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+            className="lg:hidden text-[#374151] hover:text-[#1B3A5C] p-2 rounded-lg hover:bg-slate-100 transition-colors"
             aria-label="Toggle menu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -436,7 +436,7 @@ export default function Header() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="lg:hidden bg-[#1e2e56] border-t border-white/10 px-4 py-4 space-y-1">
+        <div className="lg:hidden bg-white border-t border-[#E5E7EB] px-4 py-4 space-y-1">
           {/* Mobile cart link */}
           <MobileCartLink onClose={() => setMenuOpen(false)} />
           {NAV_LINKS.map(({ href, label }) => (
@@ -444,20 +444,20 @@ export default function Header() {
               key={label}
               href={href}
               onClick={() => setMenuOpen(false)}
-              className="block px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors"
+              className="block px-4 py-2.5 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm font-medium transition-colors"
             >
               {label}
             </Link>
           ))}
           {isLoggedIn ? (
-            <div className="pt-3 mt-3 border-t border-white/10 space-y-1">
+            <div className="pt-3 mt-3 border-t border-[#E5E7EB] space-y-1">
               <div className="flex items-center gap-3 px-4 py-2">
-                <div className="w-8 h-8 rounded-full bg-[#2dd4bf] flex items-center justify-center">
-                  <span className="text-[#1a2744] text-xs font-black">{userInitials}</span>
+                <div className="w-8 h-8 rounded-full bg-[#00B5A3] flex items-center justify-center">
+                  <span className="text-white text-xs font-black">{userInitials}</span>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">{userName}</p>
-                  {userMrn && <p className="text-[11px] text-slate-400">MRN: {userMrn}</p>}
+                  <p className="text-sm font-semibold text-[#1B3A5C]">{userName}</p>
+                  {userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>}
                 </div>
               </div>
               {[
@@ -467,26 +467,26 @@ export default function Header() {
                 { label: 'Messages', href: '#' },
               ].map(item => (
                 <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-sm transition-colors"
+                  className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                 >
                   {item.label}
                 </Link>
               ))}
               {(profile?.role === 'admin' || profile?.role === 'moderator') && (
                 <Link href="/admin" onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-sm transition-colors"
+                  className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                 >
                   Admin Settings
                 </Link>
               )}
-              <button onClick={handleLogout} className="w-full text-left px-4 py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 text-sm transition-colors">
+              <button onClick={handleLogout} className="w-full text-left px-4 py-2 rounded-lg text-rose-500 hover:bg-rose-50 text-sm transition-colors">
                 Logout
               </button>
             </div>
           ) : (
-            <div className="pt-3 mt-3 border-t border-white/10 flex flex-col gap-2">
-              <Link href="/sign-in" className="block px-4 py-2.5 text-slate-300 hover:text-white text-sm font-medium">Sign In</Link>
-              <Link href="/register" className="block bg-[#2dd4bf] text-[#1a2744] px-4 py-2.5 rounded-lg text-sm font-semibold text-center hover:bg-[#14b8a6] transition-colors">Join GOYA</Link>
+            <div className="pt-3 mt-3 border-t border-[#E5E7EB] flex flex-col gap-2">
+              <Link href="/sign-in" className="block px-4 py-2.5 text-[#374151] hover:text-[#1B3A5C] text-sm font-medium">Sign In</Link>
+              <Link href="/register" className="block bg-[#00B5A3] text-white px-4 py-2.5 rounded-lg text-sm font-semibold text-center hover:bg-[#009E8E] transition-colors">Join GOYA</Link>
             </div>
           )}
         </div>

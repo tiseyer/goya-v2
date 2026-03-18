@@ -57,7 +57,7 @@ function MultiSelect({
         onClick={() => setOpen(o => !o)}
         className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg border transition-colors ${
           value.length > 0
-            ? 'border-[#2dd4bf] bg-[#2dd4bf]/5 text-[#0e9f8a] font-semibold'
+            ? 'border-[#00B5A3] bg-[#00B5A3]/5 text-[#009E8E] font-semibold'
             : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
         }`}
       >
@@ -83,7 +83,7 @@ function MultiSelect({
                 type="checkbox"
                 checked={value.includes(opt)}
                 onChange={() => toggle(opt)}
-                className="accent-[#2dd4bf] w-3.5 h-3.5"
+                className="accent-[#00B5A3] w-3.5 h-3.5"
               />
               <span className="truncate">{opt}</span>
             </label>
@@ -128,7 +128,7 @@ function CompactCard({
       onClick={() => onSelect(member.id)}
       className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-colors border-l-2 ${
         highlighted
-          ? 'bg-[#2dd4bf]/8 border-l-[#2dd4bf]'
+          ? 'bg-[#00B5A3]/8 border-l-[#00B5A3]'
           : 'border-l-transparent hover:bg-slate-50'
       }`}
     >
@@ -144,7 +144,7 @@ function CompactCard({
             {member.name}
           </span>
           {member.featured && (
-            <svg className="w-3 h-3 text-[#2dd4bf] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-3 h-3 text-[#00B5A3] shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
           )}
@@ -186,7 +186,7 @@ function FullCard({
       ref={ref}
       className={`group relative bg-white rounded-2xl border overflow-hidden flex flex-col transition-all duration-200 ${
         highlighted
-          ? 'border-[#2dd4bf] shadow-lg shadow-[#2dd4bf]/10 ring-1 ring-[#2dd4bf]'
+          ? 'border-[#00B5A3] shadow-lg shadow-[#00B5A3]/10 ring-1 ring-[#00B5A3]'
           : 'border-slate-100 shadow-sm hover:shadow-lg'
       }`}
     >
@@ -202,8 +202,8 @@ function FullCard({
               className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100"
             />
             {member.featured && (
-              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#2dd4bf] rounded-full flex items-center justify-center ring-1 ring-white">
-                <svg className="w-2.5 h-2.5 text-[#1a2744]" fill="currentColor" viewBox="0 0 20 20">
+              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#00B5A3] rounded-full flex items-center justify-center ring-1 ring-white">
+                <svg className="w-2.5 h-2.5 text-[#1B3A5C]" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
               </div>
@@ -221,7 +221,7 @@ function FullCard({
           </div>
           <button
             onClick={() => onSelect(member.id)}
-            className="shrink-0 w-7 h-7 rounded-lg bg-slate-100 hover:bg-[#2dd4bf]/10 flex items-center justify-center text-slate-400 hover:text-[#2dd4bf] transition-colors"
+            className="shrink-0 w-7 h-7 rounded-lg bg-slate-100 hover:bg-[#00B5A3]/10 flex items-center justify-center text-slate-400 hover:text-[#00B5A3] transition-colors"
             title="Show on map"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,7 +261,7 @@ function FullCard({
           <span className="text-[10px] text-slate-400">Since {member.memberSince}</span>
           <Link
             href={`/members/${member.id}`}
-            className="text-[11px] font-semibold text-[#2dd4bf] hover:text-[#14b8a6] flex items-center gap-0.5 transition-colors"
+            className="text-[11px] font-semibold text-[#00B5A3] hover:text-[#009E8E] flex items-center gap-0.5 transition-colors"
           >
             View Profile
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,9 +319,9 @@ export default function MembersPage() {
   const MobileLayout = (
     <div className="lg:hidden">
       {/* Mobile hero */}
-      <div className="bg-[#1a2744] pt-24 pb-10 px-4 sm:px-6">
-        <h1 className="text-3xl font-bold text-white mb-2">Member Directory</h1>
-        <p className="text-slate-300 text-sm">Yoga practitioners worldwide.</p>
+      <div className="bg-[#F7F8FA] pt-24 pb-6 px-4 sm:px-6 border-b border-[#E5E7EB]">
+        <h1 className="text-3xl font-bold text-[#1B3A5C] mb-2">Member Directory</h1>
+        <p className="text-[#6B7280] text-sm">Yoga practitioners worldwide.</p>
       </div>
       {/* Mobile filters */}
       <div className="bg-white border-b border-slate-200 px-4 py-3 space-y-2">
@@ -332,14 +332,14 @@ export default function MembersPage() {
           <input
             type="text" placeholder="Search members..." value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2dd4bf]/40"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/40"
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
           {ROLES.map(role => (
             <button key={role} onClick={() => setRoleFilter(role)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                roleFilter === role ? 'bg-[#1a2744] text-white border-[#1a2744]' : 'bg-white text-slate-600 border-slate-200'
+                roleFilter === role ? 'bg-[#1B3A5C] text-white border-[#1B3A5C]' : 'bg-white text-slate-600 border-slate-200'
               }`}
             >
               {role === 'All' ? 'All' : role}
@@ -367,12 +367,12 @@ export default function MembersPage() {
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 bg-white border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-3">
-          <h1 className="text-lg font-bold text-[#1a2744]">Member Directory</h1>
+          <h1 className="text-lg font-bold text-[#1B3A5C]">Member Directory</h1>
           <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
             {filtered.length} / {members.length}
           </span>
           {hasFilters && (
-            <button onClick={clearFilters} className="text-xs text-[#2dd4bf] hover:text-[#14b8a6] font-semibold flex items-center gap-1 transition-colors">
+            <button onClick={clearFilters} className="text-xs text-[#00B5A3] hover:text-[#009E8E] font-semibold flex items-center gap-1 transition-colors">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -384,7 +384,7 @@ export default function MembersPage() {
           onClick={() => setMapOpen(o => !o)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
             mapOpen
-              ? 'bg-[#1a2744] text-white shadow-md'
+              ? 'bg-[#1B3A5C] text-white shadow-md'
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >
@@ -409,7 +409,7 @@ export default function MembersPage() {
               <input
                 type="text" placeholder="Search..." value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2dd4bf]/40 focus:border-[#2dd4bf]"
+                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/40 focus:border-[#00B5A3]"
               />
             </div>
 
@@ -419,7 +419,7 @@ export default function MembersPage() {
                 <button key={role} onClick={() => setRoleFilter(role)}
                   className={`px-2 py-1 rounded-full text-[10px] font-semibold transition-all border ${
                     roleFilter === role
-                      ? 'bg-[#1a2744] text-white border-[#1a2744]'
+                      ? 'bg-[#1B3A5C] text-white border-[#1B3A5C]'
                       : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -431,7 +431,7 @@ export default function MembersPage() {
             {/* Country */}
             <select
               value={countryFilter} onChange={e => setCountryFilter(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2dd4bf]/40 bg-white text-slate-700"
+              className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/40 bg-white text-slate-700"
             >
               {allCountries.map(c => (
                 <option key={c} value={c}>{c === 'All' ? 'All Countries' : c}</option>
@@ -481,7 +481,7 @@ export default function MembersPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <p className="font-medium text-sm">No members found</p>
-                <button onClick={clearFilters} className="mt-2 text-xs text-[#2dd4bf] hover:underline">Clear filters</button>
+                <button onClick={clearFilters} className="mt-2 text-xs text-[#00B5A3] hover:underline">Clear filters</button>
               </div>
             ) : (
               <div className="grid gap-4 grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3">

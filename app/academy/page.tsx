@@ -45,16 +45,13 @@ export default function AcademyPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="bg-[#1a2744] pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -right-20 top-0 w-96 h-96 bg-[#2dd4bf] opacity-[0.04] rounded-full blur-3xl" />
-        </div>
+      <div className="bg-[#F7F8FA] pt-20 pb-8 px-4 sm:px-6 lg:px-8 border-b border-[#E5E7EB]">
         <div className="relative max-w-7xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-[#2dd4bf]/10 border border-[#2dd4bf]/20 rounded-full px-3 py-1 text-[#2dd4bf] text-xs font-medium mb-5">
+          <div className="inline-flex items-center gap-2 bg-[#00B5A3]/10 border border-[#00B5A3]/20 rounded-full px-3 py-1 text-[#00B5A3] text-xs font-medium mb-5">
             GOYA Academy
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">Course Library</h1>
-          <p className="text-slate-300 text-lg max-w-2xl">
+          <h1 className="text-4xl sm:text-5xl font-bold text-[#1B3A5C] mb-4">Course Library</h1>
+          <p className="text-[#6B7280] text-lg max-w-2xl">
             Workshops, sequences, dharma talks, and research — curated for the serious yoga practitioner.
           </p>
         </div>
@@ -69,7 +66,7 @@ export default function AcademyPage() {
               onClick={() => setActiveFilter(cat)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                 activeFilter === cat
-                  ? 'bg-[#1a2744] text-white border-[#1a2744]'
+                  ? 'bg-[#1B3A5C] text-white border-[#1B3A5C]'
                   : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
               }`}
             >
@@ -107,7 +104,7 @@ export default function AcademyPage() {
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                     course.access === 'Free'
                       ? 'bg-emerald-400 text-white'
-                      : 'bg-[#1a2744]/80 text-[#2dd4bf] backdrop-blur-sm'
+                      : 'bg-[#1B3A5C]/80 text-[#00B5A3] backdrop-blur-sm'
                   }`}>
                     {course.access}
                   </span>
@@ -128,7 +125,7 @@ export default function AcademyPage() {
 
               {/* Content */}
               <div className="p-5 flex flex-col flex-1">
-                <h3 className="font-semibold text-[#1a2744] text-sm leading-snug mb-1 group-hover:text-[#1a2744] line-clamp-2">
+                <h3 className="font-semibold text-[#1B3A5C] text-sm leading-snug mb-1 group-hover:text-[#1B3A5C] line-clamp-2">
                   {course.title}
                 </h3>
                 <p className="text-xs text-slate-500 mb-3">{course.instructor}</p>
@@ -153,10 +150,10 @@ export default function AcademyPage() {
                   <div className="mt-3 pt-3 border-t border-slate-100">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs text-slate-500">Progress</span>
-                      <span className="text-xs font-semibold text-[#2dd4bf]">{course.userProgress}%</span>
+                      <span className="text-xs font-semibold text-[#00B5A3]">{course.userProgress}%</span>
                     </div>
                     <div className="w-full bg-slate-100 rounded-full h-1.5">
-                      <div className="bg-[#2dd4bf] h-1.5 rounded-full" style={{ width: `${course.userProgress}%` }} />
+                      <div className="bg-[#00B5A3] h-1.5 rounded-full" style={{ width: `${course.userProgress}%` }} />
                     </div>
                   </div>
                 )}

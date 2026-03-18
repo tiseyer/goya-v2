@@ -133,18 +133,18 @@ export default function AddonsPage() {
     <div className="min-h-screen bg-white">
 
       {/* Page header */}
-      <div className="bg-[#1e3a5f] pt-12 pb-10 px-4 sm:px-6 lg:px-8">
+      <div className="bg-[#F7F8FA] pt-20 pb-8 px-4 sm:px-6 lg:px-8 border-b border-[#E5E7EB]">
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-slate-400 mb-5">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <nav className="flex items-center gap-2 text-xs text-[#6B7280] mb-5">
+            <Link href="/" className="hover:text-[#1B3A5C] transition-colors">Home</Link>
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            <span className="text-slate-300">All Add-Ons &amp; Upgrades</span>
+            <span className="text-[#374151]">All Add-Ons &amp; Upgrades</span>
           </nav>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white">All Add-Ons &amp; Upgrades</h1>
-          <p className="mt-2 text-slate-300 text-sm max-w-2xl">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#1B3A5C]">All Add-Ons &amp; Upgrades</h1>
+          <p className="mt-2 text-[#6B7280] text-sm max-w-2xl">
             Enhance your GOYA profile with verified designation badges, continuing education credits, and more.
           </p>
         </div>

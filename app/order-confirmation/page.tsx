@@ -50,7 +50,7 @@ export default function OrderConfirmationPage() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
 
           {/* Hero */}
-          <div className="bg-[#1e3a5f] px-8 pt-10 pb-8 text-center">
+          <div className="bg-[#1B3A5C] px-8 pt-10 pb-8 text-center">
             {/* Checkmark */}
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-400/20 border-2 border-emerald-400 mb-5">
               <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
