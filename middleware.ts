@@ -14,8 +14,9 @@ const PROTECTED_PATHS = [
 ]
 
 // Paths that need the onboarding gate (if onboarding not completed)
+// Note: /members is intentionally excluded — public profiles are readable by any logged-in user
 const ONBOARDING_GATED_PATHS = [
-  '/dashboard', '/profile', '/connections', '/members',
+  '/dashboard', '/profile', '/connections',
 ]
 
 export async function middleware(request: NextRequest) {
