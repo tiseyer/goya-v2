@@ -35,31 +35,31 @@ export async function sendEmail({
     const result = await resend.emails.send({
       from: FROM_ADDRESS,
       to,
-      reply_to: replyTo ?? REPLY_TO,
+      replyTo: replyTo ?? REPLY_TO,
       subject,
       html,
     })
 
-    // Log to email_log table
-    supabaseAdmin.from('email_log').insert({
+    // Log to email_log table (fire-and-forget)
+    void supabaseAdmin.from('email_log').insert({
       recipient,
       subject,
       template_name: templateName,
       status: 'sent',
-    }).then(() => {}).catch(() => {}) // fire-and-forget, don't fail on log error
+    })
 
     console.log('[email] sent:', subject, 'to', recipient)
     return { success: true, result }
   } catch (error) {
     console.error('[email] error:', error)
 
-    supabaseAdmin.from('email_log').insert({
+    void supabaseAdmin.from('email_log').insert({
       recipient,
       subject,
       template_name: templateName,
       status: 'failed',
       error_message: String(error),
-    }).then(() => {}).catch(() => {})
+    })
 
     return { success: false, error }
   }
