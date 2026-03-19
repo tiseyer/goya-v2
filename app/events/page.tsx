@@ -115,11 +115,11 @@ export default function EventsPage() {
                       key={day}
                       onClick={() => setSelectedDate(isSelected ? null : iso)}
                       className={`relative flex flex-col items-center justify-center h-8 w-full rounded-lg text-xs font-medium transition-colors
-                        ${isSelected ? 'bg-[#1B3A5C] text-white' : isToday ? 'bg-[#00B5A3]/15 text-[#009E8E]' : hasEvent ? 'hover:bg-slate-100 text-slate-700' : 'text-slate-400 cursor-default'}`}
+                        ${isSelected ? 'bg-[#1B3A5C] text-white' : isToday ? 'bg-[#4E87A0]/15 text-[#3A7190]' : hasEvent ? 'hover:bg-slate-100 text-slate-700' : 'text-slate-400 cursor-default'}`}
                     >
                       {day}
                       {hasEvent && !isSelected && (
-                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#00B5A3]" />
+                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#4E87A0]" />
                       )}
                     </button>
                   );
@@ -128,7 +128,7 @@ export default function EventsPage() {
               {selectedDate && (
                 <button
                   onClick={() => setSelectedDate(null)}
-                  className="mt-3 w-full text-xs text-[#00B5A3] hover:text-[#009E8E] font-semibold text-center transition-colors"
+                  className="mt-3 w-full text-xs text-[#4E87A0] hover:text-[#3A7190] font-semibold text-center transition-colors"
                 >
                   Clear date filter
                 </button>
@@ -190,7 +190,7 @@ export default function EventsPage() {
                       {/* Date block */}
                       <div className="bg-[#1B3A5C] text-white flex flex-row sm:flex-col items-center justify-center sm:justify-start gap-3 sm:gap-0 px-5 py-4 sm:py-6 sm:w-20 shrink-0 sm:text-center">
                         <div className="text-2xl font-bold leading-none">{event.date.split('-')[2]}</div>
-                        <div className="text-[10px] font-semibold uppercase tracking-widest text-[#00B5A3]">
+                        <div className="text-[10px] font-semibold uppercase tracking-widest text-[#4E87A0]">
                           {MONTHS[parseInt(event.date.split('-')[1]) - 1].slice(0, 3)}
                         </div>
                       </div>
@@ -238,7 +238,7 @@ export default function EventsPage() {
                               <span className="text-[#1B3A5C] font-bold text-lg">${event.price}</span>
                             )}
                           </div>
-                          <Link href={`/events/${event.id}`} className="bg-[#00B5A3] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#009E8E] transition-colors whitespace-nowrap">
+                          <Link href={`/events/${event.id}`} className="bg-[#4E87A0] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#3A7190] transition-colors whitespace-nowrap">
                             Learn More →
                           </Link>
                         </div>
