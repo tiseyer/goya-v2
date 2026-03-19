@@ -109,7 +109,7 @@ function StatusDot({ status }: { status: 'inactive' | 'saved' | 'active' }) {
     status === 'saved'   ? 'bg-yellow-400' :
                            'bg-slate-300';
   const label =
-    status === 'active'  ? 'Active' :
+    status === 'active'  ? 'Configured' :
     status === 'saved'   ? 'Saved, not tracking' :
                            'Not configured';
   return (
@@ -290,6 +290,10 @@ function AnalyticsTab() {
   const [toast, setToast]         = useState<{ type: ToastType; message: string } | null>(null);
   const [loading, setLoading]     = useState(true);
   const [saving, setSaving]       = useState(false);
+  // Track what's actually committed to the DB to drive status dots accurately
+  const [savedGa4Id, setSavedGa4Id]         = useState('');
+  const [savedClarityId, setSavedClarityId] = useState('');
+  const [savedEnabled, setSavedEnabled]     = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -302,19 +306,23 @@ function AnalyticsTab() {
       if (data) {
         const map: Record<string, string> = {};
         (data as Array<{ key: string; value: string }>).forEach(r => { map[r.key] = r.value ?? ''; });
-        setGa4Id(map.ga4_measurement_id ?? '');
-        setClarityId(map.clarity_project_id ?? '');
-        setEnabled(map.analytics_enabled === 'true');
+        const ga4  = map.ga4_measurement_id ?? '';
+        const clar = map.clarity_project_id ?? '';
+        const enab = map.analytics_enabled === 'true';
+        setGa4Id(ga4);       setSavedGa4Id(ga4);
+        setClarityId(clar);  setSavedClarityId(clar);
+        setEnabled(enab);    setSavedEnabled(enab);
       }
       setLoading(false);
     }
     load();
   }, []);
 
+  // Status dots reflect the last-saved state, not the live form values
   const ga4Status: 'inactive' | 'saved' | 'active' =
-    !ga4Id ? 'inactive' : enabled ? 'active' : 'saved';
+    !savedGa4Id ? 'inactive' : savedEnabled ? 'active' : 'saved';
   const clarityStatus: 'inactive' | 'saved' | 'active' =
-    !clarityId ? 'inactive' : enabled ? 'active' : 'saved';
+    !savedClarityId ? 'inactive' : savedEnabled ? 'active' : 'saved';
 
   const dismissToast = useCallback(() => setToast(null), []);
 
@@ -323,18 +331,35 @@ function AnalyticsTab() {
     setGa4Error('');
     setClarityError('');
 
-    const ga4Valid     = !ga4Id     || /^G-[A-Z0-9]{4,}$/.test(ga4Id);
-    const clarityValid = !clarityId || /^[a-zA-Z0-9]{8,12}$/.test(clarityId);
+    // Guard: at least one ID must be present
+    if (!ga4Id && !clarityId) {
+      setToast({ type: 'error', message: 'Please enter at least one analytics ID before saving.' });
+      setSaving(false);
+      return;
+    }
 
-    if (!ga4Valid)     setGa4Error("This doesn't look like a valid GA4 ID. Please check and try again.");
-    if (!clarityValid) setClarityError("This doesn't look like a valid Clarity ID. Please check and try again.");
+    // Validate non-empty fields
+    const ga4Valid     = !ga4Id     || /^G-[A-Z0-9]{4,}$/.test(ga4Id);
+    const clarityValid = !clarityId || clarityId.length >= 8;
+
+    if (!ga4Valid) {
+      setGa4Error("GA4 Measurement ID must start with 'G-' (e.g. G-XXXXXXXXXX)");
+    }
+    if (!clarityValid) {
+      setClarityError('Clarity Project ID appears invalid. Find it at clarity.microsoft.com → your project → Setup.');
+    }
+
+    if (!ga4Valid || !clarityValid) {
+      setSaving(false);
+      return;
+    }
 
     // Get current user for updated_by
     const { data: { user } } = await supabase.auth.getUser();
 
     const rows = [
-      { key: 'ga4_measurement_id', value: ga4Id,                  description: 'Google Analytics 4 Measurement ID (format: G-XXXXXXXXXX)' },
-      { key: 'clarity_project_id', value: clarityId,              description: 'Microsoft Clarity Project ID (format: abc123def4)' },
+      { key: 'ga4_measurement_id', value: ga4Id,                      description: 'Google Analytics 4 Measurement ID (format: G-XXXXXXXXXX)' },
+      { key: 'clarity_project_id', value: clarityId,                  description: 'Microsoft Clarity Project ID (format: abc123def4)' },
       { key: 'analytics_enabled',  value: enabled ? 'true' : 'false', description: 'Master switch to enable/disable all analytics scripts' },
     ];
 
@@ -348,12 +373,20 @@ function AnalyticsTab() {
         );
     }
 
-    if (ga4Valid && clarityValid) {
-      if (enabled) {
-        setToast({ type: 'success', message: 'Analytics connected successfully. Scripts will load on the next page visit.' });
-      } else {
-        setToast({ type: 'info', message: 'Settings saved. Enable the master switch to activate tracking.' });
-      }
+    // Update saved state to reflect what's now in the DB
+    setSavedGa4Id(ga4Id);
+    setSavedClarityId(clarityId);
+    setSavedEnabled(enabled);
+
+    // Context-aware success message
+    if (!enabled) {
+      setToast({ type: 'info', message: 'Analytics tracking paused.' });
+    } else if (ga4Id && clarityId) {
+      setToast({ type: 'success', message: 'Analytics connected successfully. Scripts will load on the next page visit.' });
+    } else if (ga4Id) {
+      setToast({ type: 'success', message: 'Google Analytics 4 connected successfully. Scripts will load on the next page visit.' });
+    } else {
+      setToast({ type: 'success', message: 'Microsoft Clarity connected successfully. Scripts will load on the next page visit.' });
     }
 
     setSaving(false);
