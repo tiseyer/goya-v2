@@ -37,7 +37,7 @@ function ProductCard({ product }: { product: Product }) {
       <div className="flex items-center justify-center pt-7 pb-4 px-4 bg-white min-h-[160px]">
         {product.image_path ? (
           <Image
-            src={product.image_path}
+            src={encodeURI(product.image_path)}
             alt={product.name}
             width={130}
             height={130}
@@ -106,13 +106,17 @@ export default async function AddonsPage() {
     .eq('is_active', true)
     .order('priority', { ascending: true })
 
-  // 5. Filter with visibility logic
+  // 5. Filter with visibility logic — admins/mods see everything
+  const role = profile?.role ?? 'student'
+  const isStaff = role === 'admin' || role === 'moderator'
   const userCtx = {
-    role: profile?.role ?? 'student',
+    role,
     designations: (profile?.designations ?? []) as string[],
     isSchoolOwner,
   }
-  const visibleProducts = ((products ?? []) as Product[]).filter(p => isProductVisible(p, userCtx))
+  const visibleProducts = isStaff
+    ? ((products ?? []) as Product[])
+    : ((products ?? []) as Product[]).filter(p => isProductVisible(p, userCtx))
 
   return (
     <div className="min-h-screen bg-white">

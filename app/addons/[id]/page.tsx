@@ -126,7 +126,7 @@ export default async function AddonDetailPage({ params }: { params: Promise<{ id
             <div className="bg-slate-50 rounded-2xl border border-slate-100 p-8 flex items-center justify-center w-full">
               {product.image_path ? (
                 <Image
-                  src={product.image_path}
+                  src={encodeURI(product.image_path)}
                   alt={product.name}
                   width={240}
                   height={240}
@@ -227,7 +227,7 @@ export default async function AddonDetailPage({ params }: { params: Promise<{ id
                 <Link key={r.slug} href={`/addons/${r.slug}`}
                   className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:shadow-md hover:border-[#1e3a5f]/20 transition-all group">
                   {r.image_path && (
-                    <Image src={r.image_path} alt={r.name} width={90} height={90} className="object-contain" unoptimized />
+                    <Image src={encodeURI(r.image_path)} alt={r.name} width={90} height={90} className="object-contain" unoptimized />
                   )}
                   <p className="text-xs font-bold text-[#1e3a5f] text-center group-hover:text-[#2d5a9e] transition-colors">{r.name}</p>
                   <p className="text-xs text-slate-500">{r.price_display}</p>
