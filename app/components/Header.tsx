@@ -8,6 +8,8 @@ import { useCart } from '@/app/context/CartContext';
 import MiniCart from './MiniCart';
 import { useConnections } from '@/app/context/ConnectionsContext';
 import type { NotifRecord } from '@/app/context/ConnectionsContext';
+import { useImpersonation } from '@/app/context/ImpersonationContext';
+import { endImpersonation } from '@/app/actions/impersonation';
 
 // ─── config ───────────────────────────────────────────────────────────────────
 
@@ -294,10 +296,39 @@ function MessagesWidget() {
 
 // ─── User menu ────────────────────────────────────────────────────────────────
 
-function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMemberType, userSchoolId, onLogout }: { userName: string; userMrn: string; userInitials: string; userRole?: string; userId?: string; userMemberType?: string; userSchoolId?: string; onLogout: () => void }) {
+function UserMenu({
+  userName,
+  userMrn,
+  userInitials,
+  userRole,
+  userId,
+  userMemberType,
+  userSchoolId,
+  onLogout,
+  isImpersonating,
+  adminName,
+  impersonatedName,
+  impersonatedInitials,
+}: {
+  userName: string;
+  userMrn: string;
+  userInitials: string;
+  userRole?: string;
+  userId?: string;
+  userMemberType?: string;
+  userSchoolId?: string;
+  onLogout: () => void;
+  isImpersonating?: boolean;
+  adminName?: string;
+  impersonatedName?: string;
+  impersonatedInitials?: string;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setOpen(false));
+
+  const displayName = isImpersonating && impersonatedName ? impersonatedName : userName;
+  const displayInitials = isImpersonating && impersonatedInitials ? impersonatedInitials : userInitials;
 
   const menuItems = [
     { label: 'My Profile',      href: userId ? `/members/${userId}` : '#', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
@@ -318,10 +349,10 @@ function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMembe
         aria-label="User menu"
       >
         {/* Avatar */}
-        <div className="w-7 h-7 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
-          <span className="text-white text-[10px] font-black">{userInitials}</span>
+        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+          <span className="text-white text-[10px] font-black">{displayInitials}</span>
         </div>
-        <span className="text-sm font-medium text-[#1B3A5C] hidden lg:block">{userName}</span>
+        <span className="text-sm font-medium text-[#1B3A5C] hidden lg:block">{displayName}</span>
         <svg className={`w-3.5 h-3.5 text-[#6B7280] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
@@ -331,12 +362,18 @@ function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMembe
         <Dropdown>
           {/* User header */}
           <div className="px-4 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
-              <span className="text-white text-xs font-black">{userInitials}</span>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+              <span className="text-white text-xs font-black">{displayInitials}</span>
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#1B3A5C]">{userName}</p>
-              {userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>}
+              <p className="text-sm font-semibold text-[#1B3A5C]">{displayName}</p>
+              {isImpersonating ? (
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full mt-0.5">
+                  Viewing as — admin: {adminName ?? 'Admin'}
+                </span>
+              ) : (
+                userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>
+              )}
             </div>
           </div>
 
@@ -357,8 +394,8 @@ function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMembe
             ))}
           </div>
 
-          {/* Admin Settings */}
-          {(userRole === 'admin' || userRole === 'moderator') && (
+          {/* Admin Settings — hidden when impersonating */}
+          {!isImpersonating && (userRole === 'admin' || userRole === 'moderator') && (
             <div className="border-t border-[#E5E7EB] py-1.5">
               <Link
                 href="/admin"
@@ -374,8 +411,8 @@ function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMembe
             </div>
           )}
 
-          {/* School Settings / Register School (teacher role) */}
-          {userRole === 'teacher' && (
+          {/* School Settings / Register School (teacher role) — hidden when impersonating */}
+          {!isImpersonating && userRole === 'teacher' && (
             <div className="border-t border-[#E5E7EB] py-1.5">
               {userSchoolId ? (
                 <Link
@@ -400,6 +437,24 @@ function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMembe
                   Register School
                 </Link>
               )}
+            </div>
+          )}
+
+          {/* Switch Back — only shown when impersonating */}
+          {isImpersonating && (
+            <div className="border-t border-[#E5E7EB] py-1.5">
+              <form action={endImpersonation}>
+                <button
+                  type="submit"
+                  onClick={() => setOpen(false)}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-amber-700 hover:text-amber-900 hover:bg-amber-50 transition-colors"
+                >
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+                  </svg>
+                  Switch Back to Admin
+                </button>
+              </form>
             </div>
           )}
 
@@ -494,6 +549,7 @@ export default function Header() {
   const [profile, setProfile] = useState<any>(null);
   const [maintenanceActive, setMaintenanceActive] = useState(false);
   const [schoolId, setSchoolId] = useState<string | null>(null);
+  const { isImpersonating, targetProfile, adminProfile } = useImpersonation();
 
   function checkMaintenance(role: string | undefined) {
     if (role !== 'admin' && role !== 'moderator') return;
@@ -570,8 +626,15 @@ export default function Header() {
     });
   };
 
+  const impersonatedName = isImpersonating && targetProfile
+    ? (targetProfile.full_name ?? targetProfile.email ?? 'User')
+    : undefined;
+  const impersonatedInitials = isImpersonating && targetProfile
+    ? getInitials(targetProfile.full_name, targetProfile.email)
+    : undefined;
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E7EB] shadow-sm">
+    <header className={`fixed ${isImpersonating ? 'top-10' : 'top-0'} left-0 right-0 z-50 bg-white border-b border-[#E5E7EB] shadow-sm`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
 
@@ -627,7 +690,20 @@ export default function Header() {
                   </Link>
                 )}
                 <div className="w-px h-5 bg-[#E5E7EB] mx-1" />
-                <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} userId={profile?.id} userMemberType={profile?.member_type} userSchoolId={schoolId ?? undefined} onLogout={handleLogout} />
+                <UserMenu
+                  userName={userName}
+                  userMrn={userMrn}
+                  userInitials={userInitials}
+                  userRole={profile?.role}
+                  userId={isImpersonating && targetProfile ? targetProfile.id : profile?.id}
+                  userMemberType={isImpersonating && targetProfile ? (targetProfile.member_type ?? undefined) : profile?.member_type}
+                  userSchoolId={schoolId ?? undefined}
+                  onLogout={handleLogout}
+                  isImpersonating={isImpersonating}
+                  adminName={adminProfile?.full_name ?? 'Admin'}
+                  impersonatedName={impersonatedName}
+                  impersonatedInitials={impersonatedInitials}
+                />
               </>
             ) : (
               <>
@@ -690,19 +766,25 @@ export default function Header() {
           {isLoggedIn ? (
             <div className="pt-3 mt-3 border-t border-[#E5E7EB] space-y-1">
               <div className="flex items-center gap-3 px-4 py-2">
-                <div className="w-8 h-8 rounded-full bg-[#4E87A0] flex items-center justify-center">
-                  <span className="text-white text-xs font-black">{userInitials}</span>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+                  <span className="text-white text-xs font-black">{impersonatedInitials ?? userInitials}</span>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#1B3A5C]">{userName}</p>
-                  {userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>}
+                  <p className="text-sm font-semibold text-[#1B3A5C]">{impersonatedName ?? userName}</p>
+                  {isImpersonating ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full mt-0.5">
+                      Viewing as — admin: {adminProfile?.full_name ?? 'Admin'}
+                    </span>
+                  ) : (
+                    userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>
+                  )}
                 </div>
               </div>
               {[
-                { label: 'My Profile', href: profile?.id ? `/members/${profile.id}` : '#' },
+                { label: 'My Profile', href: (isImpersonating && targetProfile ? targetProfile.id : profile?.id) ? `/members/${isImpersonating && targetProfile ? targetProfile.id : profile?.id}` : '#' },
                 { label: 'Profile Settings', href: '/profile/settings' },
                 { label: 'Credits & Hours', href: '/credits' },
-                ...(profile?.member_type === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours' }] : []),
+                ...((isImpersonating ? targetProfile?.member_type : profile?.member_type) === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours' }] : []),
                 { label: 'Subscriptions', href: '#' },
                 { label: 'Messages', href: '#' },
               ].map(item => (
@@ -712,14 +794,14 @@ export default function Header() {
                   {item.label}
                 </Link>
               ))}
-              {(profile?.role === 'admin' || profile?.role === 'moderator') && (
+              {!isImpersonating && (profile?.role === 'admin' || profile?.role === 'moderator') && (
                 <Link href="/admin" onClick={() => setMenuOpen(false)}
                   className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                 >
                   Admin Settings
                 </Link>
               )}
-              {profile?.role === 'teacher' && (
+              {!isImpersonating && profile?.role === 'teacher' && (
                 schoolId ? (
                   <Link href={`/schools/${schoolId}/settings`} onClick={() => setMenuOpen(false)}
                     className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
@@ -733,6 +815,17 @@ export default function Header() {
                     Register School
                   </Link>
                 )
+              )}
+              {isImpersonating && (
+                <form action={endImpersonation}>
+                  <button
+                    type="submit"
+                    onClick={() => setMenuOpen(false)}
+                    className="w-full text-left px-4 py-2 rounded-lg text-amber-700 hover:bg-amber-50 text-sm transition-colors"
+                  >
+                    ↩ Switch Back to Admin
+                  </button>
+                </form>
               )}
               <button onClick={handleLogout} className="w-full text-left px-4 py-2 rounded-lg text-rose-500 hover:bg-rose-50 text-sm transition-colors">
                 Logout

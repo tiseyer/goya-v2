@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { submitCreditEntry } from '../actions';
 
 interface Props {
   teachingOnly?: boolean;
@@ -35,27 +35,15 @@ export default function CreditSubmissionForm({ teachingOnly = false, onSuccess }
     setSubmitting(true);
     setError('');
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setError('You must be logged in to submit credits.');
-      setSubmitting(false);
-      return;
-    }
-
-    const { error: insertError } = await supabase
-      .from('credit_entries')
-      .insert({
-        user_id: user.id,
-        credit_type: selectedType,
-        amount: Number(amount),
-        activity_date: activityDate,
-        description: description,
-        source: 'manual',
-        status: 'approved',
-      });
+    const { error: insertError } = await submitCreditEntry({
+      creditType: selectedType,
+      amount: Number(amount),
+      activityDate,
+      description,
+    });
 
     if (insertError) {
-      setError(insertError.message);
+      setError(insertError);
       setSubmitting(false);
       return;
     }

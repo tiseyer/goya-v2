@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import type { Course, UserCourseProgress } from '@/lib/types';
+import { markLessonComplete } from './actions';
 
 function extractVimeoId(url: string): string | null {
   const match = url.match(/(?:vimeo\.com\/(?:video\/)?|player\.vimeo\.com\/video\/)(\d+)/);
@@ -58,14 +59,8 @@ export default function LessonPage() {
     if (!progress || progress.status === 'completed') return;
     setBusy(true);
     setError('');
-    const now = new Date().toISOString();
-    const { data, error: dbErr } = await supabase
-      .from('user_course_progress')
-      .update({ status: 'completed', completed_at: now })
-      .eq('id', progress.id)
-      .select()
-      .single();
-    if (dbErr) { setError(dbErr.message); setBusy(false); return; }
+    const { data, error: dbErr } = await markLessonComplete(progress.id, id);
+    if (dbErr) { setError(dbErr); setBusy(false); return; }
     setProgress(data as UserCourseProgress);
     setBusy(false);
   }

@@ -7,6 +7,8 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ClientProviders from "./components/ClientProviders";
+import ImpersonationBanner from "./components/ImpersonationBanner";
+import { getImpersonationState } from "@/lib/impersonation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,6 +72,8 @@ export default async function RootLayout({
   const ga4Id     = analyticsEnabled ? (settings?.ga4_measurement_id     ?? '') : '';
   const clarityId = analyticsEnabled ? (settings?.clarity_project_id     ?? '') : '';
 
+  const impersonationState = await getImpersonationState();
+
   return (
     <html lang="en">
       <body
@@ -102,9 +106,10 @@ gtag('config', '${ga4Id}');
           `}</Script>
         )}
 
-        <ClientProviders>
+        <ClientProviders impersonationState={impersonationState}>
+          <ImpersonationBanner state={impersonationState} />
           {!hideNav && <Header />}
-          <main className={`${!hideNav ? "pt-16" : ""} flex-1`}>
+          <main className={`${!hideNav ? (impersonationState.isImpersonating ? 'pt-26' : 'pt-16') : ''} flex-1`}>
             {children}
           </main>
           {!hideFooter && <Footer />}

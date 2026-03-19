@@ -137,6 +137,33 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // ─── Impersonation cookie security ──────────────────────────────────────────
+  // If the impersonation cookie exists, verify the real session user is an admin.
+  // Guards against manually crafted cookies or stale sessions.
+  const impersonatingValue = request.cookies.get('goya_impersonating')?.value
+  if (impersonatingValue && user) {
+    const { data: impersonatorProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (impersonatorProfile?.role !== 'admin') {
+      // Non-admin has impersonation cookie — security violation, clear and redirect
+      const cleanResponse = NextResponse.redirect(new URL('/', request.url))
+      cleanResponse.cookies.delete('goya_impersonating')
+      cleanResponse.cookies.delete('goya_impersonation_log_id')
+      return cleanResponse
+    }
+  }
+  if (impersonatingValue && !user) {
+    // Cookie exists but no session — clear it
+    const cleanResponse = NextResponse.redirect(new URL('/sign-in', request.url))
+    cleanResponse.cookies.delete('goya_impersonating')
+    cleanResponse.cookies.delete('goya_impersonation_log_id')
+    return cleanResponse
+  }
+
   // ─── Auth enforcement ────────────────────────────────────────────────────────
   if (isProtectedPath && !user) {
     const next = encodeURIComponent(pathname)
