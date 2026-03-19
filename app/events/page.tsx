@@ -64,8 +64,10 @@ export default function EventsPage() {
       .from('events')
       .select('*')
       .eq('status', 'published')
+      .is('deleted_at', null)
       .order('date', { ascending: true })
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) console.error('[Events] fetch error:', error.message);
         setEvents((data as Event[]) ?? []);
         setLoading(false);
       });

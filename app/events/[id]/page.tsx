@@ -32,6 +32,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
     .select('*')
     .eq('id', id)
     .eq('status', 'published')
+    .is('deleted_at', null)
     .single();
 
   if (!event) notFound();

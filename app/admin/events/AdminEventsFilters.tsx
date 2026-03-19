@@ -5,8 +5,12 @@ import { useCallback, useState } from 'react';
 
 const CATEGORIES = ['Workshop', 'Teacher Training', 'Dharma Talk', 'Conference', 'Yoga Sequence', 'Music Playlist', 'Research'];
 const FORMATS    = ['Online', 'In Person', 'Hybrid'];
-const STATUSES   = ['published', 'draft', 'cancelled'];
-const SORT_OPTS  = [
+const BASE_STATUSES: Array<{ value: string; label: string }> = [
+  { value: 'published', label: 'Published' },
+  { value: 'draft',     label: 'Draft'     },
+  { value: 'cancelled', label: 'Cancelled' },
+];
+const SORT_OPTS = [
   { value: 'date_asc',        label: 'Date (oldest first)' },
   { value: 'date_desc',       label: 'Date (newest first)' },
   { value: 'created_at_desc', label: 'Recently added'      },
@@ -14,7 +18,11 @@ const SORT_OPTS  = [
 
 const SEL = 'text-sm border border-[#E5E7EB] rounded-lg px-3 py-2 bg-white text-[#374151] focus:outline-none focus:ring-1 focus:ring-[#4E87A0] focus:border-[#4E87A0]';
 
-export default function AdminEventsFilters() {
+interface Props {
+  userRole: string;
+}
+
+export default function AdminEventsFilters({ userRole }: Props) {
   const router       = useRouter();
   const searchParams = useSearchParams();
 
@@ -23,6 +31,12 @@ export default function AdminEventsFilters() {
   const [format,   setFormat]   = useState(searchParams.get('format')   ?? '');
   const [status,   setStatus]   = useState(searchParams.get('status')   ?? '');
   const [sort,     setSort]     = useState(searchParams.get('sort')     ?? 'date_asc');
+
+  const isAdmin = userRole === 'admin';
+
+  const allStatuses = isAdmin
+    ? [...BASE_STATUSES, { value: 'deleted', label: 'Deleted (trash)' }]
+    : BASE_STATUSES;
 
   const apply = useCallback((overrides: Record<string, string> = {}) => {
     const params = new URLSearchParams();
@@ -61,10 +75,12 @@ export default function AdminEventsFilters() {
         {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
       </select>
 
-      {/* Status */}
+      {/* Status — 'Deleted' option only shown to admins */}
       <select value={status} onChange={e => { setStatus(e.target.value); apply({ status: e.target.value }); }} className={SEL}>
-        <option value="">All Statuses</option>
-        {STATUSES.map(s => <option key={s} value={s} className="capitalize">{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+        <option value="">Active (pub / draft / cancelled)</option>
+        {allStatuses.map(s => (
+          <option key={s.value} value={s.value}>{s.label}</option>
+        ))}
       </select>
 
       {/* Sort */}
@@ -79,6 +95,13 @@ export default function AdminEventsFilters() {
       <button onClick={reset} className="px-4 py-2 border border-[#E5E7EB] text-[#374151] text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors">
         Reset
       </button>
+
+      {/* Deleted-view indicator */}
+      {status === 'deleted' && (
+        <span className="text-xs text-red-500 font-semibold bg-red-50 border border-red-200 px-3 py-1.5 rounded-lg">
+          Viewing deleted events — admins only
+        </span>
+      )}
     </div>
   );
 }

@@ -19,6 +19,7 @@ const STATUS_BADGE: Record<string, string> = {
   published: 'bg-emerald-50 text-emerald-700',
   draft:     'bg-yellow-50 text-yellow-700',
   cancelled: 'bg-red-50 text-red-600',
+  deleted:   'bg-slate-100 text-slate-400 line-through',
 };
 
 function fmtTime(t: string) {
@@ -39,32 +40,53 @@ export default async function AdminEventsPage({
   const search   = sp.search   ?? '';
   const category = sp.category ?? '';
   const format   = sp.format   ?? '';
-  const status   = sp.status   ?? '';
+  const status   = sp.status   ?? '';   // '' means "active" (exclude deleted)
   const sort     = sp.sort     ?? 'date_asc';
   const page     = Math.max(1, parseInt(sp.page ?? '1', 10));
 
-  const supabase = await createSupabaseServerClient();
+  // ── Current user's role ───────────────────────────────────────────────────
+  const supabase   = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: profileRow } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user!.id)
+    .single();
+  const userRole = (profileRow?.role as string) ?? 'moderator';
+  const isAdmin  = userRole === 'admin';
+
+  // ── Guard: moderators cannot view deleted events ──────────────────────────
+  // If a moderator somehow reaches ?status=deleted, treat it as no filter
+  const effectiveStatus = (status === 'deleted' && !isAdmin) ? '' : status;
+
+  // ── Query ─────────────────────────────────────────────────────────────────
   let query = supabase.from('events').select('*', { count: 'exact' });
+
+  if (effectiveStatus) {
+    // Explicit status filter (including 'deleted' for admins)
+    query = query.eq('status', effectiveStatus);
+  } else {
+    // Default: show active events only (not deleted)
+    query = query.neq('status', 'deleted');
+  }
 
   if (search)   query = query.ilike('title', `%${search}%`);
   if (category) query = query.eq('category', category);
   if (format)   query = query.eq('format', format);
-  if (status)   query = query.eq('status', status);
 
-  // Sorting
-  if (sort === 'date_desc')       query = query.order('date', { ascending: false });
+  if (sort === 'date_desc')            query = query.order('date', { ascending: false });
   else if (sort === 'created_at_desc') query = query.order('created_at', { ascending: false });
-  else                            query = query.order('date', { ascending: true });
+  else                                 query = query.order('date', { ascending: true });
 
-  // Pagination
   const from = (page - 1) * PAGE_SIZE;
   query = query.range(from, from + PAGE_SIZE - 1);
 
   const { data, count, error } = await query;
 
-  const events    = (data as Event[]) ?? [];
-  const total     = count ?? 0;
+  const events     = (data as Event[]) ?? [];
+  const total      = count ?? 0;
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const viewingDeleted = effectiveStatus === 'deleted';
 
   return (
     <div className="p-6 lg:p-8">
@@ -72,7 +94,7 @@ export default async function AdminEventsPage({
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1B3A5C]">Events</h1>
-          <p className="text-sm text-[#6B7280] mt-0.5">{total} total</p>
+          <p className="text-sm text-[#6B7280] mt-0.5">{total} {viewingDeleted ? 'deleted' : 'active'} event{total !== 1 ? 's' : ''}</p>
         </div>
         <Link
           href="/admin/events/new"
@@ -88,7 +110,7 @@ export default async function AdminEventsPage({
       {/* Filters */}
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-4 mb-6">
         <Suspense>
-          <AdminEventsFilters />
+          <AdminEventsFilters userRole={userRole} />
         </Suspense>
       </div>
 
@@ -99,20 +121,24 @@ export default async function AdminEventsPage({
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+      <div className={`bg-white rounded-xl border shadow-sm overflow-hidden ${viewingDeleted ? 'border-red-200' : 'border-[#E5E7EB]'}`}>
         {events.length === 0 ? (
           <div className="text-center py-16">
             <svg className="w-10 h-10 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <p className="text-[#374151] font-medium">No events found</p>
-            <p className="text-[#9CA3AF] text-sm mt-1">Try adjusting your filters or add a new event.</p>
+            <p className="text-[#374151] font-medium">
+              {viewingDeleted ? 'No deleted events' : 'No events found'}
+            </p>
+            <p className="text-[#9CA3AF] text-sm mt-1">
+              {viewingDeleted ? 'Nothing has been soft-deleted yet.' : 'Try adjusting your filters or add a new event.'}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#E5E7EB] bg-slate-50">
+                <tr className={`border-b border-[#E5E7EB] ${viewingDeleted ? 'bg-red-50' : 'bg-slate-50'}`}>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Event</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Date</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Time</th>
@@ -124,56 +150,63 @@ export default async function AdminEventsPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5E7EB]">
-                {events.map(ev => (
-                  <tr key={ev.id} className="hover:bg-slate-50 transition-colors">
-                    {/* Event title + badges */}
-                    <td className="px-4 py-3 max-w-xs">
-                      <p className="font-medium text-[#1B3A5C] truncate">{ev.title}</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${CATEGORY_BADGE[ev.category] ?? 'bg-slate-100 text-slate-600'}`}>
-                          {ev.category}
+                {events.map(ev => {
+                  const isDeleted = ev.status === 'deleted';
+                  return (
+                    <tr key={ev.id} className={`transition-colors ${isDeleted ? 'bg-red-50/30 hover:bg-red-50/60' : 'hover:bg-slate-50'}`}>
+                      {/* Event title + badges */}
+                      <td className="px-4 py-3 max-w-xs">
+                        <p className={`font-medium truncate ${isDeleted ? 'text-[#9CA3AF] line-through' : 'text-[#1B3A5C]'}`}>
+                          {ev.title}
+                        </p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${CATEGORY_BADGE[ev.category] ?? 'bg-slate-100 text-slate-600'}`}>
+                            {ev.category}
+                          </span>
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                            {ev.format}
+                          </span>
+                        </div>
+                      </td>
+                      {/* Date */}
+                      <td className="px-4 py-3 text-[#374151] whitespace-nowrap">
+                        {new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </td>
+                      {/* Time */}
+                      <td className="px-4 py-3 text-[#374151] whitespace-nowrap">{fmtTime(ev.time_start)}</td>
+                      {/* Instructor */}
+                      <td className="px-4 py-3 text-[#374151] hidden md:table-cell">{ev.instructor ?? '—'}</td>
+                      {/* Price */}
+                      <td className="px-4 py-3 text-[#374151] hidden lg:table-cell whitespace-nowrap">
+                        {ev.is_free ? <span className="text-emerald-600 font-semibold">Free</span> : `$${ev.price}`}
+                      </td>
+                      {/* Spots */}
+                      <td className="px-4 py-3 text-[#374151] hidden lg:table-cell">
+                        {ev.spots_remaining !== null ? `${ev.spots_remaining} / ${ev.spots_total ?? '—'}` : '—'}
+                      </td>
+                      {/* Status */}
+                      <td className="px-4 py-3">
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${STATUS_BADGE[ev.status] ?? 'bg-slate-100 text-slate-600'}`}>
+                          {ev.status}
                         </span>
-                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">
-                          {ev.format}
-                        </span>
-                      </div>
-                    </td>
-                    {/* Date */}
-                    <td className="px-4 py-3 text-[#374151] whitespace-nowrap">
-                      {new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </td>
-                    {/* Time */}
-                    <td className="px-4 py-3 text-[#374151] whitespace-nowrap">
-                      {fmtTime(ev.time_start)}
-                    </td>
-                    {/* Instructor */}
-                    <td className="px-4 py-3 text-[#374151] hidden md:table-cell">
-                      {ev.instructor ?? '—'}
-                    </td>
-                    {/* Price */}
-                    <td className="px-4 py-3 text-[#374151] hidden lg:table-cell whitespace-nowrap">
-                      {ev.is_free ? (
-                        <span className="text-emerald-600 font-semibold">Free</span>
-                      ) : (
-                        `$${ev.price}`
-                      )}
-                    </td>
-                    {/* Spots */}
-                    <td className="px-4 py-3 text-[#374151] hidden lg:table-cell">
-                      {ev.spots_remaining !== null ? `${ev.spots_remaining} / ${ev.spots_total ?? '—'}` : '—'}
-                    </td>
-                    {/* Status */}
-                    <td className="px-4 py-3">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${STATUS_BADGE[ev.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                        {ev.status}
-                      </span>
-                    </td>
-                    {/* Actions */}
-                    <td className="px-4 py-3">
-                      <AdminEventActions eventId={ev.id} imageUrl={ev.featured_image_url} />
-                    </td>
-                  </tr>
-                ))}
+                        {isDeleted && ev.deleted_at && (
+                          <p className="text-[9px] text-[#9CA3AF] mt-0.5">
+                            {new Date(ev.deleted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </p>
+                        )}
+                      </td>
+                      {/* Actions */}
+                      <td className="px-4 py-3">
+                        <AdminEventActions
+                          eventId={ev.id}
+                          imageUrl={ev.featured_image_url}
+                          isDeleted={isDeleted}
+                          userRole={userRole}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -2,7 +2,7 @@ export type UserRole = 'student' | 'teacher' | 'wellness_practitioner' | 'modera
 export type SubscriptionStatus = 'member' | 'guest';
 export type EventCategory = 'Workshop' | 'Teacher Training' | 'Dharma Talk' | 'Conference' | 'Yoga Sequence' | 'Music Playlist' | 'Research';
 export type EventFormat = 'Online' | 'In Person' | 'Hybrid';
-export type EventStatus = 'published' | 'draft' | 'cancelled';
+export type EventStatus = 'published' | 'draft' | 'cancelled' | 'deleted';
 
 export interface Profile {
   id: string;
@@ -40,6 +40,7 @@ export interface Event {
   spots_remaining: number | null;
   featured_image_url: string | null;
   status: EventStatus;
+  deleted_at: string | null;
   created_at: string;
   updated_at: string;
 }
