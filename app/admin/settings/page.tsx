@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
@@ -46,6 +46,74 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
   );
 }
 
+const ENVS = {
+  develop:    'https://goya-v2-git-develop-tiseyers-projects.vercel.app',
+  production: 'https://goya-v2.vercel.app',
+} as const;
+
+type EnvKey = keyof typeof ENVS;
+
+function DeployEnvironmentCard() {
+  const [current, setCurrent] = useState<EnvKey>('production');
+
+  useEffect(() => {
+    const h = window.location.hostname;
+    const isDev = h.includes('git-develop') || h === 'localhost';
+    setCurrent(isDev ? 'develop' : 'production');
+  }, []);
+
+  const handleSelect = (env: EnvKey) => {
+    if (env === current) return;
+    window.location.href = ENVS[env];
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+      <div className="px-6 py-4 border-b border-[#E5E7EB]">
+        <h2 className="text-base font-semibold text-[#1B3A5C]">System</h2>
+      </div>
+      <div className="px-6 py-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-[#374151]">Live Environment</p>
+            <p className="text-xs text-[#6B7280] mt-0.5">Switch between the development preview and the production site.</p>
+          </div>
+          {/* Pill switcher */}
+          <div className="shrink-0 flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+            {(['develop', 'production'] as EnvKey[]).map(env => {
+              const active = env === current;
+              return (
+                <button
+                  key={env}
+                  onClick={() => handleSelect(env)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                    active
+                      ? 'bg-[#00B5A3] text-white shadow-sm'
+                      : 'text-[#6B7280] hover:text-[#374151]'
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-white' : 'bg-slate-300'}`} />
+                  {env.charAt(0).toUpperCase() + env.slice(1)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="mt-3">
+          <a
+            href={ENVS[current]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-[#6B7280] hover:text-[#00B5A3] transition-colors font-mono"
+          >
+            {ENVS[current]}
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const environment = process.env.NODE_ENV === 'production' ? 'Production' : 'Development';
@@ -82,6 +150,9 @@ export default function SettingsPage() {
             </div>
           )}
         </Section>
+
+        {/* System */}
+        <DeployEnvironmentCard />
 
         {/* Danger Zone */}
         <div className="rounded-xl border-2 border-red-200 overflow-hidden">
