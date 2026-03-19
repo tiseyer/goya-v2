@@ -47,7 +47,7 @@ export default function AcademyPage() {
       {/* Hero */}
       <div className="bg-[#F7F8FA] pt-20 pb-8 px-4 sm:px-6 lg:px-8 border-b border-[#E5E7EB]">
         <div className="relative max-w-7xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-[#00B5A3]/10 border border-[#00B5A3]/20 rounded-full px-3 py-1 text-[#00B5A3] text-xs font-medium mb-5">
+          <div className="inline-flex items-center gap-2 bg-[#4E87A0]/10 border border-[#4E87A0]/20 rounded-full px-3 py-1 text-[#4E87A0] text-xs font-medium mb-5">
             GOYA Academy
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-[#1B3A5C] mb-4">Course Library</h1>
@@ -104,7 +104,7 @@ export default function AcademyPage() {
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                     course.access === 'Free'
                       ? 'bg-emerald-400 text-white'
-                      : 'bg-[#1B3A5C]/80 text-[#00B5A3] backdrop-blur-sm'
+                      : 'bg-[#1B3A5C]/80 text-[#4E87A0] backdrop-blur-sm'
                   }`}>
                     {course.access}
                   </span>
@@ -150,10 +150,10 @@ export default function AcademyPage() {
                   <div className="mt-3 pt-3 border-t border-slate-100">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs text-slate-500">Progress</span>
-                      <span className="text-xs font-semibold text-[#00B5A3]">{course.userProgress}%</span>
+                      <span className="text-xs font-semibold text-[#4E87A0]">{course.userProgress}%</span>
                     </div>
                     <div className="w-full bg-slate-100 rounded-full h-1.5">
-                      <div className="bg-[#00B5A3] h-1.5 rounded-full" style={{ width: `${course.userProgress}%` }} />
+                      <div className="bg-[#4E87A0] h-1.5 rounded-full" style={{ width: `${course.userProgress}%` }} />
                     </div>
                   </div>
                 )}

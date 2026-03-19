@@ -78,7 +78,7 @@ function SearchWidget() {
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Search GOYA…"
-          className="w-full bg-slate-50 border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-sm text-[#1B3A5C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#00B5A3] focus:ring-1 focus:ring-[#00B5A3]/40 mr-2"
+          className="w-full bg-slate-50 border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-sm text-[#1B3A5C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#4E87A0] focus:ring-1 focus:ring-[#4E87A0]/40 mr-2"
         />
       </div>
 
@@ -86,7 +86,7 @@ function SearchWidget() {
       <button
         onClick={toggle}
         className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-          open ? 'bg-[#00B5A3] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
+          open ? 'bg-[#4E87A0] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
         }`}
         aria-label="Search"
       >
@@ -147,7 +147,7 @@ function NotifItem({ notif, onAccept, onDecline }: {
 }) {
   if (notif.type === 'connection_request') {
     return (
-      <div className={`px-4 py-3 flex gap-3 items-start ${notif.read ? '' : 'bg-[#00B5A3]/5'}`}>
+      <div className={`px-4 py-3 flex gap-3 items-start ${notif.read ? '' : 'bg-[#4E87A0]/5'}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={notif.fromPhoto} alt={notif.fromName} className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-slate-200" />
         <div className="flex-1 min-w-0">
@@ -157,7 +157,7 @@ function NotifItem({ notif, onAccept, onDecline }: {
           <div className="flex gap-2">
             <button
               onClick={onAccept}
-              className="flex-1 bg-[#00B5A3] text-white text-xs font-semibold py-1.5 rounded-lg hover:bg-[#009E8E] transition-colors"
+              className="flex-1 bg-[#4E87A0] text-white text-xs font-semibold py-1.5 rounded-lg hover:bg-[#3A7190] transition-colors"
             >
               Accept
             </button>
@@ -229,7 +229,7 @@ function MessagesWidget() {
       <button
         onClick={handleOpen}
         className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-          open ? 'bg-[#00B5A3] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
+          open ? 'bg-[#4E87A0] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
         }`}
         aria-label={`Notifications (${unreadCount} unread)`}
       >
@@ -250,7 +250,7 @@ function MessagesWidget() {
             <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">
               Notifications
               {unreadCount > 0 && (
-                <span className="ml-2 bg-[#00B5A3] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                <span className="ml-2 bg-[#4E87A0] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
                   {unreadCount} new
                 </span>
               )}
@@ -258,7 +258,7 @@ function MessagesWidget() {
             {notifications.length > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-[10px] text-[#00B5A3] hover:text-[#009E8E] font-semibold transition-colors"
+                className="text-[10px] text-[#4E87A0] hover:text-[#3A7190] font-semibold transition-colors"
               >
                 Mark all read
               </button>
@@ -316,7 +316,7 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
         aria-label="User menu"
       >
         {/* Avatar */}
-        <div className="w-7 h-7 rounded-full bg-[#00B5A3] flex items-center justify-center shrink-0">
+        <div className="w-7 h-7 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
           <span className="text-white text-[10px] font-black">{userInitials}</span>
         </div>
         <span className="text-sm font-medium text-[#1B3A5C] hidden lg:block">{userName}</span>
@@ -329,7 +329,7 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
         <Dropdown>
           {/* User header */}
           <div className="px-4 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#00B5A3] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
               <span className="text-white text-xs font-black">{userInitials}</span>
             </div>
             <div>
@@ -435,7 +435,7 @@ function CartWidget() {
       <button
         onClick={() => setOpen(o => !o)}
         className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-          open ? 'bg-[#00B5A3] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
+          open ? 'bg-[#4E87A0] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
         }`}
         aria-label={`Cart (${itemCount} items)`}
       >
@@ -538,7 +538,7 @@ export default function Header() {
                 <Link href="/sign-in" className="text-[#374151] hover:text-[#1B3A5C] text-sm font-medium transition-colors px-3 py-2">
                   Sign In
                 </Link>
-                <Link href="/register" className="bg-[#00B5A3] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#009E8E] transition-colors">
+                <Link href="/register" className="bg-[#4E87A0] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#3A7190] transition-colors">
                   Join GOYA
                 </Link>
               </>
@@ -580,7 +580,7 @@ export default function Header() {
           {isLoggedIn ? (
             <div className="pt-3 mt-3 border-t border-[#E5E7EB] space-y-1">
               <div className="flex items-center gap-3 px-4 py-2">
-                <div className="w-8 h-8 rounded-full bg-[#00B5A3] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-[#4E87A0] flex items-center justify-center">
                   <span className="text-white text-xs font-black">{userInitials}</span>
                 </div>
                 <div>
@@ -614,7 +614,7 @@ export default function Header() {
           ) : (
             <div className="pt-3 mt-3 border-t border-[#E5E7EB] flex flex-col gap-2">
               <Link href="/sign-in" className="block px-4 py-2.5 text-[#374151] hover:text-[#1B3A5C] text-sm font-medium">Sign In</Link>
-              <Link href="/register" className="block bg-[#00B5A3] text-white px-4 py-2.5 rounded-lg text-sm font-semibold text-center hover:bg-[#009E8E] transition-colors">Join GOYA</Link>
+              <Link href="/register" className="block bg-[#4E87A0] text-white px-4 py-2.5 rounded-lg text-sm font-semibold text-center hover:bg-[#3A7190] transition-colors">Join GOYA</Link>
             </div>
           )}
         </div>

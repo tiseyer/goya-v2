@@ -34,7 +34,7 @@ export default function ConnectButton({ memberId, memberName, memberPhoto, first
         <p className="text-xs text-[#6B7280] text-center mb-1">{firstName} wants to connect</p>
         <button
           onClick={() => acceptRequest(conn.connectionId, memberId)}
-          className="w-full bg-[#00B5A3] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-[#009E8E] transition-colors"
+          className="w-full bg-[#4E87A0] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-[#3A7190] transition-colors"
         >
           Accept Request
         </button>
@@ -71,7 +71,7 @@ export default function ConnectButton({ memberId, memberName, memberPhoto, first
   return (
     <button
       onClick={() => sendRequest(memberId, memberName, memberPhoto)}
-      className="w-full bg-[#00B5A3] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-[#009E8E] transition-colors"
+      className="w-full bg-[#4E87A0] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-[#3A7190] transition-colors"
     >
       Connect with {firstName}
     </button>

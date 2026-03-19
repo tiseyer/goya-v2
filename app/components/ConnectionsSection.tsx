@@ -82,7 +82,7 @@ function ConnectionRow({ memberId }: { memberId: string }) {
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-0.5">
-          <span className="text-sm font-semibold text-[#1B3A5C] truncate group-hover:text-[#00B5A3] transition-colors">
+          <span className="text-sm font-semibold text-[#1B3A5C] truncate group-hover:text-[#4E87A0] transition-colors">
             {member.name}
           </span>
           {member.is_verified && <VerifiedBadge />}
@@ -98,7 +98,7 @@ function ConnectionRow({ memberId }: { memberId: string }) {
         {/* Message */}
         <button
           onClick={e => { e.preventDefault(); }}
-          className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-[#00B5A3]/10 flex items-center justify-center text-slate-400 hover:text-[#00B5A3] transition-colors"
+          className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-[#4E87A0]/10 flex items-center justify-center text-slate-400 hover:text-[#4E87A0] transition-colors"
           title="Message"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

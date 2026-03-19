@@ -16,7 +16,7 @@ const CREDIT_CONFIG = [
     key: 'CE' as const,
     label: 'Continuing Education',
     short: 'CE Hours',
-    bg: 'bg-[#00B5A3]',
+    bg: 'bg-[#4E87A0]',
     text: 'text-white',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +84,7 @@ export default async function MemberProfile({
       {/* Hero */}
       <div className="bg-gradient-to-b from-[#1B3A5C] via-[#1B3A5C] to-[#1e3a5f] pt-20 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00B5A3] opacity-[0.05] rounded-full blur-3xl translate-x-1/2 -translate-y-1/4" />
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#4E87A0] opacity-[0.05] rounded-full blur-3xl translate-x-1/2 -translate-y-1/4" />
         </div>
 
         <div className="relative max-w-7xl mx-auto">
@@ -109,7 +109,7 @@ export default async function MemberProfile({
                 className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover ring-4 ring-white/10 shadow-2xl"
               />
               {member.featured && (
-                <div className="absolute -top-2 -right-2 bg-[#00B5A3] text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">
+                <div className="absolute -top-2 -right-2 bg-[#4E87A0] text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">
                   Featured
                 </div>
               )}
@@ -170,7 +170,7 @@ export default async function MemberProfile({
             {/* Bio */}
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
               <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <span className="w-1 h-4 bg-[#00B5A3] rounded-full" />
+                <span className="w-1 h-4 bg-[#4E87A0] rounded-full" />
                 About
               </h2>
               <p className="text-slate-600 leading-relaxed text-[15px]">{member.bio}</p>
@@ -194,14 +194,14 @@ export default async function MemberProfile({
             {member.teachingStyles.length > 0 && (
               <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
                 <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <span className="w-1 h-4 bg-[#00B5A3] rounded-full" />
+                  <span className="w-1 h-4 bg-[#4E87A0] rounded-full" />
                   {member.role === 'School' ? 'Programs Offered' : 'Teaching Styles'}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {member.teachingStyles.map(style => (
                     <span
                       key={style}
-                      className="bg-[#00B5A3]/10 text-[#009E8E] border border-[#00B5A3]/20 text-sm font-medium px-4 py-1.5 rounded-full"
+                      className="bg-[#4E87A0]/10 text-[#3A7190] border border-[#4E87A0]/20 text-sm font-medium px-4 py-1.5 rounded-full"
                     >
                       {style}
                     </span>
@@ -214,7 +214,7 @@ export default async function MemberProfile({
             {member.specialties.length > 0 && (
               <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
                 <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <span className="w-1 h-4 bg-[#00B5A3] rounded-full" />
+                  <span className="w-1 h-4 bg-[#4E87A0] rounded-full" />
                   Specialties
                 </h2>
                 <div className="flex flex-wrap gap-2">
@@ -274,9 +274,9 @@ export default async function MemberProfile({
                       href={member.social.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 text-sm text-slate-600 hover:text-[#00B5A3] transition-colors group p-2 rounded-lg hover:bg-slate-50"
+                      className="flex items-center gap-3 text-sm text-slate-600 hover:text-[#4E87A0] transition-colors group p-2 rounded-lg hover:bg-slate-50"
                     >
-                      <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-[#00B5A3]/10 transition-colors shrink-0">
+                      <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-[#4E87A0]/10 transition-colors shrink-0">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                         </svg>
@@ -287,9 +287,9 @@ export default async function MemberProfile({
                   {member.social.instagram && (
                     <a
                       href="#"
-                      className="flex items-center gap-3 text-sm text-slate-600 hover:text-[#00B5A3] transition-colors group p-2 rounded-lg hover:bg-slate-50"
+                      className="flex items-center gap-3 text-sm text-slate-600 hover:text-[#4E87A0] transition-colors group p-2 rounded-lg hover:bg-slate-50"
                     >
-                      <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-[#00B5A3]/10 transition-colors shrink-0">
+                      <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-[#4E87A0]/10 transition-colors shrink-0">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                         </svg>
@@ -300,9 +300,9 @@ export default async function MemberProfile({
                   {member.social.youtube && (
                     <a
                       href="#"
-                      className="flex items-center gap-3 text-sm text-slate-600 hover:text-[#00B5A3] transition-colors group p-2 rounded-lg hover:bg-slate-50"
+                      className="flex items-center gap-3 text-sm text-slate-600 hover:text-[#4E87A0] transition-colors group p-2 rounded-lg hover:bg-slate-50"
                     >
-                      <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-[#00B5A3]/10 transition-colors shrink-0">
+                      <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-[#4E87A0]/10 transition-colors shrink-0">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M23.495 6.205a3.007 3.007 0 00-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 00.527 6.205a31.247 31.247 0 00-.522 5.805 31.247 31.247 0 00.522 5.783 3.007 3.007 0 002.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 002.088-2.088 31.247 31.247 0 00.5-5.783 31.247 31.247 0 00-.5-5.805zM9.609 15.601V8.408l6.264 3.602z" />
                         </svg>
@@ -316,11 +316,11 @@ export default async function MemberProfile({
 
             {/* Member card */}
             <div className="bg-[#1B3A5C] rounded-2xl p-6 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#00B5A3] opacity-[0.08] rounded-full blur-2xl translate-x-8 -translate-y-8" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#4E87A0] opacity-[0.08] rounded-full blur-2xl translate-x-8 -translate-y-8" />
               <div className="relative">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-slate-400 text-xs font-semibold uppercase tracking-widest">GOYA Member</span>
-                  <span className="w-2 h-2 bg-[#00B5A3] rounded-full animate-pulse" />
+                  <span className="w-2 h-2 bg-[#4E87A0] rounded-full animate-pulse" />
                 </div>
                 <p className="text-white font-bold text-lg mb-4">Since {member.memberSince}</p>
                 <div className="pt-4 border-t border-white/10">
