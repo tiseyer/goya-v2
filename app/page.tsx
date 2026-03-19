@@ -59,7 +59,7 @@ export default function Home() {
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1B3A5C] leading-[1.05] mb-6">
-              Connect. Grow.
+              Fast. Slow.
               <br />
               <span className="text-[#4E87A0]">Practice Together.</span>
             </h1>
