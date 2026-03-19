@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import FeedView from './FeedView';
+import PageHero from '@/app/components/PageHero';
 
 // ─── Profile completion ───────────────────────────────────────────────────────
 
@@ -107,13 +108,11 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Greeting bar */}
-      <div className="bg-white border-b border-[#E5E7EB] pt-20 pb-6 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-[#1B3A5C]">Welcome back, {firstName}</h1>
-          <p className="text-[#6B7280] text-sm mt-0.5">Here&apos;s what&apos;s happening in your yoga community.</p>
-        </div>
-      </div>
+      <PageHero
+        pill="GOYA Dashboard"
+        title={`Welcome back, ${firstName}`}
+        subtitle="Your yoga community hub."
+      />
 
       {/* 3-column layout */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

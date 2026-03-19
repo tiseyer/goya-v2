@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import type { Event, EventCategory } from '@/lib/types';
+import PageHero from '@/app/components/PageHero';
 
 const ALL_CATEGORIES: Array<'All' | EventCategory> = [
   'All', 'Workshop', 'Teacher Training', 'Dharma Talk', 'Conference',
@@ -99,15 +100,11 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div className="bg-[#F7F8FA] pt-20 pb-8 px-4 sm:px-6 lg:px-8 border-b border-[#E5E7EB]">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl font-bold text-[#1B3A5C] mb-4">Events</h1>
-          <p className="text-[#6B7280] text-lg max-w-2xl">
-            Workshops, teacher trainings, dharma talks, and conferences from the global GOYA community.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        pill="Events"
+        title="Events"
+        subtitle="Workshops, teacher trainings, dharma talks, and conferences from the global GOYA community."
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">

@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import type { Course, UserCourseProgress, CourseCategory } from '@/lib/types';
+import PageHero from '@/app/components/PageHero';
 
 const CATEGORIES: Array<'All' | CourseCategory> = [
   'All', 'Workshop', 'Yoga Sequence', 'Dharma Talk', 'Music Playlist', 'Research',
@@ -91,18 +92,11 @@ export default function AcademyPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero */}
-      <div className="bg-[#F7F8FA] pt-20 pb-8 px-4 sm:px-6 lg:px-8 border-b border-[#E5E7EB]">
-        <div className="max-w-7xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-[#4E87A0]/10 border border-[#4E87A0]/20 rounded-full px-3 py-1 text-[#4E87A0] text-xs font-medium mb-5">
-            GOYA Academy
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-[#1B3A5C] mb-4">Course Library</h1>
-          <p className="text-[#6B7280] text-lg max-w-2xl">
-            Workshops, sequences, dharma talks, and research — curated for the serious yoga practitioner.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        pill="GOYA Academy"
+        title="Course Library"
+        subtitle="Workshops, sequences, dharma talks, and research — curated for the serious yoga practitioner."
+      />
 
       {/* Filter bars */}
       <div className="sticky top-16 z-40 bg-white border-b border-slate-200 shadow-sm">

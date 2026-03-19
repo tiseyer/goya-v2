@@ -3,6 +3,7 @@ import { isProductVisible } from '@/lib/productVisibility'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import PageHero from '@/app/components/PageHero'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -121,23 +122,18 @@ export default async function AddonsPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Page header */}
-      <div className="bg-[#F7F8FA] pt-20 pb-8 px-4 sm:px-6 lg:px-8 border-b border-[#E5E7EB]">
-        <div className="max-w-7xl mx-auto">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-[#6B7280] mb-5">
-            <Link href="/" className="hover:text-[#1B3A5C] transition-colors">Home</Link>
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      <PageHero
+        customPill={
+          <div className="inline-flex items-center gap-1.5 bg-[#1B3A5C]/8 border border-[#1B3A5C]/15 rounded-full px-3 py-1 text-[#1B3A5C]/70 text-xs font-semibold tracking-wide">
+            Brightcoms
+            <svg className="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
-            <span className="text-[#374151]">All Add-Ons &amp; Upgrades</span>
-          </nav>
-          <h1 className="text-3xl sm:text-4xl font-bold text-[#1B3A5C]">All Add-Ons &amp; Upgrades</h1>
-          <p className="mt-2 text-[#6B7280] text-sm max-w-2xl">
-            Enhance your GOYA profile with verified designation badges, continuing education credits, and more.
-          </p>
-        </div>
-      </div>
+          </div>
+        }
+        title="All Add-Ons & Upgrades"
+        subtitle="Enhance your GOYA profile with verified designation badges, continuing education credits, and more."
+      />
 
       {/* Toolbar */}
       <div className="border-b border-slate-200 bg-white sticky top-16 z-40">

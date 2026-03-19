@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import PageHero from '@/app/components/PageHero';
 import {
   members,
   allCountries,
@@ -316,11 +317,11 @@ export default function MembersPage() {
   // ── Mobile layout ──────────────────────────────────────────────────────────
   const MobileLayout = (
     <div className="lg:hidden">
-      {/* Mobile hero */}
-      <div className="bg-[#F7F8FA] pt-24 pb-6 px-4 sm:px-6 border-b border-[#E5E7EB]">
-        <h1 className="text-3xl font-bold text-[#1B3A5C] mb-2">Member Directory</h1>
-        <p className="text-[#6B7280] text-sm">Yoga practitioners worldwide.</p>
-      </div>
+      <PageHero
+        pill="Community"
+        title="Member Directory"
+        subtitle="Connect with yoga teachers, students, and wellness practitioners worldwide."
+      />
       {/* Mobile filters */}
       <div className="bg-white border-b border-slate-200 px-4 py-3 space-y-2">
         <div className="relative">
