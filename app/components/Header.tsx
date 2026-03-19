@@ -294,7 +294,7 @@ function MessagesWidget() {
 
 // ─── User menu ────────────────────────────────────────────────────────────────
 
-function UserMenu({ userName, userMrn, userInitials, userRole, userId, onLogout }: { userName: string; userMrn: string; userInitials: string; userRole?: string; userId?: string; onLogout: () => void }) {
+function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMemberType, onLogout }: { userName: string; userMrn: string; userInitials: string; userRole?: string; userId?: string; userMemberType?: string; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setOpen(false));
@@ -302,6 +302,8 @@ function UserMenu({ userName, userMrn, userInitials, userRole, userId, onLogout 
   const menuItems = [
     { label: 'My Profile',      href: userId ? `/members/${userId}` : '#', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
     { label: 'Profile Settings', href: '/profile/settings',  icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' },
+    { label: 'Credits & Hours',  href: '/credits',            icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+    ...(userMemberType === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' }] : []),
     { label: 'Subscriptions',   href: '#',                   icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
     { label: 'Messages',        href: '#',                   icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
   ];
@@ -542,7 +544,7 @@ export default function Header() {
                 <MessagesWidget />
                 <CartWidget />
                 <div className="w-px h-5 bg-[#E5E7EB] mx-1" />
-                <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} userId={profile?.id} onLogout={handleLogout} />
+                <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} userId={profile?.id} userMemberType={profile?.member_type} onLogout={handleLogout} />
               </>
             ) : (
               <>
@@ -616,6 +618,8 @@ export default function Header() {
               {[
                 { label: 'My Profile', href: profile?.id ? `/members/${profile.id}` : '#' },
                 { label: 'Profile Settings', href: '/profile/settings' },
+                { label: 'Credits & Hours', href: '/credits' },
+                ...(profile?.member_type === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours' }] : []),
                 { label: 'Subscriptions', href: '#' },
                 { label: 'Messages', href: '#' },
               ].map(item => (
