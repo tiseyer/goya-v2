@@ -20,12 +20,50 @@ export interface Profile {
   role: UserRole;
   avatar_url: string | null;
   bio: string | null;
+  introduction: string | null;
   location: string | null;
+  city: string | null;
+  country: string | null;
   website: string | null;
   instagram: string | null;
+  facebook: string | null;
+  tiktok: string | null;
   youtube: string | null;
+  youtube_intro_url: string | null;
+  phone: string | null;
   is_verified: boolean;
   subscription_status: SubscriptionStatus;
+  // Onboarding
+  onboarding_completed: boolean;
+  onboarding_step: number;
+  member_type: MemberType | null;
+  verification_status: VerificationStatus;
+  // Shared
+  practice_format: 'online' | 'in_person' | 'hybrid' | null;
+  languages: string[] | null;
+  // Student
+  practice_level: string | null;
+  practice_styles: string[] | null;
+  // Teacher
+  teacher_status: string | null;
+  teaching_styles: string[] | null;
+  years_teaching: string | null;
+  teaching_focus_arr: string[] | null;
+  influences_arr: string[] | null;
+  other_org_member: boolean | null;
+  other_org_names: string[] | null;
+  other_org_name_other: string | null;
+  other_org_registration: string | null;
+  other_org_designations: string | null;
+  certificate_is_official: boolean | null;
+  certificate_url: string | null;
+  // Wellness
+  wellness_designations: string[] | null;
+  wellness_designation_other: string | null;
+  wellness_org_name: string | null;
+  wellness_regulatory_body: boolean | null;
+  wellness_regulatory_designations: string | null;
+  wellness_focus: string[] | null;
   created_at: string;
   updated_at: string;
 }

@@ -3,45 +3,35 @@
 import Link from 'next/link';
 import { useOnboarding } from './OnboardingProvider';
 
-const TOTAL_STEPS = 3;
-
 export default function OnboardingShell({ children }: { children: React.ReactNode }) {
-  const { currentStep } = useOnboarding();
-  const showProgress = currentStep >= 1 && currentStep <= TOTAL_STEPS;
-  const progressPct  = showProgress ? Math.round((currentStep / TOTAL_STEPS) * 100) : 0;
+  const { currentIndex, totalSteps, answers } = useOnboarding();
+  const showProgress = !!answers.member_type;
+  const progressPct = totalSteps > 1 ? Math.round((currentIndex / (totalSteps - 1)) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Header */}
+    <div className="min-h-screen flex flex-col" style={{ background: '#f8f7f6' }}>
       <header className="bg-white border-b border-slate-100 sticky top-0 z-20">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="font-bold text-lg tracking-tight text-[#1B3A5C]">
+          <Link href="/" className="font-black text-xl tracking-tight text-[#1B3A5C]">
             GOYA
           </Link>
-
-          {/* Step indicator */}
           {showProgress && (
             <span className="text-xs font-semibold text-slate-400">
-              Step {currentStep} of {TOTAL_STEPS}
+              Step {currentIndex + 1} of {totalSteps}
             </span>
           )}
         </div>
-
-        {/* Progress bar */}
         {showProgress && (
           <div className="h-1 bg-slate-100">
             <div
-              className="h-full bg-[#4E87A0] transition-all duration-500"
-              style={{ width: `${progressPct}%` }}
+              className="h-full transition-all duration-500"
+              style={{ width: `${progressPct}%`, background: '#9e6b7a' }}
             />
           </div>
         )}
       </header>
-
-      {/* Page content */}
       <main className="flex-1 flex items-start justify-center py-10 px-4">
-        <div className="w-full max-w-xl">
+        <div className="w-full max-w-2xl">
           {children}
         </div>
       </main>

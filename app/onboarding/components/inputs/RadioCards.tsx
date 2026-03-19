@@ -1,74 +1,58 @@
 'use client';
 
-interface Option<T extends string> {
-  value: T;
+interface Option {
+  value: string;
   label: string;
   description?: string;
-  icon?: React.ReactNode;
 }
 
-interface Props<T extends string> {
-  label?: string;
-  options: Option<T>[];
-  value: T | undefined;
-  onChange: (value: T) => void;
+interface Props {
+  options: Option[];
+  value: string | undefined;
+  onChange: (value: string) => void;
+  columns?: 1 | 2 | 3;
 }
 
-export default function RadioCards<T extends string>({
-  label,
-  options,
-  value,
-  onChange,
-}: Props<T>) {
+export default function RadioCards({ options, value, onChange, columns = 2 }: Props) {
+  const gridCols = columns === 1 ? 'grid-cols-1' : columns === 3 ? 'grid-cols-3' : 'grid-cols-2';
+
   return (
-    <div className="space-y-2">
-      {label && (
-        <p className="text-sm font-semibold text-[#1B3A5C]">{label}</p>
-      )}
-      <div className="space-y-2.5">
-        {options.map(opt => {
-          const isSelected = value === opt.value;
-          return (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => onChange(opt.value)}
-              className={`w-full text-left px-4 py-4 rounded-xl border-2 transition-all ${
-                isSelected
-                  ? 'border-[#4E87A0] bg-[#4E87A0]/5'
-                  : 'border-slate-200 bg-white hover:border-slate-300'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                {opt.icon && (
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                    isSelected ? 'bg-[#4E87A0] text-white' : 'bg-slate-100 text-slate-500'
-                  }`}>
-                    {opt.icon}
-                  </div>
+    <div className={`grid ${gridCols} gap-3`}>
+      {options.map(opt => {
+        const isSelected = value === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className={`w-full text-left px-4 py-4 rounded-xl border-2 transition-all ${
+              isSelected
+                ? 'bg-[#9e6b7a]/5'
+                : 'border-slate-200 bg-white hover:border-slate-300'
+            }`}
+            style={isSelected ? { borderColor: '#9e6b7a' } : undefined}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <span className={`font-semibold text-sm ${isSelected ? 'text-[#1B3A5C]' : 'text-slate-700'}`}>
+                  {opt.label}
+                </span>
+                {opt.description && (
+                  <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{opt.description}</p>
                 )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className={`font-semibold text-sm ${isSelected ? 'text-[#1B3A5C]' : 'text-slate-700'}`}>
-                      {opt.label}
-                    </span>
-                    <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
-                      isSelected ? 'border-[#4E87A0]' : 'border-slate-300'
-                    }`}>
-                      {isSelected && (
-                        <div className="w-2 h-2 rounded-full bg-[#4E87A0]" />
-                      )}
-                    </div>
-                  </div>
-                  {opt.description && (
-                    <p className="text-xs text-slate-500 mt-0.5">{opt.description}</p>
-                  )}
-                </div>
               </div>
-            </button>
-          );
-        })}
-      </div>
+              <div
+                className="w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center"
+                style={isSelected ? { borderColor: '#9e6b7a' } : { borderColor: '#cbd5e1' }}
+              >
+                {isSelected && (
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#9e6b7a' }} />
+                )}
+              </div>
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 }

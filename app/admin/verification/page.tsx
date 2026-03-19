@@ -8,7 +8,7 @@ export default async function VerificationPage() {
 
   const { data: pending } = await supabase
     .from('profiles')
-    .select('id, full_name, email, member_type, avatar_url, created_at')
+    .select('id, full_name, email, member_type, avatar_url, created_at, certificate_url')
     .eq('verification_status', 'pending')
     .order('created_at', { ascending: true });
 
@@ -76,7 +76,7 @@ export default async function VerificationPage() {
                 </div>
 
                 {/* Actions */}
-                <VerificationActions userId={user.id} />
+                <VerificationActions userId={user.id} certificateUrl={user.certificate_url} />
               </div>
             ))}
           </div>

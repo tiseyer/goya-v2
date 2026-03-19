@@ -2,74 +2,76 @@
 
 import { useOnboarding } from './OnboardingProvider';
 
-interface Props {
-  stepNumber: number;
+interface OnboardingStepProps {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
-  onContinue?: () => void | Promise<void>;
-  continueLabel?: string;
-  continueDisabled?: boolean;
-  hideContinue?: boolean;
+  onNext?: () => Promise<void> | void;
+  nextLabel?: string;
+  nextDisabled?: boolean;
+  hidePrev?: boolean;
 }
 
 export default function OnboardingStep({
-  stepNumber,
   title,
   subtitle,
   children,
-  onContinue,
-  continueLabel = 'Continue',
-  continueDisabled = false,
-  hideContinue = false,
-}: Props) {
-  const { goToNext, goToPrev, isSaving, currentStep } = useOnboarding();
+  onNext,
+  nextLabel = 'NEXT →',
+  nextDisabled = false,
+  hidePrev = false,
+}: OnboardingStepProps) {
+  const { goToNext, goToPrev, isSaving, savedFlash } = useOnboarding();
 
-  async function handleContinue() {
-    if (onContinue) {
-      await onContinue();
+  async function handleNext() {
+    if (onNext) {
+      await onNext();
     } else {
       await goToNext();
     }
   }
 
   return (
-    <div className="space-y-8">
-      {/* Step header */}
-      <div>
-        <p className="text-xs font-semibold text-[#4E87A0] uppercase tracking-widest mb-2">
-          Step {stepNumber} of 3
-        </p>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#1B3A5C] mb-2">{title}</h1>
+    <div>
+      {/* Card */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <h1 className="text-2xl font-bold text-[#1B3A5C]">{title}</h1>
         {subtitle && (
-          <p className="text-slate-500 text-sm leading-relaxed">{subtitle}</p>
+          <p className="text-sm text-slate-500 mt-1">{subtitle}</p>
         )}
+        <div className="mt-6">
+          {children}
+        </div>
       </div>
 
-      {/* Content */}
-      <div>{children}</div>
-
       {/* Navigation */}
-      {!hideContinue && (
-        <div className="flex items-center gap-3 pt-2">
-          {currentStep > 1 && (
-            <button
-              onClick={goToPrev}
-              disabled={isSaving}
-              className="px-5 py-3 text-sm font-semibold text-slate-500 hover:text-[#1B3A5C] transition-colors disabled:opacity-40"
-            >
-              ← Back
-            </button>
-          )}
+      <div className="mt-4 flex gap-3">
+        {!hidePrev && (
           <button
-            onClick={handleContinue}
-            disabled={continueDisabled || isSaving}
-            className="flex-1 py-3 bg-[#4E87A0] text-white font-bold rounded-xl hover:bg-[#3A7190] transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            type="button"
+            onClick={goToPrev}
+            disabled={isSaving}
+            className="flex-1 px-6 py-3 rounded-xl font-semibold text-sm text-white transition-colors disabled:opacity-50"
+            style={{ background: '#9e6b7a' }}
           >
-            {isSaving ? 'Saving…' : continueLabel}
+            ← PREVIOUS
           </button>
-        </div>
-      )}
+        )}
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={nextDisabled || isSaving}
+          className={`px-6 py-3 rounded-xl font-semibold text-sm text-white transition-opacity disabled:opacity-50 ${hidePrev ? 'w-full' : 'flex-1'}`}
+          style={{ background: '#9e6b7a' }}
+        >
+          {isSaving ? 'Saving…' : nextLabel}
+        </button>
+      </div>
+
+      {/* Autosave indicator */}
+      <p className="text-center text-xs text-slate-400 mt-3">
+        {savedFlash ? '✓ Progress saved' : 'Your progress is saved automatically ✓'}
+      </p>
     </div>
   );
 }

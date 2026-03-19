@@ -1,14 +1,14 @@
 'use client';
 
 interface Props {
-  label: string;
+  label?: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  rows?: number;
+  minLength?: number;
   maxLength?: number;
+  rows?: number;
   helpText?: string;
-  required?: boolean;
 }
 
 export default function TextareaInput({
@@ -16,35 +16,45 @@ export default function TextareaInput({
   value,
   onChange,
   placeholder,
-  rows = 4,
+  minLength,
   maxLength,
+  rows = 5,
   helpText,
-  required,
 }: Props) {
+  const len = value.length;
+  const belowMin = minLength !== undefined && len < minLength;
+  const atMax = maxLength !== undefined && len >= maxLength;
+
+  let counterColor = 'text-slate-400';
+  if (atMax) counterColor = 'text-red-500';
+  else if (belowMin) counterColor = 'text-orange-400';
+
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-[#1B3A5C]">
-          {label}
-          {required && <span className="text-rose-500 ml-1">*</span>}
-        </label>
+      {label && (
+        <label className="block text-sm font-semibold text-[#1B3A5C]">{label}</label>
+      )}
+      <div className="relative">
+        <textarea
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder={placeholder}
+          rows={rows}
+          maxLength={maxLength}
+          className="w-full px-4 py-3 rounded-xl border border-slate-200 text-[#1B3A5C] placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#9e6b7a]/40 focus:border-[#9e6b7a] transition-colors resize-none"
+        />
         {maxLength && (
-          <span className={`text-xs ${value.length > maxLength * 0.9 ? 'text-amber-500' : 'text-slate-400'}`}>
-            {value.length}/{maxLength}
+          <span className={`absolute bottom-2 right-3 text-xs ${counterColor}`}>
+            {len}/{maxLength}
           </span>
         )}
       </div>
-      <textarea
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        rows={rows}
-        maxLength={maxLength}
-        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-[#1B3A5C] placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#4E87A0]/40 focus:border-[#4E87A0] transition-colors resize-none"
-      />
-      {helpText && (
-        <p className="text-xs text-slate-400">{helpText}</p>
+      {belowMin && (
+        <p className="text-xs text-orange-400">
+          Please add at least {minLength! - len} more character{minLength! - len !== 1 ? 's' : ''}
+        </p>
       )}
+      {helpText && <p className="text-xs text-slate-400">{helpText}</p>}
     </div>
   );
 }
