@@ -55,7 +55,7 @@ export default function Footer() {
 
         <div className="border-t border-[#E5E7EB] mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs">© 2025 Global Online Yoga Association. All rights reserved.</p>
-          <a href="https://zier-seyer-marketing.de" target="_blank" rel="noopener noreferrer" className="text-xs hover:text-[#4E87A0] transition-colors">Powered by Zier Marketing</a>
+          <a href="https://seyer-marketing.de" target="_blank" rel="noopener noreferrer" className="text-xs hover:text-[#4E87A0] transition-colors">Powered by Seyer Marketing</a>
         </div>
       </div>
     </footer>
