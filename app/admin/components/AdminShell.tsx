@@ -41,6 +41,11 @@ const NAV_ITEMS = [
     ],
   },
   {
+    href: '/admin/products',
+    label: 'Products',
+    paths: ['M16 11V7a4 4 0 00-8 0v4M5 9h14l1 10H4L5 9z'],
+  },
+  {
     href: '/admin/credits',
     label: 'Credits',
     paths: [
