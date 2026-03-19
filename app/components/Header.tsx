@@ -504,7 +504,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/GOYA Logo Black.png" alt="GOYA" style={{ width: '120px', height: 'auto' }} />
+            <img src="/images/GOYA Logo Blue.png" alt="GOYA" style={{ width: '120px', height: 'auto' }} />
           </Link>
 
           {/* Desktop nav */}

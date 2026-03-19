@@ -10,7 +10,7 @@ export default function Footer() {
             <div className="mb-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/GOYA Logo Black.png"
+                src="/images/GOYA Logo Blue.png"
                 alt="GOYA"
                 style={{ width: '120px', height: 'auto' }}
               />
