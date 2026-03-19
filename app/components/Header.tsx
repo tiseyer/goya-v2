@@ -507,6 +507,18 @@ export default function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-0.5">
+            {isLoggedIn && (
+              <Link
+                href="/dashboard"
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  pathname === '/dashboard'
+                    ? 'text-[#1B3A5C] bg-slate-100'
+                    : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+                }`}
+              >
+                Dashboard
+              </Link>
+            )}
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={label}
@@ -582,6 +594,19 @@ export default function Header() {
         <div className="lg:hidden bg-white border-t border-[#E5E7EB] px-4 py-4 space-y-1">
           {/* Mobile cart link */}
           <MobileCartLink onClose={() => setMenuOpen(false)} />
+          {isLoggedIn && (
+            <Link
+              href="/dashboard"
+              onClick={() => setMenuOpen(false)}
+              className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname === '/dashboard'
+                  ? 'text-[#1B3A5C] bg-slate-100'
+                  : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+              }`}
+            >
+              Dashboard
+            </Link>
+          )}
           {NAV_LINKS.map(({ href, label }) => (
             <Link
               key={label}
