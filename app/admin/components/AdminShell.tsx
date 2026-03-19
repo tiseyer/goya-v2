@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 const NAV_ITEMS = [
   {
@@ -10,6 +11,14 @@ const NAV_ITEMS = [
     label: 'Dashboard',
     paths: [
       'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z',
+    ],
+  },
+  {
+    href: '/admin/inbox',
+    label: 'Inbox',
+    badge: true,
+    paths: [
+      'M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4',
     ],
   },
   {
@@ -65,10 +74,48 @@ const NAV_ITEMS = [
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [maintenanceActive, setMaintenanceActive] = useState(false);
+  const [pendingSchools, setPendingSchools] = useState(0);
 
   useEffect(() => {
     const stored = localStorage.getItem('admin-sidebar-collapsed');
     if (stored !== null) setCollapsed(stored === 'true');
+  }, []);
+
+  useEffect(() => {
+    async function fetchPendingSchools() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { count } = await (supabase as any)
+        .from('schools')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      setPendingSchools(count ?? 0);
+    }
+    fetchPendingSchools();
+  }, [pathname]);
+
+  useEffect(() => {
+    async function checkMaintenance() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase as any)
+        .from('site_settings')
+        .select('key, value')
+        .in('key', ['maintenance_mode_enabled', 'maintenance_mode_scheduled', 'maintenance_start_utc', 'maintenance_end_utc']);
+      if (!data) return;
+      const map: Record<string, string> = {};
+      (data as Array<{ key: string; value: string }>).forEach(r => { map[r.key] = r.value ?? ''; });
+      const enabled   = map.maintenance_mode_enabled === 'true';
+      const scheduled = map.maintenance_mode_scheduled === 'true';
+      const now = Date.now();
+      let active = enabled;
+      if (!active && scheduled) {
+        const start = map.maintenance_start_utc ? new Date(map.maintenance_start_utc).getTime() : 0;
+        const end   = map.maintenance_end_utc   ? new Date(map.maintenance_end_utc).getTime()   : 0;
+        active = start > 0 && end > 0 && now >= start && now <= end;
+      }
+      setMaintenanceActive(active);
+    }
+    checkMaintenance();
   }, []);
 
   function toggle() {
@@ -108,6 +155,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
           {NAV_ITEMS.map(item => {
             const isActive = pathname.startsWith(item.href);
+            const badgeCount = item.badge ? pendingSchools : 0;
             return (
               <Link
                 key={item.href}
@@ -121,14 +169,26 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                 }`}
                 title={collapsed ? item.label : undefined}
               >
-                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {item.paths.map((d, i) => (
-                    <path key={i} strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 2 : 1.75} d={d} />
-                  ))}
-                </svg>
+                <div className="relative shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {item.paths.map((d, i) => (
+                      <path key={i} strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 2 : 1.75} d={d} />
+                    ))}
+                  </svg>
+                  {badgeCount > 0 && collapsed && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-white text-[9px] font-bold flex items-center justify-center">
+                      {badgeCount > 9 ? '9+' : badgeCount}
+                    </span>
+                  )}
+                </div>
                 {!collapsed && (
-                  <span className="text-sm font-medium whitespace-nowrap overflow-hidden">
+                  <span className="flex-1 text-sm font-medium whitespace-nowrap overflow-hidden">
                     {item.label}
+                  </span>
+                )}
+                {!collapsed && badgeCount > 0 && (
+                  <span className="ml-auto shrink-0 inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+                    {badgeCount > 99 ? '99+' : badgeCount}
                   </span>
                 )}
               </Link>
@@ -152,6 +212,20 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
       {/* Main content */}
       <div className="flex-1 min-w-0 bg-slate-50">
+        {maintenanceActive && (
+          <div className="bg-amber-50 border-b border-amber-200 px-6 py-3 flex items-center gap-3">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+            <p className="text-sm font-medium text-amber-800 flex-1">
+              Maintenance mode is active — non-admin users are seeing the maintenance page.
+            </p>
+            <Link
+              href="/admin/settings"
+              className="text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors shrink-0"
+            >
+              Manage →
+            </Link>
+          </div>
+        )}
         {children}
       </div>
     </div>

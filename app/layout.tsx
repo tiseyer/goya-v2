@@ -62,7 +62,8 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers();
   const pathname = headersList.get("next-url") || "";
-  const hideNav = pathname.startsWith("/onboarding") || pathname.startsWith("/login") || pathname.startsWith("/register");
+  const hideNav = pathname.startsWith("/onboarding") || pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/maintenance");
+  const hideFooter = pathname.startsWith("/maintenance");
 
   const settings = await getAnalyticsSettings();
   const analyticsEnabled = settings?.analytics_enabled === 'true';
@@ -106,7 +107,7 @@ gtag('config', '${ga4Id}');
           <main className={`${!hideNav ? "pt-16" : ""} flex-1`}>
             {children}
           </main>
-          <Footer />
+          {!hideFooter && <Footer />}
         </ClientProviders>
 
         {/* Vercel Analytics — always on */}

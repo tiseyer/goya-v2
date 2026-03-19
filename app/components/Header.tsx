@@ -294,7 +294,7 @@ function MessagesWidget() {
 
 // ─── User menu ────────────────────────────────────────────────────────────────
 
-function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMemberType, onLogout }: { userName: string; userMrn: string; userInitials: string; userRole?: string; userId?: string; userMemberType?: string; onLogout: () => void }) {
+function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMemberType, userSchoolId, onLogout }: { userName: string; userMrn: string; userInitials: string; userRole?: string; userId?: string; userMemberType?: string; userSchoolId?: string; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setOpen(false));
@@ -371,6 +371,35 @@ function UserMenu({ userName, userMrn, userInitials, userRole, userId, userMembe
                 </svg>
                 Admin Settings
               </Link>
+            </div>
+          )}
+
+          {/* School Settings / Register School (teacher role) */}
+          {userRole === 'teacher' && (
+            <div className="border-t border-[#E5E7EB] py-1.5">
+              {userSchoolId ? (
+                <Link
+                  href={`/schools/${userSchoolId}/settings`}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h6" />
+                  </svg>
+                  School Settings
+                </Link>
+              ) : (
+                <Link
+                  href="/schools/create"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Register School
+                </Link>
+              )}
             </div>
           )}
 
@@ -463,25 +492,70 @@ export default function Header() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [maintenanceActive, setMaintenanceActive] = useState(false);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
+
+  function checkMaintenance(role: string | undefined) {
+    if (role !== 'admin' && role !== 'moderator') return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('site_settings')
+      .select('key, value')
+      .in('key', ['maintenance_mode_enabled', 'maintenance_mode_scheduled', 'maintenance_start_utc', 'maintenance_end_utc'])
+      .then(({ data }: { data: Array<{ key: string; value: string }> | null }) => {
+        if (!data) return;
+        const map: Record<string, string> = {};
+        data.forEach(r => { map[r.key] = r.value ?? ''; });
+        const enabled = map.maintenance_mode_enabled === 'true';
+        const scheduled = map.maintenance_mode_scheduled === 'true';
+        const now = Date.now();
+        let active = enabled;
+        if (!active && scheduled) {
+          const start = map.maintenance_start_utc ? new Date(map.maintenance_start_utc).getTime() : 0;
+          const end   = map.maintenance_end_utc   ? new Date(map.maintenance_end_utc).getTime()   : 0;
+          active = start > 0 && end > 0 && now >= start && now <= end;
+        }
+        setMaintenanceActive(active);
+      });
+  }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user ?? null);
       if (data.user) {
         supabase.from('profiles').select('*').eq('id', data.user.id).single()
-          .then(({ data: p }) => setProfile(p));
+          .then(({ data: p }) => {
+            setProfile(p);
+            checkMaintenance(p?.role);
+            if (p?.role === 'teacher') {
+              (supabase as any).from('schools').select('id').eq('owner_id', data.user!.id).maybeSingle()
+                .then(({ data: s }: { data: { id: string } | null }) => setSchoolId(s?.id ?? null));
+            }
+          });
       }
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         supabase.from('profiles').select('*').eq('id', session.user.id).single()
-          .then(({ data: p }) => setProfile(p));
+          .then(({ data: p }) => {
+            setProfile(p);
+            checkMaintenance(p?.role);
+            if (p?.role === 'teacher') {
+              (supabase as any).from('schools').select('id').eq('owner_id', session.user!.id).maybeSingle()
+                .then(({ data: s }: { data: { id: string } | null }) => setSchoolId(s?.id ?? null));
+            } else {
+              setSchoolId(null);
+            }
+          });
       } else {
         setProfile(null);
+        setMaintenanceActive(false);
+        setSchoolId(null);
       }
     });
     return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isLoggedIn = !!user;
@@ -543,8 +617,17 @@ export default function Header() {
                 <SearchWidget />
                 <MessagesWidget />
                 <CartWidget />
+                {(profile?.role === 'admin' || profile?.role === 'moderator') && maintenanceActive && (
+                  <Link
+                    href="/admin/settings"
+                    className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg hover:bg-amber-100 transition-colors"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Maintenance
+                  </Link>
+                )}
                 <div className="w-px h-5 bg-[#E5E7EB] mx-1" />
-                <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} userId={profile?.id} userMemberType={profile?.member_type} onLogout={handleLogout} />
+                <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} userId={profile?.id} userMemberType={profile?.member_type} userSchoolId={schoolId ?? undefined} onLogout={handleLogout} />
               </>
             ) : (
               <>
@@ -635,6 +718,21 @@ export default function Header() {
                 >
                   Admin Settings
                 </Link>
+              )}
+              {profile?.role === 'teacher' && (
+                schoolId ? (
+                  <Link href={`/schools/${schoolId}/settings`} onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  >
+                    School Settings
+                  </Link>
+                ) : (
+                  <Link href="/schools/create" onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  >
+                    Register School
+                  </Link>
+                )
               )}
               <button onClick={handleLogout} className="w-full text-left px-4 py-2 rounded-lg text-rose-500 hover:bg-rose-50 text-sm transition-colors">
                 Logout
