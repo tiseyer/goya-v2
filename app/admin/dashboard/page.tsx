@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import AdminOnboardingTest from './AdminOnboardingTest';
 
 // ─── Stat card ─────────────────────────────────────────────────────────────────
 
@@ -119,6 +120,7 @@ export default async function DashboardPage() {
       {/* Row 2 — Platform info */}
       <div className="mt-8">
         <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest mb-3">Platform</h2>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <StatCard label="App Version"     value="v2.0.0-alpha" icon={VersionIcon} />
           <StatCard label="Environment"     value={environment}  icon={EnvIcon} />
@@ -137,6 +139,12 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* System */}
+      <div className="mt-8">
+        <h2 className="text-lg font-bold text-[#1B3A5C] mb-4">System</h2>
+        <AdminOnboardingTest />
       </div>
     </div>
   );

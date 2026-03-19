@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import PageHero from '@/app/components/PageHero';
 import {
   members,
   allCountries,
@@ -173,7 +174,7 @@ function FullCard({
   onSelect: (id: string) => void;
 }) {
   const style = ROLE_STYLES[member.role];
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     if (highlighted && ref.current) {
@@ -182,9 +183,10 @@ function FullCard({
   }, [highlighted]);
 
   return (
-    <div
+    <Link
+      href={`/members/${member.id}`}
       ref={ref}
-      className={`group relative bg-white rounded-2xl border overflow-hidden flex flex-col transition-all duration-200 ${
+      className={`group relative bg-white rounded-2xl border overflow-hidden flex flex-col transition-all duration-200 cursor-pointer ${
         highlighted
           ? 'border-[#4E87A0] shadow-lg shadow-[#4E87A0]/10 ring-1 ring-[#4E87A0]'
           : 'border-slate-100 shadow-sm hover:shadow-lg'
@@ -220,7 +222,7 @@ function FullCard({
             </span>
           </div>
           <button
-            onClick={() => onSelect(member.id)}
+            onClick={e => { e.preventDefault(); e.stopPropagation(); onSelect(member.id); }}
             className="shrink-0 w-7 h-7 rounded-lg bg-slate-100 hover:bg-[#4E87A0]/10 flex items-center justify-center text-slate-400 hover:text-[#4E87A0] transition-colors"
             title="Show on map"
           >
@@ -259,18 +261,15 @@ function FullCard({
         {/* Footer */}
         <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
           <span className="text-[10px] text-slate-400">Since {member.memberSince}</span>
-          <Link
-            href={`/members/${member.id}`}
-            className="text-[11px] font-semibold text-[#4E87A0] hover:text-[#3A7190] flex items-center gap-0.5 transition-colors"
-          >
+          <span className="text-[11px] font-semibold text-[#4E87A0] group-hover:text-[#3A7190] flex items-center gap-0.5 transition-colors">
             View Profile
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </Link>
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -318,11 +317,11 @@ export default function MembersPage() {
   // ── Mobile layout ──────────────────────────────────────────────────────────
   const MobileLayout = (
     <div className="lg:hidden">
-      {/* Mobile hero */}
-      <div className="bg-[#F7F8FA] pt-24 pb-6 px-4 sm:px-6 border-b border-[#E5E7EB]">
-        <h1 className="text-3xl font-bold text-[#1B3A5C] mb-2">Member Directory</h1>
-        <p className="text-[#6B7280] text-sm">Yoga practitioners worldwide.</p>
-      </div>
+      <PageHero
+        pill="Community"
+        title="Member Directory"
+        subtitle="Connect with yoga teachers, students, and wellness practitioners worldwide."
+      />
       {/* Mobile filters */}
       <div className="bg-white border-b border-slate-200 px-4 py-3 space-y-2">
         <div className="relative">
@@ -363,7 +362,13 @@ export default function MembersPage() {
 
   // ── Desktop three-panel layout ─────────────────────────────────────────────
   const DesktopLayout = (
-    <div className="hidden lg:flex flex-col h-[calc(100vh-4rem)] mt-16 overflow-hidden">
+    <div className="hidden lg:block">
+      <PageHero
+        pill="Community"
+        title="Member Directory"
+        subtitle="Connect with yoga teachers, students, and wellness practitioners worldwide."
+      />
+      <div className="flex flex-col overflow-hidden h-[calc(100vh-23rem)]">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 bg-white border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-3">
@@ -506,6 +511,7 @@ export default function MembersPage() {
             isVisible={mapOpen}
           />
         </div>
+      </div>
       </div>
     </div>
   );

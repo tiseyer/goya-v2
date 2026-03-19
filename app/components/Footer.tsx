@@ -10,7 +10,7 @@ export default function Footer() {
             <div className="mb-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/GOYA Logo Black.png"
+                src="/images/GOYA Logo Blue.png"
                 alt="GOYA"
                 style={{ width: '120px', height: 'auto' }}
               />
@@ -49,13 +49,15 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li><Link href="/privacy" className="hover:text-[#4E87A0] transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-[#4E87A0] transition-colors">Terms of Use</Link></li>
+              <li><Link href="/code-of-conduct" className="hover:text-[#4E87A0] transition-colors">Code of Conduct</Link></li>
+              <li><Link href="/code-of-ethics" className="hover:text-[#4E87A0] transition-colors">Code of Ethics</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-[#E5E7EB] mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs">© 2025 Global Online Yoga Association. All rights reserved.</p>
-          <a href="https://zier-seyer-marketing.de" target="_blank" rel="noopener noreferrer" className="text-xs hover:text-[#4E87A0] transition-colors">Powered by Zier Marketing</a>
+          <a href="https://seyer-marketing.de" target="_blank" rel="noopener noreferrer" className="text-xs hover:text-[#4E87A0] transition-colors">Powered by Seyer Marketing</a>
         </div>
       </div>
     </footer>

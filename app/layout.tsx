@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
+import Script from "next/script";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -24,6 +26,35 @@ export const metadata: Metadata = {
   },
 };
 
+// ─── Analytics settings fetch (cached 1 hour) ─────────────────────────────────
+
+async function getAnalyticsSettings(): Promise<Record<string, string> | null> {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseKey) return null;
+
+    const url = `${supabaseUrl}/rest/v1/site_settings?key=in.(ga4_measurement_id,clarity_project_id,analytics_enabled)&select=key,value`;
+    const res = await fetch(url, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) return null;
+    const rows = (await res.json()) as Array<{ key: string; value: string }>;
+    const map: Record<string, string> = {};
+    rows.forEach(r => { map[r.key] = r.value ?? ''; });
+    return map;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Root layout ──────────────────────────────────────────────────────────────
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -33,11 +64,43 @@ export default async function RootLayout({
   const pathname = headersList.get("next-url") || "";
   const hideNav = pathname.startsWith("/onboarding") || pathname.startsWith("/login") || pathname.startsWith("/register");
 
+  const settings = await getAnalyticsSettings();
+  const analyticsEnabled = settings?.analytics_enabled === 'true';
+  const ga4Id     = analyticsEnabled ? (settings?.ga4_measurement_id     ?? '') : '';
+  const clarityId = analyticsEnabled ? (settings?.clarity_project_id     ?? '') : '';
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-slate-50 text-slate-900 flex flex-col`}
       >
+        {/* GA4 */}
+        {ga4Id && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">{`
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${ga4Id}');
+            `}</Script>
+          </>
+        )}
+
+        {/* Microsoft Clarity */}
+        {clarityId && (
+          <Script id="clarity-init" strategy="afterInteractive">{`
+(function(c,l,a,r,i,t,y){
+  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window,document,"clarity","script","${clarityId}");
+          `}</Script>
+        )}
+
         <ClientProviders>
           {!hideNav && <Header />}
           <main className={`${!hideNav ? "pt-16" : ""} flex-1`}>
@@ -45,6 +108,9 @@ export default async function RootLayout({
           </main>
           <Footer />
         </ClientProviders>
+
+        {/* Vercel Analytics — always on */}
+        <Analytics />
       </body>
     </html>
   );

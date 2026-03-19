@@ -25,7 +25,7 @@ export default function SignInPage() {
       setLoading(false);
       return;
     }
-    router.push('/dashboard');
+    window.location.href = '/dashboard';
   }
 
   return (
