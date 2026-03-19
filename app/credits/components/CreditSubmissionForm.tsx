@@ -77,8 +77,7 @@ export default function CreditSubmissionForm({ teachingOnly = false, onSuccess }
 
   if (success) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
-        <div className="text-center py-6">
+      <div className="text-center py-6">
           <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
@@ -93,12 +92,11 @@ export default function CreditSubmissionForm({ teachingOnly = false, onSuccess }
             Submit Another
           </button>
         </div>
-      </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+    <div>
       {/* Progress bar */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">

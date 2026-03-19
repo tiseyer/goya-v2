@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic';
 
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
-import AdminShell from '@/app/admin/components/AdminShell';
 import type { CreditRequirement, CreditType } from '@/lib/credits';
 import RequirementRow from './RequirementRow';
 
@@ -42,8 +41,7 @@ export default async function AdminCreditsPage() {
   const approved = approvedCount ?? 0;
 
   return (
-    <AdminShell>
-      <div className="min-h-full">
+    <div className="min-h-full">
         {/* Page header */}
         <div className="p-6 sm:p-8 border-b border-slate-200 bg-white">
           <h1 className="text-2xl font-bold text-[#1B3A5C]">Credits & Hours</h1>
@@ -126,6 +124,5 @@ export default async function AdminCreditsPage() {
           </section>
         </div>
       </div>
-    </AdminShell>
   );
 }
