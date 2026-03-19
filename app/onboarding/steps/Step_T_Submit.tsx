@@ -23,6 +23,12 @@ export default function Step_T_Submit() {
       setBusy(false);
       return;
     }
+    // Fire-and-forget
+    fetch('/api/email/onboarding-complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, memberType: 'teacher' }),
+    }).catch(() => {})
     router.push('/dashboard');
   }
 

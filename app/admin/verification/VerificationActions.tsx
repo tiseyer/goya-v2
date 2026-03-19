@@ -24,6 +24,31 @@ export default function VerificationActions({ userId, certificateUrl }: Props) {
         ...(action === 'approve' ? { is_verified: true } : {}),
       })
       .eq('id', userId);
+
+    // Send email notification (fire-and-forget)
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('email, first_name, full_name, teacher_status')
+      .eq('id', userId)
+      .single()
+
+    if (prof?.email) {
+      const firstName = prof.first_name || prof.full_name?.split(' ')[0] || 'there'
+      if (action === 'approve') {
+        fetch('/api/email/verification-approved', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: prof.email, firstName, designation: prof.teacher_status ?? 'GOYA Member' }),
+        }).catch(() => {})
+      } else {
+        fetch('/api/email/verification-rejected', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: prof.email, firstName, reason: rejectReason || undefined }),
+        }).catch(() => {})
+      }
+    }
+
     setBusy(null);
     setShowRejectInput(false);
     setRejectReason('');
