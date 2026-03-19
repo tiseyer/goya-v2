@@ -25,12 +25,14 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  // Append T00:00:00 to parse as local time, avoiding UTC-offset date shift
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function isExpired(entry: CreditEntry): boolean {
   if (!entry.expires_at) return false;
-  return new Date(entry.expires_at) < new Date();
+  // Compare date strings directly to avoid timezone-induced off-by-one
+  return entry.expires_at < new Date().toISOString().split('T')[0];
 }
 
 export default function CreditHistory({ filterType }: Props) {

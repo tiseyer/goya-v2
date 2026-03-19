@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import CreditSubmissionForm from './CreditSubmissionForm';
 
 interface Props {
@@ -9,9 +10,10 @@ interface Props {
 
 export default function CreditSubmissionFormToggle({ teachingOnly = false }: Props) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   function handleSuccess() {
-    // Keep form visible so user can see success state; form resets itself
+    router.refresh();
   }
 
   if (!open) {

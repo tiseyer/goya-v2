@@ -44,9 +44,9 @@ export default function RequirementRow({ requirement }: Props) {
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const originalAmount = String(requirement.required_amount);
-  const originalPeriod = String(requirement.period_months);
-  const isDirty = amount !== originalAmount || period !== originalPeriod;
+  const isDirty =
+    parseInt(amount, 10) !== requirement.required_amount ||
+    parseInt(period, 10) !== requirement.period_months;
 
   async function handleSave() {
     const newAmount = parseInt(amount, 10);
