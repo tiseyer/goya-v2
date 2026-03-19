@@ -218,7 +218,7 @@ export default function EventsPage() {
                 {filtered.map(event => {
                   const style = CATEGORY_STYLES[event.category] ?? { badge: 'bg-slate-100 text-slate-600 border-slate-200' };
                   return (
-                    <div key={event.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col sm:flex-row">
+                    <Link key={event.id} href={`/events/${event.id}`} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col sm:flex-row cursor-pointer">
                       {/* Date block */}
                       <div className="bg-[#1B3A5C] text-white flex flex-row sm:flex-col items-center justify-center sm:justify-start gap-3 sm:gap-0 px-5 py-4 sm:py-6 sm:w-20 shrink-0 sm:text-center">
                         <div className="text-2xl font-bold leading-none">{event.date.split('-')[2]}</div>
@@ -265,24 +265,16 @@ export default function EventsPage() {
                           </div>
                         </div>
 
-                        {/* Price + CTA */}
-                        <div className="flex sm:flex-col items-center sm:items-end gap-3 shrink-0">
-                          <div className="text-right">
-                            {event.is_free ? (
-                              <span className="text-emerald-600 font-bold text-sm">Free</span>
-                            ) : (
-                              <span className="text-[#1B3A5C] font-bold text-lg">${event.price}</span>
-                            )}
-                          </div>
-                          <Link
-                            href={`/events/${event.id}`}
-                            className="bg-[#4E87A0] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#3A7190] transition-colors whitespace-nowrap"
-                          >
-                            Learn More →
-                          </Link>
+                        {/* Price */}
+                        <div className="shrink-0 text-right">
+                          {event.is_free ? (
+                            <span className="text-emerald-600 font-bold text-sm">Free</span>
+                          ) : (
+                            <span className="text-[#1B3A5C] font-bold text-lg">${event.price}</span>
+                          )}
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>

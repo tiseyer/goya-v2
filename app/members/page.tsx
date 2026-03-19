@@ -173,7 +173,7 @@ function FullCard({
   onSelect: (id: string) => void;
 }) {
   const style = ROLE_STYLES[member.role];
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     if (highlighted && ref.current) {
@@ -182,9 +182,10 @@ function FullCard({
   }, [highlighted]);
 
   return (
-    <div
+    <Link
+      href={`/members/${member.id}`}
       ref={ref}
-      className={`group relative bg-white rounded-2xl border overflow-hidden flex flex-col transition-all duration-200 ${
+      className={`group relative bg-white rounded-2xl border overflow-hidden flex flex-col transition-all duration-200 cursor-pointer ${
         highlighted
           ? 'border-[#4E87A0] shadow-lg shadow-[#4E87A0]/10 ring-1 ring-[#4E87A0]'
           : 'border-slate-100 shadow-sm hover:shadow-lg'
@@ -220,7 +221,7 @@ function FullCard({
             </span>
           </div>
           <button
-            onClick={() => onSelect(member.id)}
+            onClick={e => { e.preventDefault(); e.stopPropagation(); onSelect(member.id); }}
             className="shrink-0 w-7 h-7 rounded-lg bg-slate-100 hover:bg-[#4E87A0]/10 flex items-center justify-center text-slate-400 hover:text-[#4E87A0] transition-colors"
             title="Show on map"
           >
@@ -259,18 +260,15 @@ function FullCard({
         {/* Footer */}
         <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
           <span className="text-[10px] text-slate-400">Since {member.memberSince}</span>
-          <Link
-            href={`/members/${member.id}`}
-            className="text-[11px] font-semibold text-[#4E87A0] hover:text-[#3A7190] flex items-center gap-0.5 transition-colors"
-          >
+          <span className="text-[11px] font-semibold text-[#4E87A0] group-hover:text-[#3A7190] flex items-center gap-0.5 transition-colors">
             View Profile
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </Link>
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
