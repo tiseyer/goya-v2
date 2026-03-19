@@ -1,6 +1,7 @@
 'use client';
 
 import { useOnboarding } from './OnboardingProvider';
+import { supabase } from '@/lib/supabase';
 
 interface OnboardingStepProps {
   title: string;
@@ -72,6 +73,19 @@ export default function OnboardingStep({
       <p className="text-center text-xs text-slate-400 mt-3">
         {savedFlash ? '✓ Progress saved' : 'Your progress is saved automatically ✓'}
       </p>
+
+      {/* Log out */}
+      <div className="text-center mt-6">
+        <button
+          onClick={async () => {
+            await supabase.auth.signOut();
+            window.location.href = '/';
+          }}
+          className="text-xs text-slate-400 hover:text-slate-600 transition-colors underline"
+        >
+          Want to come back later? Log out
+        </button>
+      </div>
     </div>
   );
 }

@@ -2,6 +2,22 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
+// Public paths that don't require authentication
+const PUBLIC_PATHS = [
+  '/sign-in', '/sign-up', '/register', '/login', '/forgot-password', '/reset-password',
+  '/events', '/academy',
+]
+
+// Paths that require auth
+const PROTECTED_PATHS = [
+  '/dashboard', '/admin', '/profile', '/onboarding', '/connections', '/members',
+]
+
+// Paths that need the onboarding gate (if onboarding not completed)
+const ONBOARDING_GATED_PATHS = [
+  '/dashboard', '/profile', '/connections', '/members',
+]
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request: { headers: request.headers } })
 
@@ -29,8 +45,9 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
-  const protectedPaths = ['/dashboard', '/admin', '/profile', '/onboarding']
-  const isProtected = protectedPaths.some(p => pathname.startsWith(p))
+
+  // Check if path is protected
+  const isProtected = PROTECTED_PATHS.some(p => pathname.startsWith(p))
 
   // Require auth on protected paths
   if (isProtected && !user) {
@@ -39,23 +56,60 @@ export async function middleware(request: NextRequest) {
   }
 
   // Onboarding redirect logic for authenticated users
-  if (user && (pathname.startsWith('/dashboard') || pathname.startsWith('/onboarding'))) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('onboarding_completed')
-      .eq('id', user.id)
-      .single()
+  if (user) {
+    const isOnboardingGated = ONBOARDING_GATED_PATHS.some(p => pathname.startsWith(p))
+    const isOnboardingPath = pathname.startsWith('/onboarding')
+    const isAdminPath = pathname.startsWith('/admin')
 
-    const onboardingCompleted = profile?.onboarding_completed ?? true
+    // Only fetch profile when we need to check onboarding status
+    if (isOnboardingGated || isOnboardingPath) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_completed, role')
+        .eq('id', user.id)
+        .single()
 
-    // Redirect /dashboard → /onboarding if onboarding not done
-    if (pathname.startsWith('/dashboard') && !onboardingCompleted) {
-      return NextResponse.redirect(new URL('/onboarding', request.url))
+      const onboardingCompleted = profile?.onboarding_completed ?? false
+      const role = profile?.role ?? 'member'
+      const isAdminOrMod = role === 'admin' || role === 'moderator'
+
+      const previewMode = request.cookies.get('onboarding_preview_mode')?.value === 'true'
+
+      // Admins/moderators bypass onboarding gate (unless in preview mode on /onboarding)
+      if (isAdminOrMod && !previewMode) {
+        // No onboarding redirects for admins/moderators
+        return response
+      }
+
+      // Redirect onboarding-gated paths → /onboarding if not completed
+      if (isOnboardingGated && !onboardingCompleted) {
+        return NextResponse.redirect(new URL('/onboarding', request.url))
+      }
+
+      // Redirect /onboarding → /dashboard if already completed (unless admin in preview mode)
+      if (isOnboardingPath && onboardingCompleted) {
+        if (isAdminOrMod && previewMode) {
+          // Allow admin to stay on onboarding in preview mode
+          return response
+        }
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+      }
     }
 
-    // Redirect /onboarding → /dashboard if already completed
-    if (pathname.startsWith('/onboarding') && onboardingCompleted) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+    // Admin paths: fetch profile to check role
+    if (isAdminPath) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      const role = profile?.role ?? 'member'
+      const isAdminOrMod = role === 'admin' || role === 'moderator'
+
+      if (!isAdminOrMod) {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+      }
     }
   }
 
@@ -68,5 +122,7 @@ export const config = {
     '/admin/:path*',
     '/profile/:path*',
     '/onboarding/:path*',
+    '/connections/:path*',
+    '/members/:path*',
   ],
 }
