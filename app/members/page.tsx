@@ -362,7 +362,13 @@ export default function MembersPage() {
 
   // ── Desktop three-panel layout ─────────────────────────────────────────────
   const DesktopLayout = (
-    <div className="hidden lg:flex flex-col h-[calc(100vh-4rem)] mt-16 overflow-hidden">
+    <div className="hidden lg:block">
+      <PageHero
+        pill="Community"
+        title="Member Directory"
+        subtitle="Connect with yoga teachers, students, and wellness practitioners worldwide."
+      />
+      <div className="flex flex-col overflow-hidden h-[calc(100vh-23rem)]">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 bg-white border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-3">
@@ -505,6 +511,7 @@ export default function MembersPage() {
             isVisible={mapOpen}
           />
         </div>
+      </div>
       </div>
     </div>
   );
