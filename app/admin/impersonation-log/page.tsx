@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
-import { supabaseService } from '@/lib/supabase/service'
+import { getSupabaseService } from '@/lib/supabase/service'
 import AdminShell from '@/app/admin/components/AdminShell'
 
 function formatDateTime(iso: string): string {
@@ -45,7 +45,7 @@ export default async function ImpersonationLogPage() {
 
   if (profile?.role !== 'admin') redirect('/admin/dashboard')
 
-  const { data: logs } = await (supabaseService as any)
+  const { data: logs } = await (getSupabaseService() as any)
     .from('impersonation_log')
     .select(`
       id, started_at, ended_at, actions_taken,
