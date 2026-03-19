@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import FeedView from './FeedView';
 
 // ─── Profile completion ───────────────────────────────────────────────────────
 
@@ -18,49 +19,25 @@ const COMPLETION_FIELDS = [
   { key: 'avatar_url', label: 'Profile photo'      },
 ];
 
-function getCompletion(profile: any) {
-  const done = COMPLETION_FIELDS.filter(f => profile?.[f.key]);
+interface ProfileData {
+  full_name?: string | null
+  username?: string | null
+  bio?: string | null
+  location?: string | null
+  website?: string | null
+  instagram?: string | null
+  youtube?: string | null
+  avatar_url?: string | null
+  role?: string | null
+}
+
+function getCompletion(profile: ProfileData | null) {
+  const done = COMPLETION_FIELDS.filter(f => profile?.[f.key as keyof ProfileData]);
   const pct = Math.round((done.length / COMPLETION_FIELDS.length) * 100);
   return { pct, done: done.map(f => f.key) };
 }
 
 // ─── Static placeholder data ──────────────────────────────────────────────────
-
-const PLACEHOLDER_POSTS = [
-  {
-    id: 1,
-    name: 'Sophia Chen',
-    role: 'Teacher',
-    initials: 'SC',
-    color: '#4E87A0',
-    time: '2h ago',
-    text: 'Just finished a beautiful sunrise flow with my students in Vancouver. There\'s something magical about practicing as the city wakes up. Grateful for this community! 🌅',
-    likes: 24,
-    comments: 6,
-  },
-  {
-    id: 2,
-    name: 'Ravi Krishnan',
-    role: 'Wellness Practitioner',
-    initials: 'RK',
-    color: '#00B5A3',
-    time: '5h ago',
-    text: 'Sharing my notes from last week\'s pranayama workshop. The section on nadi shodhana was particularly transformative. DM me if you\'d like the PDF — happy to share with fellow practitioners.',
-    likes: 41,
-    comments: 12,
-  },
-  {
-    id: 3,
-    name: 'Lauren Hayes',
-    role: 'Teacher',
-    initials: 'LH',
-    color: '#7C5CBF',
-    time: 'Yesterday',
-    text: 'Reminder: my online Yin & Restore workshop starts this Saturday at 9am PST. Open to all levels. Registration link in profile.',
-    likes: 18,
-    comments: 4,
-  },
-];
 
 const PLACEHOLDER_EVENTS = [
   { id: 1, day: '22', month: 'Mar', title: 'Spring Equinox Flow — Online', location: 'Zoom' },
@@ -91,18 +68,17 @@ const RECENT_PLACEHOLDERS = [
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [feedSort, setFeedSort] = useState<'recent' | 'popular'>('recent');
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/sign-in'); return; }
-      setUser(user);
-      const { data: p } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-      setProfile(p);
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) { router.push('/sign-in'); return; }
+      setUser(authUser);
+      const { data: p } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
+      setProfile(p as ProfileData | null);
       setLoading(false);
     }
     load();
@@ -120,6 +96,8 @@ export default function DashboardPage() {
   const userInitials = profile?.full_name
     ? profile.full_name.trim().split(/\s+/).map((p: string) => p[0]).slice(0, 2).join('').toUpperCase()
     : (user?.email?.[0]?.toUpperCase() ?? '?');
+  const currentUserId = user?.id ?? '';
+  const currentUserRole = profile?.role ?? 'student';
   const { pct, done } = getCompletion(profile);
 
   // Circular SVG progress
@@ -206,7 +184,7 @@ export default function DashboardPage() {
                       </svg>
                       <span className={`text-[10px] font-semibold uppercase tracking-wide ${c.text}`}>{c.label}</span>
                     </div>
-                    <div className={`text-xl font-bold ${c.text}`}>{/* TODO: fetch from DB */}{c.value}</div>
+                    <div className={`text-xl font-bold ${c.text}`}>{c.value}</div>
                   </div>
                 ))}
               </div>
@@ -226,99 +204,14 @@ export default function DashboardPage() {
           </div>
 
           {/* ── MAIN FEED ────────────────────────────────────────────────── */}
-          <div className="space-y-4">
-
-            {/* Post composer */}
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
-                  <span className="text-white text-xs font-black">{userInitials}</span>
-                </div>
-                <div className="flex-1">
-                  <div className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm text-[#9CA3AF] bg-slate-50 cursor-text hover:border-[#4E87A0]/40 transition-colors">
-                    Share something with the GOYA community…
-                  </div>
-                  <div className="flex items-center gap-1 mt-2">
-                    {[
-                      { label: 'Photo', d: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
-                      { label: 'Video', d: 'M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
-                      { label: 'Link', d: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1' },
-                    ].map(btn => (
-                      <button key={btn.label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[#6B7280] hover:text-[#4E87A0] hover:bg-slate-100 text-xs font-medium transition-colors">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={btn.d} />
-                        </svg>
-                        {btn.label}
-                      </button>
-                    ))}
-                    <button className="ml-auto px-4 py-1.5 bg-[#4E87A0] text-white text-xs font-semibold rounded-lg hover:bg-[#3A7190] transition-colors">
-                      Post
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Feed */}
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm">
-              {/* Sort header */}
-              <div className="flex items-center gap-1 px-5 py-3 border-b border-[#E5E7EB]">
-                <span className="text-xs text-[#6B7280] font-medium mr-2">Sort:</span>
-                {(['recent', 'popular'] as const).map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setFeedSort(s)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors capitalize ${
-                      feedSort === s ? 'bg-[#4E87A0] text-white' : 'text-[#6B7280] hover:bg-slate-100'
-                    }`}
-                  >
-                    {s === 'recent' ? 'Most Recent' : 'Most Popular'}
-                  </button>
-                ))}
-              </div>
-
-              {/* Posts — TODO: replace with real data from DB */}
-              <div className="divide-y divide-[#E5E7EB]">
-                {PLACEHOLDER_POSTS.map(post => (
-                  <div key={post.id} className="px-5 py-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-white text-xs font-black" style={{ backgroundColor: post.color }}>
-                        {post.initials}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline gap-2 flex-wrap">
-                          <span className="text-sm font-semibold text-[#1B3A5C]">{post.name}</span>
-                          <span className="text-xs text-[#9CA3AF]">{post.role}</span>
-                          <span className="text-xs text-[#9CA3AF] ml-auto">{post.time}</span>
-                        </div>
-                        <p className="text-sm text-[#374151] leading-relaxed mt-1.5">{post.text}</p>
-                        <div className="flex items-center gap-4 mt-3">
-                          <button className="flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#4E87A0] transition-colors">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                            {post.likes}
-                          </button>
-                          <button className="flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#4E87A0] transition-colors">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                            </svg>
-                            {post.comments}
-                          </button>
-                          <button className="flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#4E87A0] transition-colors ml-auto">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                            </svg>
-                            Share
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
+          <div>
+            {currentUserId && (
+              <FeedView
+                currentUserId={currentUserId}
+                currentUserRole={currentUserRole}
+                currentUserFirstName={firstName}
+              />
+            )}
           </div>
 
           {/* ── RIGHT SIDEBAR ─────────────────────────────────────────────── */}
