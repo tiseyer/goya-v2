@@ -3,6 +3,11 @@ export type SubscriptionStatus = 'member' | 'guest';
 export type EventCategory = 'Workshop' | 'Teacher Training' | 'Dharma Talk' | 'Conference' | 'Yoga Sequence' | 'Music Playlist' | 'Research';
 export type EventFormat = 'Online' | 'In Person' | 'Hybrid';
 export type EventStatus = 'published' | 'draft' | 'cancelled' | 'deleted';
+export type CourseCategory = 'Workshop' | 'Yoga Sequence' | 'Dharma Talk' | 'Music Playlist' | 'Research';
+export type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced' | 'All Levels';
+export type CourseAccess = 'members_only' | 'free';
+export type CourseStatus = 'published' | 'draft';
+export type ProgressStatus = 'in_progress' | 'completed';
 
 export interface Profile {
   id: string;
@@ -43,4 +48,32 @@ export interface Event {
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  short_description: string | null;
+  description: string | null;
+  category: CourseCategory;
+  instructor: string | null;
+  duration: string | null;
+  level: CourseLevel | null;
+  access: CourseAccess;
+  vimeo_url: string | null;
+  thumbnail_url: string | null;
+  gradient_from: string;
+  gradient_to: string;
+  status: CourseStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserCourseProgress {
+  id: string;
+  user_id: string;
+  course_id: string;
+  status: ProgressStatus;
+  enrolled_at: string;
+  completed_at: string | null;
 }
