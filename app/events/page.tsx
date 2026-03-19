@@ -93,11 +93,9 @@ export default function EventsPage() {
     return events.filter(e => {
       if (categoryFilter !== 'All' && e.category !== categoryFilter) return false;
       if (selectedDate && e.date !== selectedDate) return false;
-      const [y, m] = e.date.split('-').map(Number);
-      if (!selectedDate && (y !== calYear || m - 1 !== calMonth)) return false;
       return true;
     });
-  }, [events, categoryFilter, selectedDate, calYear, calMonth]);
+  }, [events, categoryFilter, selectedDate]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -195,7 +193,7 @@ export default function EventsPage() {
           <div>
             <div className="flex items-center justify-between mb-5">
               <p className="text-sm text-slate-500">
-                {selectedDate ? `Events on ${formatDate(selectedDate)}` : `${MONTHS[calMonth]} ${calYear}`}
+                {selectedDate ? `Events on ${formatDate(selectedDate)}` : 'All Events'}
                 {' — '}
                 <span className="font-semibold text-slate-800">{filtered.length}</span> event{filtered.length !== 1 ? 's' : ''}
               </p>
