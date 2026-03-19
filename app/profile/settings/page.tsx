@@ -107,9 +107,8 @@ export default function ProfileSettingsPage() {
       const { data: p } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       if (p) {
         setProfile(p);
-        const nameParts = (p.full_name ?? '').split(' ');
-        setFirstName(nameParts[0] ?? '');
-        setLastName(nameParts.slice(1).join(' '));
+        setFirstName(p.first_name ?? '');
+        setLastName(p.last_name ?? '');
         setEmail(user.email ?? '');
         setBio(p.bio ?? '');
         setLocation(p.location ?? '');
@@ -128,7 +127,7 @@ export default function ProfileSettingsPage() {
         setLineage(p.lineage ?? []);
         setProgramsOffered(p.programs_offered ?? []);
         setSchoolEstablished(p.established_year?.toString() ?? '');
-        setDeliveryFormat(p.delivery_format ?? '');
+        setDeliveryFormat(p.practice_format ?? '');
       }
       setLoading(false);
     }
@@ -144,7 +143,8 @@ export default function ProfileSettingsPage() {
     e.preventDefault();
     setSaving(true);
     const { error } = await supabase.from('profiles').update({
-      full_name: `${firstName} ${lastName}`.trim(),
+      first_name: firstName,
+      last_name: lastName,
       bio, location, website, instagram, youtube,
       introduction,
       video_intro_url: videoIntroUrl,
@@ -158,7 +158,7 @@ export default function ProfileSettingsPage() {
       lineage,
       programs_offered: programsOffered,
       established_year: schoolEstablished ? parseInt(schoolEstablished) : null,
-      delivery_format: deliveryFormat,
+      practice_format: deliveryFormat || null,
     }).eq('id', user.id);
     setSaving(false);
     if (error) showToast(error.message, 'error');

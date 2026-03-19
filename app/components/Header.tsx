@@ -294,13 +294,13 @@ function MessagesWidget() {
 
 // ─── User menu ────────────────────────────────────────────────────────────────
 
-function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { userName: string; userMrn: string; userInitials: string; userRole?: string; onLogout: () => void }) {
+function UserMenu({ userName, userMrn, userInitials, userRole, userId, onLogout }: { userName: string; userMrn: string; userInitials: string; userRole?: string; userId?: string; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setOpen(false));
 
   const menuItems = [
-    { label: 'My Profile',      href: '/profile',            icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+    { label: 'My Profile',      href: userId ? `/members/${userId}` : '#', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
     { label: 'Profile Settings', href: '/profile/settings',  icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' },
     { label: 'Subscriptions',   href: '#',                   icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
     { label: 'Messages',        href: '#',                   icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
@@ -542,7 +542,7 @@ export default function Header() {
                 <MessagesWidget />
                 <CartWidget />
                 <div className="w-px h-5 bg-[#E5E7EB] mx-1" />
-                <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} onLogout={handleLogout} />
+                <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} userId={profile?.id} onLogout={handleLogout} />
               </>
             ) : (
               <>
@@ -614,7 +614,7 @@ export default function Header() {
                 </div>
               </div>
               {[
-                { label: 'My Profile', href: '/profile' },
+                { label: 'My Profile', href: profile?.id ? `/members/${profile.id}` : '#' },
                 { label: 'Profile Settings', href: '/profile/settings' },
                 { label: 'Subscriptions', href: '#' },
                 { label: 'Messages', href: '#' },

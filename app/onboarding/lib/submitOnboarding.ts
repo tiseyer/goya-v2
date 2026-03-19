@@ -8,6 +8,8 @@ export async function submitOnboarding(
   memberType: 'student' | 'teacher' | 'wellness_practitioner'
 ) {
   const base = {
+    first_name: answers.first_name,
+    last_name: answers.last_name,
     full_name: [answers.first_name, answers.last_name].filter(Boolean).join(' '),
     username: answers.username,
     bio: answers.bio,
