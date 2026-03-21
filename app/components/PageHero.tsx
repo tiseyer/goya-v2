@@ -17,8 +17,8 @@ export default function PageHero({ pill, pillIcon, title, subtitle, customPill }
   ) : null);
 
   return (
-    <div className="bg-[#F7F8FA] pt-20 border-b border-[#E5E7EB]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col items-center text-center">
+    <div className="bg-[#F7F8FA] pt-10 border-b border-[#E5E7EB]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-10 flex flex-col items-center text-center">
         {pillContent && <div className="mb-4">{pillContent}</div>}
         <h1 className="text-4xl sm:text-5xl font-bold text-[#1B3A5C] mb-3">{title}</h1>
         {subtitle && (
