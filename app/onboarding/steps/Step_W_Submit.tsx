@@ -4,22 +4,20 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOnboarding } from '../components/OnboardingProvider';
 import OnboardingStep from '../components/OnboardingStep';
-import { submitOnboarding } from '../lib/submitOnboarding';
-import { supabase } from '@/lib/supabase';
+import { submitOnboardingAction } from '../lib/submitOnboardingAction';
 
 export default function Step_W_Submit() {
-  const { answers, userId } = useOnboarding();
+  const { answers } = useOnboarding();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
   async function handleSubmit() {
-    if (!userId) return;
     setBusy(true);
     setError('');
-    const err = await submitOnboarding(supabase, userId, answers, 'wellness_practitioner');
+    const { error: err } = await submitOnboardingAction(answers, 'wellness_practitioner');
     if (err) {
-      setError(err.message);
+      setError(err);
       setBusy(false);
       return;
     }
@@ -27,7 +25,7 @@ export default function Step_W_Submit() {
     fetch('/api/email/onboarding-complete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, memberType: 'wellness_practitioner' }),
+      body: JSON.stringify({ memberType: 'wellness_practitioner' }),
     }).catch(() => {})
     router.push('/dashboard');
   }
