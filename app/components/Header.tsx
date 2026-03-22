@@ -542,7 +542,8 @@ function CartWidget() {
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -718,32 +719,56 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="lg:hidden text-[#374151] hover:text-[#1B3A5C] p-2 rounded-lg hover:bg-slate-100 transition-colors"
-            aria-label="Toggle menu"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {menuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
+          {/* Mobile controls: hamburger + avatar/login */}
+          <div className="lg:hidden flex items-center gap-1">
+            {/* Hamburger — nav only */}
+            <button
+              onClick={() => { setNavOpen(o => !o); setProfileOpen(false); }}
+              className="text-[#374151] hover:text-[#1B3A5C] p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              aria-label="Toggle navigation"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {navOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+            {/* Avatar (logged in) or Login button (logged out) */}
+            {isLoggedIn ? (
+              <button
+                onClick={() => { setProfileOpen(o => !o); setNavOpen(false); }}
+                className="flex items-center justify-center rounded-full focus:outline-none"
+                aria-label="Account menu"
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+                  <span className="text-white text-[10px] font-black">{impersonatedInitials ?? userInitials}</span>
+                </div>
+              </button>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-[#4E87A0] hover:text-[#4E87A0] transition-colors"
+                aria-label="Sign in"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
+      {/* ── Mobile nav overlay (hamburger) ─────────────────────────────────── */}
+      {navOpen && (
         <div className="lg:hidden bg-white border-t border-[#E5E7EB] px-4 py-4 space-y-1">
-          {/* Mobile cart link */}
-          <MobileCartLink onClose={() => setMenuOpen(false)} />
+          <MobileCartLink onClose={() => setNavOpen(false)} />
           {isLoggedIn && (
             <Link
               href="/dashboard"
-              onClick={() => setMenuOpen(false)}
+              onClick={() => setNavOpen(false)}
               className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === '/dashboard'
                   ? 'text-[#1B3A5C] bg-slate-100'
@@ -757,29 +782,48 @@ export default function Header() {
             <Link
               key={label}
               href={href}
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-2.5 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm font-medium transition-colors"
+              onClick={() => setNavOpen(false)}
+              className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname === href
+                  ? 'text-[#1B3A5C] bg-slate-100'
+                  : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+              }`}
             >
               {label}
             </Link>
           ))}
-          {isLoggedIn ? (
-            <div className="pt-3 mt-3 border-t border-[#E5E7EB] space-y-1">
-              <div className="flex items-center gap-3 px-4 py-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
-                  <span className="text-white text-xs font-black">{impersonatedInitials ?? userInitials}</span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#1B3A5C]">{impersonatedName ?? userName}</p>
-                  {isImpersonating ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full mt-0.5">
-                      Viewing as — admin: {adminProfile?.full_name ?? 'Admin'}
-                    </span>
-                  ) : (
-                    userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>
-                  )}
-                </div>
+        </div>
+      )}
+
+      {/* ── Mobile profile bottom sheet (avatar) ────────────────────────────── */}
+      {profileOpen && isLoggedIn && (
+        <div className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40" onClick={() => setProfileOpen(false)} />
+          {/* Sheet */}
+          <div className="relative bg-white rounded-t-2xl overflow-hidden animate-[slideUp_0.2s_ease-out]">
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 bg-slate-200 rounded-full" />
+            </div>
+            {/* User header */}
+            <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+                <span className="text-white text-xs font-black">{impersonatedInitials ?? userInitials}</span>
               </div>
+              <div>
+                <p className="text-sm font-semibold text-[#1B3A5C]">{impersonatedName ?? userName}</p>
+                {isImpersonating ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full mt-0.5">
+                    Viewing as — admin: {adminProfile?.full_name ?? 'Admin'}
+                  </span>
+                ) : (
+                  userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>
+                )}
+              </div>
+            </div>
+            {/* Menu items */}
+            <div className="px-3 py-2 space-y-0.5">
               {[
                 { label: 'My Profile', href: (isImpersonating && targetProfile ? targetProfile.id : profile?.id) ? `/members/${isImpersonating && targetProfile ? targetProfile.id : profile?.id}` : '#' },
                 { label: 'Profile Settings', href: '/profile/settings' },
@@ -788,29 +832,29 @@ export default function Header() {
                 { label: 'Subscriptions', href: '#' },
                 { label: 'Messages', href: '#' },
               ].map(item => (
-                <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                <Link key={item.label} href={item.href} onClick={() => setProfileOpen(false)}
+                  className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                 >
                   {item.label}
                 </Link>
               ))}
               {!isImpersonating && (profile?.role === 'admin' || profile?.role === 'moderator') && (
-                <Link href="/admin" onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                <Link href="/admin" onClick={() => setProfileOpen(false)}
+                  className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                 >
                   Admin Settings
                 </Link>
               )}
               {!isImpersonating && profile?.role === 'teacher' && (
                 schoolId ? (
-                  <Link href={`/schools/${schoolId}/settings`} onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  <Link href={`/schools/${schoolId}/settings`} onClick={() => setProfileOpen(false)}
+                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                   >
                     School Settings
                   </Link>
                 ) : (
-                  <Link href="/schools/create" onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  <Link href="/schools/create" onClick={() => setProfileOpen(false)}
+                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                   >
                     Register School
                   </Link>
@@ -820,23 +864,23 @@ export default function Header() {
                 <form action={endImpersonation}>
                   <button
                     type="submit"
-                    onClick={() => setMenuOpen(false)}
-                    className="w-full text-left px-4 py-2 rounded-lg text-amber-700 hover:bg-amber-50 text-sm transition-colors"
+                    onClick={() => setProfileOpen(false)}
+                    className="w-full text-left px-4 py-3 rounded-xl text-amber-700 hover:bg-amber-50 text-sm transition-colors"
                   >
                     ↩ Switch Back to Admin
                   </button>
                 </form>
               )}
-              <button onClick={handleLogout} className="w-full text-left px-4 py-2 rounded-lg text-rose-500 hover:bg-rose-50 text-sm transition-colors">
+            </div>
+            <div className="px-3 pb-4">
+              <button
+                onClick={() => { setProfileOpen(false); handleLogout(); }}
+                className="w-full text-left px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 text-sm font-medium transition-colors"
+              >
                 Logout
               </button>
             </div>
-          ) : (
-            <div className="pt-3 mt-3 border-t border-[#E5E7EB] flex flex-col gap-2">
-              <Link href="/sign-in" className="block px-4 py-2.5 text-[#374151] hover:text-[#1B3A5C] text-sm font-medium">Sign In</Link>
-              <Link href="/register" className="block bg-[#4E87A0] text-white px-4 py-2.5 rounded-lg text-sm font-semibold text-center hover:bg-[#3A7190] transition-colors">Join GOYA</Link>
-            </div>
-          )}
+          </div>
         </div>
       )}
     </header>

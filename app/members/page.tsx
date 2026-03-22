@@ -4,7 +4,6 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import PageHero from '@/app/components/PageHero';
-import { Globe, X } from 'lucide-react';
 import {
   members,
   allCountries,
@@ -356,7 +355,9 @@ export default function MembersPage() {
             className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-slate-600 hover:text-slate-900"
             aria-label="Close map"
           >
-            <X className="w-4 h-4" />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
           <MapPanel
             allMembers={members}
@@ -548,7 +549,15 @@ export default function MembersPage() {
         className="md:hidden fixed bottom-6 right-6 z-50 w-[52px] h-[52px] rounded-full bg-[#4E87A0] text-white flex items-center justify-center shadow-lg shadow-[#4E87A0]/40 hover:bg-[#3A7190] active:scale-95 transition-all"
         aria-label={mobileMapOpen ? 'Close map' : 'Show map'}
       >
-        {mobileMapOpen ? <X className="w-5 h-5" /> : <Globe className="w-5 h-5" />}
+        {mobileMapOpen ? (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+          </svg>
+        )}
       </button>
     </>
   );
