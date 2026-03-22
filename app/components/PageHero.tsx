@@ -17,14 +17,14 @@ export default function PageHero({ pill, pillIcon, title, subtitle, customPill }
   ) : null);
 
   return (
-    <div className="bg-[#F7F8FA] pt-10 border-b border-[#E5E7EB]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-10 flex flex-col items-center text-center">
+    <section className="flex items-center justify-center w-full min-h-[180px] sm:min-h-[200px] md:min-h-[220px] py-8 sm:py-10 bg-[#F7F8FA] border-b border-[#E5E7EB]">
+      <div className="text-center px-4 max-w-3xl mx-auto flex flex-col items-center">
         {pillContent && <div className="mb-4">{pillContent}</div>}
         <h1 className="text-4xl sm:text-5xl font-bold text-[#1B3A5C] mb-3">{title}</h1>
         {subtitle && (
           <p className="text-[#6B7280] text-lg max-w-2xl">{subtitle}</p>
         )}
       </div>
-    </div>
+    </section>
   );
 }
