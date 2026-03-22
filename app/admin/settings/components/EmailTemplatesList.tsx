@@ -151,7 +151,7 @@ export default function EmailTemplatesList() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-slate-800">{template.name}</p>
               {template.description && (
-                <p className="text-xs text-slate-500 mt-0.5">{template.description}</p>
+                <p className="text-sm text-slate-500 mt-0.5">{template.description}</p>
               )}
               <p className="text-xs text-slate-400 italic truncate mt-0.5">{template.subject}</p>
             </div>
