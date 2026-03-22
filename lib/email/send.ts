@@ -107,6 +107,10 @@ export async function sendEmailFromTemplate({
     content = content.replace(pattern, value)
   }
 
+  // Strip any remaining unsubstituted placeholders
+  subject = subject.replace(/\{\{[^}]+\}\}/g, '')
+  content = content.replace(/\{\{[^}]+\}\}/g, '')
+
   // 5. Wrap in email layout
   const html = wrapInEmailLayout(content)
 
