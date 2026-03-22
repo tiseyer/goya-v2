@@ -38,6 +38,24 @@ function CategoryIcon({ category, size = 'sm' }: { category: string; size?: 'sm'
   }
 }
 
+function SkeletonCourses() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+        <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col animate-pulse">
+          <div className="h-36 bg-slate-200" />
+          <div className="p-5 flex flex-col gap-2.5">
+            <div className="h-3.5 w-3/4 bg-slate-200 rounded" />
+            <div className="h-3 w-1/2 bg-slate-200 rounded" />
+            <div className="h-3 w-full bg-slate-100 rounded" />
+            <div className="h-3 w-4/5 bg-slate-100 rounded" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function AcademyPage() {
   const [courses,        setCourses]        = useState<Course[]>([]);
   const [progress,       setProgress]       = useState<UserCourseProgress[]>([]);
@@ -151,9 +169,7 @@ export default function AcademyPage() {
       {/* Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="w-8 h-8 border-2 border-[#4E87A0] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <SkeletonCourses />
         ) : filtered.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-2xl border border-slate-100">
             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">

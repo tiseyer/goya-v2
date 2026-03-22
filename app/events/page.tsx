@@ -51,6 +51,27 @@ function fmtTime(t: string) {
   return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
+function SkeletonEvents() {
+  return (
+    <div className="space-y-4">
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col sm:flex-row animate-pulse">
+          <div className="bg-slate-200 h-16 sm:h-auto sm:w-20 shrink-0" />
+          <div className="flex-1 p-5 flex flex-col gap-2.5">
+            <div className="flex gap-2">
+              <div className="h-4 w-20 bg-slate-200 rounded-full" />
+              <div className="h-4 w-14 bg-slate-200 rounded-full" />
+            </div>
+            <div className="h-4 w-2/3 bg-slate-200 rounded" />
+            <div className="h-3 w-full bg-slate-100 rounded" />
+            <div className="h-3 w-3/5 bg-slate-100 rounded" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function EventsPage() {
   const today = new Date();
   const [calYear,       setCalYear]       = useState(today.getFullYear());
@@ -197,9 +218,7 @@ export default function EventsPage() {
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-24">
-                <div className="w-8 h-8 border-2 border-[#4E87A0] border-t-transparent rounded-full animate-spin" />
-              </div>
+              <SkeletonEvents />
             ) : filtered.length === 0 ? (
               <div className="text-center py-24 bg-white rounded-2xl border border-slate-100">
                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
