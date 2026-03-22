@@ -135,6 +135,7 @@ export default function EmailTemplateEditorPage() {
   const [testEmailTo, setTestEmailTo] = useState('')
   const [isSendingTest, setIsSendingTest] = useState(false)
   const [testError, setTestError] = useState('')
+  const [testSuccessMessage, setTestSuccessMessage] = useState('')
   const [showLinkPopup, setShowLinkPopup] = useState(false)
   const [linkUrl, setLinkUrl] = useState('')
   const [linkNewTab, setLinkNewTab] = useState(true)
@@ -298,10 +299,11 @@ export default function EmailTemplateEditorPage() {
   async function handleSendTest() {
     setIsSendingTest(true)
     setTestError('')
+    setTestSuccessMessage('')
     const result = await sendTestEmail(templateKey, testEmailTo, subject, editorHtml)
     setIsSendingTest(false)
     if (result.success) {
-      setShowTestModal(false)
+      setTestSuccessMessage('Test email sent to ' + testEmailTo + ' ✓')
     } else {
       setTestError(result.error ?? 'Failed to send test email')
     }
@@ -930,12 +932,15 @@ export default function EmailTemplateEditorPage() {
             {testError && (
               <p className="text-xs text-red-500 mb-4">{testError}</p>
             )}
+            {testSuccessMessage && (
+              <p className="text-xs text-emerald-600 mb-4">{testSuccessMessage}</p>
+            )}
             <div className="flex gap-3 justify-end">
               <button
-                onClick={() => setShowTestModal(false)}
+                onClick={() => { setShowTestModal(false); setTestSuccessMessage('') }}
                 className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
               >
-                Cancel
+                {testSuccessMessage ? 'Close' : 'Cancel'}
               </button>
               <button
                 onClick={handleSendTest}
