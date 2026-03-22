@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import PageHero from '@/app/components/PageHero';
+import { Globe, X } from 'lucide-react';
 import {
   members,
   allCountries,
@@ -282,6 +283,7 @@ export default function MembersPage() {
   const [styleFilter, setStyleFilter] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [mapOpen, setMapOpen] = useState(false);
+  const [mobileMapOpen, setMobileMapOpen] = useState(false);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   const clearFilters = () => {
@@ -346,6 +348,25 @@ export default function MembersPage() {
           ))}
         </div>
       </div>
+      {/* Mobile map panel */}
+      {mobileMapOpen && (
+        <div className="relative w-full" style={{ height: '60vh' }}>
+          <button
+            onClick={() => setMobileMapOpen(false)}
+            className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-slate-600 hover:text-slate-900"
+            aria-label="Close map"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <MapPanel
+            allMembers={members}
+            filteredMembers={filtered}
+            highlightedId={highlightedId}
+            onMemberClick={handleSelect}
+            isVisible={mobileMapOpen}
+          />
+        </div>
+      )}
       {/* Mobile grid */}
       <div className="px-4 py-6 max-w-7xl mx-auto">
         <p className="text-sm text-slate-500 mb-4">
@@ -520,6 +541,15 @@ export default function MembersPage() {
     <>
       {MobileLayout}
       {DesktopLayout}
+
+      {/* Mobile FAB — map toggle, hidden on md+ */}
+      <button
+        onClick={() => setMobileMapOpen(o => !o)}
+        className="md:hidden fixed bottom-6 right-6 z-50 w-[52px] h-[52px] rounded-full bg-[#4E87A0] text-white flex items-center justify-center shadow-lg shadow-[#4E87A0]/40 hover:bg-[#3A7190] active:scale-95 transition-all"
+        aria-label={mobileMapOpen ? 'Close map' : 'Show map'}
+      >
+        {mobileMapOpen ? <X className="w-5 h-5" /> : <Globe className="w-5 h-5" />}
+      </button>
     </>
   );
 }
