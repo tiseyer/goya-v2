@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useCart } from '@/app/context/CartContext';
 import MiniCart from './MiniCart';
+import GOYABadge from './GOYABadge';
 import { useConnections } from '@/app/context/ConnectionsContext';
 import type { NotifRecord } from '@/app/context/ConnectionsContext';
 import { useImpersonation } from '@/app/context/ImpersonationContext';
@@ -580,28 +581,122 @@ function UserMenu({
   );
 }
 
-// ─── Mobile cart link (used inside hamburger menu) ───────────────────────────
+// ─── Mobile cart toggle (hamburger menu — toggles inline mini-cart) ──────────
 
-function MobileCartLink({ onClose }: { onClose: () => void }) {
-  const { itemCount } = useCart();
+function MobileCartToggle({ onNavClose }: { onNavClose: () => void }) {
+  const [expanded, setExpanded] = useState(false);
+  const { items, itemCount, removeItem, subtotal, totalSignUpFees } = useCart();
+  const total = subtotal + totalSignUpFees;
+
   return (
-    <Link
-      href="/cart"
-      onClick={onClose}
-      className="flex items-center justify-between px-4 py-2.5 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm font-medium transition-colors"
-    >
-      <span className="flex items-center gap-2">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-        Cart
-      </span>
-      {itemCount > 0 && (
-        <span className="bg-[#8b1a1a] text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-          {itemCount > 9 ? '9+' : itemCount}
+    <div>
+      {/* Toggle row */}
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm font-medium transition-colors"
+      >
+        <span className="flex items-center gap-2">
+          <span className="relative">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {itemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#8b1a1a] text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
+                {itemCount > 9 ? '9+' : itemCount}
+              </span>
+            )}
+          </span>
+          Cart
         </span>
+        <svg
+          className={`w-4 h-4 text-slate-400 transition-transform ${expanded ? 'rotate-180' : ''}`}
+          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Inline cart content */}
+      {expanded && (
+        <div className="mx-1 mt-1 mb-1 bg-white border border-[#E5E7EB] rounded-xl overflow-hidden">
+          {items.length === 0 ? (
+            <div className="px-4 py-6 text-center">
+              <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <p className="text-sm font-medium text-[#374151] mb-1">Your cart is empty</p>
+              <p className="text-xs text-[#6B7280]">Add designations and upgrades to get started.</p>
+            </div>
+          ) : (
+            <>
+              <ul className="max-h-56 overflow-y-auto divide-y divide-[#E5E7EB]">
+                {items.map(item => (
+                  <li key={item.id} className="flex items-center gap-3 px-4 py-3">
+                    <div className="shrink-0 bg-slate-50 rounded-lg p-1 border border-[#E5E7EB]">
+                      <GOYABadge acronym={item.acronym} lines={item.badgeLines} size={40} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-[#1B3A5C] leading-snug truncate">{item.name}</p>
+                      <p className="text-xs text-[#6B7280] mt-0.5">
+                        ${item.price.toFixed(2)}
+                        {item.priceType.includes('recurring') ? <span className="text-slate-400">/yr</span> : ''}
+                        {item.quantity > 1 && <span className="text-slate-400"> × {item.quantity}</span>}
+                      </p>
+                      {item.signUpFee ? (
+                        <p className="text-[10px] text-slate-400">+ ${item.signUpFee.toFixed(2)} sign-up</p>
+                      ) : null}
+                    </div>
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="shrink-0 text-slate-400 hover:text-rose-500 transition-colors p-1 rounded hover:bg-rose-50"
+                      aria-label={`Remove ${item.name}`}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="px-4 py-3 border-t border-[#E5E7EB] bg-slate-50">
+                <div className="space-y-1 mb-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-[#6B7280]">Subtotal</span>
+                    <span className="text-[#374151] font-medium">${subtotal.toFixed(2)}</span>
+                  </div>
+                  {totalSignUpFees > 0 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[#6B7280]">Sign-up fees</span>
+                      <span className="text-[#374151] font-medium">${totalSignUpFees.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-1.5 border-t border-[#E5E7EB]">
+                    <span className="text-sm font-semibold text-[#1B3A5C]">Total</span>
+                    <span className="text-sm font-bold text-[#1B3A5C]">${total.toFixed(2)}</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link
+                    href="/cart"
+                    onClick={onNavClose}
+                    className="flex-1 text-center py-2.5 rounded-lg border border-[#E5E7EB] text-xs font-semibold text-[#374151] hover:text-[#1B3A5C] hover:border-slate-300 transition-colors"
+                  >
+                    View Cart
+                  </Link>
+                  <Link
+                    href="/checkout"
+                    onClick={onNavClose}
+                    className="flex-1 text-center py-2.5 rounded-lg bg-[#1B3A5C] text-xs font-semibold text-white hover:bg-[#162d4a] transition-colors"
+                  >
+                    Checkout
+                  </Link>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       )}
-    </Link>
+    </div>
   );
 }
 
@@ -868,7 +963,6 @@ export default function Header() {
       {/* ── Mobile nav overlay (hamburger) ─────────────────────────────────── */}
       {navOpen && (
         <div className="lg:hidden bg-white border-t border-[#E5E7EB] px-4 py-4 space-y-1">
-          <MobileCartLink onClose={() => setNavOpen(false)} />
           {isLoggedIn && (
             <Link
               href="/dashboard"
@@ -896,6 +990,7 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          <MobileCartToggle onNavClose={() => setNavOpen(false)} />
         </div>
       )}
 
