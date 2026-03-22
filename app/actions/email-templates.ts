@@ -8,16 +8,15 @@ import { DEFAULT_TEMPLATES } from '@/lib/email/defaults'
 
 async function requireAdminOrModerator() {
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Unauthorized')
-  const { data: profile } = await supabase
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) throw new Error('Unauthorized')
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single()
-  if (!profile || !['admin', 'moderator'].includes(profile.role)) {
-    throw new Error('Forbidden')
-  }
+  if (profileError) throw new Error('Failed to verify role')
+  if (!profile || !['admin', 'moderator'].includes(profile.role)) throw new Error('Forbidden')
   return { supabase, user }
 }
 
