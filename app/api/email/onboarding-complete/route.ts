@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import { sendEmail } from '@/lib/email/send'
-import { OnboardingCompleteEmail } from '@/app/emails/OnboardingCompleteEmail'
+import { sendEmailFromTemplate } from '@/lib/email/send'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
-import * as React from 'react'
 
 export async function POST(req: Request) {
   try {
@@ -18,13 +16,15 @@ export async function POST(req: Request) {
     if (!profile?.email) return NextResponse.json({ error: 'No profile' }, { status: 404 })
 
     const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'there'
-    const subject = memberType === 'student' ? 'Your GOYA profile is live!' : 'Your registration is under review'
 
-    await sendEmail({
+    await sendEmailFromTemplate({
       to: profile.email,
-      subject,
-      template: React.createElement(OnboardingCompleteEmail, { firstName, memberType }),
-      templateName: 'OnboardingCompleteEmail',
+      templateKey: 'onboarding_complete',
+      variables: {
+        firstName,
+        memberType,
+        dashboardUrl: 'https://goya.community/dashboard',
+      },
     })
 
     return NextResponse.json({ ok: true })

@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendEmail } from '@/lib/email/send'
-import { AdminInboxDigestEmail } from '@/app/emails/AdminInboxDigestEmail'
-import * as React from 'react'
+import { sendEmailFromTemplate } from '@/lib/email/send'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,17 +35,17 @@ export async function GET(req: Request) {
 
   for (const admin of admins ?? []) {
     if (!admin.email) continue
-    await sendEmail({
+    await sendEmailFromTemplate({
       to: admin.email,
-      subject: `GOYA Admin: ${total} items need your attention`,
-      template: React.createElement(AdminInboxDigestEmail, {
-        pendingVerifications: pendingVerifications ?? 0,
-        pendingCreditSubmissions: 0,
-        pendingSchools: 0,
-        contactFormSubmissions: 0,
-      }),
-      templateName: 'AdminInboxDigestEmail',
-      replyTo: process.env.EMAIL_FROM ?? 'hello@globalonlineyogaassociation.org',
+      templateKey: 'admin_digest',
+      variables: {
+        count: String(total),
+        pendingVerifications: String(pendingVerifications ?? 0),
+        pendingCredits: '0',
+        pendingSchools: '0',
+        pendingContacts: '0',
+        inboxUrl: 'https://goya.community/admin/inbox',
+      },
     })
   }
 

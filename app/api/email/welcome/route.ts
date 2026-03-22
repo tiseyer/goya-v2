@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import { sendEmail } from '@/lib/email/send'
-import { WelcomeEmail } from '@/app/emails/WelcomeEmail'
+import { sendEmailFromTemplate } from '@/lib/email/send'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
-import * as React from 'react'
 
 export async function POST(req: Request) {
   try {
@@ -19,11 +17,14 @@ export async function POST(req: Request) {
 
     const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'there'
 
-    await sendEmail({
+    await sendEmailFromTemplate({
       to: profile.email,
-      subject: `Welcome to GOYA, ${firstName}!`,
-      template: React.createElement(WelcomeEmail, { firstName, mrn: profile.mrn ?? '' }),
-      templateName: 'WelcomeEmail',
+      templateKey: 'welcome',
+      variables: {
+        firstName,
+        mrn: profile.mrn ?? '',
+        loginUrl: 'https://goya.community/login',
+      },
     })
 
     return NextResponse.json({ ok: true })

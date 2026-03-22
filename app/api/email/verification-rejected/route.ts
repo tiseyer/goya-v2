@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server'
-import { sendEmail } from '@/lib/email/send'
-import { VerificationRejectedEmail } from '@/app/emails/VerificationRejectedEmail'
-import * as React from 'react'
+import { sendEmailFromTemplate } from '@/lib/email/send'
 
 export async function POST(req: Request) {
   try {
     const { email, firstName, reason } = await req.json()
-    await sendEmail({
+    await sendEmailFromTemplate({
       to: email,
-      subject: 'Update required on your GOYA registration',
-      template: React.createElement(VerificationRejectedEmail, { firstName, reason }),
-      templateName: 'VerificationRejectedEmail',
+      templateKey: 'verification_rejected',
+      variables: {
+        firstName,
+        reason,
+        contactUrl: 'mailto:member@globalonlineyogaassociation.org',
+      },
     })
     return NextResponse.json({ ok: true })
   } catch (e) {

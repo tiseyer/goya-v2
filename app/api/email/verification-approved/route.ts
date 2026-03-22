@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server'
-import { sendEmail } from '@/lib/email/send'
-import { VerificationApprovedEmail } from '@/app/emails/VerificationApprovedEmail'
-import * as React from 'react'
+import { sendEmailFromTemplate } from '@/lib/email/send'
 
 export async function POST(req: Request) {
   try {
     const { email, firstName, designation } = await req.json()
-    await sendEmail({
+    await sendEmailFromTemplate({
       to: email,
-      subject: '🎉 Your GOYA teacher status has been verified!',
-      template: React.createElement(VerificationApprovedEmail, { firstName, designation }),
-      templateName: 'VerificationApprovedEmail',
+      templateKey: 'verification_approved',
+      variables: {
+        firstName,
+        designation,
+        profileUrl: 'https://goya.community/members',
+      },
     })
     return NextResponse.json({ ok: true })
   } catch (e) {
