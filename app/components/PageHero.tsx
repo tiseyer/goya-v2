@@ -17,7 +17,7 @@ export default function PageHero({ pill, pillIcon, title, subtitle, customPill }
   ) : null);
 
   return (
-    <section className="flex items-center justify-center w-full min-h-[180px] sm:min-h-[200px] md:min-h-[220px] py-8 sm:py-10 bg-[#F7F8FA] border-b border-[#E5E7EB]">
+    <section className="flex items-center justify-center w-full h-[200px] sm:h-[220px] md:h-[240px] bg-[#F7F8FA] border-b border-[#E5E7EB]">
       <div className="text-center px-4 max-w-3xl mx-auto flex flex-col items-center">
         {pillContent && <div className="mb-4">{pillContent}</div>}
         <h1 className="text-4xl sm:text-5xl font-bold text-[#1B3A5C] mb-3">{title}</h1>
