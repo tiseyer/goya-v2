@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useCart } from '@/app/context/CartContext';
@@ -10,6 +10,8 @@ import { useConnections } from '@/app/context/ConnectionsContext';
 import type { NotifRecord } from '@/app/context/ConnectionsContext';
 import { useImpersonation } from '@/app/context/ImpersonationContext';
 import { endImpersonation } from '@/app/actions/impersonation';
+import { getNotifications, markNotificationsRead, getUnreadNotificationCount } from '@/lib/messaging';
+import type { AppNotification } from '@/lib/types';
 
 // ─── config ───────────────────────────────────────────────────────────────────
 
@@ -214,33 +216,92 @@ function NotifItem({ notif, onAccept, onDecline }: {
   return null;
 }
 
+// ─── Relative time ────────────────────────────────────────────────────────────
+
+function relTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days === 1) return 'Yesterday';
+  return `${days}d ago`;
+}
+
 // ─── Notifications / Messages widget ─────────────────────────────────────────
 
 function MessagesWidget() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { notifications, unreadCount, acceptRequest, declineRequest, markAllRead } = useConnections();
+  const { notifications: connNotifs, unreadCount: connUnread, acceptRequest, declineRequest, markAllRead: markConnRead } = useConnections();
   useClickOutside(ref, () => setOpen(false));
 
-  function handleOpen() {
-    setOpen(o => !o);
+  // DB notifications (new messages, etc.)
+  const [dbNotifs, setDbNotifs] = useState<AppNotification[]>([]);
+  const [dbUnread, setDbUnread] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setCurrentUserId(data.user.id);
+    });
+  }, []);
+
+  const loadDbNotifs = useCallback(async () => {
+    if (!currentUserId) return;
+    const [notifs, count] = await Promise.all([
+      getNotifications(currentUserId, 5),
+      getUnreadNotificationCount(currentUserId),
+    ]);
+    setDbNotifs(notifs);
+    setDbUnread(count);
+  }, [currentUserId]);
+
+  useEffect(() => { loadDbNotifs(); }, [loadDbNotifs]);
+
+  // Realtime subscription for notifications
+  useEffect(() => {
+    if (!currentUserId) return;
+    const ch = supabase
+      .channel('header-notifications')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${currentUserId}`,
+      }, () => { loadDbNotifs(); })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [currentUserId, loadDbNotifs]);
+
+  const totalUnread = connUnread + dbUnread;
+
+  async function handleMarkAllRead() {
+    markConnRead();
+    if (currentUserId) {
+      await markNotificationsRead(currentUserId);
+      setDbUnread(0);
+      setDbNotifs(prev => prev.map(n => ({ ...n, read_at: new Date().toISOString() })));
+    }
   }
 
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={handleOpen}
+        onClick={() => setOpen(o => !o)}
         className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
           open ? 'bg-[#4E87A0] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
         }`}
-        aria-label={`Notifications (${unreadCount} unread)`}
+        aria-label={`Notifications (${totalUnread} unread)`}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        {unreadCount > 0 && (
+        {totalUnread > 0 && (
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {totalUnread > 9 ? '9+' : totalUnread}
           </span>
         )}
       </button>
@@ -251,15 +312,15 @@ function MessagesWidget() {
           <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between">
             <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">
               Notifications
-              {unreadCount > 0 && (
+              {totalUnread > 0 && (
                 <span className="ml-2 bg-[#4E87A0] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                  {unreadCount} new
+                  {totalUnread} new
                 </span>
               )}
             </p>
-            {notifications.length > 0 && (
+            {(connNotifs.length > 0 || dbNotifs.length > 0) && (
               <button
-                onClick={markAllRead}
+                onClick={handleMarkAllRead}
                 className="text-[10px] text-[#4E87A0] hover:text-[#3A7190] font-semibold transition-colors"
               >
                 Mark all read
@@ -269,24 +330,67 @@ function MessagesWidget() {
 
           {/* Notification list */}
           <div className="max-h-96 overflow-y-auto divide-y divide-[#E5E7EB]">
-            {notifications.length === 0 ? (
+            {/* Connection request notifications (with accept/decline) */}
+            {connNotifs.map(notif => (
+              <NotifItem
+                key={notif.id}
+                notif={notif}
+                onAccept={() => { acceptRequest(notif.connectionId, notif.fromSlug); }}
+                onDecline={() => { declineRequest(notif.connectionId, notif.fromSlug); }}
+              />
+            ))}
+
+            {/* DB notifications (messages, etc.) */}
+            {dbNotifs.map(notif => (
+              <Link
+                key={notif.id}
+                href={notif.link ?? '/messages'}
+                onClick={() => setOpen(false)}
+                className={`flex gap-3 items-start px-4 py-3 hover:bg-slate-50 transition-colors ${!notif.read_at ? 'bg-[#4E87A0]/5' : ''}`}
+              >
+                {notif.actor?.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={notif.actor.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-slate-200" />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
+                    <span className="text-white text-[10px] font-bold">
+                      {(notif.actor?.full_name ?? '?')[0]?.toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-[#374151] leading-snug">
+                    <span className="font-semibold text-[#1B3A5C]">{notif.actor?.full_name ?? 'Someone'}</span>
+                    {' '}{notif.type === 'new_message' ? 'sent you a message' : notif.title}
+                  </p>
+                  {notif.body && (
+                    <p className="text-[10px] text-slate-400 mt-0.5 truncate">{notif.body}</p>
+                  )}
+                </div>
+                <span className="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">{relTime(notif.created_at)}</span>
+              </Link>
+            ))}
+
+            {connNotifs.length === 0 && dbNotifs.length === 0 && (
               <div className="px-4 py-8 text-center">
                 <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0l-8 5-8-5" />
                 </svg>
                 <p className="text-sm text-[#6B7280] font-medium">No notifications yet</p>
-                <p className="text-xs text-slate-400 mt-1">Connection requests will appear here.</p>
+                <p className="text-xs text-slate-400 mt-1">Messages and connection requests appear here.</p>
               </div>
-            ) : (
-              notifications.map(notif => (
-                <NotifItem
-                  key={notif.id}
-                  notif={notif}
-                  onAccept={() => { acceptRequest(notif.connectionId, notif.fromSlug); }}
-                  onDecline={() => { declineRequest(notif.connectionId, notif.fromSlug); }}
-                />
-              ))
             )}
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-[#E5E7EB] px-4 py-2.5">
+            <Link
+              href="/messages"
+              onClick={() => setOpen(false)}
+              className="text-xs text-[#4E87A0] hover:text-[#3A7190] font-semibold transition-colors"
+            >
+              View all messages →
+            </Link>
           </div>
         </div>
       )}
@@ -336,7 +440,7 @@ function UserMenu({
     { label: 'Credits & Hours',  href: '/credits',            icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
     ...(userMemberType === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' }] : []),
     { label: 'Subscriptions',   href: '#',                   icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
-    { label: 'Messages',        href: '#',                   icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+    { label: 'Messages',        href: '/messages',           icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
   ];
 
   return (
@@ -830,7 +934,7 @@ export default function Header() {
                 { label: 'Credits & Hours', href: '/credits' },
                 ...((isImpersonating ? targetProfile?.member_type : profile?.member_type) === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours' }] : []),
                 { label: 'Subscriptions', href: '#' },
-                { label: 'Messages', href: '#' },
+                { label: 'Messages', href: '/messages' },
               ].map(item => (
                 <Link key={item.label} href={item.href} onClick={() => setProfileOpen(false)}
                   className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"

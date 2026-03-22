@@ -119,3 +119,47 @@ export interface UserCourseProgress {
   enrolled_at: string;
   completed_at: string | null;
 }
+
+// ── Messaging ──────────────────────────────────────────────────────────────────
+
+export interface ConversationParticipant {
+  id: string;
+  full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url: string | null;
+}
+
+export interface ConversationRow {
+  id: string;
+  participant_1: string;
+  participant_2: string;
+  last_message_at: string;
+  created_at: string;
+  other_participant: ConversationParticipant | null;
+  last_message: string | null;
+  last_message_sender_id: string | null;
+  unread_count: number;
+}
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface AppNotification {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  read_at: string | null;
+  actor_id: string | null;
+  created_at: string;
+  actor?: ConversationParticipant | null;
+}

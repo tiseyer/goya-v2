@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import ConnectButton from '@/app/components/ConnectButton';
 import ConnectionsSection from '@/app/components/ConnectionsSection';
+import MessageButton from '@/app/components/MessageButton';
 import { members as staticMembers } from '@/lib/members-data';
 
 export const dynamic = 'force-dynamic';
@@ -275,13 +276,14 @@ export default async function MemberProfilePage({
                 {memberSince && (
                   <p className="text-white font-bold text-lg mb-4">Since {memberSince}</p>
                 )}
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-white/10 space-y-1">
                   <ConnectButton
                     memberId={profile.id}
                     memberName={displayName}
                     memberPhoto={profile.avatar_url ?? ''}
                     firstName={firstName}
                   />
+                  <MessageButton memberId={profile.id} memberName={displayName} />
                 </div>
               </div>
             </div>
