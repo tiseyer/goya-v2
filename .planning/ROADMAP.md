@@ -40,7 +40,9 @@ Plans:
   1. Navigating to `/settings` renders a page with a sidebar listing General, Subscriptions, Connections, and Inbox in that order
   2. The active sidebar item is visually highlighted to show which page the user is on
   3. The layout uses the same design tokens and component structure as Admin Settings (`AdminShell.tsx`)
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 02-01-PLAN.md — Build settings shell with sidebar navigation and stub pages
 **UI hint**: yes
 
 ### Phase 3: Settings Pages
@@ -63,5 +65,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Dropdown Refactor | 1/1 | Complete   | 2026-03-23 |
-| 2. Settings Shell | 0/? | Not started | - |
+| 2. Settings Shell | 0/1 | Planned | - |
 | 3. Settings Pages | 0/? | Not started | - |
