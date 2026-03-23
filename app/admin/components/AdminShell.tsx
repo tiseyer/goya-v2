@@ -138,22 +138,26 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     <div className="flex min-h-[calc(100vh-4rem)]">
       {/* Sidebar */}
       <aside
-        style={{ width: collapsed ? '64px' : '256px' }}
-        className="sticky top-16 h-[calc(100vh-4rem)] flex-shrink-0 bg-white border-r border-[#E5E7EB] flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out z-10"
+        style={{ width: collapsed ? '64px' : '248px' }}
+        className="sticky top-16 h-[calc(100vh-4rem)] flex-shrink-0 bg-white border-r border-slate-200 flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out z-10"
       >
-        {/* Toggle button */}
-        <div className="flex items-center h-14 px-3 border-b border-[#E5E7EB] shrink-0">
+        {/* Toggle */}
+        <div className="flex items-center h-14 px-3 border-b border-slate-200 shrink-0">
           <button
             onClick={toggle}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#6B7280] hover:text-[#1B3A5C] hover:bg-slate-100 transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary hover:bg-primary-50 transition-colors cursor-pointer"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            <svg className={`w-4 h-4 transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className={`w-4 h-4 transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`}
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
             </svg>
           </button>
           {!collapsed && (
-            <span className="ml-2 text-sm font-semibold text-[#1B3A5C] whitespace-nowrap overflow-hidden transition-opacity duration-150">
+            <span className="ml-2.5 text-sm font-bold text-primary-dark whitespace-nowrap overflow-hidden">
               Admin
             </span>
           )}
@@ -168,17 +172,17 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-2 py-2.5 rounded-lg transition-colors ${
-                  collapsed ? 'justify-center' : ''
-                } ${
-                  isActive
-                    ? 'bg-[#00B5A3]/10 text-[#00B5A3]'
-                    : 'text-[#6B7280] hover:text-[#1B3A5C] hover:bg-slate-50'
-                }`}
                 title={collapsed ? item.label : undefined}
+                className={[
+                  'flex items-center gap-3 px-2 py-2.5 rounded-xl transition-all duration-150',
+                  collapsed ? 'justify-center' : '',
+                  isActive
+                    ? 'bg-primary/10 text-primary font-semibold'
+                    : 'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
+                ].join(' ')}
               >
                 <div className="relative shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     {item.paths.map((d, i) => (
                       <path key={i} strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 2 : 1.75} d={d} />
                     ))}
@@ -190,7 +194,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                   )}
                 </div>
                 {!collapsed && (
-                  <span className="flex-1 text-sm font-medium whitespace-nowrap overflow-hidden">
+                  <span className="flex-1 text-sm whitespace-nowrap overflow-hidden">
                     {item.label}
                   </span>
                 )}
@@ -204,22 +208,22 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           })}
         </nav>
 
-        {/* Footer */}
+        {/* Sidebar footer */}
         {!collapsed && (
-          <div className="px-4 py-4 border-t border-[#E5E7EB] shrink-0">
-            <p className="text-[11px] font-semibold text-[#1B3A5C] leading-none">GOYA Admin</p>
-            <p className="text-[10px] text-[#6B7280] mt-1">v2.0.0-alpha</p>
+          <div className="px-4 py-4 border-t border-slate-200 shrink-0">
+            <p className="text-[11px] font-bold text-primary-dark leading-none">GOYA Admin</p>
+            <p className="text-[10px] text-slate-400 mt-1">v2.0.0-alpha</p>
           </div>
         )}
         {collapsed && (
-          <div className="py-4 border-t border-[#E5E7EB] flex justify-center shrink-0">
-            <div className="w-2 h-2 rounded-full bg-[#00B5A3]" />
+          <div className="py-4 border-t border-slate-200 flex justify-center shrink-0">
+            <div className="w-2 h-2 rounded-full bg-primary" />
           </div>
         )}
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 min-w-0 bg-slate-50">
+      <div className="flex-1 min-w-0 bg-surface-muted">
         {maintenanceActive && (
           <div className="bg-amber-50 border-b border-amber-200 px-6 py-3 flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
