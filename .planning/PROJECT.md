@@ -2,20 +2,15 @@
 
 ## What This Is
 
-GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions. Admins manage the community through a full-featured admin panel.
+GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions through a unified settings section. Admins manage the community through a full-featured admin panel.
 
 ## Core Value
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: v1.0 User Settings
+## Current State
 
-**Goal:** Consolidate user-facing settings into a dedicated sidebar-navigated Settings section, improving discoverability and consistency with the existing Admin Settings pattern.
-
-**Target features:**
-- Profile dropdown refactor (add "Settings" for all users, remove scattered shortcuts)
-- User Settings page at `app/settings/` with Admin Settings–style sidebar layout
-- Sidebar: General (profile content), Subscriptions (subscription content), Connections (placeholder), Inbox (placeholder)
+**As of v1.0 (2026-03-23):** User Settings milestone shipped. Settings are now accessible from the profile dropdown for all user types via a sidebar-navigated shell at `/settings`, with General (profile form), Subscriptions (live membership data), Connections (placeholder), and Inbox (placeholder) pages.
 
 ## Requirements
 
@@ -43,32 +38,33 @@ Members stay professionally connected, credentialed, and engaged through a singl
 - ✓ Analytics (GA4, Microsoft Clarity, Vercel Analytics — DB-controlled)
 - ✓ Vercel cron jobs (credits expiry, admin digest)
 
+<!-- v1.0 User Settings milestone -->
+- ✓ User can access Settings from the profile dropdown (all user types) — v1.0
+- ✓ Admin/Moderator sees "Settings" directly above "Admin Settings" in dropdown — v1.0
+- ✓ Regular users see "Settings" between the two dropdown dividers — v1.0
+- ✓ Settings page has sidebar layout matching Admin Settings — v1.0
+- ✓ Settings > General shows existing profile settings content — v1.0
+- ✓ Settings > Subscriptions shows existing subscriptions content — v1.0
+- ✓ Settings > Connections is a placeholder page — v1.0
+- ✓ Settings > Inbox is a placeholder page — v1.0
+
 ### Active
 
-<!-- All v1.0 milestone requirements have been implemented — pending human UAT sign-off -->
-
-### Validated in Phase 01–03
-
-- ✓ User can access Settings from the profile dropdown (all user types) — Phase 01
-- ✓ Admin/Moderator sees "Settings" directly above "Admin Settings" in dropdown — Phase 01
-- ✓ Regular users see "Settings" between the two dropdown dividers — Phase 01
-- ✓ Settings page has sidebar layout matching Admin Settings — Phase 02
-- ✓ Settings > General shows existing profile settings content — Phase 03
-- ✓ Settings > Subscriptions shows existing subscriptions content — Phase 03
-- ✓ Settings > Connections is a placeholder page — Phase 03
-- ✓ Settings > Inbox is a placeholder page — Phase 03
+<!-- Add requirements for next milestone here -->
 
 ### Out of Scope
 
-- Connections settings implementation — deferred to Task 2 (placeholder only this milestone)
-- Inbox settings implementation — deferred to Task 2 (placeholder only this milestone)
+- Connections settings implementation — deferred to v1.1+ (placeholder only in v1.0)
+- Inbox settings implementation — deferred to v1.1+ (placeholder only in v1.0)
+- Notification preferences — out of scope for settings MVP
+- Account deletion in settings — high-risk operation, deferred
+- Password change in settings — handled via forgot-password flow
 
 ## Context
 
 - Next.js 16 App Router, TypeScript, Tailwind CSS 4, Supabase (auth + DB), Vercel
-- Admin Settings sidebar pattern exists at `app/admin/settings/` using `AdminShell.tsx` — User Settings should mirror this UX
-- Profile settings currently live at `app/profile/settings/` — content moves to `app/settings/general/`
-- Subscriptions content currently lives in its own route — moves to `app/settings/subscriptions/`
+- Settings shell at `app/settings/` uses SettingsShell component mirroring AdminShell
+- Profile settings migrated from `app/profile/settings/` → `app/settings/`
 - Design tokens live in `globals.css`; UI components in `app/components/ui/`
 - Role system: `student`, `teacher`, `wellness_practitioner` (regular), `moderator`, `admin`
 
@@ -76,26 +72,22 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 - **Tech Stack**: Next.js 16 App Router, Tailwind CSS 4, Supabase SSR — no new frameworks
 - **Design**: Follow existing design tokens from `globals.css` and components from `app/components/ui/`; match Admin Settings layout exactly
-- **Routing**: New settings at `app/settings/` — old routes (`app/profile/settings/`, etc.) should redirect or be replaced
+- **Routing**: Settings live at `app/settings/` — `app/profile/settings/` content has been migrated
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Mirror Admin Settings sidebar pattern | Consistency across admin/user experiences | SettingsShell mirrors AdminShell — Phase 02 |
-| `app/settings/` as root route | Clean separation from profile pages | Implemented at `app/settings/` — Phase 02 |
-| Connections + Inbox as placeholders | Scope control — full implementation in Task 2 | Polished "Coming Soon" pages shipped — Phase 03 |
+| Mirror Admin Settings sidebar pattern | Consistency across admin/user experiences | ✓ SettingsShell mirrors AdminShell — v1.0 |
+| `app/settings/` as root route | Clean separation from profile pages | ✓ Implemented — v1.0 |
+| Connections + Inbox as placeholders | Scope control — full implementation in v1.1+ | ✓ Polished Coming Soon pages — v1.0 |
+| Exact match for General nav item | Avoid General being active on all sub-routes | ✓ `pathname === '/settings'` — v1.0 |
+| Separate localStorage key for settings sidebar | Independent collapse state from admin sidebar | ✓ `settings-sidebar-collapsed` — v1.0 |
+| No role check in settings layout | Settings is for all authenticated users, unlike admin | ✓ Auth-only guard — v1.0 |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
-
-**After each phase transition** (via `/gsd:transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
 
 **After each milestone** (via `/gsd:complete-milestone`):
 1. Full review of all sections
@@ -104,4 +96,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 — Phase 03 complete, all v1.0 requirements implemented*
+*Last updated: 2026-03-23 after v1.0 milestone*
