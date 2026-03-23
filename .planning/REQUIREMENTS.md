@@ -7,9 +7,9 @@
 
 ### Database
 
-- [ ] **DB-01**: A `connections` table exists with requester_id, recipient_id, type (`peer`/`mentorship`/`faculty`), status (`pending`/`accepted`/`declined`), and timestamps
-- [ ] **DB-02**: RLS policies on `connections` ensure users can only read/write their own connections
-- [ ] **DB-03**: Migration is committed to `supabase/migrations/` and pushed via `npx supabase db push`
+- [x] **DB-01**: A `connections` table exists with requester_id, recipient_id, type (`peer`/`mentorship`/`faculty`), status (`pending`/`accepted`/`declined`), and timestamps
+- [x] **DB-02**: RLS policies on `connections` ensure users can only read/write their own connections
+- [x] **DB-03**: Migration is committed to `supabase/migrations/` and pushed via `npx supabase db push`
 - [ ] **DB-04**: `ConnectionsContext` and `ConnectButton` read from and write to Supabase (localStorage mock and `connections-data.ts` removed)
 
 ### Profile Page
@@ -64,9 +64,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | Phase 4 | Pending |
-| DB-02 | Phase 4 | Pending |
-| DB-03 | Phase 4 | Pending |
+| DB-01 | Phase 4 | Complete |
+| DB-02 | Phase 4 | Complete |
+| DB-03 | Phase 4 | Complete |
 | DB-04 | Phase 4 | Pending |
 | PROF-01 | Phase 5 | Pending |
 | PROF-02 | Phase 5 | Pending |

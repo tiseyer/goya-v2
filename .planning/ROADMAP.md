@@ -38,7 +38,7 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
   4. ConnectButton and ConnectionsContext no longer touch localStorage; all reads and writes go through Supabase
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md &mdash; Create connections table migration with RLS policies
+- [x] 04-01-PLAN.md &mdash; Create connections table migration with RLS policies
 - [ ] 04-02-PLAN.md &mdash; Rewrite ConnectionsContext to use Supabase
 
 ### Phase 5: Profile Page Buttons
@@ -92,7 +92,7 @@ Plans:
 | 1. Dropdown Refactor | v1.0 | 1/1 | Complete | 2026-03-23 |
 | 2. Settings Shell | v1.0 | 1/1 | Complete | 2026-03-23 |
 | 3. Settings Pages | v1.0 | 2/2 | Complete | 2026-03-23 |
-| 4. Database Foundation | v1.1 | 0/2 | Planning | - |
+| 4. Database Foundation | v1.1 | 1/2 | In Progress|  |
 | 5. Profile Page Buttons | v1.1 | 0/? | Not started | - |
 | 6. Settings Connections & Inbox | v1.1 | 0/? | Not started | - |
 | 7. Admin Connections Tab | v1.1 | 0/? | Not started | - |

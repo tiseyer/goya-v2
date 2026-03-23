@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Connections & Inbox
-status: Roadmap ready
-stopped_at: Phase 4 (not started)
-last_updated: "2026-03-23"
+status: Ready to execute
+stopped_at: "Checkpoint reached: Task 2 requires npx supabase db push (human-gated)"
+last_updated: "2026-03-23T11:06:20.338Z"
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
 ---
 
 # Project State
@@ -19,18 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** v1.1 Connections & Inbox — starting Phase 4: Database Foundation
+**Current focus:** Phase 04 — database-foundation
 
 ## Current Position
 
-Phase: 4 — Database Foundation
-Plan: —
-Status: Not started
-Last activity: 2026-03-23 — Roadmap for v1.1 created
-
-```
-v1.1 Progress: [░░░░] 0/4 phases
-```
+Phase: 04 (database-foundation) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -52,6 +46,7 @@ v1.1 Progress: [░░░░] 0/4 phases
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 04-database-foundation P01 | 5 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -65,6 +60,9 @@ Recent decisions affecting current work:
 - Connections + Inbox as placeholders — full implementation now in v1.1
 - [Phase 03]: Server component for Subscriptions page — data fetched at request time, no client JS needed
 - [Phase 03-settings-pages]: Profile settings form migrated to app/settings/page.tsx; server action reused from app/profile/settings/actions.ts
+- [Phase 04-database-foundation]: unique(requester_id, recipient_id) prevents duplicate connection requests at DB level
+- [Phase 04-database-foundation]: type constrained to peer/mentorship/faculty matching role-aware UI in Phase 5
+- [Phase 04-database-foundation]: status defaults to pending; insert by requester only, update by either party
 
 ### Pending Todos
 
@@ -80,6 +78,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-23
-Stopped at: Roadmap created, Phase 4 ready to plan
+Last session: 2026-03-23T11:06:20.334Z
+Stopped at: Checkpoint reached: Task 2 requires npx supabase db push (human-gated)
 Resume file: None
