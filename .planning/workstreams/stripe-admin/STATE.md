@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-03-23T15:13:38.253Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-03-23T15:20:55.782Z"
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State — stripe-admin workstream
@@ -43,6 +43,7 @@ Plan: 2 of 2
 *Updated after each plan completion*
 | Phase 05-profile-page-buttons P02 | 8 | 1 tasks | 1 files |
 | Phase 09 P01 | 2 | 1 tasks | 5 files |
+| Phase 09 P02 | 3 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,9 @@ Plan: 2 of 2
 - [Phase 05-profile-page-buttons]: School ownership uses owner_id-only query (no profile_id join needed) — viewer owns any school combined with role==='school' is sufficient for v1.1
 - [Phase 09-01]: No apiVersion argument — stripe@20.4.1 defaults to latest stable
 - [Phase 09-01]: Lazy singleton in getStripe() body (not module level) prevents build crash when STRIPE_SECRET_KEY missing
+- [Phase 09]: request.text() not request.json() — Stripe signs raw bytes, parsing breaks HMAC
+- [Phase 09]: Missing STRIPE_WEBHOOK_SECRET returns 500 (config error) not 400 (client error)
+- [Phase 09]: Phase 9 stub dispatch via console.log — idempotency + event dispatch in Phase 10
 
 ### Pending Todos
 
@@ -76,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T15:13:38.249Z
-Stopped at: Completed 09-01-PLAN.md
+Last session: 2026-03-23T15:20:55.778Z
+Stopped at: Completed 09-02-PLAN.md
 Resume file: None

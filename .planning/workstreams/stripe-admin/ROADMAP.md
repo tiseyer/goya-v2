@@ -42,8 +42,8 @@ Plans:
   4. The endpoint uses `request.text()` for body parsing, not `request.json()`
 **Plans**: 2 plans
 Plans:
-- [ ] 09-01-PLAN.md — Install stripe + server-only packages, create server-only Stripe SDK singleton with tests
-- [ ] 09-02-PLAN.md — Create webhook route handler with Stripe signature verification and tests
+- [x] 09-01-PLAN.md — Install stripe + server-only packages, create server-only Stripe SDK singleton with tests
+- [x] 09-02-PLAN.md — Create webhook route handler with Stripe signature verification and tests
 
 ### Phase 10: Webhook Handlers + Initial Sync
 **Goal**: All 15 Stripe event types are handled with idempotent upserts and an admin can seed the database from the existing Stripe account
@@ -101,7 +101,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 8. DB Foundation | 2/2 | Complete | 2026-03-23 |
-| 9. Stripe SDK + Webhook Infrastructure | 0/2 | Not started | - |
+| 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
 | 10. Webhook Handlers + Initial Sync | 0/? | Not started | - |
 | 11. AdminShell Shop Nav | 0/? | Not started | - |
 | 12. Shop Admin Pages | 0/? | Not started | - |
