@@ -54,7 +54,7 @@ function ProductCard({ product }: { product: Product }) {
 
       {/* Content */}
       <div className="px-4 pb-5 flex flex-col flex-1 gap-2">
-        <h3 className="text-sm font-bold text-[#1e3a5f] leading-snug group-hover:text-[#2d5a9e] transition-colors text-center">
+        <h3 className="text-sm font-bold text-primary-dark leading-snug group-hover:text-primary transition-colors text-center">
           {product.name}
         </h3>
         <p className="text-xs text-slate-500 text-center leading-relaxed line-clamp-2 flex-1">
@@ -64,7 +64,7 @@ function ProductCard({ product }: { product: Product }) {
           <span className="text-slate-800 font-semibold text-sm">{product.price_display}</span>
         </div>
         <div className="mt-2 text-center">
-          <span className="text-xs font-semibold text-slate-600 border border-slate-300 rounded-lg px-3 py-1.5 inline-block group-hover:border-[#1e3a5f] group-hover:text-[#1e3a5f] transition-colors">
+          <span className="text-xs font-semibold text-slate-600 border border-slate-300 rounded-lg px-3 py-1.5 inline-block group-hover:border-primary-dark group-hover:text-primary-dark transition-colors">
             {product.has_variants ? 'Select Options' : 'Add to Profile'}
           </span>
         </div>

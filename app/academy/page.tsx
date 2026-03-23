@@ -127,7 +127,7 @@ export default function AcademyPage() {
                 onClick={() => setCategoryFilter(cat)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                   categoryFilter === cat
-                    ? 'bg-[#1B3A5C] text-white border-[#1B3A5C]'
+                    ? 'bg-primary-dark text-white border-[#1B3A5C]'
                     : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                 }`}
               >
@@ -154,7 +154,7 @@ export default function AcademyPage() {
                   onClick={() => setProgressFilter(f)}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${
                     progressFilter === f
-                      ? 'bg-[#4E87A0] text-white border-[#4E87A0]'
+                      ? 'bg-primary-light text-white border-primary-light'
                       : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -234,7 +234,7 @@ export default function AcademyPage() {
 
                   {/* Content */}
                   <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-semibold text-[#1B3A5C] text-sm leading-snug mb-1 line-clamp-2">
+                    <h3 className="font-semibold text-primary-dark text-sm leading-snug mb-1 line-clamp-2">
                       {course.title}
                     </h3>
                     <p className="text-xs text-slate-500 mb-2">{course.instructor}</p>
@@ -263,13 +263,13 @@ export default function AcademyPage() {
                       <div className="mt-3 pt-3 border-t border-slate-100">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs text-slate-500">Progress</span>
-                          <span className="text-xs font-semibold text-[#4E87A0]">
+                          <span className="text-xs font-semibold text-primary-light">
                             {isCompleted ? '100%' : 'In Progress'}
                           </span>
                         </div>
                         <div className="w-full bg-slate-100 rounded-full h-1.5">
                           <div
-                            className="bg-[#4E87A0] h-1.5 rounded-full"
+                            className="bg-primary-light h-1.5 rounded-full"
                             style={{ width: isCompleted ? '100%' : '50%' }}
                           />
                         </div>
