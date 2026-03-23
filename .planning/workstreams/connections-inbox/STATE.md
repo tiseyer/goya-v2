@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Connections & Inbox
-status: Phase 04 complete — ready for Phase 05
-stopped_at: "Completed 04-02-PLAN.md"
-last_updated: "2026-03-23T11:40:00Z"
+status: Executing Phase 05
+stopped_at: "Completed 05-01-PLAN.md — Plan 1 of 2 done"
+last_updated: "2026-03-23T21:54:00.000Z"
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 4
+  completed_plans: 3
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 04 complete — ready for Phase 05 (role-aware connect button)
+**Current focus:** Phase 05 — profile-page-buttons
 
 ## Current Position
 
-Phase: 04 (database-foundation) — COMPLETE
-Plan: 2 of 2 (both complete)
+Phase: 05 (profile-page-buttons) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -42,13 +42,14 @@ Plan: 2 of 2 (both complete)
 
 **Recent Trend:**
 
-- Last 5 plans: 04-01 (~12 min), 04-02 (~35 min)
+- Last 5 plans: 04-01 (~12 min), 04-02 (~35 min), 05-01 (~12 min)
 - Trend: Steady
 
 *Updated after each plan completion*
 | Phase 04-database-foundation P01 | 5 | 1 tasks | 1 files |
 | Phase 04-database-foundation P01 | 12 | 2 tasks | 1 files |
 | Phase 04-database-foundation P02 | 35 | 3 tasks | 7 files |
+| Phase 05-profile-page-buttons P01 | 12 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,9 @@ Recent decisions affecting current work:
 - [Phase 04-02]: ConnectionsSection returns null for other profiles — Phase 6 adds cross-profile display
 - [Phase 04-02]: sendRequest has optional type param defaulting to peer — prepares for Phase 5 role-aware types
 - [Phase 04-02]: vitest.config.ts needs @ alias to match tsconfig paths
+- [Phase 05-01]: ROLE_PAIR_MAP as module-level const enables O(1) role lookup and is easily extended for new role pairs
+- [Phase 05-01]: vi.mock('next/navigation') required in jsdom tests — useRouter throws without it
+- [Phase 05-01]: type stored on ConnRecord (not derived at render) to preserve across connection lifecycle
 
 ### Pending Todos
 
@@ -77,11 +81,11 @@ Recent decisions affecting current work:
 
 - Settings > Connections and Settings > Inbox are placeholder pages — Phase 6 implements them
 - Admin user detail view has tabs but no Connections tab yet — Phase 7 adds it
-- Profile page has a "Connect with [User]" button in the right sidebar — Phase 5 makes it role-aware
+- Profile page has a "Connect with [User]" button in the right sidebar — Phase 5 Plan 2 wires role-aware ConnectButton into profile layout
 - app/page.test.tsx has a pre-existing stale test failure (not blocking, logged in deferred-items.md)
 
 ## Session Continuity
 
-Last session: 2026-03-23T11:40:00Z
-Stopped at: Completed 04-02-PLAN.md
-Resume file: None
+Last session: 2026-03-23T21:54:00.000Z
+Stopped at: Completed 05-01-PLAN.md (role-aware ConnectButton + Button migration)
+Resume file: .planning/workstreams/connections-inbox/phases/05-profile-page-buttons/05-02-PLAN.md

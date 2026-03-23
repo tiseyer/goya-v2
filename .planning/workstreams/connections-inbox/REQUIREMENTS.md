@@ -14,10 +14,10 @@
 
 ### Profile Page
 
-- [ ] **PROF-01**: Student viewing a teacher profile sees "Request Mentorship" instead of "Connect"
-- [ ] **PROF-02**: Teacher or wellness practitioner viewing a school profile sees "Apply as Faculty"
-- [ ] **PROF-03**: Teacher viewing a school they own sees "Manage School" instead of "Apply as Faculty"
-- [ ] **PROF-04**: Teacher viewing another teacher profile sees the standard "Connect" button
+- [x] **PROF-01**: Student viewing a teacher profile sees "Request Mentorship" instead of "Connect"
+- [x] **PROF-02**: Teacher or wellness practitioner viewing a school profile sees "Apply as Faculty"
+- [x] **PROF-03**: Teacher viewing a school they own sees "Manage School" instead of "Apply as Faculty"
+- [x] **PROF-04**: Teacher viewing another teacher profile sees the standard "Connect" button
 
 ### Settings — Connections
 
@@ -68,10 +68,10 @@
 | DB-02 | Phase 4 | Complete |
 | DB-03 | Phase 4 | Complete |
 | DB-04 | Phase 4 | Complete |
-| PROF-01 | Phase 5 | Pending |
-| PROF-02 | Phase 5 | Pending |
-| PROF-03 | Phase 5 | Pending |
-| PROF-04 | Phase 5 | Pending |
+| PROF-01 | Phase 5 | Complete |
+| PROF-02 | Phase 5 | Complete |
+| PROF-03 | Phase 5 | Complete |
+| PROF-04 | Phase 5 | Complete |
 | CONN-01 | Phase 6 | Pending |
 | CONN-02 | Phase 6 | Pending |
 | CONN-03 | Phase 6 | Pending |
@@ -89,4 +89,4 @@
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 — traceability populated after roadmap creation*
+*Last updated: 2026-03-23 — PROF-01/02/03/04 marked complete after 05-01 plan execution*

@@ -52,7 +52,7 @@ Plans:
   4. A teacher visiting another teacher's profile sees the standard "Connect" button
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md &mdash; Role-aware ConnectButton rewrite with Button migration and unit tests
+- [x] 05-01-PLAN.md &mdash; Role-aware ConnectButton rewrite with Button migration and unit tests
 - [ ] 05-02-PLAN.md &mdash; Wire server component data fetching and new props to ConnectButton
 **UI hint**: yes
 
@@ -93,6 +93,6 @@ Plans:
 | 2. Settings Shell | v1.0 | 1/1 | Complete | 2026-03-23 |
 | 3. Settings Pages | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 4. Database Foundation | v1.1 | 2/2 | Complete | 2026-03-23 |
-| 5. Profile Page Buttons | v1.1 | 0/2 | Planned | - |
+| 5. Profile Page Buttons | v1.1 | 1/2 | Executing | - |
 | 6. Settings Connections & Inbox | v1.1 | 0/? | Not started | - |
 | 7. Admin Connections Tab | v1.1 | 0/? | Not started | - |
