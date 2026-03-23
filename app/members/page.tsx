@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import PageHero from '@/app/components/PageHero';
+import { ROLE_BADGE } from '@/app/components/ui/Badge';
 import {
   members,
   allCountries,
@@ -18,11 +19,23 @@ const MapPanel = dynamic(() => import('./MapPanel'), { ssr: false });
 
 const ROLES: Array<'All' | MemberRole> = ['All', 'Teacher', 'Student', 'School', 'Wellness Practitioner'];
 
-const ROLE_STYLES: Record<string, { badge: string; bar: string; dot: string }> = {
-  Teacher:               { badge: 'bg-teal-50 text-teal-700',    bar: 'bg-teal-400',   dot: 'bg-teal-500' },
-  Student:               { badge: 'bg-blue-50 text-blue-700',    bar: 'bg-blue-400',   dot: 'bg-blue-500' },
-  School:                { badge: 'bg-purple-50 text-purple-700', bar: 'bg-purple-400', dot: 'bg-purple-500' },
-  'Wellness Practitioner':{ badge: 'bg-emerald-50 text-emerald-700', bar: 'bg-emerald-400', dot: 'bg-emerald-500' },
+/* Normalise 'Wellness Practitioner' → 'Wellness' for badge lookup */
+const getMemberBadge = (role: string) =>
+  ROLE_BADGE[role] ?? ROLE_BADGE['Wellness'] ?? 'bg-primary-50 text-primary border-primary-100';
+
+/* Top colour bar and role dot use blue-family tokens */
+const ROLE_BAR: Record<string, string> = {
+  Teacher:                'bg-primary',
+  Student:                'bg-primary',
+  School:                 'bg-primary-dark',
+  'Wellness Practitioner':'bg-primary-light',
+};
+
+const ROLE_DOT: Record<string, string> = {
+  Teacher:                'bg-primary',
+  Student:                'bg-primary',
+  School:                 'bg-primary-dark',
+  'Wellness Practitioner':'bg-primary-light',
 };
 
 // ─── MultiSelect dropdown ─────────────────────────────────────────────────────
@@ -58,7 +71,7 @@ function MultiSelect({
         onClick={() => setOpen(o => !o)}
         className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg border transition-colors ${
           value.length > 0
-            ? 'border-[#4E87A0] bg-[#4E87A0]/5 text-[#3A7190] font-semibold'
+            ? 'border-primary-light bg-primary-light/5 text-primary font-semibold'
             : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
         }`}
       >
@@ -114,7 +127,7 @@ function CompactCard({
   highlighted: boolean;
   onSelect: (id: string) => void;
 }) {
-  const style = ROLE_STYLES[member.role];
+  const roleBadgeCls = getMemberBadge(member.role); const roleBar = ROLE_BAR[member.role] ?? 'bg-primary'; const roleDot = ROLE_DOT[member.role] ?? 'bg-primary';
   const ref = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -129,7 +142,7 @@ function CompactCard({
       onClick={() => onSelect(member.id)}
       className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-colors border-l-2 ${
         highlighted
-          ? 'bg-[#4E87A0]/8 border-l-[#4E87A0]'
+          ? 'bg-primary-light/8 border-l-primary-light'
           : 'border-l-transparent hover:bg-slate-50'
       }`}
     >
@@ -145,14 +158,14 @@ function CompactCard({
             {member.name}
           </span>
           {member.featured && (
-            <svg className="w-3 h-3 text-[#4E87A0] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-3 h-3 text-primary-light shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
           )}
           {member.is_verified && <VerifiedBadge />}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${style.badge}`}>
+          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${roleBadgeCls}`}>
             {member.role === 'Wellness Practitioner' ? 'Wellness' : member.role}
           </span>
           <span className="text-[10px] text-slate-400 truncate">{member.city}</span>
@@ -173,7 +186,7 @@ function FullCard({
   highlighted: boolean;
   onSelect: (id: string) => void;
 }) {
-  const style = ROLE_STYLES[member.role];
+  const roleBadgeCls = getMemberBadge(member.role); const roleBar = ROLE_BAR[member.role] ?? 'bg-primary'; const roleDot = ROLE_DOT[member.role] ?? 'bg-primary';
   const ref = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
@@ -188,11 +201,11 @@ function FullCard({
       ref={ref}
       className={`group relative bg-white rounded-2xl border overflow-hidden flex flex-col transition-all duration-200 cursor-pointer ${
         highlighted
-          ? 'border-[#4E87A0] shadow-lg shadow-[#4E87A0]/10 ring-1 ring-[#4E87A0]'
+          ? 'border-primary-light shadow-lg shadow-primary-light/10 ring-1 ring-primary-light'
           : 'border-slate-100 shadow-sm hover:shadow-lg'
       }`}
     >
-      <div className={`h-1 ${style.bar}`} />
+      <div className={`h-1 ${roleBar}`} />
       <div className="p-4 flex flex-col flex-1">
         {/* Header */}
         <div className="flex items-start gap-3 mb-3">
@@ -204,8 +217,8 @@ function FullCard({
               className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100"
             />
             {member.featured && (
-              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#4E87A0] rounded-full flex items-center justify-center ring-1 ring-white">
-                <svg className="w-2.5 h-2.5 text-[#1B3A5C]" fill="currentColor" viewBox="0 0 20 20">
+              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-primary-light rounded-full flex items-center justify-center ring-1 ring-white">
+                <svg className="w-2.5 h-2.5 text-primary-dark" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
               </div>
@@ -216,14 +229,14 @@ function FullCard({
               {member.name}
               {member.is_verified && <VerifiedBadge />}
             </h3>
-            <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full mt-0.5 ${style.badge}`}>
-              <span className={`w-1 h-1 rounded-full ${style.dot}`} />
+            <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full mt-0.5 ${roleBadgeCls}`}>
+              <span className={`w-1 h-1 rounded-full ${roleDot}`} />
               {member.role}
             </span>
           </div>
           <button
             onClick={e => { e.preventDefault(); e.stopPropagation(); onSelect(member.id); }}
-            className="shrink-0 w-7 h-7 rounded-lg bg-slate-100 hover:bg-[#4E87A0]/10 flex items-center justify-center text-slate-400 hover:text-[#4E87A0] transition-colors"
+            className="shrink-0 w-7 h-7 rounded-lg bg-slate-100 hover:bg-primary-light/10 flex items-center justify-center text-slate-400 hover:text-primary-light transition-colors"
             title="Show on map"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,7 +274,7 @@ function FullCard({
         {/* Footer */}
         <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
           <span className="text-[10px] text-slate-400">Since {member.memberSince}</span>
-          <span className="text-[11px] font-semibold text-[#4E87A0] group-hover:text-[#3A7190] flex items-center gap-0.5 transition-colors">
+          <span className="text-[11px] font-semibold text-primary-light group-hover:text-primary flex items-center gap-0.5 transition-colors">
             View Profile
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -339,7 +352,7 @@ export default function MembersPage() {
           {ROLES.map(role => (
             <button key={role} onClick={() => setRoleFilter(role)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                roleFilter === role ? 'bg-[#1B3A5C] text-white border-[#1B3A5C]' : 'bg-white text-slate-600 border-slate-200'
+                roleFilter === role ? 'bg-primary-dark text-white border-[#1B3A5C]' : 'bg-white text-slate-600 border-slate-200'
               }`}
             >
               {role === 'All' ? 'All' : role}
@@ -394,12 +407,12 @@ export default function MembersPage() {
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 bg-white border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-3">
-          <h1 className="text-lg font-bold text-[#1B3A5C]">Member Directory</h1>
+          <h1 className="text-lg font-bold text-primary-dark">Member Directory</h1>
           <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
             {filtered.length} / {members.length}
           </span>
           {hasFilters && (
-            <button onClick={clearFilters} className="text-xs text-[#4E87A0] hover:text-[#3A7190] font-semibold flex items-center gap-1 transition-colors">
+            <button onClick={clearFilters} className="text-xs text-primary-light hover:text-primary font-semibold flex items-center gap-1 transition-colors">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -411,7 +424,7 @@ export default function MembersPage() {
           onClick={() => setMapOpen(o => !o)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
             mapOpen
-              ? 'bg-[#1B3A5C] text-white shadow-md'
+              ? 'bg-primary-dark text-white shadow-md'
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >
@@ -436,7 +449,7 @@ export default function MembersPage() {
               <input
                 type="text" placeholder="Search..." value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4E87A0]/40 focus:border-[#4E87A0]"
+                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4E87A0]/40 focus:border-primary-light"
               />
             </div>
 
@@ -446,7 +459,7 @@ export default function MembersPage() {
                 <button key={role} onClick={() => setRoleFilter(role)}
                   className={`px-2 py-1 rounded-full text-[10px] font-semibold transition-all border ${
                     roleFilter === role
-                      ? 'bg-[#1B3A5C] text-white border-[#1B3A5C]'
+                      ? 'bg-primary-dark text-white border-[#1B3A5C]'
                       : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -508,7 +521,7 @@ export default function MembersPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <p className="font-medium text-sm">No members found</p>
-                <button onClick={clearFilters} className="mt-2 text-xs text-[#4E87A0] hover:underline">Clear filters</button>
+                <button onClick={clearFilters} className="mt-2 text-xs text-primary-light hover:underline">Clear filters</button>
               </div>
             ) : (
               <div className="grid gap-4 grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3">
@@ -546,7 +559,7 @@ export default function MembersPage() {
       {/* Mobile FAB — map toggle, hidden on md+ */}
       <button
         onClick={() => setMobileMapOpen(o => !o)}
-        className="md:hidden fixed bottom-6 right-6 z-50 w-[52px] h-[52px] rounded-full bg-[#4E87A0] text-white flex items-center justify-center shadow-lg shadow-[#4E87A0]/40 hover:bg-[#3A7190] active:scale-95 transition-all"
+        className="md:hidden fixed bottom-6 right-6 z-50 w-[52px] h-[52px] rounded-full bg-primary-light text-white flex items-center justify-center shadow-lg shadow-[#4E87A0]/40 hover:bg-primary active:scale-95 transition-all"
         aria-label={mobileMapOpen ? 'Close map' : 'Show map'}
       >
         {mobileMapOpen ? (
