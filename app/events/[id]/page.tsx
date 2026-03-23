@@ -42,160 +42,224 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   const dateFormatted = new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
+  const dateShort = new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  });
   const catBadge = CATEGORY_COLORS[ev.category] ?? 'bg-slate-100 text-slate-600 border-slate-200';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#F8FAFC]">
 
-      {/* Hero: featured image OR dark navy gradient */}
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
       {ev.featured_image_url ? (
+        /* Image hero */
         <div className="relative pt-16">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={ev.featured_image_url}
             alt={ev.title}
-            className="w-full max-h-72 object-cover"
+            className="w-full max-h-80 object-cover"
+            width={1200}
+            height={320}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-6 lg:px-8 pb-8 max-w-5xl mx-auto">
-            <Link href="/events" className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-sm mb-4 transition-colors">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Events
-            </Link>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catBadge}`}>{ev.category}</span>
-              <span className="px-2.5 py-0.5 bg-white/20 text-white text-xs font-semibold rounded-full">{ev.format}</span>
-              {isPast && <span className="px-2.5 py-0.5 bg-white/20 text-white/80 text-xs font-semibold rounded-full">Past Event</span>}
+          {/* Gradient overlay — stronger at bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-6 lg:px-8 pb-8">
+            <div className="max-w-5xl mx-auto">
+              <Link
+                href="/events"
+                className="inline-flex items-center gap-1.5 text-white/75 hover:text-white text-sm mb-5 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Events
+              </Link>
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catBadge}`}>{ev.category}</span>
+                <span className="px-2.5 py-0.5 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full border border-white/20">{ev.format}</span>
+                {isPast && (
+                  <span className="px-2.5 py-0.5 bg-white/10 backdrop-blur-sm text-white/70 text-xs font-semibold rounded-full border border-white/15">
+                    Past Event
+                  </span>
+                )}
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">{ev.title}</h1>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">{ev.title}</h1>
           </div>
         </div>
       ) : (
-        <div className="bg-[#1B3A5C] pt-24 pb-10 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-5xl mx-auto">
-            <Link href="/events" className="inline-flex items-center gap-1.5 text-[#A8C5D8] hover:text-white text-sm mb-6 transition-colors">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        /* Gradient hero (no image) */
+        <div className="bg-[#1B3A5C] relative overflow-hidden pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+          {/* Subtle background texture */}
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+              backgroundSize: '28px 28px',
+            }}
+          />
+          {/* Soft glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#4E87A0]/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+
+          <div className="max-w-5xl mx-auto relative">
+            <Link
+              href="/events"
+              className="inline-flex items-center gap-1.5 text-[#A8C5D8] hover:text-white text-sm mb-6 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back to Events
             </Link>
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catBadge}`}>{ev.category}</span>
-              <span className="px-2.5 py-0.5 bg-white/15 text-white/90 text-xs font-semibold rounded-full">{ev.format}</span>
-              {isPast && <span className="px-2.5 py-0.5 bg-white/10 text-white/60 text-xs font-semibold rounded-full">Past Event</span>}
+              <span className="px-2.5 py-0.5 bg-white/12 text-white/90 text-xs font-semibold rounded-full border border-white/15">{ev.format}</span>
+              {isPast && (
+                <span className="px-2.5 py-0.5 bg-white/8 text-white/55 text-xs font-semibold rounded-full border border-white/10">
+                  Past Event
+                </span>
+              )}
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2">{ev.title}</h1>
-            <p className="text-[#A8C5D8]">{dateFormatted}</p>
+            <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-3">{ev.title}</h1>
+            <p className="text-[#7EB3CB] text-sm font-medium">{dateFormatted}</p>
           </div>
         </div>
       )}
 
-      {/* Main content */}
+      {/* ── Main content ─────────────────────────────────────────────────── */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_308px] gap-8">
 
           {/* LEFT: Details */}
-          <div className="space-y-5">
+          <div className="space-y-4">
 
             {/* About */}
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
-              <h2 className="text-lg font-bold text-[#1B3A5C] mb-3">About This Event</h2>
-              <p className="text-[#374151] leading-relaxed">{ev.description || 'Full details coming soon.'}</p>
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+              <h2 className="text-base font-bold text-[#1B3A5C] mb-3">About This Event</h2>
+              <p className="text-[#374151] leading-relaxed text-sm">
+                {ev.description || 'Full details coming soon.'}
+              </p>
             </div>
 
-            {/* Date & Time */}
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
-              <h2 className="text-lg font-bold text-[#1B3A5C] mb-3">Date &amp; Time</h2>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-[#4E87A0]/10 rounded-xl flex items-center justify-center text-[#4E87A0] shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            {/* Event details: Date, Location, Instructor combined */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm divide-y divide-slate-100">
+
+              {/* Date & Time */}
+              <div className="flex items-start gap-4 p-6">
+                <div className="w-9 h-9 bg-[#4E87A0]/10 rounded-xl flex items-center justify-center text-[#4E87A0] shrink-0 mt-0.5">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1B3A5C]">{dateFormatted}</p>
-                  <p className="text-[#6B7280] text-sm">{fmtTime(ev.time_start)} – {fmtTime(ev.time_end)}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Date &amp; Time</p>
+                  <p className="font-semibold text-[#1B3A5C] text-sm">{dateFormatted}</p>
+                  <p className="text-[#6B7280] text-xs mt-0.5">{fmtTime(ev.time_start)} – {fmtTime(ev.time_end)}</p>
                 </div>
               </div>
-            </div>
 
-            {/* Location */}
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
-              <h2 className="text-lg font-bold text-[#1B3A5C] mb-3">Location</h2>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-[#4E87A0]/10 rounded-xl flex items-center justify-center text-[#4E87A0] shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              {/* Location */}
+              <div className="flex items-start gap-4 p-6">
+                <div className="w-9 h-9 bg-[#4E87A0]/10 rounded-xl flex items-center justify-center text-[#4E87A0] shrink-0 mt-0.5">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
                 <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Location</p>
                   {ev.format === 'Online' ? (
                     <>
-                      <p className="font-semibold text-[#1B3A5C]">Online Event</p>
-                      <p className="text-[#6B7280] text-sm">{ev.location || 'Online via Zoom'}</p>
+                      <p className="font-semibold text-[#1B3A5C] text-sm">Online Event</p>
+                      <p className="text-[#6B7280] text-xs mt-0.5">{ev.location || 'Online via Zoom'}</p>
                       <p className="text-[#9CA3AF] text-xs mt-0.5">Link provided after registration</p>
                     </>
                   ) : (
-                    <p className="font-semibold text-[#1B3A5C]">{ev.location || '—'}</p>
+                    <p className="font-semibold text-[#1B3A5C] text-sm">{ev.location || '—'}</p>
                   )}
                 </div>
               </div>
+
+              {/* Instructor */}
+              {ev.instructor && (
+                <div className="flex items-center gap-4 p-6">
+                  <div className="w-9 h-9 rounded-full bg-[#1B3A5C] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                    {ev.instructor[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Instructor</p>
+                    <p className="font-semibold text-[#1B3A5C] text-sm">{ev.instructor}</p>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Instructor */}
-            {ev.instructor && (
-              <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
-                <h2 className="text-lg font-bold text-[#1B3A5C] mb-3">Instructor</h2>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-[#1B3A5C] flex items-center justify-center text-white font-bold shrink-0">
-                    {ev.instructor[0]}
-                  </div>
-                  <p className="font-semibold text-[#374151]">{ev.instructor}</p>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* RIGHT: Booking card */}
           <div>
-            <div className="sticky top-24 bg-white rounded-2xl border border-[#E5E7EB] shadow-lg p-6 space-y-4">
+            <div className="sticky top-24 bg-white rounded-2xl border border-slate-200/80 shadow-lg p-6 space-y-5">
+
+              {/* Price */}
               <div>
-                <div className="text-3xl font-bold text-[#1B3A5C]">
-                  {ev.is_free ? 'Free' : `$${ev.price}`}
-                </div>
+                {ev.is_free ? (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-black text-emerald-600">Free</span>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-lg font-semibold text-slate-400 -mb-1">$</span>
+                    <span className="text-4xl font-black text-[#1B3A5C] tabular-nums">{ev.price}</span>
+                  </div>
+                )}
                 {ev.spots_remaining !== null && ev.spots_remaining !== undefined && (
-                  <div className={`text-xs font-semibold mt-1 ${ev.spots_remaining < 10 ? 'text-red-500' : 'text-[#6B7280]'}`}>
+                  <div className={[
+                    'flex items-center gap-1.5 mt-2 text-xs font-semibold',
+                    ev.spots_remaining < 10 ? 'text-amber-500' : 'text-slate-400',
+                  ].join(' ')}>
+                    {ev.spots_remaining < 10 && (
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    )}
                     {ev.spots_remaining} spots remaining
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center gap-2 py-3 border-t border-b border-[#E5E7EB] text-sm text-[#374151]">
-                <svg className="w-4 h-4 text-[#9CA3AF] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              {/* Date summary */}
+              <div className="flex items-center gap-2.5 py-3.5 border-t border-b border-slate-100 text-sm text-[#374151]">
+                <svg className="w-4 h-4 text-[#4E87A0] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                {new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                <span className="font-medium text-[#374151]">{dateShort}</span>
+                {ev.time_start && (
+                  <span className="text-slate-400 text-xs">· {fmtTime(ev.time_start)}</span>
+                )}
               </div>
 
+              {/* CTA */}
               {!isPast ? (
-                <button className="block w-full text-center py-3.5 bg-[#4E87A0] text-white font-bold rounded-xl hover:bg-[#3A7190] transition-colors">
+                <button className="block w-full text-center py-3.5 px-6 bg-[#4E87A0] hover:bg-[#3A7190] active:bg-[#2E6080] text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md cursor-pointer">
                   Register Now
                 </button>
               ) : (
-                <div className="text-center text-sm text-[#9CA3AF] py-2">This event has passed.</div>
+                <div className="text-center text-sm text-[#9CA3AF] py-2 font-medium">
+                  This event has passed.
+                </div>
               )}
 
+              {/* Secondary actions */}
               <div className="grid grid-cols-2 gap-2">
-                <button className="py-2.5 border border-[#E5E7EB] text-[#374151] text-xs font-semibold rounded-xl hover:bg-slate-50 transition-colors">
+                <button className="py-2.5 border border-slate-200 text-[#374151] text-xs font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 cursor-pointer">
                   Add to Calendar
                 </button>
-                <button className="py-2.5 border border-[#E5E7EB] text-[#374151] text-xs font-semibold rounded-xl hover:bg-slate-50 transition-colors">
+                <button className="py-2.5 border border-slate-200 text-[#374151] text-xs font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 cursor-pointer">
                   Share
                 </button>
               </div>
+
             </div>
           </div>
 

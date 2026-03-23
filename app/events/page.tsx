@@ -11,20 +11,20 @@ const ALL_CATEGORIES: Array<'All' | EventCategory> = [
   'Yoga Sequence', 'Music Playlist', 'Research',
 ];
 
-const CATEGORY_STYLES: Record<string, { badge: string }> = {
-  Workshop:           { badge: 'bg-teal-50 text-teal-700 border-teal-200'    },
-  'Teacher Training': { badge: 'bg-purple-50 text-purple-700 border-purple-200' },
-  'Dharma Talk':      { badge: 'bg-blue-50 text-blue-700 border-blue-200'    },
-  Conference:         { badge: 'bg-amber-50 text-amber-700 border-amber-200' },
-  'Yoga Sequence':    { badge: 'bg-green-50 text-green-700 border-green-200' },
-  'Music Playlist':   { badge: 'bg-pink-50 text-pink-700 border-pink-200'    },
-  Research:           { badge: 'bg-slate-100 text-slate-600 border-slate-200' },
+const CATEGORY_STYLES: Record<string, { badge: string; dot: string }> = {
+  Workshop:           { badge: 'bg-teal-50 text-teal-700 border-teal-200',     dot: 'bg-teal-400'   },
+  'Teacher Training': { badge: 'bg-purple-50 text-purple-700 border-purple-200', dot: 'bg-purple-400' },
+  'Dharma Talk':      { badge: 'bg-blue-50 text-blue-700 border-blue-200',     dot: 'bg-blue-400'   },
+  Conference:         { badge: 'bg-amber-50 text-amber-700 border-amber-200',  dot: 'bg-amber-400'  },
+  'Yoga Sequence':    { badge: 'bg-green-50 text-green-700 border-green-200',  dot: 'bg-green-400'  },
+  'Music Playlist':   { badge: 'bg-pink-50 text-pink-700 border-pink-200',     dot: 'bg-pink-400'   },
+  Research:           { badge: 'bg-slate-100 text-slate-600 border-slate-200', dot: 'bg-slate-400'  },
 };
 
 const FORMAT_BADGE: Record<string, string> = {
-  Online:     'bg-slate-100 text-slate-500',
+  Online:      'bg-slate-100 text-slate-500',
   'In Person': 'bg-orange-50 text-orange-600',
-  Hybrid:     'bg-indigo-50 text-indigo-600',
+  Hybrid:      'bg-indigo-50 text-indigo-600',
 };
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -51,20 +51,49 @@ function fmtTime(t: string) {
   return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  );
+}
+function FilterIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 4h18M6 8h12M9 12h6M11 16h2" />
+    </svg>
+  );
+}
+function ChevronLeft({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+    </svg>
+  );
+}
+function ChevronRight({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  );
+}
+
 function SkeletonEvents() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {[1, 2, 3, 4].map(i => (
-        <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col sm:flex-row animate-pulse">
-          <div className="bg-slate-200 h-16 sm:h-auto sm:w-20 shrink-0" />
-          <div className="flex-1 p-5 flex flex-col gap-2.5">
+        <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex animate-pulse">
+          <div className="bg-slate-200 w-[72px] shrink-0" style={{ minHeight: 100 }} />
+          <div className="flex-1 p-5 flex flex-col gap-3">
             <div className="flex gap-2">
-              <div className="h-4 w-20 bg-slate-200 rounded-full" />
-              <div className="h-4 w-14 bg-slate-200 rounded-full" />
+              <div className="h-5 w-20 bg-slate-200 rounded-full" />
+              <div className="h-5 w-14 bg-slate-200 rounded-full" />
             </div>
             <div className="h-4 w-2/3 bg-slate-200 rounded" />
             <div className="h-3 w-full bg-slate-100 rounded" />
-            <div className="h-3 w-3/5 bg-slate-100 rounded" />
+            <div className="h-3 w-1/2 bg-slate-100 rounded" />
           </div>
         </div>
       ))}
@@ -72,15 +101,111 @@ function SkeletonEvents() {
   );
 }
 
+interface MiniCalendarProps {
+  calYear: number;
+  calMonth: number;
+  selectedDate: string | null;
+  eventDates: Set<string>;
+  today: Date;
+  onPrev: () => void;
+  onNext: () => void;
+  onSelectDate: (iso: string | null) => void;
+  onClose?: () => void;
+}
+
+function MiniCalendar({ calYear, calMonth, selectedDate, eventDates, today, onPrev, onNext, onSelectDate, onClose }: MiniCalendarProps) {
+  const daysInMonth = getDaysInMonth(calYear, calMonth);
+  const firstDay    = getFirstDayOfWeek(calYear, calMonth);
+  const todayISO    = toISO(today.getFullYear(), today.getMonth(), today.getDate());
+
+  return (
+    <div>
+      {/* Month nav */}
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={onPrev}
+          aria-label="Previous month"
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors text-slate-500 cursor-pointer"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <span className="text-sm font-semibold text-[#1B3A5C]">{MONTHS[calMonth]} {calYear}</span>
+        <button
+          onClick={onNext}
+          aria-label="Next month"
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors text-slate-500 cursor-pointer"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Day headers */}
+      <div className="grid grid-cols-7 mb-1">
+        {DAYS.map(d => (
+          <div key={d} className="text-center text-[10px] font-bold text-slate-400 py-1 uppercase tracking-wide">{d}</div>
+        ))}
+      </div>
+
+      {/* Day cells */}
+      <div className="grid grid-cols-7 gap-y-0.5">
+        {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} />)}
+        {Array.from({ length: daysInMonth }).map((_, i) => {
+          const day = i + 1;
+          const iso = toISO(calYear, calMonth, day);
+          const hasEvent   = eventDates.has(iso);
+          const isSelected = selectedDate === iso;
+          const isToday    = iso === todayISO;
+          return (
+            <button
+              key={day}
+              onClick={() => {
+                if (!hasEvent) return;
+                const next = isSelected ? null : iso;
+                onSelectDate(next);
+                if (next && onClose) onClose();
+              }}
+              aria-label={`${day} ${MONTHS[calMonth]}${hasEvent ? ', has events' : ''}`}
+              className={[
+                'relative flex flex-col items-center justify-center h-8 w-full rounded-lg text-xs font-medium transition-colors',
+                isSelected
+                  ? 'bg-[#1B3A5C] text-white'
+                  : isToday
+                  ? 'ring-1 ring-[#4E87A0] text-[#1B3A5C] font-bold'
+                  : hasEvent
+                  ? 'hover:bg-slate-100 text-slate-700 cursor-pointer'
+                  : 'text-slate-300 cursor-default',
+              ].join(' ')}
+            >
+              {day}
+              {hasEvent && !isSelected && (
+                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#4E87A0]" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {selectedDate && (
+        <button
+          onClick={() => { onSelectDate(null); if (onClose) onClose(); }}
+          className="mt-4 w-full text-xs text-[#4E87A0] hover:text-[#1B3A5C] font-semibold text-center transition-colors cursor-pointer"
+        >
+          Clear date filter
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function EventsPage() {
   const today = new Date();
-  const [calYear,       setCalYear]       = useState(today.getFullYear());
-  const [calMonth,      setCalMonth]      = useState(today.getMonth());
-  const [selectedDate,  setSelectedDate]  = useState<string | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<'All' | EventCategory>('All');
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [dateSheetOpen, setDateSheetOpen] = useState(false);
+  const [calYear,         setCalYear]         = useState(today.getFullYear());
+  const [calMonth,        setCalMonth]        = useState(today.getMonth());
+  const [selectedDate,    setSelectedDate]    = useState<string | null>(null);
+  const [categoryFilter,  setCategoryFilter]  = useState<'All' | EventCategory>('All');
+  const [events,          setEvents]          = useState<Event[]>([]);
+  const [loading,         setLoading]         = useState(true);
+  const [dateSheetOpen,   setDateSheetOpen]   = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
 
   useEffect(() => {
@@ -98,9 +223,6 @@ export default function EventsPage() {
   }, []);
 
   const eventDates = useMemo(() => new Set(events.map(e => e.date)), [events]);
-
-  const daysInMonth = getDaysInMonth(calYear, calMonth);
-  const firstDay    = getFirstDayOfWeek(calYear, calMonth);
 
   const prevMonth = () => {
     if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
@@ -121,43 +243,47 @@ export default function EventsPage() {
     });
   }, [events, categoryFilter, selectedDate]);
 
+  const activeFilters = (selectedDate ? 1 : 0) + (categoryFilter !== 'All' ? 1 : 0);
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <PageHero
         pill="Events"
         title="Events"
         subtitle="Workshops, teacher trainings, dharma talks, and conferences from the global GOYA community."
       />
 
-      {/* ── Mobile filter row ──────────────────────────────────────────────── */}
-      <div className="lg:hidden sticky top-0 z-20 bg-white border-b border-slate-200 px-4 py-2.5">
+      {/* ── Mobile filter bar ──────────────────────────────────────────────── */}
+      <div className="lg:hidden sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-4 py-2.5">
         <div className="flex gap-2">
-          {/* Date pill */}
           <button
             onClick={() => { setDateSheetOpen(true); setCategorySheetOpen(false); }}
-            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border text-sm font-medium transition-colors ${
+            aria-label="Filter by date"
+            className={[
+              'flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 cursor-pointer',
               selectedDate
-                ? 'border-[#4E87A0] bg-[#4E87A0]/5 text-[#3A7190]'
-                : 'border-slate-200 bg-white text-slate-600'
-            }`}
+                ? 'border-[#4E87A0] bg-[#4E87A0]/8 text-[#3A7190]'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
+            ].join(' ')}
           >
-            <span>📅</span>
+            <CalendarIcon className="w-4 h-4 shrink-0" />
             <span className="truncate">
               {selectedDate
                 ? new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                : `${MONTHS[calMonth]} ${calYear}`}
+                : `${MONTHS[calMonth].slice(0, 3)} ${calYear}`}
             </span>
           </button>
-          {/* Category pill */}
           <button
             onClick={() => { setCategorySheetOpen(true); setDateSheetOpen(false); }}
-            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border text-sm font-medium transition-colors ${
+            aria-label="Filter by category"
+            className={[
+              'flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 cursor-pointer',
               categoryFilter !== 'All'
-                ? 'border-[#4E87A0] bg-[#4E87A0]/5 text-[#3A7190]'
-                : 'border-slate-200 bg-white text-slate-600'
-            }`}
+                ? 'border-[#4E87A0] bg-[#4E87A0]/8 text-[#3A7190]'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
+            ].join(' ')}
           >
-            <span>☰</span>
+            <FilterIcon className="w-4 h-4 shrink-0" />
             <span className="truncate">
               {categoryFilter === 'All' ? 'All Events' : categoryFilter}
             </span>
@@ -166,153 +292,178 @@ export default function EventsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[268px_1fr] gap-8">
 
-          {/* Sidebar: calendar + filters — desktop only */}
-          <aside className="hidden lg:block space-y-6">
+          {/* ── Sidebar ─────────────────────────────────────────────────────── */}
+          <aside className="hidden lg:flex flex-col gap-4">
+
             {/* Mini calendar */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-              <div className="flex items-center justify-between mb-4">
-                <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors text-slate-500">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <span className="text-sm font-semibold text-[#1B3A5C]">{MONTHS[calMonth]} {calYear}</span>
-                <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors text-slate-500">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-              <div className="grid grid-cols-7 mb-1">
-                {DAYS.map(d => (
-                  <div key={d} className="text-center text-[10px] font-semibold text-slate-400 py-1">{d}</div>
-                ))}
-              </div>
-              <div className="grid grid-cols-7 gap-y-0.5">
-                {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} />)}
-                {Array.from({ length: daysInMonth }).map((_, i) => {
-                  const day = i + 1;
-                  const iso = toISO(calYear, calMonth, day);
-                  const hasEvent  = eventDates.has(iso);
-                  const isSelected = selectedDate === iso;
-                  const isToday   = iso === toISO(today.getFullYear(), today.getMonth(), today.getDate());
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+              <MiniCalendar
+                calYear={calYear}
+                calMonth={calMonth}
+                selectedDate={selectedDate}
+                eventDates={eventDates}
+                today={today}
+                onPrev={prevMonth}
+                onNext={nextMonth}
+                onSelectDate={setSelectedDate}
+              />
+            </div>
+
+            {/* Category filter */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Category</p>
+              <div className="flex flex-col gap-0.5">
+                {ALL_CATEGORIES.map(cat => {
+                  const isActive = categoryFilter === cat;
+                  const style = cat !== 'All' ? CATEGORY_STYLES[cat] : null;
                   return (
                     <button
-                      key={day}
-                      onClick={() => hasEvent ? setSelectedDate(isSelected ? null : iso) : undefined}
-                      className={`relative flex flex-col items-center justify-center h-8 w-full rounded-lg text-xs font-medium transition-colors
-                        ${isSelected ? 'bg-[#1B3A5C] text-white'
-                          : isToday  ? 'bg-[#4E87A0]/15 text-[#3A7190]'
-                          : hasEvent ? 'hover:bg-slate-100 text-slate-700'
-                          : 'text-slate-400 cursor-default'}`}
+                      key={cat}
+                      onClick={() => setCategoryFilter(cat)}
+                      className={[
+                        'flex items-center gap-2.5 text-left px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer',
+                        isActive
+                          ? 'bg-[#1B3A5C] text-white'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-[#1B3A5C]',
+                      ].join(' ')}
                     >
-                      {day}
-                      {hasEvent && !isSelected && (
-                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#4E87A0]" />
+                      {style && (
+                        <span className={[
+                          'w-2 h-2 rounded-full shrink-0 transition-colors',
+                          isActive ? 'bg-white/60' : style.dot,
+                        ].join(' ')} />
                       )}
+                      {cat === 'All' ? 'All Events' : cat}
                     </button>
                   );
                 })}
               </div>
-              {selectedDate && (
-                <button
-                  onClick={() => setSelectedDate(null)}
-                  className="mt-3 w-full text-xs text-[#4E87A0] hover:text-[#3A7190] font-semibold text-center transition-colors"
-                >
-                  Clear date filter
-                </button>
-              )}
             </div>
 
-            {/* Category filters */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Category</h3>
-              <div className="flex flex-col gap-1.5">
-                {ALL_CATEGORIES.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setCategoryFilter(cat)}
-                    className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      categoryFilter === cat ? 'bg-[#1B3A5C] text-white' : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    {cat === 'All' ? 'All Events' : cat}
-                  </button>
-                ))}
-              </div>
-            </div>
           </aside>
 
-          {/* Event list */}
+          {/* ── Event list ──────────────────────────────────────────────────── */}
           <div>
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-sm text-slate-500">
-                {selectedDate ? `Events on ${formatDate(selectedDate)}` : 'All Events'}
-                {' — '}
-                <span className="font-semibold text-slate-800">{filtered.length}</span> event{filtered.length !== 1 ? 's' : ''}
-              </p>
+            {/* Header row */}
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">
+                  {selectedDate ? formatDate(selectedDate) : 'All upcoming events'}
+                </p>
+                <p className="text-[#1B3A5C] font-bold text-xl leading-tight">
+                  {filtered.length}{' '}
+                  <span className="font-normal text-slate-400 text-base">
+                    event{filtered.length !== 1 ? 's' : ''}
+                  </span>
+                </p>
+              </div>
+              {activeFilters > 0 && (
+                <button
+                  onClick={() => { setSelectedDate(null); setCategoryFilter('All'); }}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[#4E87A0] hover:text-[#1B3A5C] px-3 py-1.5 rounded-full border border-[#4E87A0]/30 hover:border-[#1B3A5C]/40 transition-all duration-200 cursor-pointer"
+                >
+                  Clear {activeFilters > 1 ? `${activeFilters} filters` : 'filter'}
+                </button>
+              )}
             </div>
 
             {loading ? (
               <SkeletonEvents />
             ) : filtered.length === 0 ? (
-              <div className="text-center py-24 bg-white rounded-2xl border border-slate-100">
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+              <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-slate-100 text-center px-6">
+                <div className="w-14 h-14 bg-[#4E87A0]/8 rounded-2xl flex items-center justify-center mb-5">
+                  <CalendarIcon className="w-7 h-7 text-[#4E87A0]" />
                 </div>
-                <p className="text-slate-700 font-semibold mb-1">No events this month</p>
-                <p className="text-slate-400 text-sm">Try navigating to another month.</p>
+                <p className="text-[#1B3A5C] font-bold text-lg mb-1">No events found</p>
+                <p className="text-slate-400 text-sm max-w-xs">
+                  {selectedDate
+                    ? 'No events on this date. Try another day.'
+                    : categoryFilter !== 'All'
+                    ? `No ${categoryFilter} events scheduled. Check back soon.`
+                    : 'No upcoming events yet. Check back soon.'}
+                </p>
+                {activeFilters > 0 && (
+                  <button
+                    onClick={() => { setSelectedDate(null); setCategoryFilter('All'); }}
+                    className="mt-5 text-sm font-semibold text-[#4E87A0] hover:text-[#1B3A5C] transition-colors cursor-pointer"
+                  >
+                    Clear all filters
+                  </button>
+                )}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {filtered.map(event => {
-                  const style = CATEGORY_STYLES[event.category] ?? { badge: 'bg-slate-100 text-slate-600 border-slate-200' };
+                  const catStyle = CATEGORY_STYLES[event.category] ?? {
+                    badge: 'bg-slate-100 text-slate-600 border-slate-200',
+                    dot: 'bg-slate-400',
+                  };
+                  const [year, month, dayStr] = event.date.split('-');
+                  const dayNum = dayStr;
+                  const monthAbbr = MONTHS[parseInt(month) - 1].slice(0, 3);
+
                   return (
-                    <Link key={event.id} href={`/events/${event.id}`} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col sm:flex-row cursor-pointer">
+                    <Link
+                      key={event.id}
+                      href={`/events/${event.id}`}
+                      className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col sm:flex-row cursor-pointer"
+                    >
                       {/* Date block */}
-                      <div className="bg-[#1B3A5C] text-white flex flex-row sm:flex-col items-center justify-center sm:justify-start gap-3 sm:gap-0 px-5 py-4 sm:py-6 sm:w-20 shrink-0 sm:text-center">
-                        <div className="text-2xl font-bold leading-none">{event.date.split('-')[2]}</div>
-                        <div className="text-[10px] font-semibold uppercase tracking-widest text-[#4E87A0]">
-                          {MONTHS[parseInt(event.date.split('-')[1]) - 1].slice(0, 3)}
-                        </div>
+                      <div className="bg-[#1B3A5C] text-white flex flex-row sm:flex-col items-center justify-center gap-3 sm:gap-1 px-5 py-4 sm:py-6 sm:w-[72px] shrink-0 sm:text-center">
+                        <span className="text-3xl font-black leading-none tabular-nums">{dayNum}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#7EB3CB]">{monthAbbr}</span>
+                        <span className="sm:hidden text-[10px] font-semibold text-[#7EB3CB] uppercase tracking-wide">{year}</span>
                       </div>
 
                       {/* Content */}
-                      <div className="flex-1 p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${style.badge}`}>
+                      <div className="flex-1 p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center min-w-0">
+                        <div className="flex-1 min-w-0">
+                          {/* Badges */}
+                          <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                            <span className={`inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catStyle.badge}`}>
                               {event.category}
                             </span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${FORMAT_BADGE[event.format] ?? 'bg-slate-100 text-slate-500'}`}>
+                            <span className={`inline-flex items-center text-xs px-2.5 py-0.5 rounded-full font-medium ${FORMAT_BADGE[event.format] ?? 'bg-slate-100 text-slate-500'}`}>
                               {event.format}
                             </span>
                           </div>
-                          <h3 className="font-semibold text-[#1B3A5C] text-base mb-1">{event.title}</h3>
-                          <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 mb-2">{event.description}</p>
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                            <span className="flex items-center gap-1">
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                          {/* Title */}
+                          <h3 className="font-bold text-[#1B3A5C] text-[15px] leading-snug mb-1.5 group-hover:text-[#3A7190] transition-colors line-clamp-2">
+                            {event.title}
+                          </h3>
+
+                          {/* Description */}
+                          <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 mb-2.5">{event.description}</p>
+
+                          {/* Meta row */}
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+                            <span className="flex items-center gap-1.5">
+                              <svg className="w-3.5 h-3.5 text-[#4E87A0]/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
-                              {fmtTime(event.time_start)} – {fmtTime(event.time_end)}
+                              {fmtTime(event.time_start)}
+                              {event.time_end ? ` – ${fmtTime(event.time_end)}` : ''}
                             </span>
                             {event.location && (
-                              <span className="flex items-center gap-1">
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <span className="flex items-center gap-1.5">
+                                <svg className="w-3.5 h-3.5 text-[#4E87A0]/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                {event.location}
+                                <span className="truncate max-w-[140px]">{event.location}</span>
                               </span>
                             )}
-                            {event.instructor && <span>with {event.instructor}</span>}
+                            {event.instructor && (
+                              <span className="truncate">with {event.instructor}</span>
+                            )}
                             {event.spots_remaining !== null && event.spots_remaining !== undefined && (
-                              <span className={event.spots_remaining < 10 ? 'text-amber-500 font-medium' : ''}>
+                              <span className={[
+                                'font-semibold',
+                                event.spots_remaining < 10 ? 'text-amber-500' : 'text-slate-400',
+                              ].join(' ')}>
                                 {event.spots_remaining} spots left
                               </span>
                             )}
@@ -320,11 +471,15 @@ export default function EventsPage() {
                         </div>
 
                         {/* Price */}
-                        <div className="shrink-0 text-right">
+                        <div className="shrink-0 self-start sm:self-center text-right">
                           {event.is_free ? (
-                            <span className="text-emerald-600 font-bold text-sm">Free</span>
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+                              Free
+                            </span>
                           ) : (
-                            <span className="text-[#1B3A5C] font-bold text-lg">${event.price}</span>
+                            <span className="text-[#1B3A5C] font-black text-xl tabular-nums">
+                              ${event.price}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -337,113 +492,82 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* ── Date bottom sheet (mobile) ──────────────────────────────────────── */}
+      {/* ── Date bottom sheet (mobile) ─────────────────────────────────────── */}
       {dateSheetOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setDateSheetOpen(false)}
           />
-          {/* Sheet */}
           <div className="relative bg-white rounded-t-2xl p-5 animate-[slideUp_0.2s_ease-out]">
-            {/* Handle */}
-            <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-4" />
+            <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-5" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-[#1B3A5C]">Filter by Date</span>
-              <button onClick={() => setDateSheetOpen(false)} className="text-slate-400 hover:text-slate-600 text-xs font-medium">Done</button>
-            </div>
-            {/* Calendar */}
-            <div className="flex items-center justify-between mb-3">
-              <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors text-slate-500">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <span className="text-sm font-semibold text-[#1B3A5C]">{MONTHS[calMonth]} {calYear}</span>
-              <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors text-slate-500">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-            <div className="grid grid-cols-7 mb-1">
-              {DAYS.map(d => (
-                <div key={d} className="text-center text-[10px] font-semibold text-slate-400 py-1">{d}</div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-y-0.5">
-              {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} />)}
-              {Array.from({ length: daysInMonth }).map((_, i) => {
-                const day = i + 1;
-                const iso = toISO(calYear, calMonth, day);
-                const hasEvent  = eventDates.has(iso);
-                const isSelected = selectedDate === iso;
-                const isToday   = iso === toISO(today.getFullYear(), today.getMonth(), today.getDate());
-                return (
-                  <button
-                    key={day}
-                    onClick={() => {
-                      if (!hasEvent) return;
-                      setSelectedDate(isSelected ? null : iso);
-                      if (!isSelected) setDateSheetOpen(false);
-                    }}
-                    className={`relative flex flex-col items-center justify-center h-9 w-full rounded-lg text-sm font-medium transition-colors
-                      ${isSelected ? 'bg-[#1B3A5C] text-white'
-                        : isToday  ? 'bg-[#4E87A0]/15 text-[#3A7190]'
-                        : hasEvent ? 'hover:bg-slate-100 text-slate-700'
-                        : 'text-slate-400 cursor-default'}`}
-                  >
-                    {day}
-                    {hasEvent && !isSelected && (
-                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#4E87A0]" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {selectedDate && (
+              <span className="text-sm font-bold text-[#1B3A5C]">Filter by Date</span>
               <button
-                onClick={() => { setSelectedDate(null); setDateSheetOpen(false); }}
-                className="mt-4 w-full text-sm text-[#4E87A0] hover:text-[#3A7190] font-semibold text-center transition-colors"
+                onClick={() => setDateSheetOpen(false)}
+                className="text-slate-400 hover:text-slate-600 text-xs font-semibold transition-colors cursor-pointer px-2 py-1"
               >
-                Clear date filter
+                Done
               </button>
-            )}
+            </div>
+            <MiniCalendar
+              calYear={calYear}
+              calMonth={calMonth}
+              selectedDate={selectedDate}
+              eventDates={eventDates}
+              today={today}
+              onPrev={prevMonth}
+              onNext={nextMonth}
+              onSelectDate={setSelectedDate}
+              onClose={() => setDateSheetOpen(false)}
+            />
           </div>
         </div>
       )}
 
-      {/* ── Category bottom sheet (mobile) ─────────────────────────────────── */}
+      {/* ── Category bottom sheet (mobile) ───────────────────────────────── */}
       {categorySheetOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setCategorySheetOpen(false)}
           />
-          {/* Sheet */}
           <div className="relative bg-white rounded-t-2xl p-5 animate-[slideUp_0.2s_ease-out]">
-            {/* Handle */}
-            <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-4" />
+            <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-5" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-[#1B3A5C]">Filter by Category</span>
-              <button onClick={() => setCategorySheetOpen(false)} className="text-slate-400 hover:text-slate-600 text-xs font-medium">Done</button>
+              <span className="text-sm font-bold text-[#1B3A5C]">Filter by Category</span>
+              <button
+                onClick={() => setCategorySheetOpen(false)}
+                className="text-slate-400 hover:text-slate-600 text-xs font-semibold transition-colors cursor-pointer px-2 py-1"
+              >
+                Done
+              </button>
             </div>
-            <div className="flex flex-col gap-1">
-              {ALL_CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => { setCategoryFilter(cat); setCategorySheetOpen(false); }}
-                  className={`text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    categoryFilter === cat
-                      ? 'bg-[#1B3A5C] text-white'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  {cat === 'All' ? 'All Events' : cat}
-                </button>
-              ))}
+            <div className="flex flex-col gap-0.5">
+              {ALL_CATEGORIES.map(cat => {
+                const isActive = categoryFilter === cat;
+                const style = cat !== 'All' ? CATEGORY_STYLES[cat] : null;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => { setCategoryFilter(cat); setCategorySheetOpen(false); }}
+                    className={[
+                      'flex items-center gap-3 text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer',
+                      isActive
+                        ? 'bg-[#1B3A5C] text-white'
+                        : 'text-slate-700 hover:bg-slate-50',
+                    ].join(' ')}
+                  >
+                    {style && (
+                      <span className={[
+                        'w-2 h-2 rounded-full shrink-0',
+                        isActive ? 'bg-white/60' : style.dot,
+                      ].join(' ')} />
+                    )}
+                    {cat === 'All' ? 'All Events' : cat}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
