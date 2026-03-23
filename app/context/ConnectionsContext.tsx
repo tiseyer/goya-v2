@@ -14,6 +14,7 @@ export interface ConnRecord {
   memberName: string;
   memberPhoto: string;
   role: 'requester' | 'receiver';
+  type: 'peer' | 'mentorship' | 'faculty';
 }
 
 export interface NotifRecord {
@@ -80,6 +81,7 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
               memberName: '',
               memberPhoto: '',
               role,
+              type: row.type ?? 'peer',
             };
           }
           setConnections(map);
@@ -157,6 +159,7 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
           memberName: name,
           memberPhoto: photo,
           role: 'requester',
+          type,
         },
       }));
     }
