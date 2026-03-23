@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Dropdown Refactor** - Add role-branched Settings entry to profile dropdown and remove old shortcuts (completed 2026-03-23)
 - [ ] **Phase 2: Settings Shell** - Build sidebar-navigated Settings layout at `app/settings/` matching Admin Settings
-- [ ] **Phase 3: Settings Pages** - Populate four settings pages (General, Subscriptions, Connections, Inbox)
+- [x] **Phase 3: Settings Pages** - Populate four settings pages (General, Subscriptions, Connections, Inbox) (completed 2026-03-23)
 
 ## Phase Details
 
@@ -56,7 +56,7 @@ Plans:
   4. Settings > Inbox displays a "coming soon" placeholder page
 **Plans**: 2 plans
 Plans:
-- [ ] 03-01-PLAN.md — Migrate profile settings form into Settings > General page
+- [x] 03-01-PLAN.md — Migrate profile settings form into Settings > General page
 - [x] 03-02-PLAN.md — Build Subscriptions page with membership info and polish Connections/Inbox placeholders
 **UI hint**: yes
 
@@ -69,4 +69,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Dropdown Refactor | 1/1 | Complete   | 2026-03-23 |
 | 2. Settings Shell | 0/1 | Planned | - |
-| 3. Settings Pages | 1/2 | In Progress|  |
+| 3. Settings Pages | 2/2 | Complete   | 2026-03-23 |

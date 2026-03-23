@@ -22,7 +22,7 @@
 
 ### Settings Pages
 
-- [ ] **PAGE-01**: Settings > General displays the existing profile settings form (name, avatar, bio, etc.) currently at `app/profile/settings/`
+- [x] **PAGE-01**: Settings > General displays the existing profile settings form (name, avatar, bio, etc.) currently at `app/profile/settings/`
 - [x] **PAGE-02**: Settings > Subscriptions displays the existing subscriptions content
 - [x] **PAGE-03**: Settings > Connections displays a placeholder page indicating this section is coming soon
 - [x] **PAGE-04**: Settings > Inbox displays a placeholder page indicating this section is coming soon
@@ -62,7 +62,7 @@
 | SHELL-02 | Phase 2 | Pending |
 | SHELL-03 | Phase 2 | Pending |
 | SHELL-04 | Phase 2 | Pending |
-| PAGE-01 | Phase 3 | Pending |
+| PAGE-01 | Phase 3 | Complete |
 | PAGE-02 | Phase 3 | Complete |
 | PAGE-03 | Phase 3 | Complete |
 | PAGE-04 | Phase 3 | Complete |
