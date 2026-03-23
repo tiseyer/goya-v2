@@ -1051,10 +1051,8 @@ export default function Header() {
             <div className="px-3 py-2 space-y-0.5">
               {[
                 { label: 'My Profile', href: (isImpersonating && targetProfile ? targetProfile.id : profile?.id) ? `/members/${isImpersonating && targetProfile ? targetProfile.id : profile?.id}` : '#' },
-                { label: 'Profile Settings', href: '/profile/settings' },
                 { label: 'Credits & Hours', href: '/credits' },
                 ...((isImpersonating ? targetProfile?.member_type : profile?.member_type) === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours' }] : []),
-                { label: 'Subscriptions', href: '#' },
                 { label: 'Messages', href: '/messages' },
               ].map(item => (
                 <Link key={item.label} href={item.href} onClick={() => setProfileOpen(false)}
@@ -1064,10 +1062,24 @@ export default function Header() {
                 </Link>
               ))}
               {!isImpersonating && (profile?.role === 'admin' || profile?.role === 'moderator') && (
-                <Link href="/admin" onClick={() => setProfileOpen(false)}
+                <>
+                  <Link href="/settings" onClick={() => setProfileOpen(false)}
+                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  >
+                    Settings
+                  </Link>
+                  <Link href="/admin" onClick={() => setProfileOpen(false)}
+                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  >
+                    Admin Settings
+                  </Link>
+                </>
+              )}
+              {!isImpersonating && profile?.role !== 'admin' && profile?.role !== 'moderator' && (
+                <Link href="/settings" onClick={() => setProfileOpen(false)}
                   className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                 >
-                  Admin Settings
+                  Settings
                 </Link>
               )}
               {!isImpersonating && profile?.role === 'teacher' && (
