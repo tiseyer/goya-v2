@@ -1,77 +1,92 @@
-# Requirements: GOYA v2
+# Requirements: GOYA v2 — v1.1 Connections & Inbox
 
 **Defined:** 2026-03-23
 **Core Value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## v1.0 Requirements — User Settings
+## v1.1 Requirements
 
-### Dropdown Navigation
+### Database
 
-- [x] **NAV-01**: User can tap/click a "Settings" item in the profile dropdown to navigate to `/settings`
-- [x] **NAV-02**: Admin and Moderator users see "Settings" positioned directly above "Admin Settings" in the dropdown
-- [x] **NAV-03**: Regular users (student, teacher, wellness_practitioner) see "Settings" positioned between the two dropdown dividers
-- [x] **NAV-04**: "Profile Settings" entry is removed from the profile dropdown
-- [x] **NAV-05**: "Subscriptions" entry is removed from the profile dropdown
+- [ ] **DB-01**: A `connections` table exists with requester_id, recipient_id, type (`peer`/`mentorship`/`faculty`), status (`pending`/`accepted`/`declined`), and timestamps
+- [ ] **DB-02**: RLS policies on `connections` ensure users can only read/write their own connections
+- [ ] **DB-03**: Migration is committed to `supabase/migrations/` and pushed via `npx supabase db push`
+- [ ] **DB-04**: `ConnectionsContext` and `ConnectButton` read from and write to Supabase (localStorage mock and `connections-data.ts` removed)
 
-### Settings Shell
+### Profile Page
 
-- [ ] **SHELL-01**: Settings section is accessible at `app/settings/` with a sidebar navigation layout consistent with Admin Settings
-- [ ] **SHELL-02**: Sidebar lists four items in order: General, Subscriptions, Connections, Inbox
-- [ ] **SHELL-03**: Active sidebar item is visually highlighted to indicate current page
-- [ ] **SHELL-04**: Settings layout follows the same design tokens and component patterns as Admin Settings (`AdminShell.tsx`)
+- [ ] **PROF-01**: Student viewing a teacher profile sees "Request Mentorship" instead of "Connect"
+- [ ] **PROF-02**: Teacher or wellness practitioner viewing a school profile sees "Apply as Faculty"
+- [ ] **PROF-03**: Teacher viewing a school they own sees "Manage School" instead of "Apply as Faculty"
+- [ ] **PROF-04**: Teacher viewing another teacher profile sees the standard "Connect" button
 
-### Settings Pages
+### Settings — Connections
 
-- [x] **PAGE-01**: Settings > General displays the existing profile settings form (name, avatar, bio, etc.) currently at `app/profile/settings/`
-- [x] **PAGE-02**: Settings > Subscriptions displays the existing subscriptions content
-- [x] **PAGE-03**: Settings > Connections displays a placeholder page indicating this section is coming soon
-- [x] **PAGE-04**: Settings > Inbox displays a placeholder page indicating this section is coming soon
+- [ ] **CONN-01**: User can view connections in tabs: My Connections, My Mentors, My Mentees, My Faculty, My Schools (principal teacher tab only for school owners)
+- [ ] **CONN-02**: Each connection entry shows current status (pending sent / accepted)
+- [ ] **CONN-03**: User can remove an accepted connection
 
-## v2 Requirements
+### Settings — Inbox
 
-### Connections Settings
+- [ ] **INBOX-01**: User can view all incoming connection requests (peer, mentorship, faculty) in a list
+- [ ] **INBOX-02**: User can accept or decline each request from the inbox
+- [ ] **INBOX-03**: User can filter requests by type (all / peer / mentorship / faculty)
+- [ ] **INBOX-04**: Notification dropdown link updated from "View all messages" to "View all" pointing to `/settings/inbox`
 
-- **CONN-01**: User can manage connection preferences and privacy settings
-- **CONN-02**: User can view and manage their incoming/outgoing connection requests
+### Admin
 
-### Inbox Settings
+- [ ] **ADM-01**: Admin can view any user's connections in a Connections tab on the user detail page
+- [ ] **ADM-02**: Admin can remove any connection from the user's Connections tab
 
-- **INBX-01**: User can configure inbox notification preferences
-- **INBX-02**: User can manage message filtering rules
+## Future Requirements
+
+### Notifications
+
+- **NOTF-01**: User receives email notification when a connection request is accepted
+- **NOTF-02**: User can configure notification preferences for connection events
+
+### Connections Extended
+
+- **CONN-EXT-01**: User can search/filter their connections list
+- **CONN-EXT-02**: User can export their connections
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Connections settings implementation | Task 2 — placeholder only in this milestone |
-| Inbox settings implementation | Task 2 — placeholder only in this milestone |
-| Notification preferences | Out of scope for settings MVP |
-| Account deletion | High-risk operation — deferred |
+| Notification preferences UI | Deferred from v1.0 — separate milestone |
+| Account deletion | High-risk operation, deferred |
 | Password change in settings | Handled via forgot-password flow |
+| DMs in Inbox | Inbox is connection requests only; DMs handled by /messages |
+| Connection recommendations | Algorithmic feature, deferred to v2+ |
+| Bulk connection management | Low priority for v1.1 |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV-01 | Phase 1 | Complete |
-| NAV-02 | Phase 1 | Complete |
-| NAV-03 | Phase 1 | Complete |
-| NAV-04 | Phase 1 | Complete |
-| NAV-05 | Phase 1 | Complete |
-| SHELL-01 | Phase 2 | Pending |
-| SHELL-02 | Phase 2 | Pending |
-| SHELL-03 | Phase 2 | Pending |
-| SHELL-04 | Phase 2 | Pending |
-| PAGE-01 | Phase 3 | Complete |
-| PAGE-02 | Phase 3 | Complete |
-| PAGE-03 | Phase 3 | Complete |
-| PAGE-04 | Phase 3 | Complete |
+| DB-01 | — | Pending |
+| DB-02 | — | Pending |
+| DB-03 | — | Pending |
+| DB-04 | — | Pending |
+| PROF-01 | — | Pending |
+| PROF-02 | — | Pending |
+| PROF-03 | — | Pending |
+| PROF-04 | — | Pending |
+| CONN-01 | — | Pending |
+| CONN-02 | — | Pending |
+| CONN-03 | — | Pending |
+| INBOX-01 | — | Pending |
+| INBOX-02 | — | Pending |
+| INBOX-03 | — | Pending |
+| INBOX-04 | — | Pending |
+| ADM-01 | — | Pending |
+| ADM-02 | — | Pending |
 
 **Coverage:**
-- v1.0 requirements: 13 total
-- Mapped to phases: 13
-- Unmapped: 0 ✓
+- v1.1 requirements: 17 total
+- Mapped to phases: 0 (populated during roadmap creation)
+- Unmapped: 17 ⚠️
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 — traceability filled after roadmap creation*
+*Last updated: 2026-03-23 after initial definition*
