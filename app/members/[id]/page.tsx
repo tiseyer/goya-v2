@@ -32,6 +32,19 @@ export default async function MemberProfilePage({
   const { data: { user } } = await supabase.auth.getUser();
   const currentUserId = user?.id ?? null;
 
+  // Fetch viewer's profile for role-aware connect button
+  const { data: viewerProfile } = currentUserId
+    ? await supabase
+        .from('profiles')
+        .select('member_type, role')
+        .eq('id', currentUserId)
+        .single()
+    : { data: null };
+
+  const viewerRole = viewerProfile
+    ? (viewerProfile.member_type ?? viewerProfile.role ?? 'student')
+    : null;
+
   const { data: profileData } = await supabase
     .from('profiles')
     .select('id, full_name, first_name, last_name, avatar_url, bio, introduction, city, country, member_type, role, verification_status, instagram, youtube, website, facebook, tiktok, practice_format, teacher_status, practice_level, practice_styles, teaching_styles, years_teaching, languages, mrn, created_at')
@@ -88,6 +101,18 @@ export default async function MemberProfilePage({
 
   const firstName = profile.first_name ?? displayName.split(' ')[0] ?? '';
   const role = profile.member_type ?? profile.role ?? 'student';
+
+  // School ownership check — only query when viewing a school profile while authenticated
+  let isOwnSchool = false;
+  if (role === 'school' && currentUserId) {
+    const { data: ownedSchool } = await supabase
+      .from('schools')
+      .select('id')
+      .eq('owner_id', currentUserId)
+      .maybeSingle();
+    isOwnSchool = !!ownedSchool;
+  }
+
   const heroStyle = ROLE_HERO[role] ?? ROLE_HERO['student'];
   const roleLabel = ROLE_LABEL[role] ?? role;
   const memberSince = profile.created_at
@@ -284,6 +309,10 @@ export default async function MemberProfilePage({
                     memberName={displayName}
                     memberPhoto={profile.avatar_url ?? ''}
                     firstName={firstName}
+                    viewerRole={viewerRole}
+                    profileRole={role}
+                    isOwnProfile={profile.id === currentUserId}
+                    isOwnSchool={isOwnSchool}
                   />
                   <MessageButton memberId={profile.id} memberName={displayName} />
                 </div>
