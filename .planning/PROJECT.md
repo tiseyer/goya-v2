@@ -39,6 +39,8 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 **As of v1.0 (2026-03-23):** User Settings milestone shipped. Settings are now accessible from the profile dropdown for all user types via a sidebar-navigated shell at `/settings`, with General (profile form), Subscriptions (live membership data), Connections (placeholder), and Inbox (placeholder) pages.
 
+**Phase 09 complete (2026-03-23):** Stripe SDK infrastructure in place — server-only singleton at `lib/stripe/client.ts` and webhook route handler at `app/api/webhooks/stripe/route.ts` with HMAC signature verification. 7 unit tests passing.
+
 ## Requirements
 
 ### Validated
@@ -123,4 +125,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 — v1.2 milestone started (stripe-admin workstream)*
+*Last updated: 2026-03-23 — Phase 09 complete: Stripe SDK + webhook infrastructure*
