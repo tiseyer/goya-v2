@@ -64,29 +64,29 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | — | Pending |
-| DB-02 | — | Pending |
-| DB-03 | — | Pending |
-| DB-04 | — | Pending |
-| PROF-01 | — | Pending |
-| PROF-02 | — | Pending |
-| PROF-03 | — | Pending |
-| PROF-04 | — | Pending |
-| CONN-01 | — | Pending |
-| CONN-02 | — | Pending |
-| CONN-03 | — | Pending |
-| INBOX-01 | — | Pending |
-| INBOX-02 | — | Pending |
-| INBOX-03 | — | Pending |
-| INBOX-04 | — | Pending |
-| ADM-01 | — | Pending |
-| ADM-02 | — | Pending |
+| DB-01 | Phase 4 | Pending |
+| DB-02 | Phase 4 | Pending |
+| DB-03 | Phase 4 | Pending |
+| DB-04 | Phase 4 | Pending |
+| PROF-01 | Phase 5 | Pending |
+| PROF-02 | Phase 5 | Pending |
+| PROF-03 | Phase 5 | Pending |
+| PROF-04 | Phase 5 | Pending |
+| CONN-01 | Phase 6 | Pending |
+| CONN-02 | Phase 6 | Pending |
+| CONN-03 | Phase 6 | Pending |
+| INBOX-01 | Phase 6 | Pending |
+| INBOX-02 | Phase 6 | Pending |
+| INBOX-03 | Phase 6 | Pending |
+| INBOX-04 | Phase 6 | Pending |
+| ADM-01 | Phase 7 | Pending |
+| ADM-02 | Phase 7 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 17 total
-- Mapped to phases: 0 (populated during roadmap creation)
-- Unmapped: 17 ⚠️
+- Mapped to phases: 17
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 after initial definition*
+*Last updated: 2026-03-23 — traceability populated after roadmap creation*
