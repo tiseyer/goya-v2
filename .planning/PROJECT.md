@@ -8,7 +8,9 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: v1.1 Connections & Inbox
+## Active Milestones
+
+### v1.1 Connections & Inbox (`connections-inbox` workstream)
 
 **Goal:** Replace the localStorage-backed connection system with a real Supabase backend and build the full Connections & Inbox UX.
 
@@ -19,6 +21,19 @@ Members stay professionally connected, credentialed, and engaged through a singl
 - Settings > Connections: tabbed view (My Connections, My Mentors, My Mentees, My Faculty, My Schools) with status + remove actions
 - Settings > Inbox: full connection request inbox (accept/decline, filter by type); header "View all" links here
 - Admin > User detail: Connections tab to view/manage any user's connections
+
+### v1.2 Stripe Admin & Shop (`stripe-admin` workstream)
+
+**Goal:** Build a full bidirectional Stripe sync and Shop admin section with Products, Orders, Coupons, and Analytics.
+
+**Target features:**
+- DB foundation: 5 Supabase tables mirroring Stripe entities (products, prices, orders, coupons, redemptions) + GOYA-specific fields
+- Webhook processing: 12+ Stripe event types with reliable retry logic
+- AdminShell "Shop" nav dropdown: Orders, Products, Coupons, Analytics
+- Shop > Products: table, CRUD, drag-and-drop ordering, bulk actions, visibility logic (show/hide by owned products)
+- Shop > Orders: Stripe payment intents & subscriptions view, refund/cancel, timeline, customer journey
+- Shop > Coupons: create/manage, manual user assignment, usage history, bidirectional Stripe sync
+- Shop > Analytics: user funnel + revenue metrics (ARR), split by role, CSV export, interactive charts
 
 ## Current State
 
@@ -108,4 +123,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 — v1.1 milestone started*
+*Last updated: 2026-03-23 — v1.2 milestone started (stripe-admin workstream)*
