@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 08-02-PLAN.md — webhook_events table + bridge columns live in Supabase; Phase 08 complete
-last_updated: "2026-03-23T14:48:23.242Z"
+status: Ready to execute
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-23T15:13:38.253Z"
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 4
+  completed_plans: 3
 ---
 
 # Project State — stripe-admin workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 09 — Stripe SDK + Webhook Infrastructure
+**Current focus:** Phase 09 — stripe-sdk-webhook-infrastructure
 
 ## Current Position
 
-Phase: 9
-Plan: Not started
+Phase: 09 (stripe-sdk-webhook-infrastructure) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -41,6 +41,8 @@ Plan: Not started
 | 08-db-foundation | 2/2 | 9 min | 4.5 min |
 
 *Updated after each plan completion*
+| Phase 05-profile-page-buttons P02 | 8 | 1 tasks | 1 files |
+| Phase 09 P01 | 2 | 1 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -58,6 +60,10 @@ Plan: Not started
 - [08-02] No CREATE INDEX on webhook_events.stripe_event_id — UNIQUE constraint already creates B-tree index (avoids double index)
 - [08-02] No updated_at on webhook_events — events are write-once; status changes are the only mutation
 - [08-02] Bridge columns (products.stripe_product_id, profiles.stripe_customer_id) are nullable with no DEFAULT — existing rows have no Stripe IDs yet
+- [Phase 05-profile-page-buttons]: viewerRole fallback chain matches profileRole: member_type ?? role ?? 'student' for consistency across server component queries
+- [Phase 05-profile-page-buttons]: School ownership uses owner_id-only query (no profile_id join needed) — viewer owns any school combined with role==='school' is sufficient for v1.1
+- [Phase 09-01]: No apiVersion argument — stripe@20.4.1 defaults to latest stable
+- [Phase 09-01]: Lazy singleton in getStripe() body (not module level) prevents build crash when STRIPE_SECRET_KEY missing
 
 ### Pending Todos
 
@@ -70,6 +76,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23
-Stopped at: Completed 08-02-PLAN.md — webhook_events table + bridge columns live in Supabase; Phase 08 complete
+Last session: 2026-03-23T15:13:38.249Z
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
