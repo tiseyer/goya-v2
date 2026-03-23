@@ -8,7 +8,7 @@ Six phases build the full Stripe billing backbone and Shop admin section. The de
 
 **Phase Numbering:** Continues from v1.1 (Phases 4–7). This milestone uses Phases 8–13.
 
-- [ ] **Phase 8: DB Foundation** - Create 5 Stripe-mirror tables, idempotency table, bridge columns, and RLS policies
+- [x] **Phase 8: DB Foundation** - Create 5 Stripe-mirror tables, idempotency table, bridge columns, and RLS policies
 - [ ] **Phase 9: Stripe SDK + Webhook Infrastructure** - SDK singleton and webhook endpoint with signature verification
 - [ ] **Phase 10: Webhook Handlers + Initial Sync** - All 15 event handlers with idempotent upserts and admin-triggered sync
 - [ ] **Phase 11: AdminShell Shop Nav** - Shop collapsible dropdown in AdminShell sidebar
@@ -29,7 +29,7 @@ Six phases build the full Stripe billing backbone and Shop admin section. The de
 **Plans**: 2 plans
 Plans:
 - [x] 08-01-PLAN.md — Create 5 Stripe entity tables with RLS, triggers, and indices
-- [ ] 08-02-PLAN.md — Create webhook_events idempotency table and bridge columns
+- [x] 08-02-PLAN.md — Create webhook_events idempotency table and bridge columns
 
 ### Phase 9: Stripe SDK + Webhook Infrastructure
 **Goal**: The Stripe SDK is available server-side and the webhook endpoint can receive and verify Stripe events
@@ -97,7 +97,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 8. DB Foundation | 1/2 | Executing | - |
+| 8. DB Foundation | 2/2 | Complete | 2026-03-23 |
 | 9. Stripe SDK + Webhook Infrastructure | 0/? | Not started | - |
 | 10. Webhook Handlers + Initial Sync | 0/? | Not started | - |
 | 11. AdminShell Shop Nav | 0/? | Not started | - |

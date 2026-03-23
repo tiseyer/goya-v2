@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
-status: Executing Phase 08
-stopped_at: Completed 08-01-PLAN.md — 5 Stripe entity tables live in Supabase
-last_updated: "2026-03-23T14:30:04Z"
+status: Phase 08 Complete — Ready for Phase 09
+stopped_at: Completed 08-02-PLAN.md — webhook_events table + bridge columns live in Supabase
+last_updated: "2026-03-23T14:18:00Z"
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State — stripe-admin workstream
@@ -19,26 +19,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 08 — db-foundation
+**Current focus:** Phase 09 — Stripe SDK + Webhook Infrastructure
 
 ## Current Position
 
-Phase: 08 (db-foundation) — EXECUTING
-Plan: 2 of 2 (plan 01 complete)
+Phase: 08 (db-foundation) — COMPLETE
+Plan: 2 of 2 (all plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 1
-- Average duration: 4 min
-- Total execution time: 4 min
+- Total plans completed: 2
+- Average duration: 4.5 min
+- Total execution time: 9 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 08-db-foundation | 1/2 | 4 min | 4 min |
+| 08-db-foundation | 2/2 | 9 min | 4.5 min |
 
 *Updated after each plan completion*
 
@@ -55,6 +55,9 @@ Plan: 2 of 2 (plan 01 complete)
 - USD only for v1.2
 - [08-01] Omit explicit FKs on stripe_product_id/stripe_price_id/stripe_customer_id text columns — out-of-order webhook delivery would cause FK violations
 - [08-01] stripe_coupon_redemptions has no updated_at column or trigger — append-only log, rows are never updated
+- [08-02] No CREATE INDEX on webhook_events.stripe_event_id — UNIQUE constraint already creates B-tree index (avoids double index)
+- [08-02] No updated_at on webhook_events — events are write-once; status changes are the only mutation
+- [08-02] Bridge columns (products.stripe_product_id, profiles.stripe_customer_id) are nullable with no DEFAULT — existing rows have no Stripe IDs yet
 
 ### Pending Todos
 
@@ -68,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-23
-Stopped at: Completed 08-01-PLAN.md — 5 Stripe entity tables live in Supabase
+Stopped at: Completed 08-02-PLAN.md — webhook_events table + bridge columns live in Supabase; Phase 08 complete
 Resume file: None
