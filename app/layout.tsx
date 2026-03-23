@@ -42,7 +42,7 @@ async function getAnalyticsSettings(): Promise<Record<string, string> | null> {
         apikey: supabaseKey,
         Authorization: `Bearer ${supabaseKey}`,
       },
-      next: { revalidate: 3600 },
+      cache: 'no-store',
     });
 
     if (!res.ok) return null;
