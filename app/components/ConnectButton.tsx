@@ -3,7 +3,7 @@
 import { useConnections } from '@/app/context/ConnectionsContext';
 
 interface ConnectButtonProps {
-  memberId: string;   // slug, e.g. 'jennifer-walsh'
+  memberId: string;   // UUID from profiles.id
   memberName: string;
   memberPhoto: string;
   firstName: string;  // e.g. 'Jennifer'
