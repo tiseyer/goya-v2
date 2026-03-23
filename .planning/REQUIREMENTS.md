@@ -7,11 +7,11 @@
 
 ### Dropdown Navigation
 
-- [ ] **NAV-01**: User can tap/click a "Settings" item in the profile dropdown to navigate to `/settings`
-- [ ] **NAV-02**: Admin and Moderator users see "Settings" positioned directly above "Admin Settings" in the dropdown
-- [ ] **NAV-03**: Regular users (student, teacher, wellness_practitioner) see "Settings" positioned between the two dropdown dividers
-- [ ] **NAV-04**: "Profile Settings" entry is removed from the profile dropdown
-- [ ] **NAV-05**: "Subscriptions" entry is removed from the profile dropdown
+- [x] **NAV-01**: User can tap/click a "Settings" item in the profile dropdown to navigate to `/settings`
+- [x] **NAV-02**: Admin and Moderator users see "Settings" positioned directly above "Admin Settings" in the dropdown
+- [x] **NAV-03**: Regular users (student, teacher, wellness_practitioner) see "Settings" positioned between the two dropdown dividers
+- [x] **NAV-04**: "Profile Settings" entry is removed from the profile dropdown
+- [x] **NAV-05**: "Subscriptions" entry is removed from the profile dropdown
 
 ### Settings Shell
 
@@ -53,11 +53,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV-01 | Phase 1 | Pending |
-| NAV-02 | Phase 1 | Pending |
-| NAV-03 | Phase 1 | Pending |
-| NAV-04 | Phase 1 | Pending |
-| NAV-05 | Phase 1 | Pending |
+| NAV-01 | Phase 1 | Complete |
+| NAV-02 | Phase 1 | Complete |
+| NAV-03 | Phase 1 | Complete |
+| NAV-04 | Phase 1 | Complete |
+| NAV-05 | Phase 1 | Complete |
 | SHELL-01 | Phase 2 | Pending |
 | SHELL-02 | Phase 2 | Pending |
 | SHELL-03 | Phase 2 | Pending |

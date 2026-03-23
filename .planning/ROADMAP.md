@@ -12,7 +12,7 @@ This milestone consolidates user-facing settings into a dedicated Settings secti
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Dropdown Refactor** - Add role-branched Settings entry to profile dropdown and remove old shortcuts
+- [x] **Phase 1: Dropdown Refactor** - Add role-branched Settings entry to profile dropdown and remove old shortcuts (completed 2026-03-23)
 - [ ] **Phase 2: Settings Shell** - Build sidebar-navigated Settings layout at `app/settings/` matching Admin Settings
 - [ ] **Phase 3: Settings Pages** - Populate four settings pages (General, Subscriptions, Connections, Inbox)
 
@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. "Profile Settings" and "Subscriptions" entries are no longer present in the dropdown
 **Plans**: 1 plan
 Plans:
-- [ ] 01-01-PLAN.md — Refactor profile dropdown: add role-branched Settings entry, remove Profile Settings and Subscriptions
+- [x] 01-01-PLAN.md — Refactor profile dropdown: add role-branched Settings entry, remove Profile Settings and Subscriptions
 **UI hint**: yes
 
 ### Phase 2: Settings Shell
@@ -62,6 +62,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Dropdown Refactor | 0/1 | Planning complete | - |
+| 1. Dropdown Refactor | 1/1 | Complete   | 2026-03-23 |
 | 2. Settings Shell | 0/? | Not started | - |
 | 3. Settings Pages | 0/? | Not started | - |
