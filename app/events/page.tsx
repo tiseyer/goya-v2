@@ -5,27 +5,12 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import type { Event, EventCategory } from '@/lib/types';
 import PageHero from '@/app/components/PageHero';
+import { CATEGORY_BADGE, CATEGORY_DOT, FORMAT_BADGE } from '@/app/components/ui/Badge';
 
 const ALL_CATEGORIES: Array<'All' | EventCategory> = [
   'All', 'Workshop', 'Teacher Training', 'Dharma Talk', 'Conference',
   'Yoga Sequence', 'Music Playlist', 'Research',
 ];
-
-const CATEGORY_STYLES: Record<string, { badge: string; dot: string }> = {
-  Workshop:           { badge: 'bg-teal-50 text-teal-700 border-teal-200',     dot: 'bg-teal-400'   },
-  'Teacher Training': { badge: 'bg-purple-50 text-purple-700 border-purple-200', dot: 'bg-purple-400' },
-  'Dharma Talk':      { badge: 'bg-blue-50 text-blue-700 border-blue-200',     dot: 'bg-blue-400'   },
-  Conference:         { badge: 'bg-amber-50 text-amber-700 border-amber-200',  dot: 'bg-amber-400'  },
-  'Yoga Sequence':    { badge: 'bg-green-50 text-green-700 border-green-200',  dot: 'bg-green-400'  },
-  'Music Playlist':   { badge: 'bg-pink-50 text-pink-700 border-pink-200',     dot: 'bg-pink-400'   },
-  Research:           { badge: 'bg-slate-100 text-slate-600 border-slate-200', dot: 'bg-slate-400'  },
-};
-
-const FORMAT_BADGE: Record<string, string> = {
-  Online:      'bg-slate-100 text-slate-500',
-  'In Person': 'bg-orange-50 text-orange-600',
-  Hybrid:      'bg-indigo-50 text-indigo-600',
-};
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
@@ -129,7 +114,7 @@ function MiniCalendar({ calYear, calMonth, selectedDate, eventDates, today, onPr
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <span className="text-sm font-semibold text-[#1B3A5C]">{MONTHS[calMonth]} {calYear}</span>
+        <span className="text-sm font-semibold text-primary-dark">{MONTHS[calMonth]} {calYear}</span>
         <button
           onClick={onNext}
           aria-label="Next month"
@@ -168,9 +153,9 @@ function MiniCalendar({ calYear, calMonth, selectedDate, eventDates, today, onPr
               className={[
                 'relative flex flex-col items-center justify-center h-8 w-full rounded-lg text-xs font-medium transition-colors',
                 isSelected
-                  ? 'bg-[#1B3A5C] text-white'
+                  ? 'bg-primary-dark text-white'
                   : isToday
-                  ? 'ring-1 ring-[#4E87A0] text-[#1B3A5C] font-bold'
+                  ? 'ring-1 ring-primary-light text-primary-dark font-bold'
                   : hasEvent
                   ? 'hover:bg-slate-100 text-slate-700 cursor-pointer'
                   : 'text-slate-300 cursor-default',
@@ -178,7 +163,7 @@ function MiniCalendar({ calYear, calMonth, selectedDate, eventDates, today, onPr
             >
               {day}
               {hasEvent && !isSelected && (
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#4E87A0]" />
+                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary-light" />
               )}
             </button>
           );
@@ -188,7 +173,7 @@ function MiniCalendar({ calYear, calMonth, selectedDate, eventDates, today, onPr
       {selectedDate && (
         <button
           onClick={() => { onSelectDate(null); if (onClose) onClose(); }}
-          className="mt-4 w-full text-xs text-[#4E87A0] hover:text-[#1B3A5C] font-semibold text-center transition-colors cursor-pointer"
+          className="mt-4 w-full text-xs text-primary-light hover:text-primary-dark font-semibold text-center transition-colors cursor-pointer"
         >
           Clear date filter
         </button>
@@ -262,7 +247,7 @@ export default function EventsPage() {
             className={[
               'flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 cursor-pointer',
               selectedDate
-                ? 'border-[#4E87A0] bg-[#4E87A0]/8 text-[#3A7190]'
+                ? 'border-primary-light bg-primary-light/8 text-primary'
                 : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
             ].join(' ')}
           >
@@ -279,7 +264,7 @@ export default function EventsPage() {
             className={[
               'flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 cursor-pointer',
               categoryFilter !== 'All'
-                ? 'border-[#4E87A0] bg-[#4E87A0]/8 text-[#3A7190]'
+                ? 'border-primary-light bg-primary-light/8 text-primary'
                 : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
             ].join(' ')}
           >
@@ -317,7 +302,6 @@ export default function EventsPage() {
               <div className="flex flex-col gap-0.5">
                 {ALL_CATEGORIES.map(cat => {
                   const isActive = categoryFilter === cat;
-                  const style = cat !== 'All' ? CATEGORY_STYLES[cat] : null;
                   return (
                     <button
                       key={cat}
@@ -325,14 +309,14 @@ export default function EventsPage() {
                       className={[
                         'flex items-center gap-2.5 text-left px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer',
                         isActive
-                          ? 'bg-[#1B3A5C] text-white'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-[#1B3A5C]',
+                          ? 'bg-primary-dark text-white'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary-dark',
                       ].join(' ')}
                     >
-                      {style && (
+                      {cat !== 'All' && (
                         <span className={[
                           'w-2 h-2 rounded-full shrink-0 transition-colors',
-                          isActive ? 'bg-white/60' : style.dot,
+                          isActive ? 'bg-white/60' : (CATEGORY_DOT[cat] ?? 'bg-slate-400'),
                         ].join(' ')} />
                       )}
                       {cat === 'All' ? 'All Events' : cat}
@@ -352,7 +336,7 @@ export default function EventsPage() {
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">
                   {selectedDate ? formatDate(selectedDate) : 'All upcoming events'}
                 </p>
-                <p className="text-[#1B3A5C] font-bold text-xl leading-tight">
+                <p className="text-primary-dark font-bold text-xl leading-tight">
                   {filtered.length}{' '}
                   <span className="font-normal text-slate-400 text-base">
                     event{filtered.length !== 1 ? 's' : ''}
@@ -362,7 +346,7 @@ export default function EventsPage() {
               {activeFilters > 0 && (
                 <button
                   onClick={() => { setSelectedDate(null); setCategoryFilter('All'); }}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-[#4E87A0] hover:text-[#1B3A5C] px-3 py-1.5 rounded-full border border-[#4E87A0]/30 hover:border-[#1B3A5C]/40 transition-all duration-200 cursor-pointer"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-primary-light hover:text-primary-dark px-3 py-1.5 rounded-full border border-primary-light/30 hover:border-primary-dark/40 transition-all duration-200 cursor-pointer"
                 >
                   Clear {activeFilters > 1 ? `${activeFilters} filters` : 'filter'}
                 </button>
@@ -373,10 +357,10 @@ export default function EventsPage() {
               <SkeletonEvents />
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-slate-100 text-center px-6">
-                <div className="w-14 h-14 bg-[#4E87A0]/8 rounded-2xl flex items-center justify-center mb-5">
-                  <CalendarIcon className="w-7 h-7 text-[#4E87A0]" />
+                <div className="w-14 h-14 bg-primary-light/8 rounded-2xl flex items-center justify-center mb-5">
+                  <CalendarIcon className="w-7 h-7 text-primary-light" />
                 </div>
-                <p className="text-[#1B3A5C] font-bold text-lg mb-1">No events found</p>
+                <p className="text-primary-dark font-bold text-lg mb-1">No events found</p>
                 <p className="text-slate-400 text-sm max-w-xs">
                   {selectedDate
                     ? 'No events on this date. Try another day.'
@@ -387,7 +371,7 @@ export default function EventsPage() {
                 {activeFilters > 0 && (
                   <button
                     onClick={() => { setSelectedDate(null); setCategoryFilter('All'); }}
-                    className="mt-5 text-sm font-semibold text-[#4E87A0] hover:text-[#1B3A5C] transition-colors cursor-pointer"
+                    className="mt-5 text-sm font-semibold text-primary-light hover:text-primary-dark transition-colors cursor-pointer"
                   >
                     Clear all filters
                   </button>
@@ -396,10 +380,7 @@ export default function EventsPage() {
             ) : (
               <div className="space-y-3">
                 {filtered.map(event => {
-                  const catStyle = CATEGORY_STYLES[event.category] ?? {
-                    badge: 'bg-slate-100 text-slate-600 border-slate-200',
-                    dot: 'bg-slate-400',
-                  };
+                  const catBadge = CATEGORY_BADGE[event.category] ?? 'bg-slate-100 text-slate-600 border-slate-200';
                   const [year, month, dayStr] = event.date.split('-');
                   const dayNum = dayStr;
                   const monthAbbr = MONTHS[parseInt(month) - 1].slice(0, 3);
@@ -411,10 +392,10 @@ export default function EventsPage() {
                       className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col sm:flex-row cursor-pointer"
                     >
                       {/* Date block */}
-                      <div className="bg-[#1B3A5C] text-white flex flex-row sm:flex-col items-center justify-center gap-3 sm:gap-1 px-5 py-4 sm:py-6 sm:w-[72px] shrink-0 sm:text-center">
+                      <div className="bg-primary-dark text-white flex flex-row sm:flex-col items-center justify-center gap-3 sm:gap-1 px-5 py-4 sm:py-6 sm:w-[72px] shrink-0 sm:text-center">
                         <span className="text-3xl font-black leading-none tabular-nums">{dayNum}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#7EB3CB]">{monthAbbr}</span>
-                        <span className="sm:hidden text-[10px] font-semibold text-[#7EB3CB] uppercase tracking-wide">{year}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-primary-200">{monthAbbr}</span>
+                        <span className="sm:hidden text-[10px] font-semibold text-primary-200 uppercase tracking-wide">{year}</span>
                       </div>
 
                       {/* Content */}
@@ -422,16 +403,16 @@ export default function EventsPage() {
                         <div className="flex-1 min-w-0">
                           {/* Badges */}
                           <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                            <span className={`inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catStyle.badge}`}>
+                            <span className={`inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catBadge}`}>
                               {event.category}
                             </span>
-                            <span className={`inline-flex items-center text-xs px-2.5 py-0.5 rounded-full font-medium ${FORMAT_BADGE[event.format] ?? 'bg-slate-100 text-slate-500'}`}>
+                            <span className={`inline-flex items-center text-xs px-2.5 py-0.5 rounded-full border font-medium ${FORMAT_BADGE[event.format] ?? 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                               {event.format}
                             </span>
                           </div>
 
                           {/* Title */}
-                          <h3 className="font-bold text-[#1B3A5C] text-[15px] leading-snug mb-1.5 group-hover:text-[#3A7190] transition-colors line-clamp-2">
+                          <h3 className="font-bold text-primary-dark text-[15px] leading-snug mb-1.5 group-hover:text-primary transition-colors line-clamp-2">
                             {event.title}
                           </h3>
 
@@ -441,7 +422,7 @@ export default function EventsPage() {
                           {/* Meta row */}
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
                             <span className="flex items-center gap-1.5">
-                              <svg className="w-3.5 h-3.5 text-[#4E87A0]/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                              <svg className="w-3.5 h-3.5 text-primary-light/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                               {fmtTime(event.time_start)}
@@ -449,7 +430,7 @@ export default function EventsPage() {
                             </span>
                             {event.location && (
                               <span className="flex items-center gap-1.5">
-                                <svg className="w-3.5 h-3.5 text-[#4E87A0]/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <svg className="w-3.5 h-3.5 text-primary-light/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
@@ -477,7 +458,7 @@ export default function EventsPage() {
                               Free
                             </span>
                           ) : (
-                            <span className="text-[#1B3A5C] font-black text-xl tabular-nums">
+                            <span className="text-primary-dark font-black text-xl tabular-nums">
                               ${event.price}
                             </span>
                           )}
@@ -502,7 +483,7 @@ export default function EventsPage() {
           <div className="relative bg-white rounded-t-2xl p-5 animate-[slideUp_0.2s_ease-out]">
             <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-5" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-bold text-[#1B3A5C]">Filter by Date</span>
+              <span className="text-sm font-bold text-primary-dark">Filter by Date</span>
               <button
                 onClick={() => setDateSheetOpen(false)}
                 className="text-slate-400 hover:text-slate-600 text-xs font-semibold transition-colors cursor-pointer px-2 py-1"
@@ -535,7 +516,7 @@ export default function EventsPage() {
           <div className="relative bg-white rounded-t-2xl p-5 animate-[slideUp_0.2s_ease-out]">
             <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-5" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-bold text-[#1B3A5C]">Filter by Category</span>
+              <span className="text-sm font-bold text-primary-dark">Filter by Category</span>
               <button
                 onClick={() => setCategorySheetOpen(false)}
                 className="text-slate-400 hover:text-slate-600 text-xs font-semibold transition-colors cursor-pointer px-2 py-1"
@@ -546,7 +527,6 @@ export default function EventsPage() {
             <div className="flex flex-col gap-0.5">
               {ALL_CATEGORIES.map(cat => {
                 const isActive = categoryFilter === cat;
-                const style = cat !== 'All' ? CATEGORY_STYLES[cat] : null;
                 return (
                   <button
                     key={cat}
@@ -554,14 +534,14 @@ export default function EventsPage() {
                     className={[
                       'flex items-center gap-3 text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer',
                       isActive
-                        ? 'bg-[#1B3A5C] text-white'
+                        ? 'bg-primary-dark text-white'
                         : 'text-slate-700 hover:bg-slate-50',
                     ].join(' ')}
                   >
-                    {style && (
+                    {cat !== 'All' && (
                       <span className={[
                         'w-2 h-2 rounded-full shrink-0',
-                        isActive ? 'bg-white/60' : style.dot,
+                        isActive ? 'bg-white/60' : (CATEGORY_DOT[cat] ?? 'bg-slate-400'),
                       ].join(' ')} />
                     )}
                     {cat === 'All' ? 'All Events' : cat}

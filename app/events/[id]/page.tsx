@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { Event } from '@/lib/types';
+import { CATEGORY_BADGE } from '@/app/components/ui/Badge';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,16 +13,6 @@ function fmtTime(t: string) {
   const h12 = h % 12 || 12;
   return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
 }
-
-const CATEGORY_COLORS: Record<string, string> = {
-  Workshop:           'bg-teal-50 text-teal-700 border-teal-200',
-  'Teacher Training': 'bg-purple-50 text-purple-700 border-purple-200',
-  'Dharma Talk':      'bg-blue-50 text-blue-700 border-blue-200',
-  Conference:         'bg-amber-50 text-amber-700 border-amber-200',
-  'Yoga Sequence':    'bg-green-50 text-green-700 border-green-200',
-  'Music Playlist':   'bg-pink-50 text-pink-700 border-pink-200',
-  Research:           'bg-slate-100 text-slate-600 border-slate-200',
-};
 
 export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -45,10 +36,10 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   const dateShort = new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
   });
-  const catBadge = CATEGORY_COLORS[ev.category] ?? 'bg-slate-100 text-slate-600 border-slate-200';
+  const catBadge = CATEGORY_BADGE[ev.category] ?? 'bg-slate-100 text-slate-600 border-slate-200';
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-slate-50">
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       {ev.featured_image_url ? (
@@ -90,7 +81,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         </div>
       ) : (
         /* Gradient hero (no image) */
-        <div className="bg-[#1B3A5C] relative overflow-hidden pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="bg-primary-dark relative overflow-hidden pt-24 pb-12 px-4 sm:px-6 lg:px-8">
           {/* Subtle background texture */}
           <div
             className="absolute inset-0 opacity-[0.04]"
@@ -100,12 +91,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             }}
           />
           {/* Soft glow */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#4E87A0]/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
           <div className="max-w-5xl mx-auto relative">
             <Link
               href="/events"
-              className="inline-flex items-center gap-1.5 text-[#A8C5D8] hover:text-white text-sm mb-6 transition-colors"
+              className="inline-flex items-center gap-1.5 text-primary-200 hover:text-white text-sm mb-6 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -122,7 +113,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               )}
             </div>
             <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-3">{ev.title}</h1>
-            <p className="text-[#7EB3CB] text-sm font-medium">{dateFormatted}</p>
+            <p className="text-primary-200 text-sm font-medium">{dateFormatted}</p>
           </div>
         </div>
       )}
@@ -136,8 +127,8 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
             {/* About */}
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
-              <h2 className="text-base font-bold text-[#1B3A5C] mb-3">About This Event</h2>
-              <p className="text-[#374151] leading-relaxed text-sm">
+              <h2 className="text-base font-bold text-primary-dark mb-3">About This Event</h2>
+              <p className="text-slate-700 leading-relaxed text-sm">
                 {ev.description || 'Full details coming soon.'}
               </p>
             </div>
@@ -147,21 +138,21 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
               {/* Date & Time */}
               <div className="flex items-start gap-4 p-6">
-                <div className="w-9 h-9 bg-[#4E87A0]/10 rounded-xl flex items-center justify-center text-[#4E87A0] shrink-0 mt-0.5">
+                <div className="w-9 h-9 bg-primary-light/10 rounded-xl flex items-center justify-center text-primary-light shrink-0 mt-0.5">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Date &amp; Time</p>
-                  <p className="font-semibold text-[#1B3A5C] text-sm">{dateFormatted}</p>
-                  <p className="text-[#6B7280] text-xs mt-0.5">{fmtTime(ev.time_start)} – {fmtTime(ev.time_end)}</p>
+                  <p className="font-semibold text-primary-dark text-sm">{dateFormatted}</p>
+                  <p className="text-slate-500 text-xs mt-0.5">{fmtTime(ev.time_start)} – {fmtTime(ev.time_end)}</p>
                 </div>
               </div>
 
               {/* Location */}
               <div className="flex items-start gap-4 p-6">
-                <div className="w-9 h-9 bg-[#4E87A0]/10 rounded-xl flex items-center justify-center text-[#4E87A0] shrink-0 mt-0.5">
+                <div className="w-9 h-9 bg-primary-light/10 rounded-xl flex items-center justify-center text-primary-light shrink-0 mt-0.5">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -171,12 +162,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Location</p>
                   {ev.format === 'Online' ? (
                     <>
-                      <p className="font-semibold text-[#1B3A5C] text-sm">Online Event</p>
-                      <p className="text-[#6B7280] text-xs mt-0.5">{ev.location || 'Online via Zoom'}</p>
-                      <p className="text-[#9CA3AF] text-xs mt-0.5">Link provided after registration</p>
+                      <p className="font-semibold text-primary-dark text-sm">Online Event</p>
+                      <p className="text-slate-500 text-xs mt-0.5">{ev.location || 'Online via Zoom'}</p>
+                      <p className="text-slate-400 text-xs mt-0.5">Link provided after registration</p>
                     </>
                   ) : (
-                    <p className="font-semibold text-[#1B3A5C] text-sm">{ev.location || '—'}</p>
+                    <p className="font-semibold text-primary-dark text-sm">{ev.location || '—'}</p>
                   )}
                 </div>
               </div>
@@ -184,12 +175,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               {/* Instructor */}
               {ev.instructor && (
                 <div className="flex items-center gap-4 p-6">
-                  <div className="w-9 h-9 rounded-full bg-[#1B3A5C] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-primary-dark flex items-center justify-center text-white font-bold text-sm shrink-0">
                     {ev.instructor[0].toUpperCase()}
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Instructor</p>
-                    <p className="font-semibold text-[#1B3A5C] text-sm">{ev.instructor}</p>
+                    <p className="font-semibold text-primary-dark text-sm">{ev.instructor}</p>
                   </div>
                 </div>
               )}
@@ -210,7 +201,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                 ) : (
                   <div className="flex items-baseline gap-1">
                     <span className="text-lg font-semibold text-slate-400 -mb-1">$</span>
-                    <span className="text-4xl font-black text-[#1B3A5C] tabular-nums">{ev.price}</span>
+                    <span className="text-4xl font-black text-primary-dark tabular-nums">{ev.price}</span>
                   </div>
                 )}
                 {ev.spots_remaining !== null && ev.spots_remaining !== undefined && (
@@ -229,11 +220,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               </div>
 
               {/* Date summary */}
-              <div className="flex items-center gap-2.5 py-3.5 border-t border-b border-slate-100 text-sm text-[#374151]">
-                <svg className="w-4 h-4 text-[#4E87A0] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <div className="flex items-center gap-2.5 py-3.5 border-t border-b border-slate-100 text-sm text-slate-700">
+                <svg className="w-4 h-4 text-primary-light shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span className="font-medium text-[#374151]">{dateShort}</span>
+                <span className="font-medium text-slate-700">{dateShort}</span>
                 {ev.time_start && (
                   <span className="text-slate-400 text-xs">· {fmtTime(ev.time_start)}</span>
                 )}
@@ -241,21 +232,21 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
               {/* CTA */}
               {!isPast ? (
-                <button className="block w-full text-center py-3.5 px-6 bg-[#4E87A0] hover:bg-[#3A7190] active:bg-[#2E6080] text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md cursor-pointer">
+                <button className="block w-full text-center py-3.5 px-6 bg-primary-light hover:bg-primary active:bg-primary-dark text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md cursor-pointer">
                   Register Now
                 </button>
               ) : (
-                <div className="text-center text-sm text-[#9CA3AF] py-2 font-medium">
+                <div className="text-center text-sm text-slate-400 py-2 font-medium">
                   This event has passed.
                 </div>
               )}
 
               {/* Secondary actions */}
               <div className="grid grid-cols-2 gap-2">
-                <button className="py-2.5 border border-slate-200 text-[#374151] text-xs font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 cursor-pointer">
+                <button className="py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 cursor-pointer">
                   Add to Calendar
                 </button>
-                <button className="py-2.5 border border-slate-200 text-[#374151] text-xs font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 cursor-pointer">
+                <button className="py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 cursor-pointer">
                   Share
                 </button>
               </div>
