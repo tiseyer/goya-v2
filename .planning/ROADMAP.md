@@ -36,7 +36,10 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
   2. RLS policies prevent users from reading or writing another user's connections
   3. The migration file is committed to `supabase/migrations/` and the schema is live
   4. ConnectButton and ConnectionsContext no longer touch localStorage; all reads and writes go through Supabase
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md &mdash; Create connections table migration with RLS policies
+- [ ] 04-02-PLAN.md &mdash; Rewrite ConnectionsContext to use Supabase
 
 ### Phase 5: Profile Page Buttons
 **Goal**: The button shown on a profile page reflects the correct relationship type based on the viewer's role and the profile owner's role
@@ -47,7 +50,10 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
   2. A teacher or wellness practitioner visiting a school profile sees "Apply as Faculty"
   3. A teacher visiting a school they own sees "Manage School" (not "Apply as Faculty")
   4. A teacher visiting another teacher's profile sees the standard "Connect" button
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md &mdash; Create connections table migration with RLS policies
+- [ ] 04-02-PLAN.md &mdash; Rewrite ConnectionsContext to use Supabase
 **UI hint**: yes
 
 ### Phase 6: Settings Connections & Inbox
@@ -60,7 +66,10 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
   3. Settings > Inbox lists all incoming connection requests with accept and decline actions
   4. Inbox requests can be filtered by type (all / peer / mentorship / faculty)
   5. The notification dropdown "View all" link points to `/settings/inbox`
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md &mdash; Create connections table migration with RLS policies
+- [ ] 04-02-PLAN.md &mdash; Rewrite ConnectionsContext to use Supabase
 **UI hint**: yes
 
 ### Phase 7: Admin Connections Tab
@@ -70,7 +79,10 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 **Success Criteria** (what must be TRUE):
   1. The admin user detail page has a Connections tab that lists all of that user's connections with type, status, and the other party's name
   2. Admin can remove any connection from the Connections tab without leaving the user detail page
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md &mdash; Create connections table migration with RLS policies
+- [ ] 04-02-PLAN.md &mdash; Rewrite ConnectionsContext to use Supabase
 **UI hint**: yes
 
 ## Progress
@@ -80,7 +92,7 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 | 1. Dropdown Refactor | v1.0 | 1/1 | Complete | 2026-03-23 |
 | 2. Settings Shell | v1.0 | 1/1 | Complete | 2026-03-23 |
 | 3. Settings Pages | v1.0 | 2/2 | Complete | 2026-03-23 |
-| 4. Database Foundation | v1.1 | 0/? | Not started | - |
+| 4. Database Foundation | v1.1 | 0/2 | Planning | - |
 | 5. Profile Page Buttons | v1.1 | 0/? | Not started | - |
 | 6. Settings Connections & Inbox | v1.1 | 0/? | Not started | - |
 | 7. Admin Connections Tab | v1.1 | 0/? | Not started | - |
