@@ -3,9 +3,16 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ConnectButton from '@/app/components/ConnectButton';
 import type { ConnRecord } from '@/app/context/ConnectionsContext';
 
+// ─── Mock next/navigation ─────────────────────────────────────────────────────
+
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
 // ─── Mock ConnectionsContext ──────────────────────────────────────────────────
 
-const mockGetStatus = vi.fn(() => null as ReturnType<typeof import('@/app/context/ConnectionsContext')['useConnections']>['getStatus'] extends (...args: unknown[]) => infer R ? R : never);
+const mockGetStatus = vi.fn<[], ReturnType<import('@/app/context/ConnectionsContext').ConnectionsContextType['getStatus']>>(() => null);
 const mockSendRequest = vi.fn();
 const mockAcceptRequest = vi.fn();
 const mockDeclineRequest = vi.fn();
