@@ -26,7 +26,10 @@ Six phases build the full Stripe billing backbone and Shop admin section. The de
   2. Admin and moderator roles can read and write to all new tables; other roles are blocked by RLS
   3. Existing `products` table has a nullable `stripe_product_id` column; `profiles` table has a nullable `stripe_customer_id` column
   4. The `webhook_events` table has a UNIQUE constraint on event ID that prevents duplicate processing on INSERT conflict
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 08-01-PLAN.md — Create 5 Stripe entity tables with RLS, triggers, and indices
+- [ ] 08-02-PLAN.md — Create webhook_events idempotency table and bridge columns
 
 ### Phase 9: Stripe SDK + Webhook Infrastructure
 **Goal**: The Stripe SDK is available server-side and the webhook endpoint can receive and verify Stripe events
@@ -94,7 +97,7 @@ Six phases build the full Stripe billing backbone and Shop admin section. The de
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 8. DB Foundation | 0/? | Not started | - |
+| 8. DB Foundation | 0/2 | Planned | - |
 | 9. Stripe SDK + Webhook Infrastructure | 0/? | Not started | - |
 | 10. Webhook Handlers + Initial Sync | 0/? | Not started | - |
 | 11. AdminShell Shop Nav | 0/? | Not started | - |
