@@ -53,25 +53,25 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| NAV-03 | — | Pending |
-| NAV-04 | — | Pending |
-| NAV-05 | — | Pending |
-| SHELL-01 | — | Pending |
-| SHELL-02 | — | Pending |
-| SHELL-03 | — | Pending |
-| SHELL-04 | — | Pending |
-| PAGE-01 | — | Pending |
-| PAGE-02 | — | Pending |
-| PAGE-03 | — | Pending |
-| PAGE-04 | — | Pending |
+| NAV-01 | Phase 1 | Pending |
+| NAV-02 | Phase 1 | Pending |
+| NAV-03 | Phase 1 | Pending |
+| NAV-04 | Phase 1 | Pending |
+| NAV-05 | Phase 1 | Pending |
+| SHELL-01 | Phase 2 | Pending |
+| SHELL-02 | Phase 2 | Pending |
+| SHELL-03 | Phase 2 | Pending |
+| SHELL-04 | Phase 2 | Pending |
+| PAGE-01 | Phase 3 | Pending |
+| PAGE-02 | Phase 3 | Pending |
+| PAGE-03 | Phase 3 | Pending |
+| PAGE-04 | Phase 3 | Pending |
 
 **Coverage:**
 - v1.0 requirements: 13 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 13 ⚠️
+- Mapped to phases: 13
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 after initial definition*
+*Last updated: 2026-03-23 — traceability filled after roadmap creation*

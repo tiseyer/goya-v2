@@ -1,22 +1,63 @@
-# State
+# Project State
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Milestone v1.0 — User Settings
+**Current focus:** Milestone v1.0 — User Settings (Phase 1 ready to plan)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 1 of 3 (Dropdown Refactor)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-23 — Milestone v1.0 started
+Status: Ready to plan
+Last activity: 2026-03-23 — Roadmap created, ready for Phase 1 planning
+
+Progress: [░░░░░░░░░░] 0%
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 0
+- Average duration: —
+- Total execution time: —
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
+
+**Recent Trend:**
+- Last 5 plans: —
+- Trend: —
+
+*Updated after each plan completion*
 
 ## Accumulated Context
 
-- Codebase mapped: `.planning/codebase/` (ARCHITECTURE, STACK, STRUCTURE, CONVENTIONS, INTEGRATIONS, TESTING, CONCERNS)
-- Admin Settings sidebar pattern at `app/admin/settings/` + `AdminShell.tsx` is the reference implementation for User Settings layout
-- Profile settings action at `app/profile/settings/actions.ts` — reuse in Settings > General
-- Design tokens in `globals.css`; UI components in `app/components/ui/`
+### Decisions
+
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- Mirror Admin Settings sidebar pattern for consistency across admin/user experiences
+- `app/settings/` as root route for clean separation from profile pages
+- Connections + Inbox as placeholders — full implementation deferred to v2
+
+### Pending Todos
+
+None yet.
+
+### Blockers/Concerns
+
+- Admin Settings sidebar (`AdminShell.tsx`) is the reference — review before building Phase 2 shell
+- Profile settings action at `app/profile/settings/actions.ts` should be reused in Settings > General (Phase 3)
+- Old routes (`app/profile/settings/`, subscriptions route) will need redirects or removal after Phase 3
+
+## Session Continuity
+
+Last session: 2026-03-23
+Stopped at: Roadmap created — no plans written yet
+Resume file: None
