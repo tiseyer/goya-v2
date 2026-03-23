@@ -28,7 +28,7 @@ Six phases build the full Stripe billing backbone and Shop admin section. The de
   4. The `webhook_events` table has a UNIQUE constraint on event ID that prevents duplicate processing on INSERT conflict
 **Plans**: 2 plans
 Plans:
-- [ ] 08-01-PLAN.md — Create 5 Stripe entity tables with RLS, triggers, and indices
+- [x] 08-01-PLAN.md — Create 5 Stripe entity tables with RLS, triggers, and indices
 - [ ] 08-02-PLAN.md — Create webhook_events idempotency table and bridge columns
 
 ### Phase 9: Stripe SDK + Webhook Infrastructure
@@ -97,7 +97,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 8. DB Foundation | 0/2 | Planned | - |
+| 8. DB Foundation | 1/2 | Executing | - |
 | 9. Stripe SDK + Webhook Infrastructure | 0/? | Not started | - |
 | 10. Webhook Handlers + Initial Sync | 0/? | Not started | - |
 | 11. AdminShell Shop Nav | 0/? | Not started | - |
