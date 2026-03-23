@@ -54,7 +54,10 @@ Plans:
   2. Settings > Subscriptions displays subscription information identical to the existing subscriptions page
   3. Settings > Connections displays a "coming soon" placeholder page
   4. Settings > Inbox displays a "coming soon" placeholder page
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 03-01-PLAN.md — Migrate profile settings form into Settings > General page
+- [ ] 03-02-PLAN.md — Build Subscriptions page with membership info and polish Connections/Inbox placeholders
 **UI hint**: yes
 
 ## Progress
@@ -66,4 +69,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Dropdown Refactor | 1/1 | Complete   | 2026-03-23 |
 | 2. Settings Shell | 0/1 | Planned | - |
-| 3. Settings Pages | 0/? | Not started | - |
+| 3. Settings Pages | 0/2 | Planned | - |
