@@ -45,14 +45,18 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 ### Active
 
-- [ ] User can access Settings from the profile dropdown (all user types)
-- [ ] Admin/Moderator sees "Settings" directly above "Admin Settings" in dropdown
-- [ ] Regular users see "Settings" between the two dropdown dividers
-- [ ] Settings page has sidebar layout matching Admin Settings
-- [ ] Settings > General shows existing profile settings content
-- [ ] Settings > Subscriptions shows existing subscriptions content
-- [ ] Settings > Connections is a placeholder page
-- [ ] Settings > Inbox is a placeholder page
+<!-- All v1.0 milestone requirements have been implemented — pending human UAT sign-off -->
+
+### Validated in Phase 01–03
+
+- ✓ User can access Settings from the profile dropdown (all user types) — Phase 01
+- ✓ Admin/Moderator sees "Settings" directly above "Admin Settings" in dropdown — Phase 01
+- ✓ Regular users see "Settings" between the two dropdown dividers — Phase 01
+- ✓ Settings page has sidebar layout matching Admin Settings — Phase 02
+- ✓ Settings > General shows existing profile settings content — Phase 03
+- ✓ Settings > Subscriptions shows existing subscriptions content — Phase 03
+- ✓ Settings > Connections is a placeholder page — Phase 03
+- ✓ Settings > Inbox is a placeholder page — Phase 03
 
 ### Out of Scope
 
@@ -78,9 +82,9 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Mirror Admin Settings sidebar pattern | Consistency across admin/user experiences | — Pending |
-| `app/settings/` as root route | Clean separation from profile pages | — Pending |
-| Connections + Inbox as placeholders | Scope control — full implementation in Task 2 | — Pending |
+| Mirror Admin Settings sidebar pattern | Consistency across admin/user experiences | SettingsShell mirrors AdminShell — Phase 02 |
+| `app/settings/` as root route | Clean separation from profile pages | Implemented at `app/settings/` — Phase 02 |
+| Connections + Inbox as placeholders | Scope control — full implementation in Task 2 | Polished "Coming Soon" pages shipped — Phase 03 |
 
 ## Evolution
 
@@ -100,4 +104,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 — Milestone v1.0 started*
+*Last updated: 2026-03-23 — Phase 03 complete, all v1.0 requirements implemented*
