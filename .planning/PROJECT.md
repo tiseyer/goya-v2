@@ -8,6 +8,18 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
+## Current Milestone: v1.1 Connections & Inbox
+
+**Goal:** Replace the localStorage-backed connection system with a real Supabase backend and build the full Connections & Inbox UX.
+
+**Target features:**
+- DB layer: connections table with types (peer/mentorship/faculty), RLS policies, migrations
+- Wire ConnectButton + ConnectionsContext to real Supabase (replace localStorage)
+- Role-aware profile buttons: Request Mentorship (student→teacher), Apply as Faculty (teacher→school), Manage School (school owner)
+- Settings > Connections: tabbed view (My Connections, My Mentors, My Mentees, My Faculty, My Schools) with status + remove actions
+- Settings > Inbox: full connection request inbox (accept/decline, filter by type); header "View all" links here
+- Admin > User detail: Connections tab to view/manage any user's connections
+
 ## Current State
 
 **As of v1.0 (2026-03-23):** User Settings milestone shipped. Settings are now accessible from the profile dropdown for all user types via a sidebar-navigated shell at `/settings`, with General (profile form), Subscriptions (live membership data), Connections (placeholder), and Inbox (placeholder) pages.
@@ -50,12 +62,12 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 ### Active
 
-<!-- Add requirements for next milestone here -->
+<!-- v1.1 Connections & Inbox milestone -->
 
 ### Out of Scope
 
-- Connections settings implementation — deferred to v1.1+ (placeholder only in v1.0)
-- Inbox settings implementation — deferred to v1.1+ (placeholder only in v1.0)
+- Connections settings implementation — in progress in v1.1
+- Inbox settings implementation — in progress in v1.1
 - Notification preferences — out of scope for settings MVP
 - Account deletion in settings — high-risk operation, deferred
 - Password change in settings — handled via forgot-password flow
@@ -96,4 +108,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 after v1.0 milestone*
+*Last updated: 2026-03-23 — v1.1 milestone started*
