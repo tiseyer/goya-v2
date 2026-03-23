@@ -52,8 +52,8 @@ Plans:
   4. A teacher visiting another teacher's profile sees the standard "Connect" button
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md &mdash; Create connections table migration with RLS policies
-- [ ] 04-02-PLAN.md &mdash; Rewrite ConnectionsContext to use Supabase
+- [ ] 05-01-PLAN.md &mdash; Role-aware ConnectButton rewrite with Button migration and unit tests
+- [ ] 05-02-PLAN.md &mdash; Wire server component data fetching and new props to ConnectButton
 **UI hint**: yes
 
 ### Phase 6: Settings Connections & Inbox
@@ -68,8 +68,8 @@ Plans:
   5. The notification dropdown "View all" link points to `/settings/inbox`
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md &mdash; Create connections table migration with RLS policies
-- [ ] 04-02-PLAN.md &mdash; Rewrite ConnectionsContext to use Supabase
+- [ ] 06-01-PLAN.md &mdash; TBD
+- [ ] 06-02-PLAN.md &mdash; TBD
 **UI hint**: yes
 
 ### Phase 7: Admin Connections Tab
@@ -81,8 +81,8 @@ Plans:
   2. Admin can remove any connection from the Connections tab without leaving the user detail page
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md &mdash; Create connections table migration with RLS policies
-- [ ] 04-02-PLAN.md &mdash; Rewrite ConnectionsContext to use Supabase
+- [ ] 07-01-PLAN.md &mdash; TBD
+- [ ] 07-02-PLAN.md &mdash; TBD
 **UI hint**: yes
 
 ## Progress
@@ -93,6 +93,6 @@ Plans:
 | 2. Settings Shell | v1.0 | 1/1 | Complete | 2026-03-23 |
 | 3. Settings Pages | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 4. Database Foundation | v1.1 | 2/2 | Complete | 2026-03-23 |
-| 5. Profile Page Buttons | v1.1 | 0/? | Not started | - |
+| 5. Profile Page Buttons | v1.1 | 0/2 | Planned | - |
 | 6. Settings Connections & Inbox | v1.1 | 0/? | Not started | - |
 | 7. Admin Connections Tab | v1.1 | 0/? | Not started | - |
