@@ -94,22 +94,56 @@
 
 ## Traceability
 
-Populated by roadmapper.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01–DB-09 | TBD | Pending |
-| NAV-01–NAV-03 | TBD | Pending |
-| PROD-01–PROD-11 | TBD | Pending |
-| ORD-01–ORD-09 | TBD | Pending |
-| CPN-01–CPN-05 | TBD | Pending |
-| ANA-01–ANA-05 | TBD | Pending |
+| DB-01 | Phase 8 | Pending |
+| DB-02 | Phase 8 | Pending |
+| DB-03 | Phase 8 | Pending |
+| DB-04 | Phase 9 | Pending |
+| DB-05 | Phase 9 | Pending |
+| DB-06 | Phase 10 | Pending |
+| DB-07 | Phase 10 | Pending |
+| DB-08 | Phase 10 | Pending |
+| DB-09 | Phase 10 | Pending |
+| NAV-01 | Phase 11 | Pending |
+| NAV-02 | Phase 11 | Pending |
+| NAV-03 | Phase 11 | Pending |
+| PROD-01 | Phase 12 | Pending |
+| PROD-02 | Phase 12 | Pending |
+| PROD-03 | Phase 12 | Pending |
+| PROD-04 | Phase 12 | Pending |
+| PROD-05 | Phase 12 | Pending |
+| PROD-06 | Phase 12 | Pending |
+| PROD-07 | Phase 12 | Pending |
+| PROD-08 | Phase 12 | Pending |
+| PROD-09 | Phase 12 | Pending |
+| PROD-10 | Phase 12 | Pending |
+| PROD-11 | Phase 12 | Pending |
+| ORD-01 | Phase 12 | Pending |
+| ORD-02 | Phase 12 | Pending |
+| ORD-03 | Phase 12 | Pending |
+| ORD-04 | Phase 12 | Pending |
+| ORD-05 | Phase 12 | Pending |
+| ORD-06 | Phase 12 | Pending |
+| ORD-07 | Phase 12 | Pending |
+| ORD-08 | Phase 12 | Pending |
+| ORD-09 | Phase 12 | Pending |
+| CPN-01 | Phase 12 | Pending |
+| CPN-02 | Phase 12 | Pending |
+| CPN-03 | Phase 12 | Pending |
+| CPN-04 | Phase 12 | Pending |
+| CPN-05 | Phase 12 | Pending |
+| ANA-01 | Phase 13 | Pending |
+| ANA-02 | Phase 13 | Pending |
+| ANA-03 | Phase 13 | Pending |
+| ANA-04 | Phase 13 | Pending |
+| ANA-05 | Phase 13 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 37 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 37 ⚠️
+- Mapped to phases: 37
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 after initial definition*
+*Last updated: 2026-03-23 — traceability populated by roadmapper*
