@@ -21,7 +21,7 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 ### v1.1 Connections & Inbox
 
 - [x] **Phase 4: Database Foundation** — connections table, RLS policies, migration, wire real Supabase
-- [ ] **Phase 5: Profile Page Buttons** — role-aware connect buttons on profile pages
+- [x] **Phase 5: Profile Page Buttons** — role-aware connect buttons on profile pages (completed 2026-03-23)
 - [ ] **Phase 6: Settings Connections & Inbox** — full Settings > Connections and Settings > Inbox pages
 - [ ] **Phase 7: Admin Connections Tab** — admin user detail Connections tab
 
@@ -53,7 +53,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 05-01-PLAN.md &mdash; Role-aware ConnectButton rewrite with Button migration and unit tests
-- [ ] 05-02-PLAN.md &mdash; Wire server component data fetching and new props to ConnectButton
+- [x] 05-02-PLAN.md &mdash; Wire server component data fetching and new props to ConnectButton
 **UI hint**: yes
 
 ### Phase 6: Settings Connections & Inbox
@@ -93,6 +93,6 @@ Plans:
 | 2. Settings Shell | v1.0 | 1/1 | Complete | 2026-03-23 |
 | 3. Settings Pages | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 4. Database Foundation | v1.1 | 2/2 | Complete | 2026-03-23 |
-| 5. Profile Page Buttons | v1.1 | 1/2 | Executing | - |
+| 5. Profile Page Buttons | v1.1 | 2/2 | Complete   | 2026-03-23 |
 | 6. Settings Connections & Inbox | v1.1 | 0/? | Not started | - |
 | 7. Admin Connections Tab | v1.1 | 0/? | Not started | - |

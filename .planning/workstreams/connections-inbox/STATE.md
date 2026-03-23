@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Connections & Inbox
-status: Executing Phase 05
-stopped_at: "Completed 05-01-PLAN.md — Plan 1 of 2 done"
-last_updated: "2026-03-23T21:54:00.000Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 05-02-PLAN.md — Phase 5 done (2/2 plans)
+last_updated: "2026-03-23T15:15:20.305Z"
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -50,6 +50,7 @@ Plan: 2 of 2
 | Phase 04-database-foundation P01 | 12 | 2 tasks | 1 files |
 | Phase 04-database-foundation P02 | 35 | 3 tasks | 7 files |
 | Phase 05-profile-page-buttons P01 | 12 | 2 tasks | 3 files |
+| Phase 05-profile-page-buttons P02 | 15 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,7 @@ Recent decisions affecting current work:
 - [Phase 05-01]: ROLE_PAIR_MAP as module-level const enables O(1) role lookup and is easily extended for new role pairs
 - [Phase 05-01]: vi.mock('next/navigation') required in jsdom tests — useRouter throws without it
 - [Phase 05-01]: type stored on ConnRecord (not derived at render) to preserve across connection lifecycle
+- [Phase 05-profile-page-buttons]: School ownership check uses owner_id only (no profile_id join) — viewer owns any school = show Manage School, sufficient for v1.1
 
 ### Pending Todos
 
@@ -86,6 +88,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-23T21:54:00.000Z
-Stopped at: Completed 05-01-PLAN.md (role-aware ConnectButton + Button migration)
-Resume file: .planning/workstreams/connections-inbox/phases/05-profile-page-buttons/05-02-PLAN.md
+Last session: 2026-03-23T15:15:20.302Z
+Stopped at: Completed 05-02-PLAN.md — Phase 5 done (2/2 plans)
+Resume file: None
