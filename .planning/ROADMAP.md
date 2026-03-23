@@ -27,7 +27,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Admin and Moderator users see "Settings" immediately above "Admin Settings" in the dropdown
   3. Regular users (student, teacher, wellness_practitioner) see "Settings" between the two dropdown dividers
   4. "Profile Settings" and "Subscriptions" entries are no longer present in the dropdown
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 01-01-PLAN.md — Refactor profile dropdown: add role-branched Settings entry, remove Profile Settings and Subscriptions
 **UI hint**: yes
 
 ### Phase 2: Settings Shell
@@ -60,6 +62,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Dropdown Refactor | 0/? | Not started | - |
+| 1. Dropdown Refactor | 0/1 | Planning complete | - |
 | 2. Settings Shell | 0/? | Not started | - |
 | 3. Settings Pages | 0/? | Not started | - |
