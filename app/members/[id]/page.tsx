@@ -29,6 +29,8 @@ export default async function MemberProfilePage({
 }) {
   const { id } = await params;
   const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const currentUserId = user?.id ?? null;
 
   const { data: profileData } = await supabase
     .from('profiles')
@@ -206,7 +208,7 @@ export default async function MemberProfilePage({
             )}
 
             {/* Connections */}
-            <ConnectionsSection profileMemberId={profile.id} />
+            <ConnectionsSection profileMemberId={profile.id} isOwnProfile={profile.id === currentUserId} />
           </div>
 
           {/* Right column */}
