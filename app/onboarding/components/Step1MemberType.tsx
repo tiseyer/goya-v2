@@ -43,10 +43,9 @@ export default function Step1MemberType() {
 
   return (
     <OnboardingStep
-      stepNumber={1}
       title="What brings you to GOYA?"
       subtitle="This helps us personalise your experience and connect you with the right people."
-      continueDisabled={!answers.member_type}
+      nextDisabled={!answers.member_type}
     >
       <RadioCards
         options={OPTIONS}
