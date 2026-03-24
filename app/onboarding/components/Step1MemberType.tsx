@@ -39,7 +39,7 @@ const OPTIONS: Array<{ value: MemberType; label: string; description: string; ic
 ];
 
 export default function Step1MemberType() {
-  const { answers, saveAnswer, goToNext, isSaving } = useOnboarding();
+  const { answers, setAnswer, goToNext, isSaving } = useOnboarding();
 
   return (
     <OnboardingStep
@@ -51,7 +51,7 @@ export default function Step1MemberType() {
       <RadioCards
         options={OPTIONS}
         value={answers.member_type}
-        onChange={val => saveAnswer('member_type', val)}
+        onChange={val => setAnswer('member_type', val)}
       />
 
       {answers.member_type && answers.member_type !== 'student' && (
