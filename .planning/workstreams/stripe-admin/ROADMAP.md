@@ -69,7 +69,9 @@ Plans:
   1. AdminShell sidebar shows a "Shop" collapsible group with four child links in order: Orders, Products, Coupons, Analytics
   2. The legacy top-level "Products" nav item is gone; no duplicate products links exist in the sidebar
   3. A user with student, teacher, or wellness practitioner role sees no Shop nav group
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 11-01-PLAN.md — Add collapsible Shop nav group to AdminShell sidebar with Orders, Products, Coupons, Analytics child links
 **UI hint**: yes
 
 ### Phase 12: Shop Admin Pages
@@ -107,6 +109,6 @@ Plans:
 | 8. DB Foundation | 2/2 | Complete | 2026-03-23 |
 | 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
 | 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
-| 11. AdminShell Shop Nav | 0/? | Not started | - |
+| 11. AdminShell Shop Nav | 0/1 | Not started | - |
 | 12. Shop Admin Pages | 0/? | Not started | - |
 | 13. Analytics | 0/? | Not started | - |
