@@ -36,6 +36,7 @@ interface ConnectionsContextType {
   sendRequest: (userId: string, name: string, photo: string, type?: 'peer' | 'mentorship' | 'faculty') => Promise<void>;
   acceptRequest: (connectionId: string, fromUserId: string) => Promise<void>;
   declineRequest: (connectionId: string, fromUserId: string) => Promise<void>;
+  removeConnection: (connectionId: string, otherUserId: string) => Promise<void>;
   markAllRead: () => void;
 }
 
@@ -62,7 +63,11 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
     if (!supabaseUserId) return;
     supabase
       .from('connections')
-      .select('*')
+      .select(`
+        *,
+        requester:profiles!connections_requester_id_fkey(id, full_name, avatar_url),
+        recipient:profiles!connections_recipient_id_fkey(id, full_name, avatar_url)
+      `)
       .or(`requester_id.eq.${supabaseUserId},recipient_id.eq.${supabaseUserId}`)
       .then(({ data }) => {
         if (data) {
@@ -74,12 +79,13 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
               row.status === 'pending' && role === 'requester' ? 'pending_sent' :
               row.status === 'pending' && role === 'receiver' ? 'pending_received' :
               row.status as ConnStatus;
+            const otherProfile = row.requester_id === supabaseUserId ? row.recipient : row.requester;
             map[otherId] = {
               connectionId: row.id,
               status: displayStatus,
               memberId: otherId,
-              memberName: '',
-              memberPhoto: '',
+              memberName: otherProfile?.full_name ?? '',
+              memberPhoto: otherProfile?.avatar_url ?? '',
               role,
               type: row.type ?? 'peer',
             };
@@ -199,6 +205,20 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const removeConnection = useCallback(async (connectionId: string, otherUserId: string) => {
+    const { error } = await supabase
+      .from('connections')
+      .delete()
+      .eq('id', connectionId);
+
+    if (!error) {
+      setConnections(prev => {
+        const { [otherUserId]: _removed, ...rest } = prev;
+        return rest;
+      });
+    }
+  }, []);
+
   const markAllRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   }, []);
@@ -214,6 +234,7 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
       sendRequest,
       acceptRequest,
       declineRequest,
+      removeConnection,
       markAllRead,
     }}>
       {children}
