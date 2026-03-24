@@ -11,7 +11,7 @@ Six phases build the full Stripe billing backbone and Shop admin section. The de
 - [x] **Phase 8: DB Foundation** - Create 5 Stripe-mirror tables, idempotency table, bridge columns, and RLS policies
 - [ ] **Phase 9: Stripe SDK + Webhook Infrastructure** - SDK singleton and webhook endpoint with signature verification
 - [x] **Phase 10: Webhook Handlers + Initial Sync** - All 15 event handlers with idempotent upserts and admin-triggered sync (completed 2026-03-24)
-- [ ] **Phase 11: AdminShell Shop Nav** - Shop collapsible dropdown in AdminShell sidebar
+- [x] **Phase 11: AdminShell Shop Nav** - Shop collapsible dropdown in AdminShell sidebar (completed 2026-03-24)
 - [ ] **Phase 12: Shop Admin Pages** - Products, Orders, and Coupons admin sections
 - [ ] **Phase 13: Analytics** - ARR/MRR metrics, revenue charts, role-split funnel, CSV export
 
@@ -71,7 +71,7 @@ Plans:
   3. A user with student, teacher, or wellness practitioner role sees no Shop nav group
 **Plans**: 1 plan
 Plans:
-- [ ] 11-01-PLAN.md — Add collapsible Shop nav group to AdminShell sidebar with Orders, Products, Coupons, Analytics child links
+- [x] 11-01-PLAN.md — Add collapsible Shop nav group to AdminShell sidebar with Orders, Products, Coupons, Analytics child links
 **UI hint**: yes
 
 ### Phase 12: Shop Admin Pages
@@ -109,6 +109,6 @@ Plans:
 | 8. DB Foundation | 2/2 | Complete | 2026-03-23 |
 | 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
 | 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
-| 11. AdminShell Shop Nav | 0/1 | Not started | - |
+| 11. AdminShell Shop Nav | 1/1 | Complete   | 2026-03-24 |
 | 12. Shop Admin Pages | 0/? | Not started | - |
 | 13. Analytics | 0/? | Not started | - |

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 10-03-PLAN.md
-last_updated: "2026-03-24T01:07:47.140Z"
+status: Phase complete — ready for verification
+stopped_at: "Checkpoint reached: Task 2 human-verify for Shop nav group"
+last_updated: "2026-03-24T01:30:27.474Z"
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  completed_phases: 4
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # Project State — stripe-admin workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 10 — webhook-handlers-initial-sync
+**Current focus:** Phase 11 — adminshell-shop-nav
 
 ## Current Position
 
-Phase: 11
-Plan: Not started
+Phase: 11 (adminshell-shop-nav) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Plan: Not started
 | Phase 09 P02 | 3 | 1 tasks | 2 files |
 | Phase 10 P02 | 162 | 2 tasks | 6 files |
 | Phase 10 P03 | 4 | 3 tasks | 6 files |
+| Phase 11-adminshell-shop-nav P01 | 4 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,7 @@ Plan: Not started
 - [Phase 10]: invoice.subscription_status=null — invoice rows track payment events, not subscription lifecycle (subscription handler owns that field)
 - [Phase 10]: PostgreSQL 23505 error code used for idempotency gate (atomic single INSERT vs SELECT-then-INSERT)
 - [Phase 10]: Admin sync uses CRON_SECRET bearer token (not session auth) — run from CLI or scheduled trigger
+- [Phase 11-adminshell-shop-nav]: Hardcode shopOpen as named state — generic group state map deferred until second nav group is needed
 
 ### Pending Todos
 
@@ -86,6 +88,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T01:00:58.416Z
-Stopped at: Completed 10-03-PLAN.md
+Last session: 2026-03-24T01:30:21.850Z
+Stopped at: Checkpoint reached: Task 2 human-verify for Shop nav group
 Resume file: None
