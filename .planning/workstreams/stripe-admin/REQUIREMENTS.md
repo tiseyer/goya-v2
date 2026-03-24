@@ -15,7 +15,7 @@
 - [x] **DB-06**: All 15 Stripe event types are handled: `product.created/updated/deleted`, `price.created/updated/deleted`, `payment_intent.succeeded/failed`, `customer.subscription.created/updated/deleted`, `invoice.paid/failed`, `coupon.created/updated/deleted`
 - [x] **DB-07**: Webhook handlers use idempotent upserts keyed on `stripe_id` with write-partitioning enforced (GOYA owns `priority`, `requires_any_of`, `hidden_if_has_any`, `is_active`; Stripe owns payment/billing fields)
 - [x] **DB-08**: Complex webhook events (checkout, subscription updates with email side-effects) return 200 immediately after idempotency check; heavy side-effects are processed via Vercel cron polling the `webhook_events` table
-- [ ] **DB-09**: Admin can trigger a one-time initial sync that seeds `stripe_products`, `stripe_prices`, and `stripe_coupons` from the existing Stripe account via the Stripe list API
+- [x] **DB-09**: Admin can trigger a one-time initial sync that seeds `stripe_products`, `stripe_prices`, and `stripe_coupons` from the existing Stripe account via the Stripe list API
 
 ### NAV — AdminShell Navigation
 
@@ -104,7 +104,7 @@
 | DB-06 | Phase 10 | Complete |
 | DB-07 | Phase 10 | Complete |
 | DB-08 | Phase 10 | Complete |
-| DB-09 | Phase 10 | Pending |
+| DB-09 | Phase 10 | Complete |
 | NAV-01 | Phase 11 | Pending |
 | NAV-02 | Phase 11 | Pending |
 | NAV-03 | Phase 11 | Pending |

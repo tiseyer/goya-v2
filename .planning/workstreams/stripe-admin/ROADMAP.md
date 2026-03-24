@@ -10,7 +10,7 @@ Six phases build the full Stripe billing backbone and Shop admin section. The de
 
 - [x] **Phase 8: DB Foundation** - Create 5 Stripe-mirror tables, idempotency table, bridge columns, and RLS policies
 - [ ] **Phase 9: Stripe SDK + Webhook Infrastructure** - SDK singleton and webhook endpoint with signature verification
-- [ ] **Phase 10: Webhook Handlers + Initial Sync** - All 15 event handlers with idempotent upserts and admin-triggered sync
+- [x] **Phase 10: Webhook Handlers + Initial Sync** - All 15 event handlers with idempotent upserts and admin-triggered sync (completed 2026-03-24)
 - [ ] **Phase 11: AdminShell Shop Nav** - Shop collapsible dropdown in AdminShell sidebar
 - [ ] **Phase 12: Shop Admin Pages** - Products, Orders, and Coupons admin sections
 - [ ] **Phase 13: Analytics** - ARR/MRR metrics, revenue charts, role-split funnel, CSV export
@@ -57,9 +57,9 @@ Plans:
   5. Admin can trigger a one-time sync that populates `stripe_products`, `stripe_prices`, and `stripe_coupons` from the Stripe account
 **Plans**: 3 plans
 Plans:
-- [ ] 10-01-PLAN.md — Migration for pending_cron status + product, price, coupon handlers with tests
+- [x] 10-01-PLAN.md — Migration for pending_cron status + product, price, coupon handlers with tests
 - [x] 10-02-PLAN.md — Subscription, payment-intent, invoice handlers with pending_cron support
-- [ ] 10-03-PLAN.md — Wire dispatch + idempotency into webhook route, cron route, admin sync route
+- [x] 10-03-PLAN.md — Wire dispatch + idempotency into webhook route, cron route, admin sync route
 
 ### Phase 11: AdminShell Shop Nav
 **Goal**: The Shop section is navigable from the AdminShell sidebar for admin and moderator roles
@@ -106,7 +106,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 8. DB Foundation | 2/2 | Complete | 2026-03-23 |
 | 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
-| 10. Webhook Handlers + Initial Sync | 1/3 | In Progress|  |
+| 10. Webhook Handlers + Initial Sync | 3/3 | Complete   | 2026-03-24 |
 | 11. AdminShell Shop Nav | 0/? | Not started | - |
 | 12. Shop Admin Pages | 0/? | Not started | - |
 | 13. Analytics | 0/? | Not started | - |

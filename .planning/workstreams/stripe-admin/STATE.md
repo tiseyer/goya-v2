@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 10-02-PLAN.md
-last_updated: "2026-03-24T00:46:42.466Z"
+stopped_at: Completed 10-03-PLAN.md
+last_updated: "2026-03-24T01:00:58.419Z"
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 7
 ---
 
 # Project State — stripe-admin workstream
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 10 (webhook-handlers-initial-sync) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Plan: 2 of 3
 | Phase 09 P01 | 2 | 1 tasks | 5 files |
 | Phase 09 P02 | 3 | 1 tasks | 2 files |
 | Phase 10 P02 | 162 | 2 tasks | 6 files |
+| Phase 10 P03 | 4 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,8 @@ Plan: 2 of 3
 - [Phase 09]: Phase 9 stub dispatch via console.log — idempotency + event dispatch in Phase 10
 - [Phase 10]: HandlerResult type defined in subscription.ts and imported by payment-intent.ts and invoice.ts — avoids type duplication
 - [Phase 10]: invoice.subscription_status=null — invoice rows track payment events, not subscription lifecycle (subscription handler owns that field)
+- [Phase 10]: PostgreSQL 23505 error code used for idempotency gate (atomic single INSERT vs SELECT-then-INSERT)
+- [Phase 10]: Admin sync uses CRON_SECRET bearer token (not session auth) — run from CLI or scheduled trigger
 
 ### Pending Todos
 
@@ -83,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T00:46:42.462Z
-Stopped at: Completed 10-02-PLAN.md
+Last session: 2026-03-24T01:00:58.416Z
+Stopped at: Completed 10-03-PLAN.md
 Resume file: None
