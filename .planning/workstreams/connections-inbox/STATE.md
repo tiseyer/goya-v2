@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Connections & Inbox
-status: Ready to plan
-stopped_at: Completed 05-02-PLAN.md — Phase 5 done (2/2 plans)
-last_updated: "2026-03-24T00:25:10.562Z"
+status: Executing Phase 06
+stopped_at: Completed 06-01-PLAN.md — Phase 6 (1/2 plans)
+last_updated: "2026-03-24T01:13:25Z"
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 5
+  total_plans: 8
+  completed_plans: 6
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 05 — profile-page-buttons
+**Current focus:** Phase 06 — settings-connections-inbox
 
 ## Current Position
 
-Phase: 6
-Plan: Not started
+Phase: 06 (settings-connections-inbox) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: Not started
 | Phase 04-database-foundation P02 | 35 | 3 tasks | 7 files |
 | Phase 05-profile-page-buttons P01 | 12 | 2 tasks | 3 files |
 | Phase 05-profile-page-buttons P02 | 15 | 2 tasks | 1 files |
+| Phase 06-settings-connections-inbox P01 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,9 @@ Recent decisions affecting current work:
 - [Phase 05-01]: vi.mock('next/navigation') required in jsdom tests — useRouter throws without it
 - [Phase 05-01]: type stored on ConnRecord (not derived at render) to preserve across connection lifecycle
 - [Phase 05-profile-page-buttons]: School ownership check uses owner_id only (no profile_id join) — viewer owns any school = show Manage School, sufficient for v1.1
+- [Phase 06-01]: Profiles join in ConnectionsContext initial load (not pages) — single source of truth, avoids N+1 fetches
+- [Phase 06-01]: removeConnection mirrors declineRequest pattern — DELETE from Supabase then remove from local state map
+- [Phase 06-01]: otherProfile derived by requester_id comparison — clean derivation matching existing role calculation logic
 
 ### Pending Todos
 
@@ -88,6 +92,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-23T15:15:20.302Z
-Stopped at: Completed 05-02-PLAN.md — Phase 5 done (2/2 plans)
+Last session: 2026-03-24T01:13:25Z
+Stopped at: Completed 06-01-PLAN.md — Phase 6 (1/2 plans complete)
 Resume file: None
