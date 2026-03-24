@@ -58,74 +58,87 @@ export default async function AnalyticsPage({
   const diffDays = Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24))
   const granularity: 'daily' | 'weekly' = diffDays <= 60 ? 'daily' : 'weekly'
 
-  const supabase = getSupabaseService()
+  let funnel = {
+    newRegistrations: 0, completedOnboarding: 0, conversionRate: 0,
+    newSubscriptions: 0, pendingCancellations: 0, newCancellations: 0,
+    totalActiveMembers: 0, netGrowth: 0,
+  }
+  let revenue = { arrTotal: 0, newArr: 0, churnedArr: 0, netNewArr: 0 }
+  let chartData: { date: string; revenue: number; orders: number }[] = []
+  let fetchError: string | null = null
 
-  // Parallel fetch all required data
-  const [ordersRes, profilesRes, pricesRes, schoolsRes] = await Promise.all([
-    supabase
-      .from('stripe_orders')
-      .select(
-        'id, stripe_id, stripe_customer_id, stripe_price_id, stripe_product_id, user_id, amount_total, type, subscription_status, cancel_at_period_end, canceled_at, created_at',
-      ),
-    supabase
-      .from('profiles')
-      .select('id, role, member_type, created_at, onboarding_completed, subscription_status'),
-    supabase
-      .from('stripe_prices')
-      .select('stripe_id, unit_amount, type, interval, interval_count'),
-    supabase.from('schools').select('owner_id'),
-  ])
+  try {
+    const supabase = getSupabaseService()
 
-  const orders = (ordersRes.data ?? []).map((o) => ({
-    id: o.id,
-    stripe_id: o.stripe_id,
-    stripe_customer_id: o.stripe_customer_id ?? null,
-    stripe_price_id: o.stripe_price_id ?? null,
-    stripe_product_id: o.stripe_product_id ?? null,
-    user_id: o.user_id ?? null,
-    amount_total: o.amount_total ?? null,
-    type: o.type ?? 'one_time',
-    subscription_status: o.subscription_status ?? null,
-    cancel_at_period_end: o.cancel_at_period_end ?? false,
-    canceled_at: o.canceled_at ?? null,
-    created_at: o.created_at ?? '',
-  }))
+    // Parallel fetch all required data
+    const [ordersRes, profilesRes, pricesRes, schoolsRes] = await Promise.all([
+      supabase
+        .from('stripe_orders')
+        .select(
+          'id, stripe_id, stripe_customer_id, stripe_price_id, stripe_product_id, user_id, amount_total, type, subscription_status, cancel_at_period_end, canceled_at, created_at',
+        ),
+      supabase
+        .from('profiles')
+        .select('id, role, member_type, created_at, onboarding_completed, subscription_status'),
+      supabase
+        .from('stripe_prices')
+        .select('stripe_id, unit_amount, type, interval, interval_count'),
+      supabase.from('schools').select('owner_id'),
+    ])
 
-  const profiles = (profilesRes.data ?? []).map((p) => ({
-    id: p.id,
-    role: p.role ?? '',
-    member_type: p.member_type ?? null,
-    created_at: p.created_at ?? '',
-    onboarding_completed: p.onboarding_completed ?? false,
-    subscription_status: p.subscription_status ?? '',
-  }))
+    const orders = (ordersRes.data ?? []).map((o) => ({
+      id: o.id,
+      stripe_id: o.stripe_id,
+      stripe_customer_id: o.stripe_customer_id ?? null,
+      stripe_price_id: o.stripe_price_id ?? null,
+      stripe_product_id: o.stripe_product_id ?? null,
+      user_id: o.user_id ?? null,
+      amount_total: o.amount_total ?? null,
+      type: o.type ?? 'one_time',
+      subscription_status: o.subscription_status ?? null,
+      cancel_at_period_end: o.cancel_at_period_end ?? false,
+      canceled_at: o.canceled_at ?? null,
+      created_at: o.created_at ?? '',
+    }))
 
-  const prices = (pricesRes.data ?? []).map((p) => ({
-    stripe_id: p.stripe_id,
-    unit_amount: p.unit_amount ?? null,
-    type: p.type ?? '',
-    interval: p.interval ?? null,
-    interval_count: p.interval_count ?? null,
-  }))
+    const profiles = (profilesRes.data ?? []).map((p) => ({
+      id: p.id,
+      role: p.role ?? '',
+      member_type: p.member_type ?? null,
+      created_at: p.created_at ?? '',
+      onboarding_completed: p.onboarding_completed ?? false,
+      subscription_status: p.subscription_status ?? '',
+    }))
 
-  const schoolOwnerIds = new Set(
-    (schoolsRes.data ?? []).map((s) => s.owner_id).filter((id): id is string => !!id),
-  )
-  const profileMap = new Map(profiles.map((p) => [p.id, p]))
-  const roleFilter = role as RoleFilter
+    const prices = (pricesRes.data ?? []).map((p) => ({
+      stripe_id: p.stripe_id,
+      unit_amount: p.unit_amount ?? null,
+      type: p.type ?? '',
+      interval: p.interval ?? null,
+      interval_count: p.interval_count ?? null,
+    }))
 
-  // Compute metrics
-  const funnel = computeFunnelMetrics(profiles, orders, from, to, roleFilter, schoolOwnerIds)
-  const revenue = computeRevenueMetrics(
-    orders,
-    prices,
-    from,
-    to,
-    roleFilter,
-    profileMap,
-    schoolOwnerIds,
-  )
-  const chartData = bucketTimeSeries(orders, from, to, granularity)
+    const schoolOwnerIds = new Set(
+      (schoolsRes.data ?? []).map((s) => s.owner_id).filter((id): id is string => !!id),
+    )
+    const profileMap = new Map(profiles.map((p) => [p.id, p]))
+    const roleFilter = role as RoleFilter
+
+    // Compute metrics
+    funnel = computeFunnelMetrics(profiles, orders, from, to, roleFilter, schoolOwnerIds)
+    revenue = computeRevenueMetrics(
+      orders,
+      prices,
+      from,
+      to,
+      roleFilter,
+      profileMap,
+      schoolOwnerIds,
+    )
+    chartData = bucketTimeSeries(orders, from, to, granularity)
+  } catch (err) {
+    fetchError = err instanceof Error ? err.message : 'Failed to load analytics data'
+  }
 
   // CSV-ready data objects
   const funnelCsvData = [
@@ -160,6 +173,12 @@ export default async function AnalyticsPage({
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-[#1B3A5C]">Analytics</h1>
         </div>
+
+        {fetchError && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
+            <p className="text-sm text-red-600">{fetchError}</p>
+          </div>
+        )}
 
         <Suspense>
           <AnalyticsFilters

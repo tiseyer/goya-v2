@@ -20,7 +20,11 @@ export async function toggleProductStatus(
 
   if (error) throw new Error(`toggleProductStatus supabase error: ${error.message}`)
 
-  await getStripe().products.update(stripeProductId, { active: newIsActive })
+  try {
+    await getStripe().products.update(stripeProductId, { active: newIsActive })
+  } catch (err) {
+    throw new Error(`Stripe sync failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+  }
 
   revalidatePath('/admin/shop/products')
 }
@@ -48,7 +52,11 @@ export async function bulkProductAction(
 
         if (error) throw new Error(`bulkProductAction supabase error: ${error.message}`)
 
-        await getStripe().products.update(stripeProductId, { active: newIsActive })
+        try {
+          await getStripe().products.update(stripeProductId, { active: newIsActive })
+        } catch (err) {
+          throw new Error(`Stripe sync failed for ${productId}: ${err instanceof Error ? err.message : 'Unknown error'}`)
+        }
       }
     }),
   )
@@ -88,7 +96,11 @@ export async function softDeleteProduct(
 
   if (error) throw new Error(`softDeleteProduct supabase error: ${error.message}`)
 
-  await getStripe().products.update(stripeProductId, { active: false })
+  try {
+    await getStripe().products.update(stripeProductId, { active: false })
+  } catch (err) {
+    throw new Error(`Stripe sync failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+  }
 
   revalidatePath('/admin/shop/products')
 }
@@ -159,26 +171,33 @@ export async function createProduct(data: {
   unitLabel?: string
   marketingFeatures?: string[]
 }): Promise<void> {
-  const stripe = getStripe()
+  let stripeProduct;
+  let stripePrice;
 
-  const stripeProduct = await stripe.products.create({
-    name: data.name,
-    description: data.description,
-    images: data.imagePath ? [data.imagePath] : [],
-    metadata: data.metadata ?? {},
-    ...(data.statementDescriptor ? { statement_descriptor: data.statementDescriptor } : {}),
-    ...(data.unitLabel ? { unit_label: data.unitLabel } : {}),
-    ...(data.marketingFeatures
-      ? { marketing_features: data.marketingFeatures.map((f) => ({ name: f })) }
-      : {}),
-  })
+  try {
+    const stripe = getStripe()
 
-  const stripePrice = await stripe.prices.create({
-    product: stripeProduct.id,
-    unit_amount: data.priceCents,
-    currency: 'usd',
-    ...(data.priceType === 'recurring' ? { recurring: { interval: data.interval! } } : {}),
-  })
+    stripeProduct = await stripe.products.create({
+      name: data.name,
+      description: data.description,
+      images: data.imagePath ? [data.imagePath] : [],
+      metadata: data.metadata ?? {},
+      ...(data.statementDescriptor ? { statement_descriptor: data.statementDescriptor } : {}),
+      ...(data.unitLabel ? { unit_label: data.unitLabel } : {}),
+      ...(data.marketingFeatures
+        ? { marketing_features: data.marketingFeatures.map((f) => ({ name: f })) }
+        : {}),
+    })
+
+    stripePrice = await stripe.prices.create({
+      product: stripeProduct.id,
+      unit_amount: data.priceCents,
+      currency: 'usd',
+      ...(data.priceType === 'recurring' ? { recurring: { interval: data.interval! } } : {}),
+    })
+  } catch (err) {
+    throw new Error(`Stripe product creation failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+  }
 
   const sb = getSupabaseService()
 
@@ -250,7 +269,11 @@ export async function editProduct(
   if (data.marketingFeatures !== undefined)
     updateObj.marketing_features = data.marketingFeatures.map((f) => ({ name: f }))
 
-  await getStripe().products.update(stripeProductId, updateObj)
+  try {
+    await getStripe().products.update(stripeProductId, updateObj)
+  } catch (err) {
+    throw new Error(`Stripe product update failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+  }
 
   revalidatePath('/admin/shop/products')
 }
@@ -268,19 +291,26 @@ export async function updateProductPrice(
   type: 'one_time' | 'recurring',
   interval?: 'month' | 'year',
 ): Promise<void> {
-  const stripe = getStripe()
+  let newPrice;
+
+  try {
+    const stripe = getStripe()
+
+    // 1. Create new Stripe Price
+    newPrice = await stripe.prices.create({
+      product: stripeProductId,
+      unit_amount: newAmountCents,
+      currency,
+      ...(type === 'recurring' ? { recurring: { interval: interval! } } : {}),
+    })
+
+    // 2. Archive old Stripe Price (immutability — NEVER update unit_amount)
+    await stripe.prices.update(oldPriceId, { active: false })
+  } catch (err) {
+    throw new Error(`Stripe price update failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+  }
+
   const sb = getSupabaseService()
-
-  // 1. Create new Stripe Price
-  const newPrice = await stripe.prices.create({
-    product: stripeProductId,
-    unit_amount: newAmountCents,
-    currency,
-    ...(type === 'recurring' ? { recurring: { interval: interval! } } : {}),
-  })
-
-  // 2. Archive old Stripe Price (immutability — NEVER update unit_amount)
-  await stripe.prices.update(oldPriceId, { active: false })
 
   // 3. Upsert new price row in stripe_prices
   await sb.from('stripe_prices').upsert(

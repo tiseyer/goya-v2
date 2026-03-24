@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Suspense } from 'react'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import ProductsTable, { type ProductRow } from './ProductsTable'
@@ -21,7 +22,19 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
     ? parseInt(str(params.pageSize), 10)
     : 25
 
-  const supabase = await createSupabaseServerClient()
+  let supabase;
+  try {
+    supabase = await createSupabaseServerClient()
+  } catch {
+    return (
+      <div className="p-6 lg:p-8">
+        <h1 className="text-2xl font-bold text-[#1B3A5C] mb-4">Products</h1>
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
+          <p className="text-sm text-red-600">Failed to connect to database.</p>
+        </div>
+      </div>
+    )
+  }
 
   // --- Query 1: GOYA products ---
   let productsQuery = supabase
@@ -180,13 +193,24 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
     <div className="p-6 lg:p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#1B3A5C]">Products</h1>
-        <p className="text-sm text-[#6B7280]">
-          <span className="font-medium text-[#374151]">{pagedProducts.length}</span>
-          {' / '}
-          <span className="font-medium text-[#374151]">{totalCount.toLocaleString()}</span>
-          {' products'}
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B3A5C]">Products</h1>
+          <p className="text-sm text-[#6B7280] mt-0.5">
+            <span className="font-medium text-[#374151]">{pagedProducts.length}</span>
+            {' / '}
+            <span className="font-medium text-[#374151]">{totalCount.toLocaleString()}</span>
+            {' products'}
+          </p>
+        </div>
+        <Link
+          href="/admin/shop/products/new"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1B3A5C] text-white text-sm font-medium hover:bg-[#142d47] transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Create Product
+        </Link>
       </div>
 
       {/* Filters */}

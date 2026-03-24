@@ -26,121 +26,141 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
     ? parseInt(str(params.pageSize), 10)
     : 25;
 
-  const supabase = getSupabaseService();
+  let merged: OrderRow[] = [];
+  let totalCount = 0;
+  let totalPages = 1;
+  let displayedCount = 0;
+  let fetchError: string | null = null;
 
-  // Build stripe_orders query
-  let query = supabase
-    .from('stripe_orders')
-    .select('*', { count: 'exact' });
+  try {
+    const supabase = getSupabaseService();
 
-  if (type && type !== 'all') query = query.eq('type', type);
-  if (status && status !== 'all') query = query.eq('status', status);
-  if (dateFrom) query = query.gte('created_at', dateFrom);
-  if (dateTo)   query = query.lte('created_at', dateTo + 'T23:59:59Z');
-  if (priceMin) query = query.gte('amount_total', parseInt(priceMin) * 100);
-  if (priceMax) query = query.lte('amount_total', parseInt(priceMax) * 100);
+    // Build stripe_orders query
+    let query = supabase
+      .from('stripe_orders')
+      .select('*', { count: 'exact' });
 
-  switch (sort) {
-    case 'oldest':      query = query.order('created_at', { ascending: true });   break;
-    case 'amount_high': query = query.order('amount_total', { ascending: false }); break;
-    case 'amount_low':  query = query.order('amount_total', { ascending: true });  break;
-    default:            query = query.order('created_at', { ascending: false });   break;
-  }
+    if (type && type !== 'all') query = query.eq('type', type);
+    if (status && status !== 'all') query = query.eq('status', status);
+    if (dateFrom) query = query.gte('created_at', dateFrom);
+    if (dateTo)   query = query.lte('created_at', dateTo + 'T23:59:59Z');
+    if (priceMin) query = query.gte('amount_total', parseInt(priceMin) * 100);
+    if (priceMax) query = query.lte('amount_total', parseInt(priceMax) * 100);
 
-  const from = (page - 1) * pageSize;
-  const to   = from + pageSize - 1;
-  query = query.range(from, to);
+    switch (sort) {
+      case 'oldest':      query = query.order('created_at', { ascending: true });   break;
+      case 'amount_high': query = query.order('amount_total', { ascending: false }); break;
+      case 'amount_low':  query = query.order('amount_total', { ascending: true });  break;
+      default:            query = query.order('created_at', { ascending: false });   break;
+    }
 
-  const { data: orders, count } = await query;
+    const from = (page - 1) * pageSize;
+    const to   = from + pageSize - 1;
+    query = query.range(from, to);
 
-  const rawOrders = orders ?? [];
+    const { data: orders, count } = await query;
 
-  // Fetch profiles for customer names via stripe_customer_id join
-  const customerIds = [...new Set(
-    rawOrders
-      .map((o) => o.stripe_customer_id)
-      .filter((id): id is string => !!id),
-  )];
+    const rawOrders = orders ?? [];
 
-  const profileMap = new Map<string, { full_name: string | null; email: string | null }>();
-  if (customerIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('stripe_customer_id, full_name, email')
-      .in('stripe_customer_id', customerIds);
+    // Fetch profiles for customer names via stripe_customer_id join
+    const customerIds = [...new Set(
+      rawOrders
+        .map((o) => o.stripe_customer_id)
+        .filter((id): id is string => !!id),
+    )];
 
-    for (const p of profiles ?? []) {
-      if (p.stripe_customer_id) {
-        profileMap.set(p.stripe_customer_id, {
-          full_name: p.full_name ?? null,
-          email: p.email ?? null,
-        });
+    const profileMap = new Map<string, { full_name: string | null; email: string | null }>();
+    if (customerIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('stripe_customer_id, full_name, email')
+        .in('stripe_customer_id', customerIds);
+
+      for (const p of profiles ?? []) {
+        if (p.stripe_customer_id) {
+          profileMap.set(p.stripe_customer_id, {
+            full_name: p.full_name ?? null,
+            email: p.email ?? null,
+          });
+        }
       }
     }
-  }
 
-  // Fetch coupons from order metadata (if present)
-  // metadata may have coupon_id or discount_id fields
-  const couponIds = [...new Set(
-    rawOrders
-      .map((o) => {
-        const meta = o.metadata as Record<string, unknown> | null;
-        return (meta?.coupon_id as string | undefined) ?? (meta?.discount_id as string | undefined);
-      })
-      .filter((id): id is string => !!id),
-  )];
+    // Fetch coupons from order metadata (if present)
+    const couponIds = [...new Set(
+      rawOrders
+        .map((o) => {
+          const meta = o.metadata as Record<string, unknown> | null;
+          return (meta?.coupon_id as string | undefined) ?? (meta?.discount_id as string | undefined);
+        })
+        .filter((id): id is string => !!id),
+    )];
 
-  const couponMap = new Map<string, string>();
-  if (couponIds.length > 0) {
-    const { data: coupons } = await supabase
-      .from('stripe_coupons')
-      .select('stripe_coupon_id, name')
-      .in('stripe_coupon_id', couponIds);
+    const couponMap = new Map<string, string>();
+    if (couponIds.length > 0) {
+      const { data: coupons } = await supabase
+        .from('stripe_coupons')
+        .select('stripe_coupon_id, name')
+        .in('stripe_coupon_id', couponIds);
 
-    for (const c of coupons ?? []) {
-      couponMap.set(c.stripe_coupon_id, c.name ?? '');
+      for (const c of coupons ?? []) {
+        couponMap.set(c.stripe_coupon_id, c.name ?? '');
+      }
     }
+
+    // Merge into OrderRow[]
+    merged = rawOrders.map((o) => {
+      const profile = o.stripe_customer_id ? profileMap.get(o.stripe_customer_id) : undefined;
+      const meta = o.metadata as Record<string, unknown> | null;
+      const couponId =
+        (meta?.coupon_id as string | undefined) ??
+        (meta?.discount_id as string | undefined);
+
+      return {
+        id:                 o.id,
+        stripeId:           o.stripe_id,
+        customerName:       profile?.full_name ?? null,
+        customerEmail:      profile?.email ?? null,
+        createdAt:          o.created_at ?? '',
+        status:             o.status,
+        amountTotal:        o.amount_total ?? 0,
+        currency:           o.currency ?? 'usd',
+        paymentMethod:      null,
+        type:               (o.type as 'one_time' | 'recurring'),
+        subscriptionStatus: o.subscription_status ?? null,
+        currentPeriodEnd:   o.current_period_end ?? null,
+        cancelAtPeriodEnd:  o.cancel_at_period_end ?? false,
+        couponName:         couponId ? (couponMap.get(couponId) ?? null) : null,
+      };
+    });
+
+    // Search filter (cross-table, done in JS)
+    if (search) {
+      const q = search.toLowerCase();
+      merged = merged.filter(
+        (o) =>
+          (o.customerName?.toLowerCase().includes(q) ?? false) ||
+          (o.customerEmail?.toLowerCase().includes(q) ?? false),
+      );
+    }
+
+    totalCount  = count ?? 0;
+    totalPages  = Math.max(1, Math.ceil(totalCount / pageSize));
+    displayedCount = merged.length;
+  } catch (err) {
+    fetchError = err instanceof Error ? err.message : 'Failed to load orders';
   }
 
-  // Merge into OrderRow[]
-  let merged: OrderRow[] = rawOrders.map((o) => {
-    const profile = o.stripe_customer_id ? profileMap.get(o.stripe_customer_id) : undefined;
-    const meta = o.metadata as Record<string, unknown> | null;
-    const couponId =
-      (meta?.coupon_id as string | undefined) ??
-      (meta?.discount_id as string | undefined);
-
-    return {
-      id:                 o.id,
-      stripeId:           o.stripe_id,
-      customerName:       profile?.full_name ?? null,
-      customerEmail:      profile?.email ?? null,
-      createdAt:          o.created_at ?? '',
-      status:             o.status,
-      amountTotal:        o.amount_total ?? 0,
-      currency:           o.currency ?? 'usd',
-      paymentMethod:      null,
-      type:               (o.type as 'one_time' | 'recurring'),
-      subscriptionStatus: o.subscription_status ?? null,
-      currentPeriodEnd:   o.current_period_end ?? null,
-      cancelAtPeriodEnd:  o.cancel_at_period_end ?? false,
-      couponName:         couponId ? (couponMap.get(couponId) ?? null) : null,
-    };
-  });
-
-  // Search filter (cross-table, done in JS)
-  if (search) {
-    const q = search.toLowerCase();
-    merged = merged.filter(
-      (o) =>
-        (o.customerName?.toLowerCase().includes(q) ?? false) ||
-        (o.customerEmail?.toLowerCase().includes(q) ?? false),
+  if (fetchError) {
+    return (
+      <div className="p-6 lg:p-8">
+        <h1 className="text-2xl font-bold text-[#1B3A5C] mb-4">Orders</h1>
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
+          <p className="text-sm text-red-600">{fetchError}</p>
+        </div>
+      </div>
     );
   }
-
-  const totalCount  = count ?? 0;
-  const totalPages  = Math.max(1, Math.ceil(totalCount / pageSize));
-  const displayedCount = merged.length;
 
   return (
     <div className="p-6 lg:p-8">

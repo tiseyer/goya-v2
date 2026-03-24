@@ -21,7 +21,19 @@ export default async function CouponsPage({ searchParams }: { searchParams: Sear
     ? parseInt(str(params.pageSize), 10)
     : 25
 
-  const supabase = await createSupabaseServerClient()
+  let supabase;
+  try {
+    supabase = await createSupabaseServerClient()
+  } catch {
+    return (
+      <div className="p-6 lg:p-8">
+        <h1 className="text-2xl font-bold text-[#1B3A5C] mb-4">Coupons</h1>
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
+          <p className="text-sm text-red-600">Failed to connect to database.</p>
+        </div>
+      </div>
+    )
+  }
 
   let query = supabase
     .from('stripe_coupons')
