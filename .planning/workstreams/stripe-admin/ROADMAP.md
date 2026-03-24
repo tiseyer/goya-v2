@@ -84,14 +84,15 @@ Plans:
   3. Admin can view, filter, search, and bulk-action orders; order detail shows a chronological Stripe event timeline, customer info, full/partial refund action, and subscription cancel (schedule or immediate)
   4. Admin can create, edit, and manually assign coupons; both `stripe_coupon_id` and `stripe_promotion_code_id` are stored; coupon detail shows redemption history
   5. Product visibility rules (show-to / don't-show-to) can be configured per product and are persisted to GOYA-owned columns
-**Plans**: 6 plans
+**Plans**: 7 plans
 Plans:
 - [x] 12-01-PLAN.md — Products list page with dnd-kit sortable table, status toggle, bulk actions, drag-and-drop reorder
-- [ ] 12-02-PLAN.md — Product detail/edit page with price change flow, visibility config, sync status
+- [x] 12-02-PLAN.md — Product detail/edit page with price change flow, visibility config, sync status
 - [x] 12-03-PLAN.md — Orders list page with filters, search, bulk actions
 - [x] 12-04-PLAN.md — Order detail page with timeline, refund/cancel actions, customer info, invoice
 - [x] 12-05-PLAN.md — Coupons list page with table, create/edit Server Actions
 - [x] 12-06-PLAN.md — Coupon detail page with form, manual assignment, redemption history
+- [ ] 12-07-PLAN.md — Gap closure: fix createProduct local row link + coupon test expectation
 **UI hint**: yes
 
 ### Phase 13: Analytics
@@ -117,5 +118,5 @@ Plans:
 | 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
 | 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
 | 11. AdminShell Shop Nav | 1/1 | Complete    | 2026-03-24 |
-| 12. Shop Admin Pages | 6/6 | Complete | 2026-03-24 |
+| 12. Shop Admin Pages | 6/7 | In Progress |  |
 | 13. Analytics | 0/? | Not started | - |
