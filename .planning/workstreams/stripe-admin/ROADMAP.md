@@ -13,7 +13,7 @@ Six phases build the full Stripe billing backbone and Shop admin section. The de
 - [x] **Phase 10: Webhook Handlers + Initial Sync** - All 15 event handlers with idempotent upserts and admin-triggered sync (completed 2026-03-24)
 - [x] **Phase 11: AdminShell Shop Nav** - Shop collapsible dropdown in AdminShell sidebar (completed 2026-03-24)
 - [x] **Phase 12: Shop Admin Pages** - Products, Orders, and Coupons admin sections (completed 2026-03-24)
-- [ ] **Phase 13: Analytics** - ARR/MRR metrics, revenue charts, role-split funnel, CSV export
+- [x] **Phase 13: Analytics** - ARR/MRR metrics, revenue charts, role-split funnel, CSV export (completed 2026-03-24)
 
 ## Phase Details
 
@@ -108,7 +108,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 13-01-PLAN.md — TDD: Pure metric computation functions (funnel, revenue, time-series) and CSV export with unit tests
-- [ ] 13-02-PLAN.md — Analytics page UI with Recharts charts, filters, metric cards, and CSV export buttons
+- [x] 13-02-PLAN.md — Analytics page UI with Recharts charts, filters, metric cards, and CSV export buttons
 **UI hint**: yes
 
 ## Progress
@@ -122,4 +122,4 @@ Plans:
 | 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
 | 11. AdminShell Shop Nav | 1/1 | Complete    | 2026-03-24 |
 | 12. Shop Admin Pages | 6/7 | Complete    | 2026-03-24 |
-| 13. Analytics | 1/2 | In Progress|  |
+| 13. Analytics | 2/2 | Complete   | 2026-03-24 |
