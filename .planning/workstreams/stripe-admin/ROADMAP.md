@@ -58,7 +58,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [ ] 10-01-PLAN.md — Migration for pending_cron status + product, price, coupon handlers with tests
-- [ ] 10-02-PLAN.md — Subscription, payment-intent, invoice handlers with pending_cron support
+- [x] 10-02-PLAN.md — Subscription, payment-intent, invoice handlers with pending_cron support
 - [ ] 10-03-PLAN.md — Wire dispatch + idempotency into webhook route, cron route, admin sync route
 
 ### Phase 11: AdminShell Shop Nav
@@ -106,7 +106,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 8. DB Foundation | 2/2 | Complete | 2026-03-23 |
 | 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
-| 10. Webhook Handlers + Initial Sync | 0/3 | Not started | - |
+| 10. Webhook Handlers + Initial Sync | 1/3 | In Progress|  |
 | 11. AdminShell Shop Nav | 0/? | Not started | - |
 | 12. Shop Admin Pages | 0/? | Not started | - |
 | 13. Analytics | 0/? | Not started | - |

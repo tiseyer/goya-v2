@@ -10,11 +10,11 @@
 - [ ] **DB-01**: Admin migration creates `stripe_products`, `stripe_prices`, `stripe_orders`, `stripe_coupons`, `stripe_coupon_redemptions` tables with correct columns and RLS policies for admin/moderator roles
 - [ ] **DB-02**: `webhook_events` idempotency table prevents duplicate webhook processing on Stripe retries (INSERT event ID before processing; skip on conflict)
 - [ ] **DB-03**: `stripe_product_id` bridge column added to existing `products` table; `stripe_customer_id` column added to `profiles` table
-- [ ] **DB-04**: Stripe SDK singleton exists at `lib/stripe/client.ts` with a server-only guard (never imported in Client Components)
-- [ ] **DB-05**: Webhook endpoint at `/api/webhooks/stripe` verifies Stripe signature using raw request body (`request.text()`, not `request.json()`) and dispatches to per-entity event handlers
-- [ ] **DB-06**: All 15 Stripe event types are handled: `product.created/updated/deleted`, `price.created/updated/deleted`, `payment_intent.succeeded/failed`, `customer.subscription.created/updated/deleted`, `invoice.paid/failed`, `coupon.created/updated/deleted`
-- [ ] **DB-07**: Webhook handlers use idempotent upserts keyed on `stripe_id` with write-partitioning enforced (GOYA owns `priority`, `requires_any_of`, `hidden_if_has_any`, `is_active`; Stripe owns payment/billing fields)
-- [ ] **DB-08**: Complex webhook events (checkout, subscription updates with email side-effects) return 200 immediately after idempotency check; heavy side-effects are processed via Vercel cron polling the `webhook_events` table
+- [x] **DB-04**: Stripe SDK singleton exists at `lib/stripe/client.ts` with a server-only guard (never imported in Client Components)
+- [x] **DB-05**: Webhook endpoint at `/api/webhooks/stripe` verifies Stripe signature using raw request body (`request.text()`, not `request.json()`) and dispatches to per-entity event handlers
+- [x] **DB-06**: All 15 Stripe event types are handled: `product.created/updated/deleted`, `price.created/updated/deleted`, `payment_intent.succeeded/failed`, `customer.subscription.created/updated/deleted`, `invoice.paid/failed`, `coupon.created/updated/deleted`
+- [x] **DB-07**: Webhook handlers use idempotent upserts keyed on `stripe_id` with write-partitioning enforced (GOYA owns `priority`, `requires_any_of`, `hidden_if_has_any`, `is_active`; Stripe owns payment/billing fields)
+- [x] **DB-08**: Complex webhook events (checkout, subscription updates with email side-effects) return 200 immediately after idempotency check; heavy side-effects are processed via Vercel cron polling the `webhook_events` table
 - [ ] **DB-09**: Admin can trigger a one-time initial sync that seeds `stripe_products`, `stripe_prices`, and `stripe_coupons` from the existing Stripe account via the Stripe list API
 
 ### NAV — AdminShell Navigation
@@ -99,11 +99,11 @@
 | DB-01 | Phase 8 | Pending |
 | DB-02 | Phase 8 | Pending |
 | DB-03 | Phase 8 | Pending |
-| DB-04 | Phase 9 | Pending |
-| DB-05 | Phase 9 | Pending |
-| DB-06 | Phase 10 | Pending |
-| DB-07 | Phase 10 | Pending |
-| DB-08 | Phase 10 | Pending |
+| DB-04 | Phase 9 | Complete |
+| DB-05 | Phase 9 | Complete |
+| DB-06 | Phase 10 | Complete |
+| DB-07 | Phase 10 | Complete |
+| DB-08 | Phase 10 | Complete |
 | DB-09 | Phase 10 | Pending |
 | NAV-01 | Phase 11 | Pending |
 | NAV-02 | Phase 11 | Pending |
