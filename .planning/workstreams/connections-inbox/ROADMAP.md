@@ -68,8 +68,8 @@ Plans:
   5. The notification dropdown "View all" link points to `/settings/inbox`
 **Plans**: 2 plans
 Plans:
-- [ ] 06-01-PLAN.md &mdash; TBD
-- [ ] 06-02-PLAN.md &mdash; TBD
+- [ ] 06-01-PLAN.md &mdash; Extend ConnectionsContext with profiles join and removeConnection mutation
+- [ ] 06-02-PLAN.md &mdash; Build Settings Connections page, Inbox page, and Header link update
 **UI hint**: yes
 
 ### Phase 7: Admin Connections Tab
@@ -94,5 +94,5 @@ Plans:
 | 3. Settings Pages | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 4. Database Foundation | v1.1 | 2/2 | Complete | 2026-03-23 |
 | 5. Profile Page Buttons | v1.1 | 2/2 | Complete   | 2026-03-23 |
-| 6. Settings Connections & Inbox | v1.1 | 0/? | Not started | - |
+| 6. Settings Connections & Inbox | v1.1 | 0/2 | Planning complete | - |
 | 7. Admin Connections Tab | v1.1 | 0/? | Not started | - |
