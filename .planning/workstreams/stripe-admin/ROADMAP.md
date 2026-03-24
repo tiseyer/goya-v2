@@ -105,6 +105,9 @@ Plans:
   5. /admin/shop/products has a "+ Create Product" button matching coupons page pattern
 **Plans**: 1 plan
 
+Plans:
+- [ ] 20-01-PLAN.md — Fix orders pagination, audit-log client, analytics null-safety (FIX-02, FIX-03, FIX-04, FIX-05)
+
 ## Progress
 
 **Execution Order:** 19 → 14 + 20 (parallel) → 15 → 16 → 17 → 18
