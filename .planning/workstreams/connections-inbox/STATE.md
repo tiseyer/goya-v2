@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Connections & Inbox
 status: Executing Phase 06
-stopped_at: Completed 06-01-PLAN.md — Phase 6 (1/2 plans)
-last_updated: "2026-03-24T01:13:25Z"
+stopped_at: Checkpoint 06-02 Task 3 — awaiting human-verify (Settings pages built, need browser verification)
+last_updated: "2026-03-24T08:21:31Z"
 progress:
   total_phases: 4
   completed_phases: 2
@@ -52,6 +52,7 @@ Plan: 2 of 2
 | Phase 05-profile-page-buttons P01 | 12 | 2 tasks | 3 files |
 | Phase 05-profile-page-buttons P02 | 15 | 2 tasks | 1 files |
 | Phase 06-settings-connections-inbox P01 | 5 | 2 tasks | 2 files |
+| Phase 06-settings-connections-inbox P02 | 10 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,8 @@ Recent decisions affecting current work:
 - [Phase 06-01]: Profiles join in ConnectionsContext initial load (not pages) — single source of truth, avoids N+1 fetches
 - [Phase 06-01]: removeConnection mirrors declineRequest pattern — DELETE from Supabase then remove from local state map
 - [Phase 06-01]: otherProfile derived by requester_id comparison — clean derivation matching existing role calculation logic
+- [Phase 06-02]: Schools tab (faculty+requester) vs Principal Teacher tab (faculty+receiver) — role determines viewer perspective
+- [Phase 06-02]: Header "View all messages" → "View all" — dropdown shows connection requests, not messages
 
 ### Pending Todos
 
@@ -85,13 +88,12 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- Settings > Connections and Settings > Inbox are placeholder pages — Phase 6 implements them
+- Settings > Connections and Inbox pages built (Plan 02) — awaiting human browser verification (checkpoint)
 - Admin user detail view has tabs but no Connections tab yet — Phase 7 adds it
-- Profile page has a "Connect with [User]" button in the right sidebar — Phase 5 Plan 2 wires role-aware ConnectButton into profile layout
 - app/page.test.tsx has a pre-existing stale test failure (not blocking, logged in deferred-items.md)
 
 ## Session Continuity
 
-Last session: 2026-03-24T01:13:25Z
-Stopped at: Completed 06-01-PLAN.md — Phase 6 (1/2 plans complete)
+Last session: 2026-03-24T08:21:31Z
+Stopped at: Checkpoint 06-02 Task 3 — Settings pages built, awaiting human-verify before Phase 06 complete
 Resume file: None
