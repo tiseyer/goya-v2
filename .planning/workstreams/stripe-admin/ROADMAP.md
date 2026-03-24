@@ -118,5 +118,5 @@ Plans:
 | 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
 | 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
 | 11. AdminShell Shop Nav | 1/1 | Complete    | 2026-03-24 |
-| 12. Shop Admin Pages | 6/7 | In Progress |  |
+| 12. Shop Admin Pages | 6/7 | Complete    | 2026-03-24 |
 | 13. Analytics | 0/? | Not started | - |
