@@ -8,6 +8,19 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
+## Current Milestone: v1.3 Subscriptions & Teacher Upgrade
+
+**Goal:** Replace placeholder Subscriptions page with real Stripe data, add teacher upgrade flow with certificate verification and delayed payment capture, fix broken admin pages.
+
+**Target features:**
+- Fix admin/moderator role display bug on Subscriptions page
+- Subscriptions page showing real Stripe memberships + designations with Customer Portal
+- Upgrade CTA for students/WPs to become certified teachers
+- Multi-step upgrade page: info → certificate upload → Stripe delayed capture checkout
+- Admin inbox Teacher Upgrades tab with approve (capture payment, change role) / reject flow
+- Supabase schema: upgrade_requests, user_designations tables
+- Fix 3 crashing admin pages (/admin/shop/orders, /admin/shop/analytics, /admin/audit-log) + add Create Product button
+
 ## Current State
 
 **As of v1.2 (2026-03-24):** Stripe Admin & Shop milestone shipped. Full bidirectional Stripe integration with 5 mirror tables, webhook processing for 15 event types, and complete Shop admin section:
@@ -73,7 +86,7 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 ### Active
 
-(No active milestone — next milestone to be defined)
+<!-- v1.3 Subscriptions & Teacher Upgrade milestone — see stripe-admin workstream -->
 
 ### Out of Scope
 
@@ -127,4 +140,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 after v1.2 milestone*
+*Last updated: 2026-03-24 after v1.3 milestone start*
