@@ -12,7 +12,7 @@ Six phases build the full Stripe billing backbone and Shop admin section. The de
 - [ ] **Phase 9: Stripe SDK + Webhook Infrastructure** - SDK singleton and webhook endpoint with signature verification
 - [x] **Phase 10: Webhook Handlers + Initial Sync** - All 15 event handlers with idempotent upserts and admin-triggered sync (completed 2026-03-24)
 - [x] **Phase 11: AdminShell Shop Nav** - Shop collapsible dropdown in AdminShell sidebar (completed 2026-03-24)
-- [ ] **Phase 12: Shop Admin Pages** - Products, Orders, and Coupons admin sections
+- [x] **Phase 12: Shop Admin Pages** - Products, Orders, and Coupons admin sections (completed 2026-03-24)
 - [ ] **Phase 13: Analytics** - ARR/MRR metrics, revenue charts, role-split funnel, CSV export
 
 ## Phase Details
@@ -92,7 +92,7 @@ Plans:
 - [x] 12-04-PLAN.md — Order detail page with timeline, refund/cancel actions, customer info, invoice
 - [x] 12-05-PLAN.md — Coupons list page with table, create/edit Server Actions
 - [x] 12-06-PLAN.md — Coupon detail page with form, manual assignment, redemption history
-- [ ] 12-07-PLAN.md — Gap closure: fix createProduct local row link + coupon test expectation
+- [x] 12-07-PLAN.md — Gap closure: fix createProduct local row link + coupon test expectation
 **UI hint**: yes
 
 ### Phase 13: Analytics
