@@ -386,11 +386,11 @@ function MessagesWidget() {
           {/* Footer */}
           <div className="border-t border-[#E5E7EB] px-4 py-2.5">
             <Link
-              href="/messages"
+              href="/settings/inbox"
               onClick={() => setOpen(false)}
               className="text-xs text-[#4E87A0] hover:text-[#3A7190] font-semibold transition-colors"
             >
-              View all messages →
+              View all →
             </Link>
           </div>
         </div>
