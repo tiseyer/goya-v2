@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
+  createLocalProduct,
   createProduct,
   editProduct,
   updateProductPrice,
@@ -742,12 +743,6 @@ function CreateProductSection({ allProducts }: { allProducts: AllProduct[] }) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
-  // We need a product ID — for new products we generate one client-side
-  // In practice, the product row should be created server-side first.
-  // Here we assume a product row exists with id='new' as a placeholder,
-  // and createProduct will update it. For full flow, a server action
-  // can create the local product row first and return its ID.
-
   function handleCreate() {
     const cents = Math.round(parseFloat(priceDollars) * 100)
     if (!name.trim()) {
@@ -761,11 +756,15 @@ function CreateProductSection({ allProducts }: { allProducts: AllProduct[] }) {
     setError(null)
     startTransition(async () => {
       try {
-        // For new products, we create a temporary ID here.
-        // In a full production flow, you'd create the local row first via a separate server action.
-        const tempId = crypto.randomUUID()
+        const { productId } = await createLocalProduct({
+          name,
+          description,
+          priceCents: cents,
+          priceType,
+          imagePath: imagePath || undefined,
+        })
         await createProduct({
-          productId: tempId,
+          productId,
           name,
           description,
           priceCents: cents,

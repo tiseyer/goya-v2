@@ -23,6 +23,7 @@ import {
   bulkProductAction,
   reorderProducts,
   softDeleteProduct,
+  createLocalProduct,
   createProduct,
   editProduct,
   updateProductPrice,
@@ -220,5 +221,29 @@ describe('updateProductVisibility', () => {
     })
     expect(sb.eq).toHaveBeenCalledWith('id', 'prod-uuid')
     expect(revalidatePath).toHaveBeenCalledWith('/admin/shop/products')
+  })
+})
+
+describe('createLocalProduct', () => {
+  it('inserts a product row and returns the real UUID', async () => {
+    const sbMock = makeSupabaseMock()
+    const selectMock = vi.fn().mockReturnValue({
+      single: vi.fn().mockResolvedValue({ data: { id: 'real-uuid-from-db' }, error: null }),
+    })
+    sbMock.from.mockReturnValue({
+      ...sbMock.from(),
+      insert: vi.fn().mockReturnValue({ select: selectMock }),
+    })
+    vi.mocked(getSupabaseService).mockReturnValue(sbMock as any)
+
+    const result = await createLocalProduct({
+      name: 'Test Product',
+      description: 'A test',
+      priceCents: 2999,
+      priceType: 'one_time',
+    })
+
+    expect(result).toEqual({ productId: 'real-uuid-from-db' })
+    expect(sbMock.from).toHaveBeenCalledWith('products')
   })
 })

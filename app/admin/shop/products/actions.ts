@@ -94,6 +94,54 @@ export async function softDeleteProduct(
 }
 
 /**
+ * Insert a new product row into the GOYA products table.
+ * Returns the real UUID assigned by Postgres (gen_random_uuid()).
+ * This must be called BEFORE createProduct so that createProduct's
+ * products.update({ stripe_product_id }) finds a real row to link.
+ */
+export async function createLocalProduct(data: {
+  name: string
+  description: string
+  priceCents: number
+  priceType: 'one_time' | 'recurring'
+  imagePath?: string
+}): Promise<{ productId: string }> {
+  const slug =
+    data.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') +
+    '-' +
+    Date.now()
+
+  const priceDisplay =
+    data.priceType === 'recurring'
+      ? `$${(data.priceCents / 100).toFixed(2)}/month`
+      : `$${(data.priceCents / 100).toFixed(2)}`
+
+  const { data: row, error } = await getSupabaseService()
+    .from('products')
+    .insert({
+      slug,
+      name: data.name,
+      full_name: data.name,
+      category: 'special' as const,
+      price_display: priceDisplay,
+      price_cents: data.priceCents,
+      image_path: data.imagePath ?? null,
+      description: data.description,
+      is_active: false,
+    })
+    .select('id')
+    .single()
+
+  if (error) throw new Error(`createLocalProduct supabase error: ${error.message}`)
+
+  revalidatePath('/admin/shop/products')
+  return { productId: row.id }
+}
+
+/**
  * Create a new product in Stripe, create its initial price, sync to Supabase stripe_products
  * and stripe_prices, then link the Stripe product ID to the local products row.
  * Write-partitioning: Stripe owns product/price data; GOYA owns stripe_product_id link.
