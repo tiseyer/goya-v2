@@ -17,7 +17,7 @@ Members stay professionally connected, credentialed, and engaged through a singl
 **Target features:**
 - DB layer: connections table with types (peer/mentorship/faculty), RLS policies, migrations
 - Wire ConnectButton + ConnectionsContext to real Supabase (replace localStorage)
-- Role-aware profile buttons: Request Mentorship (student→teacher), Apply as Faculty (teacher→school), Manage School (school owner)
+- ✅ Role-aware profile buttons: Request Mentorship (student→teacher), Apply as Faculty (teacher→school), Manage School (school owner) — Validated in Phase 05: profile-page-buttons
 - Settings > Connections: tabbed view (My Connections, My Mentors, My Mentees, My Faculty, My Schools) with status + remove actions
 - Settings > Inbox: full connection request inbox (accept/decline, filter by type); header "View all" links here
 - Admin > User detail: Connections tab to view/manage any user's connections
