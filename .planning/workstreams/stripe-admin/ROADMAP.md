@@ -55,7 +55,11 @@ Plans:
   3. GOYA-owned columns (`priority`, `requires_any_of`, `hidden_if_has_any`, `is_active`) are never overwritten by webhook handlers
   4. Complex webhook events (checkout, subscription updates) return 200 immediately; side-effects are queued to `webhook_events` for Vercel Cron processing
   5. Admin can trigger a one-time sync that populates `stripe_products`, `stripe_prices`, and `stripe_coupons` from the Stripe account
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 10-01-PLAN.md — Migration for pending_cron status + product, price, coupon handlers with tests
+- [ ] 10-02-PLAN.md — Subscription, payment-intent, invoice handlers with pending_cron support
+- [ ] 10-03-PLAN.md — Wire dispatch + idempotency into webhook route, cron route, admin sync route
 
 ### Phase 11: AdminShell Shop Nav
 **Goal**: The Shop section is navigable from the AdminShell sidebar for admin and moderator roles
@@ -102,7 +106,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 8. DB Foundation | 2/2 | Complete | 2026-03-23 |
 | 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
-| 10. Webhook Handlers + Initial Sync | 0/? | Not started | - |
+| 10. Webhook Handlers + Initial Sync | 0/3 | Not started | - |
 | 11. AdminShell Shop Nav | 0/? | Not started | - |
 | 12. Shop Admin Pages | 0/? | Not started | - |
 | 13. Analytics | 0/? | Not started | - |
