@@ -50,7 +50,7 @@ export default function Step1MemberType() {
       <RadioCards
         options={OPTIONS}
         value={answers.member_type}
-        onChange={val => setAnswer('member_type', val)}
+        onChange={val => setAnswer('member_type', val as MemberType)}
       />
 
       {answers.member_type && answers.member_type !== 'student' && (
