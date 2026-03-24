@@ -1,125 +1,117 @@
-# Roadmap: GOYA v2 — v1.2 Stripe Admin & Shop
+# Roadmap: GOYA v2 — v1.3 Subscriptions & Teacher Upgrade
 
 ## Overview
 
-Six phases build the full Stripe billing backbone and Shop admin section. The dependency chain is strict: database tables must exist before webhooks can write to them, webhook infrastructure must exist before handlers can be wired up, and the admin UI can only show meaningful data once the tables are populated. Phases 8–10 establish the invisible infrastructure; Phases 11–13 deliver the visible admin experience.
+Seven phases deliver the Subscriptions page Stripe integration and Teacher Upgrade flow. The dependency chain: schema first (Phase 19) so tables exist for all subsequent work, then bug fixes (Phase 14) and broken admin page fixes (Phase 20) can run in parallel, followed by subscriptions page (Phase 15), upgrade CTA (Phase 16), upgrade page (Phase 17), and admin inbox (Phase 18).
 
 ## Phases
 
-**Phase Numbering:** Continues from v1.1 (Phases 4–7). This milestone uses Phases 8–13.
+**Phase Numbering:** Continues from v1.2 (Phases 8–13). This milestone uses Phases 14–20.
 
-- [x] **Phase 8: DB Foundation** - Create 5 Stripe-mirror tables, idempotency table, bridge columns, and RLS policies
-- [ ] **Phase 9: Stripe SDK + Webhook Infrastructure** - SDK singleton and webhook endpoint with signature verification
-- [x] **Phase 10: Webhook Handlers + Initial Sync** - All 15 event handlers with idempotent upserts and admin-triggered sync (completed 2026-03-24)
-- [x] **Phase 11: AdminShell Shop Nav** - Shop collapsible dropdown in AdminShell sidebar (completed 2026-03-24)
-- [x] **Phase 12: Shop Admin Pages** - Products, Orders, and Coupons admin sections (completed 2026-03-24)
-- [x] **Phase 13: Analytics** - ARR/MRR metrics, revenue charts, role-split funnel, CSV export (completed 2026-03-24)
+- [ ] **Phase 14: Fix Role Display Bug** - Fix admin/moderator "Guest" display on Subscriptions page
+- [ ] **Phase 15: Subscriptions Page — Real Stripe Data** - Replace placeholder with live Stripe membership, designations, school, Customer Portal
+- [ ] **Phase 16: Upgrade CTA** - Show upgrade prompts for students/WPs on Subscriptions page and in Shop
+- [ ] **Phase 17: Upgrade Page** - Multi-step /upgrade page with certificate upload and Stripe delayed capture
+- [ ] **Phase 18: Admin Inbox — Teacher Upgrades** - Admin approve/reject flow with payment capture and role change
+- [ ] **Phase 19: Supabase Schema** - Create upgrade_requests and user_designations tables with RLS
+- [ ] **Phase 20: Fix Broken Admin Pages** - Fix 3 crashing admin pages + add Create Product button
 
 ## Phase Details
 
-### Phase 8: DB Foundation
-**Goal**: The database layer for all Stripe data is in place and enforced
-**Depends on**: Nothing (first phase of this milestone)
-**Requirements**: DB-01, DB-02, DB-03
+### Phase 14: Fix Role Display Bug
+**Goal**: Admin and moderator users never show "Guest" on the Subscriptions page
+**Depends on**: Nothing (standalone fix)
+**Requirements**: FIX-01
 **Success Criteria** (what must be TRUE):
-  1. Supabase contains `stripe_products`, `stripe_prices`, `stripe_orders`, `stripe_coupons`, `stripe_coupon_redemptions`, and `webhook_events` tables with correct columns
-  2. Admin and moderator roles can read and write to all new tables; other roles are blocked by RLS
-  3. Existing `products` table has a nullable `stripe_product_id` column; `profiles` table has a nullable `stripe_customer_id` column
-  4. The `webhook_events` table has a UNIQUE constraint on event ID that prevents duplicate processing on INSERT conflict
-**Plans**: 2 plans
-Plans:
-- [x] 08-01-PLAN.md — Create 5 Stripe entity tables with RLS, triggers, and indices
-- [x] 08-02-PLAN.md — Create webhook_events idempotency table and bridge columns
-
-### Phase 9: Stripe SDK + Webhook Infrastructure
-**Goal**: The Stripe SDK is available server-side and the webhook endpoint can receive and verify Stripe events
-**Depends on**: Phase 8
-**Requirements**: DB-04, DB-05
-**Success Criteria** (what must be TRUE):
-  1. `lib/stripe/client.ts` exports a server-only Stripe singleton; importing it in a Client Component throws a build error
-  2. `POST /api/webhooks/stripe` returns 400 for requests with an invalid or missing signature
-  3. `POST /api/webhooks/stripe` returns 200 for a valid Stripe-signed test event sent via Stripe CLI
-  4. The endpoint uses `request.text()` for body parsing, not `request.json()`
-**Plans**: 2 plans
-Plans:
-- [x] 09-01-PLAN.md — Install stripe + server-only packages, create server-only Stripe SDK singleton with tests
-- [x] 09-02-PLAN.md — Create webhook route handler with Stripe signature verification and tests
-
-### Phase 10: Webhook Handlers + Initial Sync
-**Goal**: All 15 Stripe event types are handled with idempotent upserts and an admin can seed the database from the existing Stripe account
-**Depends on**: Phase 9
-**Requirements**: DB-06, DB-07, DB-08, DB-09
-**Success Criteria** (what must be TRUE):
-  1. Firing each of the 15 event types via Stripe CLI results in a correctly upserted row in the corresponding Supabase table
-  2. Firing the same event ID twice produces exactly one row in the database (idempotency holds under concurrent retries)
-  3. GOYA-owned columns (`priority`, `requires_any_of`, `hidden_if_has_any`, `is_active`) are never overwritten by webhook handlers
-  4. Complex webhook events (checkout, subscription updates) return 200 immediately; side-effects are queued to `webhook_events` for Vercel Cron processing
-  5. Admin can trigger a one-time sync that populates `stripe_products`, `stripe_prices`, and `stripe_coupons` from the Stripe account
-**Plans**: 3 plans
-Plans:
-- [x] 10-01-PLAN.md — Migration for pending_cron status + product, price, coupon handlers with tests
-- [x] 10-02-PLAN.md — Subscription, payment-intent, invoice handlers with pending_cron support
-- [x] 10-03-PLAN.md — Wire dispatch + idempotency into webhook route, cron route, admin sync route
-
-### Phase 11: AdminShell Shop Nav
-**Goal**: The Shop section is navigable from the AdminShell sidebar for admin and moderator roles
-**Depends on**: Phase 10
-**Requirements**: NAV-01, NAV-02, NAV-03
-**Success Criteria** (what must be TRUE):
-  1. AdminShell sidebar shows a "Shop" collapsible group with four child links in order: Orders, Products, Coupons, Analytics
-  2. The legacy top-level "Products" nav item is gone; no duplicate products links exist in the sidebar
-  3. A user with student, teacher, or wellness practitioner role sees no Shop nav group
+  1. Admin user sees "Admin Member" on Subscriptions page regardless of Stripe subscription status
+  2. Moderator user sees "Moderator Member" on Subscriptions page regardless of Stripe subscription status
+  3. The fix is a display + logic change, not a Stripe data change
 **Plans**: 1 plan
-Plans:
-- [x] 11-01-PLAN.md — Add collapsible Shop nav group to AdminShell sidebar with Orders, Products, Coupons, Analytics child links
-**UI hint**: yes
 
-### Phase 12: Shop Admin Pages
-**Goal**: Admins can manage all products, orders, and coupons through dedicated Shop admin pages
-**Depends on**: Phase 11
-**Requirements**: PROD-01, PROD-02, PROD-03, PROD-04, PROD-05, PROD-06, PROD-07, PROD-08, PROD-09, PROD-10, PROD-11, ORD-01, ORD-02, ORD-03, ORD-04, ORD-05, ORD-06, ORD-07, ORD-08, ORD-09, CPN-01, CPN-02, CPN-03, CPN-04, CPN-05
+### Phase 15: Subscriptions Page — Real Stripe Data
+**Goal**: Subscriptions page shows real Stripe membership data with Customer Portal access and soft-deletable designations
+**Depends on**: Phase 14 (role display logic), Phase 19 (user_designations table)
+**Requirements**: SUB-01, SUB-02, SUB-03, SUB-04, SUB-05, SUB-06, SUB-07, SUB-08
 **Success Criteria** (what must be TRUE):
-  1. Admin can view, filter, reorder (drag-and-drop), bulk-action, and soft-delete products; the new order persists to `products.priority`
-  2. Changing a product's price creates a new Stripe Price and archives the old one; the edit form does not allow direct amount mutation
-  3. Admin can view, filter, search, and bulk-action orders; order detail shows a chronological Stripe event timeline, customer info, full/partial refund action, and subscription cancel (schedule or immediate)
-  4. Admin can create, edit, and manually assign coupons; both `stripe_coupon_id` and `stripe_promotion_code_id` are stored; coupon detail shows redemption history
-  5. Product visibility rules (show-to / don't-show-to) can be configured per product and are persisted to GOYA-owned columns
-**Plans**: 7 plans
-Plans:
-- [x] 12-01-PLAN.md — Products list page with dnd-kit sortable table, status toggle, bulk actions, drag-and-drop reorder
-- [x] 12-02-PLAN.md — Product detail/edit page with price change flow, visibility config, sync status
-- [x] 12-03-PLAN.md — Orders list page with filters, search, bulk actions
-- [x] 12-04-PLAN.md — Order detail page with timeline, refund/cancel actions, customer info, invoice
-- [x] 12-05-PLAN.md — Coupons list page with table, create/edit Server Actions
-- [x] 12-06-PLAN.md — Coupon detail page with form, manual assignment, redemption history
-- [x] 12-07-PLAN.md — Gap closure: fix createProduct local row link + coupon test expectation
-**UI hint**: yes
-
-### Phase 13: Analytics
-**Goal**: Admins can view user funnel and revenue metrics computed from local tables, filtered by role and time range, with chart and CSV export
-**Depends on**: Phase 12
-**Requirements**: ANA-01, ANA-02, ANA-03, ANA-04, ANA-05
-**Success Criteria** (what must be TRUE):
-  1. Analytics page loads without any Stripe API calls; all metrics are computed from Supabase tables
-  2. Admin can select a time range (30 days / 3 months / 6 months / custom) and all funnel and revenue metrics update accordingly
-  3. Funnel and revenue metrics can be filtered by member role (Student / Teacher / Wellness Practitioner / School)
-  4. Admin can export any metric or chart data as a CSV file
-  5. Revenue over time and new orders over time are displayed as interactive Recharts time-series charts
+  1. User with active Stripe membership sees correct plan name and price with "Verwalten" button opening Stripe Customer Portal
+  2. User with no active Stripe membership but with a role sees role-based plan name
+  3. Additional recurring subscriptions beyond base membership shown in separate box
+  4. School membership box appears only for school owners
+  5. Designations listed with delete button that soft-deletes via deleted_at (no Stripe cancellation, no refund)
+  6. Layout uses stacked content boxes with visual separators
 **Plans**: 2 plans
-Plans:
-- [x] 13-01-PLAN.md — TDD: Pure metric computation functions (funnel, revenue, time-series) and CSV export with unit tests
-- [x] 13-02-PLAN.md — Analytics page UI with Recharts charts, filters, metric cards, and CSV export buttons
 **UI hint**: yes
+
+### Phase 16: Upgrade CTA
+**Goal**: Students and wellness practitioners see upgrade prompts on Subscriptions page and in Shop
+**Depends on**: Phase 15 (subscriptions page exists), Phase 19 (upgrade_requests table for pending state)
+**Requirements**: UPG-01, UPG-02, UPG-08
+**Success Criteria** (what must be TRUE):
+  1. Student/WP sees upgrade CTA card on Subscriptions page below current plan
+  2. Teacher Membership product visible only to students/WPs in Shop with "Upgrade" label
+  3. If upgrade request is pending: CTA hidden everywhere, info card shown on Subscriptions page, Teacher Membership hidden in Shop
+**Plans**: 1 plan
+**UI hint**: yes
+
+### Phase 17: Upgrade Page (/upgrade)
+**Goal**: Multi-step upgrade page with certificate upload, Stripe delayed capture, and success page
+**Depends on**: Phase 16 (CTA links to /upgrade), Phase 19 (upgrade_requests table)
+**Requirements**: UPG-03, UPG-04, UPG-05, UPG-06, UPG-07, UPG-09
+**Success Criteria** (what must be TRUE):
+  1. Step 1 shows teacher membership info with "Start Upgrade" button
+  2. Step 2 allows 1-3 file uploads (PDF/JPG/PNG/WEBP, max 4MB) to Supabase Storage with progress and previews
+  3. Step 3 creates Payment Intent with capture_method: "manual" and redirects to Stripe Checkout
+  4. On checkout.session.completed: upgrade_request created with status "pending", no role change, no payment capture
+  5. /upgrade/success page shows confirmation with 48-hour timeline
+  6. Admin inbox notification triggered on submission
+**Plans**: 2 plans
+**UI hint**: yes
+
+### Phase 18: Admin Inbox — Teacher Upgrades
+**Goal**: Admins can approve or reject teacher upgrade requests with payment capture and role change
+**Depends on**: Phase 17 (upgrade requests exist to review)
+**Requirements**: ADM-01, ADM-02, ADM-03, ADM-04, ADM-05
+**Success Criteria** (what must be TRUE):
+  1. "Teacher Upgrades" tab exists in /admin/inbox matching School Registrations pattern
+  2. Request cards show user info, certificates (downloadable), payment details, submission date
+  3. Approve captures payment, activates subscription, changes role to teacher, migrates designations, notifies user
+  4. Reject cancels payment intent (no charge), sets rejection reason, notifies user, restores CTA
+  5. Sub-tabs: Pending | Approved | Rejected
+**Plans**: 2 plans
+**UI hint**: yes
+
+### Phase 19: Supabase Schema
+**Goal**: Database tables for upgrade requests and user designations exist with proper RLS
+**Depends on**: Nothing (first phase to execute — other phases depend on this)
+**Requirements**: SCH-01, SCH-02
+**Success Criteria** (what must be TRUE):
+  1. upgrade_requests table exists with all columns, CHECK constraint on status, and RLS policies
+  2. user_designations table exists with all columns, soft-delete pattern (deleted_at), and RLS policies
+  3. Migrations applied successfully via `npx supabase db push`
+**Plans**: 1 plan
+
+### Phase 20: Fix Broken Admin Pages
+**Goal**: Three crashing admin pages load without errors and products page has Create Product button
+**Depends on**: Nothing (independent fixes)
+**Requirements**: FIX-02, FIX-03, FIX-04, FIX-05
+**Success Criteria** (what must be TRUE):
+  1. /admin/shop/orders loads without server-side exceptions
+  2. /admin/shop/analytics loads without server-side exceptions
+  3. /admin/audit-log loads without server-side exceptions
+  4. All three pages show empty state when data is unavailable (never crash)
+  5. /admin/shop/products has a "+ Create Product" button matching coupons page pattern
+**Plans**: 1 plan
 
 ## Progress
 
-**Execution Order:** 8 → 9 → 10 → 11 → 12 → 13
+**Execution Order:** 19 → 14 + 20 (parallel) → 15 → 16 → 17 → 18
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 8. DB Foundation | 2/2 | Complete | 2026-03-23 |
-| 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
-| 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
-| 11. AdminShell Shop Nav | 1/1 | Complete    | 2026-03-24 |
-| 12. Shop Admin Pages | 6/7 | Complete    | 2026-03-24 |
-| 13. Analytics | 2/2 | Complete    | 2026-03-24 |
+| 19. Supabase Schema | 0/1 | Not started | - |
+| 14. Fix Role Display Bug | 0/1 | Not started | - |
+| 20. Fix Broken Admin Pages | 0/1 | Not started | - |
+| 15. Subscriptions Page | 0/2 | Not started | - |
+| 16. Upgrade CTA | 0/1 | Not started | - |
+| 17. Upgrade Page | 0/2 | Not started | - |
+| 18. Admin Inbox — Teacher Upgrades | 0/2 | Not started | - |
