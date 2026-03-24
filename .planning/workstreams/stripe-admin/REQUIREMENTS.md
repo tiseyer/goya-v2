@@ -53,8 +53,8 @@
 
 ### SCH — Supabase Schema
 
-- [ ] **SCH-01**: upgrade_requests table with id, user_id, status CHECK ('pending','approved','rejected'), certificate_urls text[], stripe_payment_intent_id, stripe_subscription_id (on approve), rejection_reason, created_at, reviewed_at, reviewed_by, and RLS policies
-- [ ] **SCH-02**: user_designations table with id, user_id, stripe_product_id, stripe_price_id, purchase_date, deleted_at (null = active), deleted_by, and RLS policies
+- [x] **SCH-01**: upgrade_requests table with id, user_id, status CHECK ('pending','approved','rejected'), certificate_urls text[], stripe_payment_intent_id, stripe_subscription_id (on approve), rejection_reason, created_at, reviewed_at, reviewed_by, and RLS policies
+- [x] **SCH-02**: user_designations table with id, user_id, stripe_product_id, stripe_price_id, purchase_date, deleted_at (null = active), deleted_by, and RLS policies
 
 ## Future Requirements
 
@@ -112,8 +112,8 @@
 | ADM-03 | Phase 18 | Pending |
 | ADM-04 | Phase 18 | Pending |
 | ADM-05 | Phase 18 | Pending |
-| SCH-01 | Phase 19 | Pending |
-| SCH-02 | Phase 19 | Pending |
+| SCH-01 | Phase 19 | Complete |
+| SCH-02 | Phase 19 | Complete |
 
 **Coverage:**
 - v1.3 requirements: 29 total
