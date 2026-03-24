@@ -133,13 +133,78 @@ None — full spec included in v1.6.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated during roadmap creation) | | |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Pending |
+| AUTH-07 | Phase 1 | Pending |
+| AUTH-08 | Phase 1 | Pending |
+| AUTH-09 | Phase 1 | Pending |
+| PAGE-01 | Phase 1 | Pending |
+| AUDT-01 | Phase 1 | Pending |
+| USER-01 | Phase 2 | Pending |
+| USER-02 | Phase 2 | Pending |
+| USER-03 | Phase 2 | Pending |
+| USER-04 | Phase 2 | Pending |
+| USER-05 | Phase 2 | Pending |
+| USER-06 | Phase 2 | Pending |
+| EVNT-01 | Phase 3 | Pending |
+| EVNT-02 | Phase 3 | Pending |
+| EVNT-03 | Phase 3 | Pending |
+| EVNT-04 | Phase 3 | Pending |
+| EVNT-05 | Phase 3 | Pending |
+| EVNT-06 | Phase 3 | Pending |
+| EVNT-07 | Phase 3 | Pending |
+| CRSE-01 | Phase 4 | Pending |
+| CRSE-02 | Phase 4 | Pending |
+| CRSE-03 | Phase 4 | Pending |
+| CRSE-04 | Phase 4 | Pending |
+| CRSE-05 | Phase 4 | Pending |
+| CRSE-06 | Phase 4 | Pending |
+| CRSE-07 | Phase 4 | Pending |
+| CRSE-08 | Phase 4 | Pending |
+| CRED-01 | Phase 5 | Pending |
+| CRED-02 | Phase 5 | Pending |
+| CRED-03 | Phase 5 | Pending |
+| CRED-04 | Phase 5 | Pending |
+| CRED-05 | Phase 5 | Pending |
+| VERF-01 | Phase 5 | Pending |
+| VERF-02 | Phase 5 | Pending |
+| VERF-03 | Phase 5 | Pending |
+| VERF-04 | Phase 5 | Pending |
+| VERF-05 | Phase 5 | Pending |
+| ANLY-01 | Phase 6 | Pending |
+| ANLY-02 | Phase 6 | Pending |
+| ANLY-03 | Phase 6 | Pending |
+| ANLY-04 | Phase 6 | Pending |
+| ANLY-05 | Phase 6 | Pending |
+| ADON-01 | Phase 7 | Pending |
+| ADON-02 | Phase 7 | Pending |
+| ADON-03 | Phase 7 | Pending |
+| ADON-04 | Phase 7 | Pending |
+| ADON-05 | Phase 7 | Pending |
+| ADON-06 | Phase 7 | Pending |
+| ADON-07 | Phase 7 | Pending |
+| ADON-08 | Phase 7 | Pending |
+| ADMN-01 | Phase 7 | Pending |
+| ADMN-02 | Phase 7 | Pending |
+| ADMN-03 | Phase 7 | Pending |
+| ADMN-04 | Phase 7 | Pending |
+| WHKN-01 | Phase 7 | Pending |
+| WHKN-02 | Phase 7 | Pending |
+| WHKN-03 | Phase 7 | Pending |
+| AKUI-01 | Phase 8 | Pending |
+| AKUI-02 | Phase 8 | Pending |
+| AKUI-03 | Phase 8 | Pending |
+| DOCS-01 | Phase 8 | Pending |
 
 **Coverage:**
 - v1.6 requirements: 55 total
-- Mapped to phases: 0
-- Unmapped: 55
+- Mapped to phases: 55
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-25*
-*Last updated: 2026-03-25 after initial definition*
+*Last updated: 2026-03-25 after roadmap creation*
