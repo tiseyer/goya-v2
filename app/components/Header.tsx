@@ -336,8 +336,8 @@ function MessagesWidget() {
               <NotifItem
                 key={notif.id}
                 notif={notif}
-                onAccept={() => { acceptRequest(notif.connectionId, notif.fromSlug); }}
-                onDecline={() => { declineRequest(notif.connectionId, notif.fromSlug); }}
+                onAccept={() => { acceptRequest(notif.connectionId, notif.fromUserId); }}
+                onDecline={() => { declineRequest(notif.connectionId, notif.fromUserId); }}
               />
             ))}
 
