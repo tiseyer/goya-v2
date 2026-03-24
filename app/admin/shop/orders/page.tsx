@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { getSupabaseService } from '@/lib/supabase/service';
 import OrdersTable, { OrderRow } from './OrdersTable';
 import OrdersFilters from './OrdersFilters';
-import AdminUsersPagination from '@/app/admin/users/AdminUsersPagination';
+import OrdersPagination from './OrdersPagination';
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -196,7 +196,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
 
       {/* Pagination */}
       <Suspense>
-        <AdminUsersPagination
+        <OrdersPagination
           page={page}
           pageSize={pageSize}
           totalPages={totalPages}
