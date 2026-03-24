@@ -69,13 +69,14 @@ export async function createCoupon(
     let promoCode: { id: string } | undefined
     if (data.publicCode) {
       promoCode = await stripe.promotionCodes.create({
-        coupon: coupon.id,
+        promotion: { type: 'coupon', coupon: coupon.id },
         code: data.publicCode,
       })
     }
 
     // Upsert to stripe_coupons (includes GOYA-local restriction fields per CPN-02)
-    const { error } = await getSupabaseService()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (getSupabaseService() as any)
       .from('stripe_coupons')
       .upsert(
         {
@@ -99,10 +100,10 @@ export async function createCoupon(
           redeem_by: data.redeemBy ?? null,
           valid: true,
           metadata: {},
-          // GOYA-local fields — NOT sent to Stripe
+          // GOYA-local fields — NOT sent to Stripe (not yet in generated types)
           role_restrictions: data.roleRestrictions ?? {},
           product_restrictions: data.productRestrictions ?? {},
-        } as Record<string, unknown>,
+        },
         { onConflict: 'stripe_coupon_id' }
       )
 
@@ -132,14 +133,16 @@ export async function editCoupon(
     })
 
     // Build local update object with GOYA-specific fields
-    const localUpdate: Record<string, unknown> = {}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const localUpdate: any = {}
     if (data.name !== undefined) localUpdate.name = data.name
     if (data.metadata !== undefined) localUpdate.metadata = data.metadata
-    // GOYA-local fields — NOT sent to Stripe
+    // GOYA-local fields — NOT sent to Stripe (not yet in generated types)
     if (data.roleRestrictions !== undefined) localUpdate.role_restrictions = data.roleRestrictions
     if (data.productRestrictions !== undefined) localUpdate.product_restrictions = data.productRestrictions
 
-    const { error } = await getSupabaseService()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (getSupabaseService() as any)
       .from('stripe_coupons')
       .update(localUpdate)
       .eq('stripe_coupon_id', stripeCouponId)
