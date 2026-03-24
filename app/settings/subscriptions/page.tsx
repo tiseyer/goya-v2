@@ -26,7 +26,15 @@ export default async function SettingsSubscriptionsPage() {
       {/* Card 1: Current Plan */}
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 mb-4">
         <h2 className="text-base font-semibold text-[#1B3A5C] mb-3">Current Plan</h2>
-        {profile.subscription_status === 'member' ? (
+        {profile.role === 'admin' ? (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
+            Admin Member
+          </span>
+        ) : profile.role === 'moderator' ? (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+            Moderator Member
+          </span>
+        ) : profile.subscription_status === 'member' ? (
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
             Active Member
           </span>
