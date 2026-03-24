@@ -54,8 +54,8 @@
 - [x] **CPN-01**: Admin can view all coupons in a table with columns: Name, Code, Type, Discount, Usage count, Expiry, Status
 - [x] **CPN-02**: Admin can create a coupon with: internal name (admin-only), external coupon code (optional, for public use), type (Percentage / Fixed Amount / Free Product), role restrictions (multi-select whitelist or blacklist), product restrictions (multi-select whitelist or blacklist), usage limit (number input; 0 = unlimited) or single-use toggle, start date, expiry date
 - [x] **CPN-03**: Admin can edit a coupon; changes sync bidirectionally with Stripe (both `stripe_coupon_id` and `stripe_promotion_code_id` are stored separately)
-- [ ] **CPN-04**: Admin can manually assign a coupon directly to a specific user without requiring a code; the user sees the associated product as free in the shop
-- [ ] **CPN-05**: Coupon detail page shows usage history: a list of users who redeemed the coupon with date and order reference
+- [x] **CPN-04**: Admin can manually assign a coupon directly to a specific user without requiring a code; the user sees the associated product as free in the shop
+- [x] **CPN-05**: Coupon detail page shows usage history: a list of users who redeemed the coupon with date and order reference
 
 ### ANA — Analytics
 
@@ -131,8 +131,8 @@
 | CPN-01 | Phase 12 | Complete |
 | CPN-02 | Phase 12 | Complete |
 | CPN-03 | Phase 12 | Complete |
-| CPN-04 | Phase 12 | Pending |
-| CPN-05 | Phase 12 | Pending |
+| CPN-04 | Phase 12 | Complete |
+| CPN-05 | Phase 12 | Complete |
 | ANA-01 | Phase 13 | Pending |
 | ANA-02 | Phase 13 | Pending |
 | ANA-03 | Phase 13 | Pending |

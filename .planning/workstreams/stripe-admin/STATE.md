@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: Executing Phase 12
-stopped_at: Completed 12-01-PLAN.md
-last_updated: "2026-03-24T09:40:00.000Z"
+stopped_at: Completed 12-06-PLAN.md
+last_updated: "2026-03-24T03:05:57.000Z"
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 14
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State — stripe-admin workstream
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 12 (shop-admin-pages) — EXECUTING
-Plan: 2 of 6
+Plan: 6 of 6
 
 ## Performance Metrics
 
@@ -79,6 +79,9 @@ Plan: 2 of 6
 - [12-01]: Status derivation: Deleted = stripe.active false; Draft = is_active false with stripe active; Published = both active
 - [12-01]: Sales counts fetched via stripe_orders table, grouped in JS with Map — avoids per-product subqueries
 - [12-01]: Status/type filtering applied in JS after fetching all products (enables status derivation before filter)
+- [12-06]: CouponAssignment extracted as separate client component to keep page.tsx as a server component
+- [12-06]: role_restrictions/product_restrictions cast via (supabase as any) — columns added in migration but types/supabase.ts not regenerated; regeneration needed before typed client can use these fields
+- [12-06]: Stripe promotionCodes.create API changed to require promotion: { type: 'coupon', coupon: id } wrapper object (fixed in Plan 12-06)
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T09:40:00Z
-Stopped at: Completed 12-01-PLAN.md
+Last session: 2026-03-24T03:05:57Z
+Stopped at: Completed 12-06-PLAN.md
 Resume file: None

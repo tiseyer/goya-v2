@@ -91,7 +91,7 @@ Plans:
 - [ ] 12-03-PLAN.md — Orders list page with filters, search, bulk actions
 - [ ] 12-04-PLAN.md — Order detail page with timeline, refund/cancel actions, customer info, invoice
 - [ ] 12-05-PLAN.md — Coupons list page with table, create/edit Server Actions
-- [ ] 12-06-PLAN.md — Coupon detail page with form, manual assignment, redemption history
+- [x] 12-06-PLAN.md — Coupon detail page with form, manual assignment, redemption history
 **UI hint**: yes
 
 ### Phase 13: Analytics
@@ -117,5 +117,5 @@ Plans:
 | 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
 | 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
 | 11. AdminShell Shop Nav | 1/1 | Complete    | 2026-03-24 |
-| 12. Shop Admin Pages | 1/6 | In Progress | - |
+| 12. Shop Admin Pages | 2/6 | In Progress | - |
 | 13. Analytics | 0/? | Not started | - |
