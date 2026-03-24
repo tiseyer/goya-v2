@@ -21,16 +21,16 @@
 
 ### Settings — Connections
 
-- [ ] **CONN-01**: User can view connections in tabs: My Connections, My Mentors, My Mentees, My Faculty, My Schools (principal teacher tab only for school owners)
-- [ ] **CONN-02**: Each connection entry shows current status (pending sent / accepted)
-- [ ] **CONN-03**: User can remove an accepted connection
+- [x] **CONN-01**: User can view connections in tabs: My Connections, My Mentors, My Mentees, My Faculty, My Schools (principal teacher tab only for school owners)
+- [x] **CONN-02**: Each connection entry shows current status (pending sent / accepted)
+- [x] **CONN-03**: User can remove an accepted connection
 
 ### Settings — Inbox
 
-- [ ] **INBOX-01**: User can view all incoming connection requests (peer, mentorship, faculty) in a list
-- [ ] **INBOX-02**: User can accept or decline each request from the inbox
-- [ ] **INBOX-03**: User can filter requests by type (all / peer / mentorship / faculty)
-- [ ] **INBOX-04**: Notification dropdown link updated from "View all messages" to "View all" pointing to `/settings/inbox`
+- [x] **INBOX-01**: User can view all incoming connection requests (peer, mentorship, faculty) in a list
+- [x] **INBOX-02**: User can accept or decline each request from the inbox
+- [x] **INBOX-03**: User can filter requests by type (all / peer / mentorship / faculty)
+- [x] **INBOX-04**: Notification dropdown link updated from "View all messages" to "View all" pointing to `/settings/inbox`
 
 ### Admin
 
@@ -72,13 +72,13 @@
 | PROF-02 | Phase 5 | Complete |
 | PROF-03 | Phase 5 | Complete |
 | PROF-04 | Phase 5 | Complete |
-| CONN-01 | Phase 6 | Pending |
-| CONN-02 | Phase 6 | Pending |
-| CONN-03 | Phase 6 | Pending |
-| INBOX-01 | Phase 6 | Pending |
-| INBOX-02 | Phase 6 | Pending |
-| INBOX-03 | Phase 6 | Pending |
-| INBOX-04 | Phase 6 | Pending |
+| CONN-01 | Phase 6 | Complete |
+| CONN-02 | Phase 6 | Complete |
+| CONN-03 | Phase 6 | Complete |
+| INBOX-01 | Phase 6 | Complete |
+| INBOX-02 | Phase 6 | Complete |
+| INBOX-03 | Phase 6 | Complete |
+| INBOX-04 | Phase 6 | Complete |
 | ADM-01 | Phase 7 | Pending |
 | ADM-02 | Phase 7 | Pending |
 

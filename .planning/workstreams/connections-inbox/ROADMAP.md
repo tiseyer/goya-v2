@@ -22,7 +22,7 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 
 - [x] **Phase 4: Database Foundation** — connections table, RLS policies, migration, wire real Supabase
 - [x] **Phase 5: Profile Page Buttons** — role-aware connect buttons on profile pages (completed 2026-03-23)
-- [ ] **Phase 6: Settings Connections & Inbox** — full Settings > Connections and Settings > Inbox pages
+- [x] **Phase 6: Settings Connections & Inbox** — full Settings > Connections and Settings > Inbox pages (completed 2026-03-24)
 - [ ] **Phase 7: Admin Connections Tab** — admin user detail Connections tab
 
 ## Phase Details
@@ -69,7 +69,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 06-01-PLAN.md &mdash; Extend ConnectionsContext with profiles join and removeConnection mutation
-- [ ] 06-02-PLAN.md &mdash; Build Settings Connections page, Inbox page, and Header link update
+- [x] 06-02-PLAN.md &mdash; Build Settings Connections page, Inbox page, and Header link update
 **UI hint**: yes
 
 ### Phase 7: Admin Connections Tab
@@ -94,5 +94,5 @@ Plans:
 | 3. Settings Pages | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 4. Database Foundation | v1.1 | 2/2 | Complete | 2026-03-23 |
 | 5. Profile Page Buttons | v1.1 | 2/2 | Complete   | 2026-03-23 |
-| 6. Settings Connections & Inbox | v1.1 | 1/2 | In progress | - |
+| 6. Settings Connections & Inbox | v1.1 | 2/2 | Complete   | 2026-03-24 |
 | 7. Admin Connections Tab | v1.1 | 0/? | Not started | - |
