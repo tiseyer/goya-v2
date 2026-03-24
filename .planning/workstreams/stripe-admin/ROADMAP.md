@@ -13,7 +13,7 @@ Seven phases deliver the Subscriptions page Stripe integration and Teacher Upgra
 - [ ] **Phase 16: Upgrade CTA** - Show upgrade prompts for students/WPs on Subscriptions page and in Shop
 - [ ] **Phase 17: Upgrade Page** - Multi-step /upgrade page with certificate upload and Stripe delayed capture
 - [ ] **Phase 18: Admin Inbox — Teacher Upgrades** - Admin approve/reject flow with payment capture and role change
-- [ ] **Phase 19: Supabase Schema** - Create upgrade_requests and user_designations tables with RLS
+- [x] **Phase 19: Supabase Schema** - Create upgrade_requests and user_designations tables with RLS (completed 2026-03-24)
 - [ ] **Phase 20: Fix Broken Admin Pages** - Fix 3 crashing admin pages + add Create Product button
 
 ## Phase Details
@@ -91,7 +91,7 @@ Seven phases deliver the Subscriptions page Stripe integration and Teacher Upgra
 **Plans**: 1 plan
 
 Plans:
-- [ ] 19-01-PLAN.md — Create upgrade_requests and user_designations migration (20260345)
+- [x] 19-01-PLAN.md — Create upgrade_requests and user_designations migration (20260345)
 
 ### Phase 20: Fix Broken Admin Pages
 **Goal**: Three crashing admin pages load without errors and products page has Create Product button
@@ -111,7 +111,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 19. Supabase Schema | 0/1 | Not started | - |
+| 19. Supabase Schema | 1/1 | Complete   | 2026-03-24 |
 | 14. Fix Role Display Bug | 0/1 | Not started | - |
 | 20. Fix Broken Admin Pages | 0/1 | Not started | - |
 | 15. Subscriptions Page | 0/2 | Not started | - |

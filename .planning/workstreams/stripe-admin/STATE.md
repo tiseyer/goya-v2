@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.3
-milestone_name: Subscriptions & Teacher Upgrade
-status: Defining requirements
-stopped_at: null
-last_updated: "2026-03-24T18:45:00.000Z"
+milestone_name: milestone
+status: Phase complete — ready for verification
+stopped_at: Completed 19-01-PLAN.md
+last_updated: "2026-03-24T16:21:08.081Z"
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 7
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
 ---
 
 # Project State — stripe-admin workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 13 — analytics
+**Current focus:** Phase 19 — supabase-schema
 
 ## Current Position
 
-Phase: 13
-Plan: Not started
+Phase: 19 (supabase-schema) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Plan: Not started
 | Phase 12 P04 | 16 | 2 tasks | 6 files |
 | Phase 12 P02 | 9 | 2 tasks | 4 files |
 | Phase 13 P01 | 8 | 2 tasks | 4 files |
+| Phase 19 P01 | 5 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,7 @@ Plan: Not started
 - [Phase 12-shop-admin-pages]: Timeline filter: JS JSON.stringify(payload).includes(stripe_id) — avoids complex JSONB query on webhook_events
 - [Phase 13]: ARR deduplication via stripe_customer_id+stripe_product_id composite key to prevent double-counting across billing cycles
 - [Phase 13]: Pure computation functions (no Supabase/React) in lib/analytics/ — all business logic isolated for testability
+- [Phase 19]: Added updated_at column to upgrade_requests (required by update_updated_at_column trigger — plan SQL omitted it)
 
 ### Pending Todos
 
@@ -105,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T10:16:39.357Z
-Stopped at: Completed 13-01-PLAN.md
+Last session: 2026-03-24T16:21:08.078Z
+Stopped at: Completed 19-01-PLAN.md
 Resume file: None
