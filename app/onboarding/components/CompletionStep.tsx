@@ -5,7 +5,7 @@ import { useOnboarding } from './OnboardingProvider';
 
 export default function CompletionStep() {
   const { answers } = useOnboarding();
-  const firstName   = answers.full_name?.split(' ')[0] ?? 'there';
+  const firstName   = answers.first_name ?? 'there';
   const isTeacher   = answers.member_type === 'teacher' || answers.member_type === 'wellness_practitioner';
 
   return (
