@@ -145,7 +145,7 @@ export default async function AnalyticsPage({
     {
       'New Registrations': funnel.newRegistrations,
       'Completed Onboarding': funnel.completedOnboarding,
-      'Conversion Rate': (funnel.conversionRate * 100).toFixed(1) + '%',
+      'Conversion Rate': ((funnel.conversionRate ?? 0) * 100).toFixed(1) + '%',
       'New Subscriptions': funnel.newSubscriptions,
       'Pending Cancellations': funnel.pendingCancellations,
       'New Cancellations': funnel.newCancellations,
@@ -155,10 +155,10 @@ export default async function AnalyticsPage({
   ]
   const revenueCsvData = [
     {
-      'ARR Total': '$' + revenue.arrTotal.toFixed(2),
-      'New ARR': '$' + revenue.newArr.toFixed(2),
-      'Churned ARR': '$' + revenue.churnedArr.toFixed(2),
-      'Net New ARR': '$' + revenue.netNewArr.toFixed(2),
+      'ARR Total': '$' + (revenue.arrTotal ?? 0).toFixed(2),
+      'New ARR': '$' + (revenue.newArr ?? 0).toFixed(2),
+      'Churned ARR': '$' + (revenue.churnedArr ?? 0).toFixed(2),
+      'Net New ARR': '$' + (revenue.netNewArr ?? 0).toFixed(2),
     },
   ]
   const chartCsvData = chartData.map((p) => ({
@@ -206,7 +206,7 @@ export default async function AnalyticsPage({
             />
             <AnalyticsMetricCard
               label="Conversion Rate"
-              value={(funnel.conversionRate * 100).toFixed(1) + '%'}
+              value={((funnel.conversionRate ?? 0) * 100).toFixed(1) + '%'}
             />
             <AnalyticsMetricCard
               label="New Subscriptions"
@@ -245,28 +245,28 @@ export default async function AnalyticsPage({
               label="ARR Total"
               value={
                 '$' +
-                revenue.arrTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })
+                (revenue.arrTotal ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })
               }
             />
             <AnalyticsMetricCard
               label="New ARR"
               value={
                 '$' +
-                revenue.newArr.toLocaleString(undefined, { minimumFractionDigits: 2 })
+                (revenue.newArr ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })
               }
             />
             <AnalyticsMetricCard
               label="Churned ARR"
               value={
                 '$' +
-                revenue.churnedArr.toLocaleString(undefined, { minimumFractionDigits: 2 })
+                (revenue.churnedArr ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })
               }
             />
             <AnalyticsMetricCard
               label="Net New ARR"
               value={
                 '$' +
-                revenue.netNewArr.toLocaleString(undefined, { minimumFractionDigits: 2 })
+                (revenue.netNewArr ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })
               }
               trend={
                 revenue.netNewArr > 0 ? 'up' : revenue.netNewArr < 0 ? 'down' : 'neutral'
