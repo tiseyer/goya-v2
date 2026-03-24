@@ -122,4 +122,4 @@ Plans:
 | 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
 | 11. AdminShell Shop Nav | 1/1 | Complete    | 2026-03-24 |
 | 12. Shop Admin Pages | 6/7 | Complete    | 2026-03-24 |
-| 13. Analytics | 2/2 | Complete   | 2026-03-24 |
+| 13. Analytics | 2/2 | Complete    | 2026-03-24 |
