@@ -90,6 +90,9 @@ Seven phases deliver the Subscriptions page Stripe integration and Teacher Upgra
   3. Migrations applied successfully via `npx supabase db push`
 **Plans**: 1 plan
 
+Plans:
+- [ ] 19-01-PLAN.md — Create upgrade_requests and user_designations migration (20260345)
+
 ### Phase 20: Fix Broken Admin Pages
 **Goal**: Three crashing admin pages load without errors and products page has Create Product button
 **Depends on**: Nothing (independent fixes)
