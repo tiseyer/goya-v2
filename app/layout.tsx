@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import SlimFooter from "./components/SlimFooter";
 import ClientProviders from "./components/ClientProviders";
 import ImpersonationBanner from "./components/ImpersonationBanner";
 import { getImpersonationState } from "@/lib/impersonation";
@@ -66,6 +67,9 @@ export default async function RootLayout({
   const pathname = headersList.get("next-url") || "";
   const hideNav = pathname.startsWith("/onboarding") || pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/maintenance");
   const hideFooter = pathname.startsWith("/maintenance");
+  const fullFooterPaths = ["/", "/privacy", "/terms", "/code-of-conduct", "/code-of-ethics"];
+  const showFullFooter = !hideFooter && fullFooterPaths.includes(pathname);
+  const showSlimFooter = !hideFooter && !showFullFooter;
 
   const settings = await getAnalyticsSettings();
   const analyticsEnabled = settings?.analytics_enabled === 'true';
@@ -112,7 +116,8 @@ gtag('config', '${ga4Id}');
           <main className={`${!hideNav ? (impersonationState.isImpersonating ? 'pt-26' : 'pt-16') : ''} flex-1`}>
             {children}
           </main>
-          {!hideFooter && <Footer />}
+          {showFullFooter && <Footer />}
+          {showSlimFooter && <SlimFooter />}
         </ClientProviders>
 
         {/* Vercel Analytics — always on */}
