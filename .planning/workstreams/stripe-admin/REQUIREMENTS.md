@@ -59,10 +59,10 @@
 
 ### ANA — Analytics
 
-- [ ] **ANA-01**: Admin can view user funnel metrics with a time range selector (30 days / 3 months / 6 months / custom range): new registrations, completed onboarding, conversion rate (registered → paid), new subscriptions, pending cancellations (cancelled but active until period end), new cancellations (fully churned), total active members, net growth
-- [ ] **ANA-02**: Admin can view revenue metrics computed from local Supabase tables (no Stripe API calls at page load): ARR total, new ARR in period, churned ARR in period, net new ARR
-- [ ] **ANA-03**: All funnel and revenue metrics can be split/filtered by member role: Student / Teacher / Wellness Practitioner / School
-- [ ] **ANA-04**: Admin can export any metric or chart as a CSV file
+- [x] **ANA-01**: Admin can view user funnel metrics with a time range selector (30 days / 3 months / 6 months / custom range): new registrations, completed onboarding, conversion rate (registered → paid), new subscriptions, pending cancellations (cancelled but active until period end), new cancellations (fully churned), total active members, net growth
+- [x] **ANA-02**: Admin can view revenue metrics computed from local Supabase tables (no Stripe API calls at page load): ARR total, new ARR in period, churned ARR in period, net new ARR
+- [x] **ANA-03**: All funnel and revenue metrics can be split/filtered by member role: Student / Teacher / Wellness Practitioner / School
+- [x] **ANA-04**: Admin can export any metric or chart as a CSV file
 - [ ] **ANA-05**: Analytics page displays interactive time-series charts built with Recharts: revenue over time and new orders over time
 
 ## Future Requirements
@@ -133,10 +133,10 @@
 | CPN-03 | Phase 12 | Complete |
 | CPN-04 | Phase 12 | Complete |
 | CPN-05 | Phase 12 | Complete |
-| ANA-01 | Phase 13 | Pending |
-| ANA-02 | Phase 13 | Pending |
-| ANA-03 | Phase 13 | Pending |
-| ANA-04 | Phase 13 | Pending |
+| ANA-01 | Phase 13 | Complete |
+| ANA-02 | Phase 13 | Complete |
+| ANA-03 | Phase 13 | Complete |
+| ANA-04 | Phase 13 | Complete |
 | ANA-05 | Phase 13 | Pending |
 
 **Coverage:**
