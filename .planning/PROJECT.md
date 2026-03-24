@@ -43,6 +43,8 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 **Phase 10 complete (2026-03-24):** All 15 Stripe event types handled with idempotent upserts. 6 handler files, dispatch switch with 23505 dedup, Vercel Cron for deferred events (`*/5 * * * *`), and admin sync endpoint with cursor pagination. 47 unit tests passing.
 
+**Phase 11 complete (2026-03-24):** Collapsible "Shop" nav group added to AdminShell sidebar with Orders, Products, Coupons, Analytics child links. Legacy top-level Products link removed. NavItem union type (NavLink | NavGroup) established for typed mixed navigation.
+
 ## Requirements
 
 ### Validated
@@ -127,4 +129,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 — Phase 10 complete: webhook handlers + initial sync (47 tests)*
+*Last updated: 2026-03-24 — Phase 11 complete: AdminShell Shop nav group*
