@@ -18,6 +18,34 @@ const HEADLINES = [
   'Your chakras are aligned, but this URL is not.',
 ];
 
+function LotusIllustration({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 200 180"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Outer petals */}
+      <ellipse cx="100" cy="90" rx="18" ry="52" transform="rotate(-50 100 90)" className="fill-primary-200 opacity-50" />
+      <ellipse cx="100" cy="90" rx="18" ry="52" transform="rotate(50 100 90)" className="fill-primary-200 opacity-50" />
+      <ellipse cx="100" cy="90" rx="16" ry="48" transform="rotate(-30 100 90)" className="fill-primary-100 opacity-70" />
+      <ellipse cx="100" cy="90" rx="16" ry="48" transform="rotate(30 100 90)" className="fill-primary-100 opacity-70" />
+      {/* Center petals */}
+      <ellipse cx="100" cy="80" rx="14" ry="40" transform="rotate(-15 100 90)" className="fill-primary-light opacity-50" />
+      <ellipse cx="100" cy="80" rx="14" ry="40" transform="rotate(15 100 90)" className="fill-primary-light opacity-50" />
+      <ellipse cx="100" cy="78" rx="12" ry="36" className="fill-primary opacity-30" />
+      {/* Center circle */}
+      <circle cx="100" cy="82" r="8" className="fill-primary opacity-50" />
+      <circle cx="100" cy="82" r="4" className="fill-primary-dark opacity-40" />
+      {/* Base / water line */}
+      <path d="M40 120 Q70 108 100 112 Q130 108 160 120" stroke="currentColor" strokeWidth="1.5" className="text-primary-200" fill="none" />
+      <path d="M30 128 Q65 114 100 118 Q135 114 170 128" stroke="currentColor" strokeWidth="1" className="text-primary-100" fill="none" opacity="0.6" />
+    </svg>
+  );
+}
+
 export default function NotFound() {
   const [headline, setHeadline] = useState('');
 
@@ -26,53 +54,32 @@ export default function NotFound() {
   }, []);
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-16 bg-primary-50">
-      <div className="text-center max-w-lg">
-        {/* 404 with lotus */}
-        <div className="relative inline-block mb-8">
-          <span className="text-[10rem] sm:text-[12rem] font-bold leading-none tracking-tighter text-primary-200 select-none">
-            4
-            {/* Lotus flower in place of the 0 */}
-            <span className="relative inline-block w-[0.65em]">
-              <svg
-                viewBox="0 0 120 120"
-                className="w-full h-full absolute inset-0"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                {/* Center petal */}
-                <ellipse cx="60" cy="50" rx="14" ry="30" className="fill-primary-light opacity-60" />
-                {/* Left petal */}
-                <ellipse cx="60" cy="50" rx="14" ry="30" transform="rotate(-30 60 60)" className="fill-primary opacity-40" />
-                {/* Right petal */}
-                <ellipse cx="60" cy="50" rx="14" ry="30" transform="rotate(30 60 60)" className="fill-primary opacity-40" />
-                {/* Far left petal */}
-                <ellipse cx="60" cy="50" rx="12" ry="26" transform="rotate(-55 60 60)" className="fill-primary-light opacity-30" />
-                {/* Far right petal */}
-                <ellipse cx="60" cy="50" rx="12" ry="26" transform="rotate(55 60 60)" className="fill-primary-light opacity-30" />
-                {/* Center dot */}
-                <circle cx="60" cy="56" r="6" className="fill-primary opacity-70" />
-              </svg>
-            </span>
-            4
-          </span>
+    <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-gradient-to-b from-primary-50 via-white to-primary-50/30">
+      <div className="text-center max-w-xl">
+        {/* Lotus illustration */}
+        <div className="flex justify-center mb-2">
+          <LotusIllustration className="w-36 h-auto sm:w-44 opacity-80" />
         </div>
 
+        {/* 404 number */}
+        <h1 className="text-8xl sm:text-9xl font-bold tracking-tighter text-primary-200 select-none leading-none mb-6">
+          404
+        </h1>
+
         {/* Headline */}
-        <p className="text-lg sm:text-xl text-primary-dark font-medium leading-relaxed mb-3 min-h-[3.5rem]">
-          {headline}
+        <p className="text-lg sm:text-xl text-primary-dark font-medium leading-relaxed mb-3 min-h-[3.5rem] italic">
+          &ldquo;{headline}&rdquo;
         </p>
 
         {/* Subtitle */}
-        <p className="text-sm text-slate-500 mb-10">
+        <p className="text-sm text-primary-light/80 mb-10">
           Let&apos;s guide you back to your practice.
         </p>
 
         {/* CTA */}
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white text-sm font-semibold shadow-soft hover:bg-primary-dark transition-colors duration-200"
+          className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-white text-sm font-semibold shadow-card hover:bg-primary-dark hover:shadow-elevated transition-all duration-200"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
