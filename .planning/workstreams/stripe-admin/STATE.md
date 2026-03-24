@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: Executing Phase 12
-stopped_at: Completed 11-01-PLAN.md — human-verify approved
-last_updated: "2026-03-24T02:30:23.086Z"
+stopped_at: Completed 12-01-PLAN.md
+last_updated: "2026-03-24T09:40:00.000Z"
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 14
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State — stripe-admin workstream
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 12 (shop-admin-pages) — EXECUTING
-Plan: 1 of 6
+Plan: 2 of 6
 
 ## Performance Metrics
 
@@ -76,6 +76,9 @@ Plan: 1 of 6
 - [Phase 10]: PostgreSQL 23505 error code used for idempotency gate (atomic single INSERT vs SELECT-then-INSERT)
 - [Phase 10]: Admin sync uses CRON_SECRET bearer token (not session auth) — run from CLI or scheduled trigger
 - [Phase 11-adminshell-shop-nav]: Hardcode shopOpen as named state — generic group state map deferred until second nav group is needed
+- [12-01]: Status derivation: Deleted = stripe.active false; Draft = is_active false with stripe active; Published = both active
+- [12-01]: Sales counts fetched via stripe_orders table, grouped in JS with Map — avoids per-product subqueries
+- [12-01]: Status/type filtering applied in JS after fetching all products (enables status derivation before filter)
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T01:35:00Z
-Stopped at: Completed 11-01-PLAN.md — human-verify approved
+Last session: 2026-03-24T09:40:00Z
+Stopped at: Completed 12-01-PLAN.md
 Resume file: None
