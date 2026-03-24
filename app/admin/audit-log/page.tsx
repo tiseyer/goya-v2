@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getSupabaseService } from '@/lib/supabase/service';
+import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import AuditLogFilters from './AuditLogFilters';
 import AuditLogPagination from './AuditLogPagination';
 
@@ -65,10 +65,9 @@ export default async function AuditLogPage({ searchParams }: { searchParams: Sea
   let error: string | null = null;
 
   try {
-    const supabase = getSupabaseService();
+    const supabase = await createSupabaseServerClient();
 
-    // audit_log table is not in generated types — cast to any
-    let query = (supabase as any)
+    let query = supabase
       .from('audit_log')
       .select(
         'id, category, action, severity, actor_name, actor_role, target_type, target_label, description, metadata, ip_address, created_at',
@@ -99,7 +98,7 @@ export default async function AuditLogPage({ searchParams }: { searchParams: Sea
     if (dbError) {
       error = dbError.message;
     } else {
-      rows = ((data as unknown) as AuditRow[]) ?? [];
+      rows = (data as AuditRow[]) ?? [];
       totalCount = count ?? 0;
     }
   } catch (e) {
