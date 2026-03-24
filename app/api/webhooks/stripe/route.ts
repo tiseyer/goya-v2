@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { getStripe } from '@/lib/stripe/client'
 import Stripe from 'stripe'
+import { getSupabaseService } from '@/lib/supabase/service'
+import { handleProduct } from '@/lib/stripe/handlers/product'
+import { handlePrice } from '@/lib/stripe/handlers/price'
+import { handleCoupon } from '@/lib/stripe/handlers/coupon'
+import { handleSubscription } from '@/lib/stripe/handlers/subscription'
+import { handlePaymentIntent } from '@/lib/stripe/handlers/payment-intent'
+import { handleInvoice } from '@/lib/stripe/handlers/invoice'
+import type { HandlerResult } from '@/lib/stripe/handlers/subscription'
 
 export async function POST(request: Request) {
   const body = await request.text()
@@ -37,8 +45,79 @@ export async function POST(request: Request) {
     )
   }
 
-  // Phase 9 stub — full dispatch + idempotency in Phase 10
-  console.log(`[webhook] received: ${event.type} (${event.id})`)
+  // --- Idempotency gate: insert event before processing ---
+  const supabase = getSupabaseService()
+  const { error: insertError } = await supabase
+    .from('webhook_events')
+    .insert({
+      stripe_event_id: event.id,
+      event_type: event.type,
+      status: 'processing',
+      payload: event as unknown as Record<string, unknown>,
+    })
+
+  // PostgreSQL unique_violation = duplicate event
+  if (insertError?.code === '23505') {
+    return NextResponse.json({ received: true }, { status: 200 })
+  }
+  if (insertError) {
+    console.error(`[webhook] insert error: ${insertError.message}`)
+    return NextResponse.json({ error: insertError.message }, { status: 500 })
+  }
+
+  // --- Dispatch to handler ---
+  let finalStatus: 'processed' | 'pending_cron' | 'failed' = 'processed'
+  try {
+    const result = await dispatchEvent(event)
+    finalStatus = result?.status ?? 'processed'
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown handler error'
+    console.error(`[webhook] handler error for ${event.type}: ${message}`)
+    await supabase
+      .from('webhook_events')
+      .update({ status: 'failed', error_message: message, processed_at: new Date().toISOString() })
+      .eq('stripe_event_id', event.id)
+    return NextResponse.json({ received: true }, { status: 200 })
+  }
+
+  // --- Update event status ---
+  await supabase
+    .from('webhook_events')
+    .update({ status: finalStatus, processed_at: new Date().toISOString() })
+    .eq('stripe_event_id', event.id)
 
   return NextResponse.json({ received: true }, { status: 200 })
+}
+
+async function dispatchEvent(event: Stripe.Event): Promise<HandlerResult | void> {
+  switch (event.type) {
+    case 'product.created':
+    case 'product.updated':
+    case 'product.deleted':
+      await handleProduct(event as Stripe.ProductCreatedEvent | Stripe.ProductUpdatedEvent | Stripe.ProductDeletedEvent)
+      return
+    case 'price.created':
+    case 'price.updated':
+    case 'price.deleted':
+      await handlePrice(event as Stripe.PriceCreatedEvent | Stripe.PriceUpdatedEvent | Stripe.PriceDeletedEvent)
+      return
+    case 'coupon.created':
+    case 'coupon.updated':
+    case 'coupon.deleted':
+      await handleCoupon(event as Stripe.CouponCreatedEvent | Stripe.CouponUpdatedEvent | Stripe.CouponDeletedEvent)
+      return
+    case 'customer.subscription.created':
+    case 'customer.subscription.updated':
+    case 'customer.subscription.deleted':
+      return await handleSubscription(event as any)
+    case 'payment_intent.succeeded':
+    case 'payment_intent.payment_failed':
+      return await handlePaymentIntent(event as any)
+    case 'invoice.paid':
+    case 'invoice.payment_failed':
+      return await handleInvoice(event as any)
+    default:
+      console.log(`[webhook] unhandled event type: ${event.type}`)
+      return
+  }
 }
