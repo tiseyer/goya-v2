@@ -42,6 +42,10 @@ Seven phases deliver the Subscriptions page Stripe integration and Teacher Upgra
 **Plans**: 2 plans
 **UI hint**: yes
 
+Plans:
+- [ ] 15-01-PLAN.md — Data layer: fetchSubscriptionsData query + createPortalSession + softDeleteDesignation actions (SUB-01..SUB-07)
+- [ ] 15-02-PLAN.md — UI layer: PortalButton, DesignationsBox, replace page.tsx with live data rendering (SUB-01..SUB-08)
+
 ### Phase 16: Upgrade CTA
 **Goal**: Students and wellness practitioners see upgrade prompts on Subscriptions page and in Shop
 **Depends on**: Phase 15 (subscriptions page exists), Phase 19 (upgrade_requests table for pending state)
@@ -117,7 +121,7 @@ Plans:
 | 19. Supabase Schema | 1/1 | Complete    | 2026-03-24 |
 | 14. Fix Role Display Bug | 0/1 | Complete    | 2026-03-24 |
 | 20. Fix Broken Admin Pages | 1/1 | Complete    | 2026-03-24 |
-| 15. Subscriptions Page | 0/2 | Not started | - |
+| 15. Subscriptions Page | 0/2 | Planned     | - |
 | 16. Upgrade CTA | 0/1 | Not started | - |
 | 17. Upgrade Page | 0/2 | Not started | - |
 | 18. Admin Inbox — Teacher Upgrades | 0/2 | Not started | - |
