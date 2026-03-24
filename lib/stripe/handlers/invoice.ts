@@ -15,7 +15,7 @@ export async function handleInvoice(
 
   const status_value = event.type === 'invoice.paid' ? 'paid' : 'payment_failed'
 
-  const subscriptionField = invoice.subscription
+  const subscriptionField = (invoice as any).parent?.subscription_details?.subscription ?? (invoice as any).subscription
   const subscription_id =
     typeof subscriptionField === 'string'
       ? subscriptionField
@@ -32,7 +32,7 @@ export async function handleInvoice(
         amount_total: invoice.amount_paid ?? invoice.total,
         currency: invoice.currency,
         status: status_value,
-        type: invoice.subscription ? 'recurring' : 'one_time',
+        type: subscriptionField ? 'recurring' : 'one_time',
         subscription_status: null,
         metadata: { subscription_id },
         stripe_event_id: event.id,
