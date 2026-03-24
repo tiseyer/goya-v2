@@ -19,9 +19,9 @@
 
 ### NAV — AdminShell Navigation
 
-- [ ] **NAV-01**: AdminShell sidebar has a "Shop" collapsible dropdown group with four child links: Orders (top), Products, Coupons, Analytics
-- [ ] **NAV-02**: The old "Products" admin nav item is removed; Shop > Products replaces it as the single products management page
-- [ ] **NAV-03**: All Shop sections are accessible to Admin and Moderator roles only; other roles see no Shop nav items
+- [x] **NAV-01**: AdminShell sidebar has a "Shop" collapsible dropdown group with four child links: Orders (top), Products, Coupons, Analytics
+- [x] **NAV-02**: The old "Products" admin nav item is removed; Shop > Products replaces it as the single products management page
+- [x] **NAV-03**: All Shop sections are accessible to Admin and Moderator roles only; other roles see no Shop nav items
 
 ### PROD — Products Admin
 
@@ -51,9 +51,9 @@
 
 ### CPN — Coupons Admin
 
-- [ ] **CPN-01**: Admin can view all coupons in a table with columns: Name, Code, Type, Discount, Usage count, Expiry, Status
-- [ ] **CPN-02**: Admin can create a coupon with: internal name (admin-only), external coupon code (optional, for public use), type (Percentage / Fixed Amount / Free Product), role restrictions (multi-select whitelist or blacklist), product restrictions (multi-select whitelist or blacklist), usage limit (number input; 0 = unlimited) or single-use toggle, start date, expiry date
-- [ ] **CPN-03**: Admin can edit a coupon; changes sync bidirectionally with Stripe (both `stripe_coupon_id` and `stripe_promotion_code_id` are stored separately)
+- [x] **CPN-01**: Admin can view all coupons in a table with columns: Name, Code, Type, Discount, Usage count, Expiry, Status
+- [x] **CPN-02**: Admin can create a coupon with: internal name (admin-only), external coupon code (optional, for public use), type (Percentage / Fixed Amount / Free Product), role restrictions (multi-select whitelist or blacklist), product restrictions (multi-select whitelist or blacklist), usage limit (number input; 0 = unlimited) or single-use toggle, start date, expiry date
+- [x] **CPN-03**: Admin can edit a coupon; changes sync bidirectionally with Stripe (both `stripe_coupon_id` and `stripe_promotion_code_id` are stored separately)
 - [ ] **CPN-04**: Admin can manually assign a coupon directly to a specific user without requiring a code; the user sees the associated product as free in the shop
 - [ ] **CPN-05**: Coupon detail page shows usage history: a list of users who redeemed the coupon with date and order reference
 
@@ -105,9 +105,9 @@
 | DB-07 | Phase 10 | Complete |
 | DB-08 | Phase 10 | Complete |
 | DB-09 | Phase 10 | Complete |
-| NAV-01 | Phase 11 | Pending |
-| NAV-02 | Phase 11 | Pending |
-| NAV-03 | Phase 11 | Pending |
+| NAV-01 | Phase 11 | Complete |
+| NAV-02 | Phase 11 | Complete |
+| NAV-03 | Phase 11 | Complete |
 | PROD-01 | Phase 12 | Pending |
 | PROD-02 | Phase 12 | Pending |
 | PROD-03 | Phase 12 | Pending |
@@ -128,9 +128,9 @@
 | ORD-07 | Phase 12 | Pending |
 | ORD-08 | Phase 12 | Pending |
 | ORD-09 | Phase 12 | Pending |
-| CPN-01 | Phase 12 | Pending |
-| CPN-02 | Phase 12 | Pending |
-| CPN-03 | Phase 12 | Pending |
+| CPN-01 | Phase 12 | Complete |
+| CPN-02 | Phase 12 | Complete |
+| CPN-03 | Phase 12 | Complete |
 | CPN-04 | Phase 12 | Pending |
 | CPN-05 | Phase 12 | Pending |
 | ANA-01 | Phase 13 | Pending |
