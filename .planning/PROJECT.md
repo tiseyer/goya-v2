@@ -41,6 +41,8 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 **Phase 09 complete (2026-03-23):** Stripe SDK infrastructure in place — server-only singleton at `lib/stripe/client.ts` and webhook route handler at `app/api/webhooks/stripe/route.ts` with HMAC signature verification. 7 unit tests passing.
 
+**Phase 10 complete (2026-03-24):** All 15 Stripe event types handled with idempotent upserts. 6 handler files, dispatch switch with 23505 dedup, Vercel Cron for deferred events (`*/5 * * * *`), and admin sync endpoint with cursor pagination. 47 unit tests passing.
+
 ## Requirements
 
 ### Validated
@@ -125,4 +127,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 — Phase 09 complete: Stripe SDK + webhook infrastructure*
+*Last updated: 2026-03-24 — Phase 10 complete: webhook handlers + initial sync (47 tests)*
