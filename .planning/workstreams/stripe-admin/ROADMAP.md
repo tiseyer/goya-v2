@@ -116,7 +116,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 19. Supabase Schema | 1/1 | Complete    | 2026-03-24 |
 | 14. Fix Role Display Bug | 0/1 | Complete    | 2026-03-24 |
-| 20. Fix Broken Admin Pages | 1/1 | Complete   | 2026-03-24 |
+| 20. Fix Broken Admin Pages | 1/1 | Complete    | 2026-03-24 |
 | 15. Subscriptions Page | 0/2 | Not started | - |
 | 16. Upgrade CTA | 0/1 | Not started | - |
 | 17. Upgrade Page | 0/2 | Not started | - |
