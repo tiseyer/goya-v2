@@ -105,7 +105,10 @@ Plans:
   3. Funnel and revenue metrics can be filtered by member role (Student / Teacher / Wellness Practitioner / School)
   4. Admin can export any metric or chart data as a CSV file
   5. Revenue over time and new orders over time are displayed as interactive Recharts time-series charts
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 13-01-PLAN.md — TDD: Pure metric computation functions (funnel, revenue, time-series) and CSV export with unit tests
+- [ ] 13-02-PLAN.md — Analytics page UI with Recharts charts, filters, metric cards, and CSV export buttons
 **UI hint**: yes
 
 ## Progress
@@ -119,4 +122,4 @@ Plans:
 | 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
 | 11. AdminShell Shop Nav | 1/1 | Complete    | 2026-03-24 |
 | 12. Shop Admin Pages | 6/7 | Complete    | 2026-03-24 |
-| 13. Analytics | 0/? | Not started | - |
+| 13. Analytics | 0/2 | Not started | - |
