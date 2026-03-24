@@ -48,6 +48,7 @@ Plan: 6 of 6
 | Phase 10 P03 | 4 | 3 tasks | 6 files |
 | Phase 11-adminshell-shop-nav P01 | 4 | 1 tasks | 1 files |
 | Phase 12 P04 | 16 | 2 tasks | 6 files |
+| Phase 12 P02 | 9 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Plan: 6 of 6
 - [12-06]: CouponAssignment extracted as separate client component to keep page.tsx as a server component
 - [12-06]: role_restrictions/product_restrictions cast via (supabase as any) — columns added in migration but types/supabase.ts not regenerated; regeneration needed before typed client can use these fields
 - [12-06]: Stripe promotionCodes.create API changed to require promotion: { type: 'coupon', coupon: id } wrapper object (fixed in Plan 12-06)
+- [12-02]: createProduct uses client-side crypto.randomUUID() as temp productId — full flow requires a separate insertProduct server action to create local row first
+- [12-02]: stripeProduct fetched via explicit column select (not *) to avoid TypeScript inference issue with Json metadata type
+- [12-02]: PriceSection shows current price as read-only; Change Price flow opens amber sub-form making destructive nature clear
 - [Phase 12-shop-admin-pages]: OrderActions extracted as separate client component — keeps page.tsx as pure server component
 - [Phase 12-shop-admin-pages]: billingAddress/shippingAddress from Stripe customers.retrieve wrapped in try/catch — non-fatal if Stripe API fails
 - [Phase 12-shop-admin-pages]: Timeline filter: JS JSON.stringify(payload).includes(stripe_id) — avoids complex JSONB query on webhook_events
@@ -98,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T03:17:29.289Z
-Stopped at: Completed 12-04-PLAN.md
+Last session: 2026-03-24T03:21:00Z
+Stopped at: Completed 12-02-PLAN.md
 Resume file: None

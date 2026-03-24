@@ -29,12 +29,12 @@
 - [x] **PROD-02**: Admin can toggle a product's status inline by clicking the Status pill (Published ↔ Draft; Deleted is soft-delete only)
 - [x] **PROD-03**: Admin can select multiple products and bulk change status or bulk delete
 - [x] **PROD-04**: Admin can drag-and-drop reorder products; the new order persists to `products.priority` and determines storefront display order
-- [ ] **PROD-05**: Admin can add a new product; the product is created in Stripe and the `stripe_product_id` is stored on the local `products` row
-- [ ] **PROD-06**: Admin can edit a product's Name, Description, Featured Image (pushed to Stripe), and up to 5 product images (GOYA-only for images beyond the featured one)
-- [ ] **PROD-07**: Admin can edit More Options via a dropdown: Statement Descriptor, Unit Label, Metadata (key/value pairs with add/remove), Marketing Feature List (with add/remove)
-- [ ] **PROD-08**: Changing a product price creates a new Stripe Price and archives the old one (never calls `stripe.prices.update()` with a new amount)
-- [ ] **PROD-09**: Admin can configure product Visibility: "Show to" searchable list (shown if user owns any product in list) and "Don't show to" searchable list (hidden if user owns any — veto overrides positive condition)
-- [ ] **PROD-10**: Product detail page shows a Stripe sync status indicator (last synced timestamp or "Out of sync" warning)
+- [x] **PROD-05**: Admin can add a new product; the product is created in Stripe and the `stripe_product_id` is stored on the local `products` row
+- [x] **PROD-06**: Admin can edit a product's Name, Description, Featured Image (pushed to Stripe), and up to 5 product images (GOYA-only for images beyond the featured one)
+- [x] **PROD-07**: Admin can edit More Options via a dropdown: Statement Descriptor, Unit Label, Metadata (key/value pairs with add/remove), Marketing Feature List (with add/remove)
+- [x] **PROD-08**: Changing a product price creates a new Stripe Price and archives the old one (never calls `stripe.prices.update()` with a new amount)
+- [x] **PROD-09**: Admin can configure product Visibility: "Show to" searchable list (shown if user owns any product in list) and "Don't show to" searchable list (hidden if user owns any — veto overrides positive condition)
+- [x] **PROD-10**: Product detail page shows a Stripe sync status indicator (last synced timestamp or "Out of sync" warning)
 - [x] **PROD-11**: Admin can soft-delete a product (sets status = Deleted); deleted products remain visible in the table with a Deleted status pill
 
 ### ORD — Orders Admin
@@ -112,12 +112,12 @@
 | PROD-02 | Phase 12 | Complete |
 | PROD-03 | Phase 12 | Complete |
 | PROD-04 | Phase 12 | Complete |
-| PROD-05 | Phase 12 | Pending |
-| PROD-06 | Phase 12 | Pending |
-| PROD-07 | Phase 12 | Pending |
-| PROD-08 | Phase 12 | Pending |
-| PROD-09 | Phase 12 | Pending |
-| PROD-10 | Phase 12 | Pending |
+| PROD-05 | Phase 12 | Complete |
+| PROD-06 | Phase 12 | Complete |
+| PROD-07 | Phase 12 | Complete |
+| PROD-08 | Phase 12 | Complete |
+| PROD-09 | Phase 12 | Complete |
+| PROD-10 | Phase 12 | Complete |
 | PROD-11 | Phase 12 | Complete |
 | ORD-01 | Phase 12 | Pending |
 | ORD-02 | Phase 12 | Pending |
