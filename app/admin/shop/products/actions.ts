@@ -92,3 +92,185 @@ export async function softDeleteProduct(
 
   revalidatePath('/admin/shop/products')
 }
+
+/**
+ * Create a new product in Stripe, create its initial price, sync to Supabase stripe_products
+ * and stripe_prices, then link the Stripe product ID to the local products row.
+ * Write-partitioning: Stripe owns product/price data; GOYA owns stripe_product_id link.
+ */
+export async function createProduct(data: {
+  productId: string
+  name: string
+  description: string
+  priceCents: number
+  priceType: 'one_time' | 'recurring'
+  interval?: 'month' | 'year'
+  imagePath?: string
+  metadata?: Record<string, string>
+  statementDescriptor?: string
+  unitLabel?: string
+  marketingFeatures?: string[]
+}): Promise<void> {
+  const stripe = getStripe()
+
+  const stripeProduct = await stripe.products.create({
+    name: data.name,
+    description: data.description,
+    images: data.imagePath ? [data.imagePath] : [],
+    metadata: data.metadata ?? {},
+    ...(data.statementDescriptor ? { statement_descriptor: data.statementDescriptor } : {}),
+    ...(data.unitLabel ? { unit_label: data.unitLabel } : {}),
+    ...(data.marketingFeatures
+      ? { marketing_features: data.marketingFeatures.map((f) => ({ name: f })) }
+      : {}),
+  })
+
+  const stripePrice = await stripe.prices.create({
+    product: stripeProduct.id,
+    unit_amount: data.priceCents,
+    currency: 'usd',
+    ...(data.priceType === 'recurring' ? { recurring: { interval: data.interval! } } : {}),
+  })
+
+  const sb = getSupabaseService()
+
+  await sb.from('stripe_products').upsert(
+    {
+      stripe_id: stripeProduct.id,
+      name: stripeProduct.name,
+      description: stripeProduct.description ?? null,
+      active: stripeProduct.active,
+      images: stripeProduct.images,
+      metadata: stripeProduct.metadata as Record<string, string>,
+    },
+    { onConflict: 'stripe_id' },
+  )
+
+  await sb.from('stripe_prices').upsert(
+    {
+      stripe_id: stripePrice.id,
+      stripe_product_id: stripeProduct.id,
+      currency: 'usd',
+      unit_amount: data.priceCents,
+      type: data.priceType,
+      interval: data.interval ?? null,
+      active: true,
+    },
+    { onConflict: 'stripe_id' },
+  )
+
+  await sb.from('products').update({ stripe_product_id: stripeProduct.id }).eq('id', data.productId)
+
+  revalidatePath('/admin/shop/products')
+}
+
+/**
+ * Edit a product's Stripe-owned fields (name, description, images, metadata, etc.).
+ * The webhook will sync the stripe_products row after Stripe confirms the update.
+ * Write-partitioning: Stripe owns all fields updated here.
+ */
+export async function editProduct(
+  stripeProductId: string,
+  data: {
+    name?: string
+    description?: string
+    images?: string[]
+    metadata?: Record<string, string>
+    statementDescriptor?: string
+    unitLabel?: string
+    marketingFeatures?: string[]
+  },
+): Promise<void> {
+  type StripeProductUpdateParams = {
+    name?: string
+    description?: string
+    images?: string[]
+    metadata?: Record<string, string>
+    statement_descriptor?: string
+    unit_label?: string
+    marketing_features?: Array<{ name: string }>
+  }
+
+  const updateObj: StripeProductUpdateParams = {}
+  if (data.name !== undefined) updateObj.name = data.name
+  if (data.description !== undefined) updateObj.description = data.description
+  if (data.images !== undefined) updateObj.images = data.images
+  if (data.metadata !== undefined) updateObj.metadata = data.metadata
+  if (data.statementDescriptor !== undefined)
+    updateObj.statement_descriptor = data.statementDescriptor
+  if (data.unitLabel !== undefined) updateObj.unit_label = data.unitLabel
+  if (data.marketingFeatures !== undefined)
+    updateObj.marketing_features = data.marketingFeatures.map((f) => ({ name: f }))
+
+  await getStripe().products.update(stripeProductId, updateObj)
+
+  revalidatePath('/admin/shop/products')
+}
+
+/**
+ * Change a product's price by creating a new Stripe Price and archiving the old one.
+ * IMMUTABILITY RULE: Never call stripe.prices.update() with a new unit_amount.
+ * Flow: create new price → archive old price → sync both to stripe_prices table.
+ */
+export async function updateProductPrice(
+  stripeProductId: string,
+  oldPriceId: string,
+  newAmountCents: number,
+  currency: string,
+  type: 'one_time' | 'recurring',
+  interval?: 'month' | 'year',
+): Promise<void> {
+  const stripe = getStripe()
+  const sb = getSupabaseService()
+
+  // 1. Create new Stripe Price
+  const newPrice = await stripe.prices.create({
+    product: stripeProductId,
+    unit_amount: newAmountCents,
+    currency,
+    ...(type === 'recurring' ? { recurring: { interval: interval! } } : {}),
+  })
+
+  // 2. Archive old Stripe Price (immutability — NEVER update unit_amount)
+  await stripe.prices.update(oldPriceId, { active: false })
+
+  // 3. Upsert new price row in stripe_prices
+  await sb.from('stripe_prices').upsert(
+    {
+      stripe_id: newPrice.id,
+      stripe_product_id: stripeProductId,
+      currency,
+      unit_amount: newAmountCents,
+      type,
+      interval: interval ?? null,
+      active: true,
+    },
+    { onConflict: 'stripe_id' },
+  )
+
+  // 4. Mark old price inactive in stripe_prices
+  await sb
+    .from('stripe_prices')
+    .update({ active: false })
+    .eq('stripe_id', oldPriceId)
+
+  revalidatePath('/admin/shop/products')
+}
+
+/**
+ * Update product visibility rules (GOYA-owned columns only — no Stripe writes).
+ * requires_any_of: user must own at least one of these products to see this product
+ * hidden_if_has_any: user who owns any of these will NOT see this product (veto overrides)
+ */
+export async function updateProductVisibility(
+  productId: string,
+  requiresAnyOf: string[],
+  hiddenIfHasAny: string[],
+): Promise<void> {
+  await getSupabaseService()
+    .from('products')
+    .update({ requires_any_of: requiresAnyOf, hidden_if_has_any: hiddenIfHasAny })
+    .eq('id', productId)
+
+  revalidatePath('/admin/shop/products')
+}
