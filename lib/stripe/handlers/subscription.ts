@@ -37,8 +37,12 @@ export async function handleSubscription(
         type: 'recurring',
         subscription_status: sub.status,
         cancel_at_period_end: sub.cancel_at_period_end ?? false,
-        current_period_start: new Date((sub as any).current_period_start * 1000).toISOString(),
-        current_period_end: new Date((sub as any).current_period_end * 1000).toISOString(),
+        current_period_start: firstItem?.current_period_start
+          ? new Date(firstItem.current_period_start * 1000).toISOString()
+          : null,
+        current_period_end: firstItem?.current_period_end
+          ? new Date(firstItem.current_period_end * 1000).toISOString()
+          : null,
         canceled_at: sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null,
         metadata: (sub.metadata as Record<string, string>) ?? {},
         stripe_event_id: event.id,
