@@ -5,7 +5,7 @@ import OnboardingStep from './OnboardingStep';
 import FileUpload from './inputs/FileUpload';
 
 export default function Step3Documents() {
-  const { answers, saveAnswer, userId, completeOnboarding, isSaving } = useOnboarding();
+  const { answers, setAnswer, userId, completeOnboarding, isSaving } = useOnboarding();
   const isTeacher = answers.member_type === 'teacher' || answers.member_type === 'wellness_practitioner';
 
   return (
@@ -25,7 +25,7 @@ export default function Step3Documents() {
           path={userId ?? 'unknown'}
           accept="image/jpeg,image/png,image/webp"
           helpText="JPG, PNG or WebP · max 5 MB"
-          onUploaded={url => saveAnswer('avatar_url', url)}
+          onUploaded={url => setAnswer('avatar_url', url)}
           currentUrl={answers.avatar_url}
         />
 
@@ -36,7 +36,7 @@ export default function Step3Documents() {
             path={userId ?? 'unknown'}
             accept="application/pdf,image/jpeg,image/png"
             helpText="Upload a teaching certification, RYT certificate, or other credential. PDF, JPG or PNG · max 10 MB."
-            onUploaded={url => saveAnswer('document_url', url)}
+            onUploaded={url => setAnswer('document_url', url)}
             currentUrl={answers.document_url}
           />
         )}

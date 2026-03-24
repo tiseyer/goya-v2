@@ -35,7 +35,7 @@ const YOGA_STYLES = [
 ];
 
 export default function Step2Profile() {
-  const { answers, saveAnswer } = useOnboarding();
+  const { answers, setAnswer } = useOnboarding();
   const isTeacher = answers.member_type === 'teacher' || answers.member_type === 'wellness_practitioner';
 
   return (
@@ -49,7 +49,7 @@ export default function Step2Profile() {
         <TextInput
           label="Full name"
           value={answers.full_name ?? ''}
-          onChange={val => saveAnswer('full_name', val)}
+          onChange={val => setAnswer('full_name', val)}
           placeholder="Your full name"
           required
         />
@@ -57,7 +57,7 @@ export default function Step2Profile() {
         <TextInput
           label="Location"
           value={answers.location ?? ''}
-          onChange={val => saveAnswer('location', val)}
+          onChange={val => setAnswer('location', val)}
           placeholder="City, Country"
           helpText="E.g. Bali, Indonesia"
         />
@@ -65,7 +65,7 @@ export default function Step2Profile() {
         <TextareaInput
           label="Bio"
           value={answers.bio ?? ''}
-          onChange={val => saveAnswer('bio', val)}
+          onChange={val => setAnswer('bio', val)}
           placeholder={isTeacher
             ? 'Share your teaching philosophy, lineage, and what inspires your practice…'
             : 'Tell the community a little about yourself and your yoga journey…'}
@@ -78,7 +78,7 @@ export default function Step2Profile() {
             <SelectInput
               label="Years teaching"
               value={answers.years_teaching ?? ''}
-              onChange={val => saveAnswer('years_teaching', val)}
+              onChange={val => setAnswer('years_teaching', val)}
               options={YEARS_TEACHING}
               placeholder="Select range…"
             />
@@ -86,7 +86,7 @@ export default function Step2Profile() {
               label="Yoga styles you teach"
               options={YOGA_STYLES}
               value={answers.practice_styles ?? []}
-              onChange={val => saveAnswer('practice_styles', val)}
+              onChange={val => setAnswer('practice_styles', val)}
               maxSelect={5}
             />
           </>
@@ -95,7 +95,7 @@ export default function Step2Profile() {
             <SelectInput
               label="Practice level"
               value={answers.practice_level ?? ''}
-              onChange={val => saveAnswer('practice_level', val)}
+              onChange={val => setAnswer('practice_level', val)}
               options={PRACTICE_LEVELS}
               placeholder="Select your level…"
             />
@@ -103,7 +103,7 @@ export default function Step2Profile() {
               label="Styles you enjoy"
               options={YOGA_STYLES}
               value={answers.practice_styles ?? []}
-              onChange={val => saveAnswer('practice_styles', val)}
+              onChange={val => setAnswer('practice_styles', val)}
               maxSelect={5}
             />
           </>
