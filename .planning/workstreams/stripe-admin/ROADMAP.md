@@ -109,6 +109,6 @@ Plans:
 | 8. DB Foundation | 2/2 | Complete | 2026-03-23 |
 | 9. Stripe SDK + Webhook Infrastructure | 1/2 | In Progress|  |
 | 10. Webhook Handlers + Initial Sync | 3/3 | Complete    | 2026-03-24 |
-| 11. AdminShell Shop Nav | 1/1 | Complete   | 2026-03-24 |
+| 11. AdminShell Shop Nav | 1/1 | Complete    | 2026-03-24 |
 | 12. Shop Admin Pages | 0/? | Not started | - |
 | 13. Analytics | 0/? | Not started | - |
