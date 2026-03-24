@@ -116,9 +116,10 @@ describe('createCoupon', () => {
       publicCode: 'SUMMER25',
     })
 
-    expect(mockPromotionCodesCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ coupon: 'cpn_test123', code: 'SUMMER25' })
-    )
+    expect(mockPromotionCodesCreate).toHaveBeenCalledWith({
+      promotion: { type: 'coupon', coupon: 'cpn_test123' },
+      code: 'SUMMER25',
+    })
     expect(result).toEqual({ success: true })
   })
 
