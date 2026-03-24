@@ -45,6 +45,8 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 **Phase 11 complete (2026-03-24):** Collapsible "Shop" nav group added to AdminShell sidebar with Orders, Products, Coupons, Analytics child links. Legacy top-level Products link removed. NavItem union type (NavLink | NavGroup) established for typed mixed navigation.
 
+**Phase 12 complete (2026-03-24):** Full Shop admin pages — Products list with dnd-kit sortable table, detail/edit with Stripe price immutability handling and visibility config; Orders list with filters/search/bulk actions, detail with event timeline and refund/cancel; Coupons list with create/edit, detail with manual assignment and redemption history. 7 plans executed including gap closure for createLocalProduct flow and coupon test fix. 4 human verification items pending (drag-drop, status toggle, address rendering, role restrictions UI).
+
 ## Requirements
 
 ### Validated
