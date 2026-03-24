@@ -1,7 +1,9 @@
 export type StepKey = string;
 
+export type MemberType = 'student' | 'teacher' | 'wellness_practitioner';
+
 export interface OnboardingAnswers {
-  member_type?: 'student' | 'teacher' | 'wellness_practitioner';
+  member_type?: MemberType;
   first_name?: string;
   last_name?: string;
   email?: string;

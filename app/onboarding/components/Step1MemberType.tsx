@@ -1,6 +1,7 @@
 'use client';
 
-import { useOnboarding, type MemberType } from './OnboardingProvider';
+import { useOnboarding } from './OnboardingProvider';
+import type { MemberType } from '../lib/steps';
 import OnboardingStep from './OnboardingStep';
 import RadioCards from './inputs/RadioCards';
 
