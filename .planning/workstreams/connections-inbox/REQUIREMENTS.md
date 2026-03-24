@@ -34,8 +34,8 @@
 
 ### Admin
 
-- [ ] **ADM-01**: Admin can view any user's connections in a Connections tab on the user detail page
-- [ ] **ADM-02**: Admin can remove any connection from the user's Connections tab
+- [x] **ADM-01**: Admin can view any user's connections in a Connections tab on the user detail page
+- [x] **ADM-02**: Admin can remove any connection from the user's Connections tab
 
 ## Future Requirements
 
@@ -79,8 +79,8 @@
 | INBOX-02 | Phase 6 | Complete |
 | INBOX-03 | Phase 6 | Complete |
 | INBOX-04 | Phase 6 | Complete |
-| ADM-01 | Phase 7 | Pending |
-| ADM-02 | Phase 7 | Pending |
+| ADM-01 | Phase 7 | Complete |
+| ADM-02 | Phase 7 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 17 total

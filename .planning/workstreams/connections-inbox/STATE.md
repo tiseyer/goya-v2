@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Connections & Inbox
-status: Ready to plan
-stopped_at: Completed 06-settings-connections-inbox 06-02-PLAN.md — Phase 06 complete
-last_updated: "2026-03-24T01:34:23.889Z"
+status: Ready to execute
+stopped_at: Completed 07-admin-connections-tab/07-01-PLAN.md
+last_updated: "2026-03-24T02:12:01.120Z"
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 8
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 06 — settings-connections-inbox
+**Current focus:** Phase 07 — admin-connections-tab
 
 ## Current Position
 
-Phase: 7
-Plan: Not started
+Phase: 07 (admin-connections-tab) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Plan: Not started
 | Phase 06-settings-connections-inbox P01 | 5 | 2 tasks | 2 files |
 | Phase 06-settings-connections-inbox P02 | 10 | 2 tasks | 6 files |
 | Phase 06-settings-connections-inbox P02 | 10 | 3 tasks | 6 files |
+| Phase 07-admin-connections-tab P01 | 15 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase 06-02]: Header "View all messages" → "View all" — dropdown shows connection requests, not messages
 - [Phase 06-settings-connections-inbox]: Schools tab (faculty+requester) vs Principal Teacher tab (faculty+receiver) — role determines viewer perspective
 - [Phase 06-settings-connections-inbox]: Header link text changed from 'View all messages' to 'View all' — dropdown shows connection requests, not messages
+- [Phase 07-admin-connections-tab]: Use getSupabaseService() for admin connections fetch — RLS on connections only allows requester/recipient; admin sessions return 0 rows without service role
+- [Phase 07-admin-connections-tab]: URL search param tabs (?tab=connections) for deep-linkable server-rendered tab content
 
 ### Pending Todos
 
@@ -97,6 +100,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-24T01:28:56.783Z
-Stopped at: Completed 06-settings-connections-inbox 06-02-PLAN.md — Phase 06 complete
+Last session: 2026-03-24T02:12:01.117Z
+Stopped at: Completed 07-admin-connections-tab/07-01-PLAN.md
 Resume file: None
