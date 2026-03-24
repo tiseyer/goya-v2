@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       stripe_event_id: event.id,
       event_type: event.type,
       status: 'processing',
-      payload: event as unknown as Record<string, unknown>,
+      payload: JSON.parse(JSON.stringify(event)),
     })
 
   // PostgreSQL unique_violation = duplicate event
