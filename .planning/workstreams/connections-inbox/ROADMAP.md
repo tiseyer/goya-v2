@@ -81,7 +81,7 @@ Plans:
   2. Admin can remove any connection from the Connections tab without leaving the user detail page
 **Plans**: 2 plans
 Plans:
-- [ ] 07-01-PLAN.md &mdash; Add Connections tab with server action, remove button, and tab bar to admin user detail
+- [x] 07-01-PLAN.md &mdash; Add Connections tab with server action, remove button, and tab bar to admin user detail
 - [ ] 07-02-PLAN.md &mdash; Human verification of admin Connections tab end-to-end
 **UI hint**: yes
 
@@ -95,4 +95,4 @@ Plans:
 | 4. Database Foundation | v1.1 | 2/2 | Complete | 2026-03-23 |
 | 5. Profile Page Buttons | v1.1 | 2/2 | Complete   | 2026-03-23 |
 | 6. Settings Connections & Inbox | v1.1 | 2/2 | Complete   | 2026-03-24 |
-| 7. Admin Connections Tab | v1.1 | 0/2 | Not started | - |
+| 7. Admin Connections Tab | v1.1 | 1/2 | In Progress|  |
