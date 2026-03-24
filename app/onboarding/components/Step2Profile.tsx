@@ -40,26 +40,24 @@ export default function Step2Profile() {
 
   return (
     <OnboardingStep
-      stepNumber={2}
       title="Tell us about yourself"
       subtitle="This information will appear on your public profile."
-      continueDisabled={!answers.full_name?.trim()}
+      nextDisabled={!answers.first_name?.trim()}
     >
       <div className="space-y-5">
         <TextInput
-          label="Full name"
-          value={answers.full_name ?? ''}
-          onChange={val => setAnswer('full_name', val)}
-          placeholder="Your full name"
+          label="First name"
+          value={answers.first_name ?? ''}
+          onChange={val => setAnswer('first_name', val)}
+          placeholder="Your first name"
           required
         />
 
         <TextInput
-          label="Location"
-          value={answers.location ?? ''}
-          onChange={val => setAnswer('location', val)}
-          placeholder="City, Country"
-          helpText="E.g. Bali, Indonesia"
+          label="Last name"
+          value={answers.last_name ?? ''}
+          onChange={val => setAnswer('last_name', val)}
+          placeholder="Your last name"
         />
 
         <TextareaInput
@@ -83,7 +81,6 @@ export default function Step2Profile() {
               placeholder="Select range…"
             />
             <CheckboxCards
-              label="Yoga styles you teach"
               options={YOGA_STYLES}
               value={answers.practice_styles ?? []}
               onChange={val => setAnswer('practice_styles', val)}
@@ -100,7 +97,6 @@ export default function Step2Profile() {
               placeholder="Select your level…"
             />
             <CheckboxCards
-              label="Styles you enjoy"
               options={YOGA_STYLES}
               value={answers.practice_styles ?? []}
               onChange={val => setAnswer('practice_styles', val)}

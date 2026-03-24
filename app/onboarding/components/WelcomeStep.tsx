@@ -5,7 +5,7 @@ import { useOnboarding } from './OnboardingProvider';
 export default function WelcomeStep() {
   const { goToNext, isSaving, answers } = useOnboarding();
 
-  const firstName = answers.full_name?.split(' ')[0] ?? '';
+  const firstName = answers.first_name ?? '';
 
   return (
     <div className="text-center space-y-8 py-8">
@@ -44,7 +44,7 @@ export default function WelcomeStep() {
 
       {/* CTA */}
       <button
-        onClick={goToNext}
+        onClick={() => goToNext()}
         disabled={isSaving}
         className="w-full max-w-sm mx-auto py-3.5 bg-[#4E87A0] text-white font-bold rounded-xl hover:bg-[#3A7190] transition-colors text-sm disabled:opacity-50 block"
       >

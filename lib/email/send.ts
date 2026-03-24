@@ -1,14 +1,21 @@
 import { resend, FROM_ADDRESS, REPLY_TO } from './client'
 import { render } from '@react-email/render'
 import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
 import * as React from 'react'
 import { wrapInEmailLayout } from './wrapper'
 import { DEFAULT_TEMPLATES } from './defaults'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+let _supabaseAdmin: ReturnType<typeof createClient<Database>> | null = null
+function getSupabaseAdmin() {
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+  }
+  return _supabaseAdmin
+}
 
 /**
  * @deprecated Use sendEmailFromTemplate() instead.
@@ -46,7 +53,7 @@ export async function sendEmail({
     })
 
     // Log to email_log table (fire-and-forget)
-    void supabaseAdmin.from('email_log').insert({
+    void getSupabaseAdmin().from('email_log').insert({
       recipient,
       subject,
       template_name: templateName,
@@ -58,7 +65,7 @@ export async function sendEmail({
   } catch (error) {
     console.error('[email] error:', error)
 
-    void supabaseAdmin.from('email_log').insert({
+    void getSupabaseAdmin().from('email_log').insert({
       recipient,
       subject,
       template_name: templateName,
@@ -80,7 +87,7 @@ export async function sendEmailFromTemplate({
   variables: Record<string, string>
 }): Promise<{ success: boolean; reason?: string; error?: unknown }> {
   // 1. Fetch template from DB
-  const { data: template } = await supabaseAdmin
+  const { data: template } = await getSupabaseAdmin()
     .from('email_templates')
     .select('subject, html_content, is_active')
     .eq('template_key', templateKey)
@@ -127,7 +134,7 @@ export async function sendEmailFromTemplate({
     })
 
     // 7. Log to email_log
-    void supabaseAdmin.from('email_log').insert({
+    void getSupabaseAdmin().from('email_log').insert({
       recipient,
       subject,
       template_name: templateKey,
@@ -139,7 +146,7 @@ export async function sendEmailFromTemplate({
   } catch (error) {
     console.error('[email] template send error:', error)
 
-    void supabaseAdmin.from('email_log').insert({
+    void getSupabaseAdmin().from('email_log').insert({
       recipient,
       subject,
       template_name: templateKey,

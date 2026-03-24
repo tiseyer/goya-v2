@@ -5,24 +5,23 @@ import OnboardingStep from './OnboardingStep';
 import FileUpload from './inputs/FileUpload';
 
 export default function Step3Documents() {
-  const { answers, setAnswer, userId, completeOnboarding, isSaving } = useOnboarding();
+  const { answers, setAnswer, userId, goToNext, isSaving } = useOnboarding();
   const isTeacher = answers.member_type === 'teacher' || answers.member_type === 'wellness_practitioner';
 
   return (
     <OnboardingStep
-      stepNumber={3}
       title={isTeacher ? 'Photo & Verification' : 'Add a profile photo'}
       subtitle={isTeacher
         ? 'Upload a photo and any relevant credentials or certificates for verification.'
         : 'A profile photo helps the community recognise you.'}
-      onContinue={completeOnboarding}
-      continueLabel="Complete Setup →"
+      onNext={goToNext}
+      nextLabel="Complete Setup →"
     >
       <div className="space-y-6">
         <FileUpload
           label="Profile photo"
           bucket="profile-photos"
-          path={userId ?? 'unknown'}
+          storagePath={userId ?? 'unknown'}
           accept="image/jpeg,image/png,image/webp"
           helpText="JPG, PNG or WebP · max 5 MB"
           onUploaded={url => setAnswer('avatar_url', url)}
@@ -33,11 +32,11 @@ export default function Step3Documents() {
           <FileUpload
             label="Credentials / Certificate (optional)"
             bucket="member-documents"
-            path={userId ?? 'unknown'}
+            storagePath={userId ?? 'unknown'}
             accept="application/pdf,image/jpeg,image/png"
             helpText="Upload a teaching certification, RYT certificate, or other credential. PDF, JPG or PNG · max 10 MB."
-            onUploaded={url => setAnswer('document_url', url)}
-            currentUrl={answers.document_url}
+            onUploaded={url => setAnswer('certificate_url', url)}
+            currentUrl={answers.certificate_url}
           />
         )}
 
