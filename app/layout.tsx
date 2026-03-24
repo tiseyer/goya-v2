@@ -79,9 +79,9 @@ export default async function RootLayout({
   const impersonationState = await getImpersonationState();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-slate-50 text-slate-900 flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-background text-foreground flex flex-col`}
       >
         {/* GA4 */}
         {ga4Id && (

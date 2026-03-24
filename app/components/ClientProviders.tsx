@@ -1,5 +1,6 @@
 'use client';
 
+import { ThemeProvider } from 'next-themes';
 import { CartProvider } from '@/app/context/CartContext';
 import { ConnectionsProvider } from '@/app/context/ConnectionsContext';
 import { ImpersonationProvider } from '@/app/context/ImpersonationContext';
@@ -14,12 +15,14 @@ export default function ClientProviders({
   impersonationState: ImpersonationState;
 }) {
   return (
-    <ImpersonationProvider value={impersonationState}>
-      <CartProvider>
-        <ConnectionsProvider>
-          {children}
-        </ConnectionsProvider>
-      </CartProvider>
-    </ImpersonationProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
+      <ImpersonationProvider value={impersonationState}>
+        <CartProvider>
+          <ConnectionsProvider>
+            {children}
+          </ConnectionsProvider>
+        </CartProvider>
+      </ImpersonationProvider>
+    </ThemeProvider>
   );
 }

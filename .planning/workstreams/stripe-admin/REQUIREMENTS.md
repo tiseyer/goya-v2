@@ -15,10 +15,10 @@
 ### FIX — Bug Fixes & Admin Page Crashes
 
 - [ ] **FIX-01**: Admin and moderator users always display "Admin Member" / "Moderator Member" on the Subscriptions page, never "Guest", regardless of Stripe subscription status
-- [ ] **FIX-02**: /admin/shop/orders page loads without crashing — all data fetches wrapped in try/catch, empty state shown when data unavailable
-- [ ] **FIX-03**: /admin/shop/analytics page loads without crashing — all data fetches wrapped in try/catch, empty state shown when data unavailable
-- [ ] **FIX-04**: /admin/audit-log page loads without crashing — all data fetches wrapped in try/catch, empty state shown when data unavailable
-- [ ] **FIX-05**: /admin/shop/products page has a "+ Create Product" button (same pattern as existing "+ Create Coupon" on coupons page)
+- [x] **FIX-02**: /admin/shop/orders page loads without crashing — all data fetches wrapped in try/catch, empty state shown when data unavailable
+- [x] **FIX-03**: /admin/shop/analytics page loads without crashing — all data fetches wrapped in try/catch, empty state shown when data unavailable
+- [x] **FIX-04**: /admin/audit-log page loads without crashing — all data fetches wrapped in try/catch, empty state shown when data unavailable
+- [x] **FIX-05**: /admin/shop/products page has a "+ Create Product" button (same pattern as existing "+ Create Coupon" on coupons page)
 
 ### SUB — Subscriptions Page (Real Stripe Data)
 
@@ -86,10 +86,10 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FIX-01 | Phase 14 | Pending |
-| FIX-02 | Phase 20 | Pending |
-| FIX-03 | Phase 20 | Pending |
-| FIX-04 | Phase 20 | Pending |
-| FIX-05 | Phase 20 | Pending |
+| FIX-02 | Phase 20 | Complete |
+| FIX-03 | Phase 20 | Complete |
+| FIX-04 | Phase 20 | Complete |
+| FIX-05 | Phase 20 | Complete |
 | SUB-01 | Phase 15 | Pending |
 | SUB-02 | Phase 15 | Pending |
 | SUB-03 | Phase 15 | Pending |

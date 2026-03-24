@@ -8,6 +8,7 @@ import { useCart } from '@/app/context/CartContext';
 import MiniCart from './MiniCart';
 import GOYABadge from './GOYABadge';
 import { useConnections } from '@/app/context/ConnectionsContext';
+import { ThemeInline } from '@/app/components/ThemeToggle';
 import type { NotifRecord } from '@/app/context/ConnectionsContext';
 import { useImpersonation } from '@/app/context/ImpersonationContext';
 import { endImpersonation } from '@/app/actions/impersonation';
@@ -588,6 +589,11 @@ function UserMenu({
               </form>
             </div>
           )}
+
+          {/* Theme quick switch */}
+          <div className="border-t border-[#E5E7EB] px-4 py-2">
+            <ThemeInline />
+          </div>
 
           {/* Logout */}
           <div className="border-t border-[#E5E7EB] py-1.5">

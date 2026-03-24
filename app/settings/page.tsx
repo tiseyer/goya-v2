@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { updateProfile } from './actions';
+import { ThemeCards } from '@/app/components/ThemeToggle';
 
 const INPUT = 'w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2dd4bf]/40 focus:border-[#2dd4bf] transition-colors placeholder:text-slate-400';
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide';
@@ -392,7 +393,16 @@ export default function SettingsGeneralPage() {
           </div>
         </div>
 
-        {/* SECTION 3: Danger Zone */}
+        {/* SECTION 3: Appearance */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+          <div>
+            <h2 className="text-lg font-bold text-[#1a2744]">Appearance</h2>
+            <p className="text-sm text-slate-400 mt-0.5">Choose your preferred theme</p>
+          </div>
+          <ThemeCards />
+        </div>
+
+        {/* SECTION 4: Danger Zone */}
         <div className="rounded-2xl border-2 border-red-100 bg-red-50/20 p-6">
           <h2 className="text-lg font-bold text-red-700 mb-1">Danger Zone</h2>
           <p className="text-sm text-red-500/80 mb-5">These actions are permanent or hard to reverse.</p>
