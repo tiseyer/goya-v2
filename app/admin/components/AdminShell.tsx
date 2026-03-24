@@ -5,8 +5,28 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
-const NAV_ITEMS = [
+type NavLink = {
+  type: 'link';
+  href: string;
+  label: string;
+  badge?: boolean;
+  paths: string[];
+};
+
+type NavGroup = {
+  type: 'group';
+  label: string;
+  paths: string[];
+  children: Omit<NavLink, 'type'>[];
+};
+
+type NavItem = NavLink | NavGroup;
+
+// Role gating: AdminLayout redirects non-admin/moderator users before this component renders.
+// Shop nav items are visible to all users who reach AdminShell (admin + moderator only).
+const NAV_ITEMS: NavItem[] = [
   {
+    type: 'link',
     href: '/admin/dashboard',
     label: 'Dashboard',
     paths: [
@@ -14,6 +34,7 @@ const NAV_ITEMS = [
     ],
   },
   {
+    type: 'link',
     href: '/admin/inbox',
     label: 'Inbox',
     badge: true,
@@ -22,6 +43,7 @@ const NAV_ITEMS = [
     ],
   },
   {
+    type: 'link',
     href: '/admin/users',
     label: 'Users',
     paths: [
@@ -29,6 +51,7 @@ const NAV_ITEMS = [
     ],
   },
   {
+    type: 'link',
     href: '/admin/verification',
     label: 'Verification',
     paths: [
@@ -36,6 +59,7 @@ const NAV_ITEMS = [
     ],
   },
   {
+    type: 'link',
     href: '/admin/events',
     label: 'Events',
     paths: [
@@ -43,6 +67,7 @@ const NAV_ITEMS = [
     ],
   },
   {
+    type: 'link',
     href: '/admin/courses',
     label: 'Courses',
     paths: [
@@ -50,11 +75,18 @@ const NAV_ITEMS = [
     ],
   },
   {
-    href: '/admin/products',
-    label: 'Products',
-    paths: ['M16 11V7a4 4 0 00-8 0v4M5 9h14l1 10H4L5 9z'],
+    type: 'group',
+    label: 'Shop',
+    paths: ['M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z'],
+    children: [
+      { href: '/admin/shop/orders', label: 'Orders', paths: ['M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'] },
+      { href: '/admin/shop/products', label: 'Products', paths: ['M16 11V7a4 4 0 00-8 0v4M5 9h14l1 10H4L5 9z'] },
+      { href: '/admin/shop/coupons', label: 'Coupons', paths: ['M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z'] },
+      { href: '/admin/shop/analytics', label: 'Analytics', paths: ['M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'] },
+    ],
   },
   {
+    type: 'link',
     href: '/admin/credits',
     label: 'Credits',
     paths: [
@@ -62,6 +94,7 @@ const NAV_ITEMS = [
     ],
   },
   {
+    type: 'link',
     href: '/admin/impersonation-log',
     label: 'Audit Log',
     paths: [
@@ -70,6 +103,7 @@ const NAV_ITEMS = [
     ],
   },
   {
+    type: 'link',
     href: '/admin/settings',
     label: 'Settings',
     paths: [
@@ -84,11 +118,16 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [collapsed, setCollapsed] = useState(false);
   const [maintenanceActive, setMaintenanceActive] = useState(false);
   const [pendingSchools, setPendingSchools] = useState(0);
+  const [shopOpen, setShopOpen] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem('admin-sidebar-collapsed');
     if (stored !== null) setCollapsed(stored === 'true');
   }, []);
+
+  useEffect(() => {
+    if (pathname.startsWith('/admin/shop')) setShopOpen(true);
+  }, [pathname]);
 
   useEffect(() => {
     async function fetchPendingSchools() {
@@ -166,6 +205,76 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         {/* Nav items */}
         <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
           {NAV_ITEMS.map(item => {
+            if (item.type === 'group') {
+              const isAnyChildActive = item.children.some(child => pathname.startsWith(child.href));
+              return (
+                <div key={item.label}>
+                  <button
+                    onClick={() => setShopOpen(prev => !prev)}
+                    title={collapsed ? item.label : undefined}
+                    className={[
+                      'w-full flex items-center gap-3 px-2 py-2.5 rounded-xl transition-all duration-150 cursor-pointer',
+                      collapsed ? 'justify-center' : '',
+                      isAnyChildActive
+                        ? 'bg-primary/10 text-primary font-semibold'
+                        : 'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
+                    ].join(' ')}
+                  >
+                    <div className="relative shrink-0">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        {item.paths.map((d, i) => (
+                          <path key={i} strokeLinecap="round" strokeLinejoin="round" strokeWidth={isAnyChildActive ? 2 : 1.75} d={d} />
+                        ))}
+                      </svg>
+                    </div>
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1 text-sm whitespace-nowrap overflow-hidden text-left">
+                          {item.label}
+                        </span>
+                        <svg
+                          className={`w-3.5 h-3.5 transition-transform duration-200 ${shopOpen ? 'rotate-180' : ''}`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                  {shopOpen && !collapsed && (
+                    <div className="mt-0.5 space-y-0.5">
+                      {item.children.map(child => {
+                        const isChildActive = pathname.startsWith(child.href);
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className={[
+                              'flex items-center gap-3 pl-9 pr-2 py-2 rounded-xl transition-all duration-150',
+                              isChildActive
+                                ? 'bg-primary/10 text-primary font-semibold'
+                                : 'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
+                            ].join(' ')}
+                          >
+                            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                              {child.paths.map((d, i) => (
+                                <path key={i} strokeLinecap="round" strokeLinejoin="round" strokeWidth={isChildActive ? 2 : 1.75} d={d} />
+                              ))}
+                            </svg>
+                            <span className="text-xs whitespace-nowrap overflow-hidden">
+                              {child.label}
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            // type === 'link'
             const isActive = pathname.startsWith(item.href);
             const badgeCount = item.badge ? pendingSchools : 0;
             return (
