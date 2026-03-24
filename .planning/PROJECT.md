@@ -2,38 +2,20 @@
 
 ## What This Is
 
-GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions through a unified settings section. Admins manage the community through a full-featured admin panel.
+GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions through a unified settings section. Admins manage the community through a full-featured admin panel with a comprehensive Shop section for products, orders, coupons, and analytics powered by bidirectional Stripe integration.
 
 ## Core Value
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Active Milestones
-
-### v1.2 Stripe Admin & Shop (`stripe-admin` workstream)
-
-**Goal:** Build a full bidirectional Stripe sync and Shop admin section with Products, Orders, Coupons, and Analytics.
-
-**Target features:**
-- DB foundation: 5 Supabase tables mirroring Stripe entities (products, prices, orders, coupons, redemptions) + GOYA-specific fields
-- Webhook processing: 12+ Stripe event types with reliable retry logic
-- AdminShell "Shop" nav dropdown: Orders, Products, Coupons, Analytics
-- Shop > Products: table, CRUD, drag-and-drop ordering, bulk actions, visibility logic (show/hide by owned products)
-- Shop > Orders: Stripe payment intents & subscriptions view, refund/cancel, timeline, customer journey
-- Shop > Coupons: create/manage, manual user assignment, usage history, bidirectional Stripe sync
-- Shop > Analytics: user funnel + revenue metrics (ARR), split by role, CSV export, interactive charts
-
 ## Current State
 
-**As of v1.1 (2026-03-24):** Connections & Inbox milestone shipped. Full connections system with Supabase backend — connections table (peer/mentorship/faculty types), RLS policies, role-aware ConnectButton on profile pages, tabbed Settings > Connections and Settings > Inbox with accept/decline/remove/filter, and admin Connections tab on user detail page with service-role fetch.
-
-**Phase 09 complete (2026-03-23):** Stripe SDK infrastructure in place — server-only singleton at `lib/stripe/client.ts` and webhook route handler at `app/api/webhooks/stripe/route.ts` with HMAC signature verification. 7 unit tests passing.
-
-**Phase 10 complete (2026-03-24):** All 15 Stripe event types handled with idempotent upserts. 6 handler files, dispatch switch with 23505 dedup, Vercel Cron for deferred events (`*/5 * * * *`), and admin sync endpoint with cursor pagination. 47 unit tests passing.
-
-**Phase 11 complete (2026-03-24):** Collapsible "Shop" nav group added to AdminShell sidebar with Orders, Products, Coupons, Analytics child links. Legacy top-level Products link removed. NavItem union type (NavLink | NavGroup) established for typed mixed navigation.
-
-**Phase 12 complete (2026-03-24):** Full Shop admin pages — Products list with dnd-kit sortable table, detail/edit with Stripe price immutability handling and visibility config; Orders list with filters/search/bulk actions, detail with event timeline and refund/cancel; Coupons list with create/edit, detail with manual assignment and redemption history. 7 plans executed including gap closure for createLocalProduct flow and coupon test fix. 4 human verification items pending (drag-drop, status toggle, address rendering, role restrictions UI).
+**As of v1.2 (2026-03-24):** Stripe Admin & Shop milestone shipped. Full bidirectional Stripe integration with 5 mirror tables, webhook processing for 15 event types, and complete Shop admin section:
+- **Products**: dnd-kit sortable table, CRUD with Stripe sync, price immutability handling, visibility rules (show-to/don't-show-to)
+- **Orders**: filters/search/bulk actions, detail with event timeline, refund (full/partial), subscription cancel (schedule/immediate), customer journey
+- **Coupons**: create/edit with Stripe sync, manual assignment, role/product restrictions, redemption history
+- **Analytics**: funnel + revenue metrics (ARR with subscription dedup), role-split filtering, Recharts charts, CSV export — all from local Supabase tables
+- 126 unit tests, 37/37 requirements satisfied
 
 ## Requirements
 
@@ -79,9 +61,19 @@ Members stay professionally connected, credentialed, and engaged through a singl
 - ✓ Header notification "View all" links to /settings/inbox — v1.1
 - ✓ Admin Connections tab on user detail page with service-role fetch and remove action — v1.1
 
+<!-- v1.2 Stripe Admin & Shop milestone -->
+- ✓ 5 Stripe mirror tables with admin/moderator RLS and webhook idempotency — v1.2
+- ✓ Server-only Stripe SDK singleton and webhook endpoint with signature verification — v1.2
+- ✓ 15 Stripe event type handlers with idempotent upserts and admin sync — v1.2
+- ✓ Shop nav group in AdminShell sidebar (Orders, Products, Coupons, Analytics) — v1.2
+- ✓ Products admin: table, CRUD, drag-drop reorder, price change, visibility rules — v1.2
+- ✓ Orders admin: filters/search, detail with timeline, refund/cancel actions — v1.2
+- ✓ Coupons admin: create/edit, manual assignment, redemption history — v1.2
+- ✓ Analytics dashboard: funnel + revenue metrics, role filter, Recharts charts, CSV export — v1.2
+
 ### Active
 
-<!-- v1.2 Stripe Admin & Shop milestone — see stripe-admin workstream -->
+(No active milestone — next milestone to be defined)
 
 ### Out of Scope
 
@@ -118,6 +110,11 @@ Members stay professionally connected, credentialed, and engaged through a singl
 | Profiles join in ConnectionsContext | Single source of truth, avoids N+1 fetches on pages | ✓ Context load — v1.1 |
 | getSupabaseService() for admin connections | RLS restricts to requester/recipient; admin needs service role | ✓ Admin tab — v1.1 |
 | URL search param tabs for admin detail | Deep-linkable, server-rendered tab content | ✓ ?tab=connections — v1.1 |
+| Supabase as cache, Stripe as source of truth | Write-partitioning prevents webhook loops | ✓ Implemented — v1.2 |
+| Async webhook processing via Vercel Cron | Avoid blocking webhook responses for complex side-effects | ✓ pending_cron status + cron route — v1.2 |
+| Recharts 3.8.0 locked version | 3.7.x has React 19 blank-chart regression | ✓ Analytics charts — v1.2 |
+| Pure computation functions for analytics | Testable, reusable metrics without DB coupling | ✓ 42 unit tests — v1.2 |
+| No Stripe API calls on analytics page | Compute from local Supabase tables for speed and rate limit safety | ✓ Analytics page — v1.2 |
 
 ## Evolution
 
@@ -130,4 +127,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 after v1.1 milestone*
+*Last updated: 2026-03-24 after v1.2 milestone*

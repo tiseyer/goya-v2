@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.2 Stripe Admin & Shop (Shipped: 2026-03-24)
+
+**Phases completed:** 6 phases (8–13), 17 plans, 47 tasks
+**Files changed:** 90 | **Lines added:** 12,325
+**Timeline:** 2026-03-23 → 2026-03-24 (2 days)
+**Requirements:** 37/37 satisfied | **Audit:** tech_debt (5 low-severity items)
+
+**Key accomplishments:**
+
+- Supabase DB foundation: 5 Stripe mirror tables + webhook_events idempotency table + bridge columns, all with admin/moderator RLS
+- Stripe SDK singleton (server-only) + webhook endpoint with HMAC signature verification + 15 event type handlers with idempotent upserts
+- Shop admin section: Products (dnd-kit sortable, CRUD, price immutability, visibility rules), Orders (filters, refund/cancel, event timeline, customer journey), Coupons (create/edit, manual assignment, redemption history)
+- Analytics dashboard: funnel + revenue metrics (ARR with subscription dedup), role-split filtering, Recharts charts, CSV export — all from local Supabase tables (zero Stripe API calls at page load)
+- Collapsible Shop nav group in AdminShell sidebar with Orders, Products, Coupons, Analytics child links
+- 126 unit tests across metrics, CSV, handlers, SDK, and server actions
+
+---
+
 ## v1.1 Connections & Inbox (Shipped: 2026-03-24)
 
 **Phases completed:** 4 phases, 8 plans, 12 tasks
