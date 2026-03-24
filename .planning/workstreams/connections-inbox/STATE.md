@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Connections & Inbox
-status: Milestone complete
-stopped_at: Completed 07-admin-connections-tab/07-01-PLAN.md
-last_updated: "2026-03-24T02:32:53.306Z"
+status: Ready to execute
+stopped_at: Completed 12-07-PLAN.md
+last_updated: "2026-03-24T04:06:07.445Z"
 progress:
-  total_phases: 5
+  total_phases: 4
   completed_phases: 4
-  total_plans: 10
-  completed_plans: 9
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 07 — admin-connections-tab
+**Current focus:** Phase 12 — shop-admin-pages
 
 ## Current Position
 
-Phase: 7
-Plan: Not started
+Phase: 12 (shop-admin-pages) — EXECUTING
+Plan: 2 of 7
 
 ## Performance Metrics
 
@@ -55,6 +55,9 @@ Plan: Not started
 | Phase 06-settings-connections-inbox P02 | 10 | 2 tasks | 6 files |
 | Phase 06-settings-connections-inbox P02 | 10 | 3 tasks | 6 files |
 | Phase 07-admin-connections-tab P01 | 15 | 2 tasks | 3 files |
+| Phase 12 P05 | 5 | 2 tasks | 5 files |
+| Phase 12-shop-admin-pages P03 | 15 | 1 tasks | 5 files |
+| Phase 12 P07 | 5 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -87,6 +90,10 @@ Recent decisions affecting current work:
 - [Phase 06-settings-connections-inbox]: Header link text changed from 'View all messages' to 'View all' — dropdown shows connection requests, not messages
 - [Phase 07-admin-connections-tab]: Use getSupabaseService() for admin connections fetch — RLS on connections only allows requester/recipient; admin sessions return 0 rows without service role
 - [Phase 07-admin-connections-tab]: URL search param tabs (?tab=connections) for deep-linkable server-rendered tab content
+- [Phase 12]: role_restrictions and product_restrictions stored as GOYA-local jsonb on stripe_coupons — never passed to Stripe API
+- [Phase 12]: [Phase 12-05] free_product discount type maps to percent_off:100 in Stripe (Pitfall 6 per research)
+- [Phase 12]: Payment Method column shows dash in Orders table — payment_method_type column not in stripe_orders schema; deferred to future phase
+- [Phase 12]: createLocalProduct uses insert-then-link pattern: INSERT local row first to get real UUID before calling Stripe API
 
 ### Pending Todos
 
@@ -100,6 +107,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-24T02:12:01.117Z
-Stopped at: Completed 07-admin-connections-tab/07-01-PLAN.md
+Last session: 2026-03-24T04:06:07.441Z
+Stopped at: Completed 12-07-PLAN.md
 Resume file: None
