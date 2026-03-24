@@ -23,7 +23,7 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 - [x] **Phase 4: Database Foundation** — connections table, RLS policies, migration, wire real Supabase
 - [x] **Phase 5: Profile Page Buttons** — role-aware connect buttons on profile pages (completed 2026-03-23)
 - [x] **Phase 6: Settings Connections & Inbox** — full Settings > Connections and Settings > Inbox pages (completed 2026-03-24)
-- [ ] **Phase 7: Admin Connections Tab** — admin user detail Connections tab
+- [x] **Phase 7: Admin Connections Tab** — admin user detail Connections tab (completed 2026-03-24)
 
 ## Phase Details
 
@@ -82,7 +82,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 07-01-PLAN.md &mdash; Add Connections tab with server action, remove button, and tab bar to admin user detail
-- [ ] 07-02-PLAN.md &mdash; Human verification of admin Connections tab end-to-end
+- [x] 07-02-PLAN.md &mdash; Human verification of admin Connections tab end-to-end
 **UI hint**: yes
 
 ## Progress
@@ -95,4 +95,4 @@ Plans:
 | 4. Database Foundation | v1.1 | 2/2 | Complete | 2026-03-23 |
 | 5. Profile Page Buttons | v1.1 | 2/2 | Complete   | 2026-03-23 |
 | 6. Settings Connections & Inbox | v1.1 | 2/2 | Complete   | 2026-03-24 |
-| 7. Admin Connections Tab | v1.1 | 1/2 | In Progress|  |
+| 7. Admin Connections Tab | v1.1 | 1/2 | Complete    | 2026-03-24 |
