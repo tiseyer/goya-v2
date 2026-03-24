@@ -10,18 +10,6 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 ## Active Milestones
 
-### v1.1 Connections & Inbox (`connections-inbox` workstream)
-
-**Goal:** Replace the localStorage-backed connection system with a real Supabase backend and build the full Connections & Inbox UX.
-
-**Target features:**
-- DB layer: connections table with types (peer/mentorship/faculty), RLS policies, migrations
-- Wire ConnectButton + ConnectionsContext to real Supabase (replace localStorage)
-- ✅ Role-aware profile buttons: Request Mentorship (student→teacher), Apply as Faculty (teacher→school), Manage School (school owner) — Validated in Phase 05: profile-page-buttons
-- ✅ Settings > Connections: tabbed view (My Connections, My Mentors, My Mentees, My Faculty, My Schools) with status + remove actions — Validated in Phase 06: settings-connections-inbox
-- ✅ Settings > Inbox: full connection request inbox (accept/decline, filter by type); header "View all" links here — Validated in Phase 06: settings-connections-inbox
-- Admin > User detail: Connections tab to view/manage any user's connections
-
 ### v1.2 Stripe Admin & Shop (`stripe-admin` workstream)
 
 **Goal:** Build a full bidirectional Stripe sync and Shop admin section with Products, Orders, Coupons, and Analytics.
@@ -37,7 +25,7 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 ## Current State
 
-**As of v1.0 (2026-03-23):** User Settings milestone shipped. Settings are now accessible from the profile dropdown for all user types via a sidebar-navigated shell at `/settings`, with General (profile form), Subscriptions (live membership data), Connections (placeholder), and Inbox (placeholder) pages.
+**As of v1.1 (2026-03-24):** Connections & Inbox milestone shipped. Full connections system with Supabase backend — connections table (peer/mentorship/faculty types), RLS policies, role-aware ConnectButton on profile pages, tabbed Settings > Connections and Settings > Inbox with accept/decline/remove/filter, and admin Connections tab on user detail page with service-role fetch.
 
 **Phase 09 complete (2026-03-23):** Stripe SDK infrastructure in place — server-only singleton at `lib/stripe/client.ts` and webhook route handler at `app/api/webhooks/stripe/route.ts` with HMAC signature verification. 7 unit tests passing.
 
@@ -81,16 +69,22 @@ Members stay professionally connected, credentialed, and engaged through a singl
 - ✓ Settings > General shows existing profile settings content — v1.0
 - ✓ Settings > Subscriptions shows existing subscriptions content — v1.0
 - ✓ Settings > Connections is a placeholder page — v1.0
-- ✓ Settings > Inbox is a placeholder page — v1.0
+
+<!-- v1.1 Connections & Inbox milestone -->
+- ✓ Connections table with peer/mentorship/faculty types, RLS policies, migration — v1.1
+- ✓ ConnectionsContext and ConnectButton backed by real Supabase (localStorage removed) — v1.1
+- ✓ Role-aware ConnectButton: Request Mentorship, Apply as Faculty, Manage School, Connect — v1.1
+- ✓ Settings > Connections: tabbed view with status badges and remove action — v1.1
+- ✓ Settings > Inbox: accept/decline incoming requests with type filter — v1.1
+- ✓ Header notification "View all" links to /settings/inbox — v1.1
+- ✓ Admin Connections tab on user detail page with service-role fetch and remove action — v1.1
 
 ### Active
 
-<!-- v1.1 Connections & Inbox milestone -->
+<!-- v1.2 Stripe Admin & Shop milestone — see stripe-admin workstream -->
 
 ### Out of Scope
 
-- Connections settings implementation — in progress in v1.1
-- Inbox settings implementation — in progress in v1.1
 - Notification preferences — out of scope for settings MVP
 - Account deletion in settings — high-risk operation, deferred
 - Password change in settings — handled via forgot-password flow
@@ -119,6 +113,11 @@ Members stay professionally connected, credentialed, and engaged through a singl
 | Exact match for General nav item | Avoid General being active on all sub-routes | ✓ `pathname === '/settings'` — v1.0 |
 | Separate localStorage key for settings sidebar | Independent collapse state from admin sidebar | ✓ `settings-sidebar-collapsed` — v1.0 |
 | No role check in settings layout | Settings is for all authenticated users, unlike admin | ✓ Auth-only guard — v1.0 |
+| unique(requester_id, recipient_id) constraint | Prevents duplicate connection requests at DB level | ✓ Enforced — v1.1 |
+| ROLE_PAIR_MAP for connect button labels | O(1) role lookup, easily extensible for new role pairs | ✓ ConnectButton — v1.1 |
+| Profiles join in ConnectionsContext | Single source of truth, avoids N+1 fetches on pages | ✓ Context load — v1.1 |
+| getSupabaseService() for admin connections | RLS restricts to requester/recipient; admin needs service role | ✓ Admin tab — v1.1 |
+| URL search param tabs for admin detail | Deep-linkable, server-rendered tab content | ✓ ?tab=connections — v1.1 |
 
 ## Evolution
 
@@ -131,4 +130,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 — Phase 11 complete: AdminShell Shop nav group*
+*Last updated: 2026-03-24 after v1.1 milestone*
