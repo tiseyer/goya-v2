@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-03-25T07:50:00Z"
+status: Phase 01 complete
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-03-25T10:40:00Z"
 progress:
   total_phases: 8
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 
 ## Current Position
 
-Phase: 01 (foundation) — EXECUTING
-Plan: 4 of 4
+Phase: 01 (foundation) — COMPLETE
+Plan: 4 of 4 (all complete)
 
 ## Performance Metrics
 
@@ -41,9 +41,10 @@ Plan: 4 of 4
 | - | - | - | - |
 
 *Updated after each plan completion*
-| Phase 01 P01 | 127 | 2 tasks | 3 files |
-| Phase 15 P02 | 15 | 2 tasks | 3 files |
+| Phase 01 P01 | 127 min | 2 tasks | 3 files |
+| Phase 01 P02 | 15 min | 2 tasks | 3 files |
 | Phase 01 P03 | 35 min | 1 task | 1 file |
+| Phase 01 P04 | 20 min | 2 tasks | 1 file |
 
 ## Accumulated Context
 
@@ -61,6 +62,8 @@ Plan: 4 of 4
 - [Phase 01 P03]: In-memory rate limiter with periodic cleanup every 1000 calls — avoids background timers
 - [Phase 15]: Inline Separator function component — no separate file needed for a single-use 4-line component
 - [Phase 15]: Optimistic UI in DesignationsBox (filter local state) — avoids full page reload; softDeleteDesignation still calls revalidatePath for next hard navigation
+- [Phase 01 P04]: Health endpoint has no auth/rate-limit — AUTH-05 requires public access
+- [Phase 01 P04]: api_keys migration applied via supabase db query --linked — duplicate 20260341 timestamp prefix blocked standard db push
 
 ### Pending Todos
 
@@ -72,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T07:50:00Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-03-25T10:40:00Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None

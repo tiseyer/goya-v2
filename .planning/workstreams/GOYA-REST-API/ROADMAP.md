@@ -6,7 +6,7 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** - API key system, middleware, rate limiting, response format, health endpoint, handler factory, service layer, pagination, audit logging
+- [x] **Phase 1: Foundation** - API key system, middleware, rate limiting, response format, health endpoint, handler factory, service layer, pagination, audit logging
 - [ ] **Phase 2: Users** - Full users API with profile sub-resources (credits, certifications, verifications)
 - [ ] **Phase 3: Events** - Events CRUD with registration management
 - [ ] **Phase 4: Courses** - Courses CRUD with enrollment management
@@ -32,7 +32,7 @@ Plans:
 - [x] 01-01-PLAN.md — API keys migration, response types, response helpers
 - [x] 01-02-PLAN.md — Handler factory and pagination utilities
 - [x] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
-- [ ] 01-04-PLAN.md — Health endpoint and migration push
+- [x] 01-04-PLAN.md — Health endpoint and migration push
 
 ### Phase 2: Users
 **Goal**: Callers can list, retrieve, and update users plus read their associated credits, certifications, and verifications
@@ -141,7 +141,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/4 | In Progress|  |
+| 1. Foundation | 4/4 | Complete | 2026-03-25 |
 | 2. Users | 0/? | Not started | - |
 | 3. Events | 0/? | Not started | - |
 | 4. Courses | 0/? | Not started | - |

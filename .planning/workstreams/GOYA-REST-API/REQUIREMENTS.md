@@ -13,10 +13,10 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 - [x] **AUTH-02**: Middleware validates API keys on all `/api/v1/` routes
 - [x] **AUTH-03**: Rate limiting enforced per key (100 req/min)
 - [x] **AUTH-04**: All responses follow consistent format: `{ success, data, error, meta }`
-- [ ] **AUTH-05**: `/api/v1/health` endpoint returns status + version without auth
+- [x] **AUTH-05**: `/api/v1/health` endpoint returns status + version without auth
 - [x] **AUTH-06**: Admin-only endpoints check for admin role in addition to API key
-- [ ] **AUTH-07**: Shared route handler factory reduces repetition across endpoints
-- [ ] **AUTH-08**: Business logic lives in `/lib/api/` service files, not route handlers
+- [x] **AUTH-07**: Shared route handler factory reduces repetition across endpoints
+- [x] **AUTH-08**: Business logic lives in `/lib/api/` service files, not route handlers
 - [x] **AUTH-09**: Supabase service role client used for all API operations (bypass RLS)
 
 ### Users
