@@ -266,7 +266,7 @@ function GeneralTab() {
   useEffect(() => {
     async function load() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await (supabase as any)
+      const { data } = await supabase
         .from('site_settings')
         .select('key, value')
         .in('key', ['maintenance_mode_enabled', 'maintenance_mode_scheduled', 'maintenance_start_utc', 'maintenance_end_utc', 'maintenance_message']);
@@ -304,7 +304,7 @@ function GeneralTab() {
     ];
     for (const row of rows) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any)
+      await supabase
         .from('site_settings')
         .upsert(
           { ...row, updated_at: new Date().toISOString(), updated_by: user?.id ?? null },
@@ -517,7 +517,7 @@ function AnalyticsTab() {
   useEffect(() => {
     async function load() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await (supabase as any)
+      const { data } = await supabase
         .from('site_settings')
         .select('key, value')
         .in('key', ['ga4_measurement_id', 'clarity_project_id', 'analytics_enabled']);
@@ -584,7 +584,7 @@ function AnalyticsTab() {
 
     for (const row of rows) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any)
+      await supabase
         .from('site_settings')
         .upsert(
           { ...row, updated_at: new Date().toISOString(), updated_by: user?.id ?? null },

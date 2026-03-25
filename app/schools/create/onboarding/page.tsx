@@ -164,7 +164,7 @@ export default function SchoolOnboardingPage() {
 
       // Generate and verify slug uniqueness
       let slug = generateSlug(form.name.trim());
-      const { data: existing } = await (supabase as any)
+      const { data: existing } = await supabase
         .from('schools')
         .select('id')
         .eq('slug', slug)
@@ -175,7 +175,7 @@ export default function SchoolOnboardingPage() {
       }
 
       // Insert school record
-      const { data: school, error: insertError } = await (supabase as any)
+      const { data: school, error: insertError } = await supabase
         .from('schools')
         .insert({
           owner_id: user.id,

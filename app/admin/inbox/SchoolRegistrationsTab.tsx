@@ -57,7 +57,7 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
   async function handleApprove(schoolId: string) {
     setBusy(schoolId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('schools')
       .update({ status: 'approved', rejection_reason: null })
       .eq('id', schoolId);
@@ -72,7 +72,7 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
   async function handleReject(schoolId: string) {
     setBusy(schoolId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('schools')
       .update({ status: 'rejected', rejection_reason: rejectReason || null })
       .eq('id', schoolId);
@@ -89,7 +89,7 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
   async function handleReset(schoolId: string) {
     setBusy(schoolId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('schools')
       .update({ status: 'pending', rejection_reason: null })
       .eq('id', schoolId);

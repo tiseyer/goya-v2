@@ -786,7 +786,7 @@ export default function Header() {
   function checkMaintenance(role: string | undefined) {
     if (role !== 'admin' && role !== 'moderator') return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (supabase as any)
+    supabase
       .from('site_settings')
       .select('key, value')
       .in('key', ['maintenance_mode_enabled', 'maintenance_mode_scheduled', 'maintenance_start_utc', 'maintenance_end_utc'])
@@ -816,7 +816,7 @@ export default function Header() {
             setProfile(p);
             checkMaintenance(p?.role);
             if (p?.role === 'teacher') {
-              (supabase as any).from('schools').select('id').eq('owner_id', data.user!.id).maybeSingle()
+              supabase.from('schools').select('id').eq('owner_id', data.user!.id).maybeSingle()
                 .then(({ data: s }: { data: { id: string } | null }) => setSchoolId(s?.id ?? null));
             }
           });
@@ -830,7 +830,7 @@ export default function Header() {
             setProfile(p);
             checkMaintenance(p?.role);
             if (p?.role === 'teacher') {
-              (supabase as any).from('schools').select('id').eq('owner_id', session.user!.id).maybeSingle()
+              supabase.from('schools').select('id').eq('owner_id', session.user!.id).maybeSingle()
                 .then(({ data: s }: { data: { id: string } | null }) => setSchoolId(s?.id ?? null));
             } else {
               setSchoolId(null);

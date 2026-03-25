@@ -93,7 +93,7 @@ export default async function AddonsPage() {
   let hasPendingUpgrade = false
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: pendingUpgrade } = await (supabase as any)
+    const { data: pendingUpgrade } = await supabase
       .from('upgrade_requests')
       .select('id')
       .eq('user_id', user.id)

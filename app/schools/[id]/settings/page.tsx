@@ -9,7 +9,7 @@ export default async function SchoolSettingsPage({ params }: { params: Promise<{
   if (!user) redirect('/sign-in')
 
   // Fetch school (RLS will enforce access — owner or admin can see it)
-  const { data: school } = await (supabase as any)
+  const { data: school } = await supabase
     .from('schools')
     .select('*')
     .eq('id', id)

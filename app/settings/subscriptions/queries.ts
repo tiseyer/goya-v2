@@ -104,7 +104,7 @@ export async function fetchSubscriptionsData(userId: string): Promise<Subscripti
 
   // Step 7: Fetch active user_designations
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: designationRows } = await (supabase as any)
+  const { data: designationRows } = await supabase
     .from('user_designations')
     .select('id, stripe_product_id, stripe_price_id, purchase_date')
     .eq('user_id', userId)
@@ -136,7 +136,7 @@ export async function fetchSubscriptionsData(userId: string): Promise<Subscripti
 
   // Step 8: Check upgrade_requests for a pending request by this user
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: pendingUpgrade } = await (supabase as any)
+  const { data: pendingUpgrade } = await supabase
     .from('upgrade_requests')
     .select('id')
     .eq('user_id', userId)

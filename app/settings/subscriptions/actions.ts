@@ -24,7 +24,7 @@ export async function softDeleteDesignation(designationId: string): Promise<void
   if (!user) redirect('/sign-in')
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('user_designations')
     .update({ deleted_at: new Date().toISOString(), deleted_by: user.id })
     .eq('id', designationId)

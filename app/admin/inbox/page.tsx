@@ -8,7 +8,7 @@ export default async function InboxPage() {
 
   // Fetch all schools with owner profile info
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: schoolsData } = await (supabase as any)
+  const { data: schoolsData } = await supabase
     .from('schools')
     .select(`
       id, name, logo_url, city, country, status, rejection_reason, created_at,
@@ -16,9 +16,13 @@ export default async function InboxPage() {
     `)
     .order('created_at', { ascending: false });
 
-  const schools = schoolsData ?? [];
+  // The join returns owner as an array; normalize to single object for the component
+  const schools = (schoolsData ?? []).map((s) => ({
+    ...s,
+    owner: Array.isArray(s.owner) ? s.owner[0] ?? null : s.owner,
+  }));
   const pendingSchoolCount = schools.filter(
-    (s: { status: string }) => s.status === 'pending'
+    (s) => s.status === 'pending'
   ).length;
 
   return (

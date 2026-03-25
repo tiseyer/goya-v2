@@ -132,7 +132,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     async function fetchPendingSchools() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { count } = await (supabase as any)
+      const { count } = await supabase
         .from('schools')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'pending');
@@ -144,7 +144,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     async function checkMaintenance() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await (supabase as any)
+      const { data } = await supabase
         .from('site_settings')
         .select('key, value')
         .in('key', ['maintenance_mode_enabled', 'maintenance_mode_scheduled', 'maintenance_start_utc', 'maintenance_end_utc']);

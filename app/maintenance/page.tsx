@@ -21,7 +21,7 @@ export default function MaintenancePage() {
   useEffect(() => {
     async function load() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await (supabase as any)
+      const { data } = await supabase
         .from('site_settings')
         .select('key, value')
         .in('key', ['maintenance_mode_enabled', 'maintenance_mode_scheduled', 'maintenance_end_utc', 'maintenance_message']);

@@ -173,7 +173,7 @@ export default function SchoolSettingsClient({
         setLogoFile(null);
       }
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('schools')
         .update({ name, description, logo_url: finalLogoUrl || null, updated_at: new Date().toISOString() })
         .eq('id', initialSchool.id);
@@ -191,7 +191,7 @@ export default function SchoolSettingsClient({
   async function saveLocation() {
     setSavingLocation(true);
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('schools')
         .update({ street_address: streetAddress || null, city: city || null, state: state || null, zip: zip || null, country: country || null, updated_at: new Date().toISOString() })
         .eq('id', initialSchool.id);
@@ -208,7 +208,7 @@ export default function SchoolSettingsClient({
   async function saveLinks() {
     setSavingLinks(true);
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('schools')
         .update({ website: website || null, instagram: instagram || null, facebook: facebook || null, youtube: youtube || null, tiktok: tiktok || null, updated_at: new Date().toISOString() })
         .eq('id', initialSchool.id);
@@ -225,7 +225,7 @@ export default function SchoolSettingsClient({
   async function confirmDelete() {
     setDeleting(true);
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('schools')
         .delete()
         .eq('id', initialSchool.id);

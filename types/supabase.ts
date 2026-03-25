@@ -607,6 +607,30 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_state: {
+        Row: {
+          user_id: string
+          current_step: number
+          max_step_reached: number
+          onboarding_complete: boolean
+          updated_at: string | null
+        }
+        Insert: {
+          user_id: string
+          current_step?: number
+          max_step_reached?: number
+          onboarding_complete?: boolean
+          updated_at?: string | null
+        }
+        Update: {
+          user_id?: string
+          current_step?: number
+          max_step_reached?: number
+          onboarding_complete?: boolean
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       poll_options: {
         Row: {
           created_at: string | null
@@ -1407,6 +1431,63 @@ export type Database = {
         }
         Relationships: []
       }
+      upgrade_requests: {
+        Row: {
+          id: string
+          user_id: string
+          status: string
+          certificate_urls: string[]
+          stripe_payment_intent_id: string | null
+          stripe_subscription_id: string | null
+          rejection_reason: string | null
+          created_at: string
+          updated_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          status?: string
+          certificate_urls?: string[]
+          stripe_payment_intent_id?: string | null
+          stripe_subscription_id?: string | null
+          rejection_reason?: string | null
+          created_at?: string
+          updated_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          status?: string
+          certificate_urls?: string[]
+          stripe_payment_intent_id?: string | null
+          stripe_subscription_id?: string | null
+          rejection_reason?: string | null
+          created_at?: string
+          updated_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "upgrade_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "upgrade_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_course_progress: {
         Row: {
           completed_at: string | null
@@ -1438,6 +1519,51 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_designations: {
+        Row: {
+          id: string
+          user_id: string
+          stripe_product_id: string
+          stripe_price_id: string
+          purchase_date: string
+          deleted_at: string | null
+          deleted_by: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          stripe_product_id: string
+          stripe_price_id: string
+          purchase_date?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          stripe_product_id?: string
+          stripe_price_id?: string
+          purchase_date?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_designations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_designations_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
