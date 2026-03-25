@@ -130,5 +130,5 @@ Plans:
 | 20. Fix Broken Admin Pages | 1/1 | Complete    | 2026-03-24 |
 | 15. Subscriptions Page | 1/2 | Complete    | 2026-03-25 |
 | 16. Upgrade CTA | 1/1 | Complete    | 2026-03-25 |
-| 17. Upgrade Page | 2/2 | Complete   | 2026-03-25 |
+| 17. Upgrade Page | 2/2 | Complete    | 2026-03-25 |
 | 18. Admin Inbox — Teacher Upgrades | 0/2 | Not started | - |
