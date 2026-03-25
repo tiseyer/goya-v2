@@ -134,7 +134,7 @@ export async function fetchSubscriptionsData(userId: string): Promise<Subscripti
     purchaseDate: row.purchase_date,
   }))
 
-  // Step 8: Check for pending upgrade request
+  // Step 8: Check upgrade_requests for a pending request by this user
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: pendingUpgrade } = await (supabase as any)
     .from('upgrade_requests')
