@@ -1,76 +1,114 @@
-import { createSupabaseServerClient } from '@/lib/supabaseServer';
-import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@/lib/supabaseServer'
+import { redirect } from 'next/navigation'
+import { fetchSubscriptionsData } from './queries'
+import { PortalButton } from './PortalButton'
+import { DesignationsBox } from './DesignationsBox'
+
+const ROLE_PLAN_NAMES: Record<string, string> = {
+  student: 'GOYA Student Membership',
+  teacher: 'GOYA Teacher Membership',
+  wellness_practitioner: 'GOYA Wellness Practitioner Membership',
+  admin: 'Admin Member',
+  moderator: 'Moderator Member',
+}
+
+function formatPrice(cents: number, interval: string): string {
+  const dollars = (cents / 100).toFixed(2)
+  return `$${dollars} / ${interval}`
+}
+
+function Separator() {
+  return (
+    <div className="flex items-center justify-center py-1">
+      <span className="text-[#9CA3AF] text-lg font-light select-none">+</span>
+    </div>
+  )
+}
 
 export default async function SettingsSubscriptionsPage() {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/sign-in');
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/sign-in')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('subscription_status, role, member_type, mrn, created_at, full_name')
-    .eq('id', user.id)
-    .single();
+  const {
+    profile,
+    baseMembership,
+    additionalSubscriptions,
+    ownsSchool,
+    schoolName,
+    designations,
+  } = await fetchSubscriptionsData(user.id)
 
-  if (!profile) redirect('/sign-in');
+  const basePlanName = baseMembership
+    ? baseMembership.productName
+    : (ROLE_PLAN_NAMES[profile.role] ?? 'No active membership')
 
-  const memberSince = new Date(profile.created_at).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  });
+  const basePriceText = baseMembership
+    ? formatPrice(baseMembership.unitAmount, baseMembership.interval)
+    : null
 
   return (
     <div className="p-6 max-w-4xl">
       <h1 className="text-xl font-semibold text-[#1B3A5C] mb-6">Subscriptions</h1>
 
-      {/* Card 1: Current Plan */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 mb-4">
-        <h2 className="text-base font-semibold text-[#1B3A5C] mb-3">Current Plan</h2>
-        {profile.role === 'admin' ? (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
-            Admin Member
-          </span>
-        ) : profile.role === 'moderator' ? (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-            Moderator Member
-          </span>
-        ) : profile.subscription_status === 'member' ? (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-            Active Member
-          </span>
-        ) : (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
-            Guest
-          </span>
+      {/* BOX 1 — Base Membership (always shown) */}
+      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6">
+        <h2 className="text-base font-semibold text-[#1B3A5C] mb-1">Membership</h2>
+        <p className="text-sm text-[#1B3A5C] font-medium">{basePlanName}</p>
+        {basePriceText && (
+          <p className="text-sm text-[#6B7280] mt-1">{basePriceText}</p>
         )}
-        <p className="text-sm text-[#6B7280] mt-3">
-          Role:{' '}
-          <span className="font-medium text-[#1B3A5C] capitalize">
-            {profile.role.replace('_', ' ')}
-          </span>
-        </p>
-        <p className="text-sm text-[#6B7280] mt-1">
-          Member Number:{' '}
-          <span className="font-mono font-medium text-[#1B3A5C]">
-            {profile.mrn ?? '—'}
-          </span>
-        </p>
-        <p className="text-sm text-[#6B7280] mt-1">
-          Member since:{' '}
-          <span className="font-medium text-[#1B3A5C]">{memberSince}</span>
-        </p>
+        {/* Verwalten button — only if user has a Stripe customer ID and an active membership */}
+        {baseMembership && profile.stripeCustomerId && (
+          <PortalButton stripeCustomerId={profile.stripeCustomerId} />
+        )}
       </div>
 
-      {/* Card 2: Manage Subscription */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6">
-        <h2 className="text-base font-semibold text-[#1B3A5C] mb-3">Manage Subscription</h2>
-        <p className="text-sm text-[#6B7280]">
-          To change your subscription plan or manage billing, please contact support.
-        </p>
-        <p className="text-xs text-[#9CA3AF] mt-3">
-          Subscription management features are coming in a future update.
-        </p>
-      </div>
+      {/* BOX 2 — Additional Subscriptions (only if any) */}
+      {additionalSubscriptions.length > 0 && (
+        <>
+          <Separator />
+          <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6">
+            <h2 className="text-base font-semibold text-[#1B3A5C] mb-3">Additional Subscriptions</h2>
+            <ul className="space-y-4">
+              {additionalSubscriptions.map(sub => (
+                <li key={sub.stripeOrderId} className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-[#1B3A5C] font-medium">{sub.productName}</p>
+                    <p className="text-sm text-[#6B7280]">{formatPrice(sub.unitAmount, sub.interval)}</p>
+                  </div>
+                  {profile.stripeCustomerId && (
+                    <PortalButton stripeCustomerId={profile.stripeCustomerId} />
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
+
+      {/* BOX 3 — School Membership (only if user owns a school) */}
+      {ownsSchool && (
+        <>
+          <Separator />
+          <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6">
+            <h2 className="text-base font-semibold text-[#1B3A5C] mb-1">School Membership</h2>
+            <p className="text-sm text-[#1B3A5C] font-medium">{schoolName ?? 'Your School'}</p>
+            <p className="text-sm text-[#6B7280] mt-1">This is your school membership.</p>
+            {profile.stripeCustomerId && (
+              <PortalButton stripeCustomerId={profile.stripeCustomerId} />
+            )}
+          </div>
+        </>
+      )}
+
+      {/* BOX 4 — Designations (only if user has any active designations) */}
+      {designations.length > 0 && (
+        <>
+          <Separator />
+          <DesignationsBox designations={designations} />
+        </>
+      )}
     </div>
-  );
+  )
 }
