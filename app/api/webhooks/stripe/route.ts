@@ -9,6 +9,7 @@ import { handleCoupon } from '@/lib/stripe/handlers/coupon'
 import { handleSubscription } from '@/lib/stripe/handlers/subscription'
 import { handlePaymentIntent } from '@/lib/stripe/handlers/payment-intent'
 import { handleInvoice } from '@/lib/stripe/handlers/invoice'
+import { handleCheckoutSession } from '@/lib/stripe/handlers/checkout-session'
 import type { HandlerResult } from '@/lib/stripe/handlers/subscription'
 
 export async function POST(request: Request) {
@@ -116,6 +117,8 @@ async function dispatchEvent(event: Stripe.Event): Promise<HandlerResult | void>
     case 'invoice.paid':
     case 'invoice.payment_failed':
       return await handleInvoice(event as any)
+    case 'checkout.session.completed':
+      return await handleCheckoutSession(event as Stripe.CheckoutSessionCompletedEvent)
     default:
       console.log(`[webhook] unhandled event type: ${event.type}`)
       return
