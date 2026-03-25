@@ -57,6 +57,9 @@ Plans:
 **Plans**: 1 plan
 **UI hint**: yes
 
+Plans:
+- [ ] 16-01-PLAN.md — Extend queries, add CTA/pending cards to subscriptions page, conditionally show Teacher Membership in /addons (UPG-01, UPG-02, UPG-08)
+
 ### Phase 17: Upgrade Page (/upgrade)
 **Goal**: Multi-step upgrade page with certificate upload, Stripe delayed capture, and success page
 **Depends on**: Phase 16 (CTA links to /upgrade), Phase 19 (upgrade_requests table)
