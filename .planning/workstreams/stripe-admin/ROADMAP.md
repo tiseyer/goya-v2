@@ -74,6 +74,10 @@ Plans:
 **Plans**: 2 plans
 **UI hint**: yes
 
+Plans:
+- [ ] 17-01-PLAN.md — Server actions (uploadCertificate + createUpgradeCheckoutSession) + checkout.session.completed webhook handler (UPG-05, UPG-06, UPG-09)
+- [ ] 17-02-PLAN.md — Multi-step /upgrade page (Steps 1–3) + /upgrade/success confirmation page (UPG-03, UPG-04, UPG-05, UPG-07)
+
 ### Phase 18: Admin Inbox — Teacher Upgrades
 **Goal**: Admins can approve or reject teacher upgrade requests with payment capture and role change
 **Depends on**: Phase 17 (upgrade requests exist to review)
