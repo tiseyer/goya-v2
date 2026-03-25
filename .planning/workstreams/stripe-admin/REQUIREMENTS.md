@@ -37,11 +37,11 @@
 - [x] **UPG-02**: In Shop/Add-ons, Teacher Membership product is visible ONLY to students and wellness practitioners with "Upgrade" button label (not "Buy"), linking to /upgrade
 - [ ] **UPG-03**: Upgrade page Step 1 shows info about teacher membership benefits with "Start Upgrade" button
 - [ ] **UPG-04**: Upgrade page Step 2 allows uploading 1-3 certificate files (PDF, JPG, PNG, WEBP, max 4MB each) to Supabase Storage bucket "upgrade-certificates/{user_id}/{timestamp}-{filename}" with progress, previews, and remove button
-- [ ] **UPG-05**: Upgrade page Step 3 creates a Stripe Payment Intent with capture_method: "manual" (authorize only, do not capture), then redirects to Stripe Checkout
-- [ ] **UPG-06**: On checkout.session.completed webhook: create upgrade_request record (status: "pending"), store user_id, certificate_urls[], stripe_payment_intent_id — do NOT change role, do NOT capture payment
+- [x] **UPG-05**: Upgrade page Step 3 creates a Stripe Payment Intent with capture_method: "manual" (authorize only, do not capture), then redirects to Stripe Checkout
+- [x] **UPG-06**: On checkout.session.completed webhook: create upgrade_request record (status: "pending"), store user_id, certificate_urls[], stripe_payment_intent_id — do NOT change role, do NOT capture payment
 - [ ] **UPG-07**: Redirect to /upgrade/success page showing confirmation message ("submitted", "verify within 48 hours", "notification when verified")
 - [x] **UPG-08**: While upgrade request is pending: hide upgrade CTA everywhere, show info card on Subscriptions page ("Your upgrade request is pending verification"), hide Teacher Membership in Shop
-- [ ] **UPG-09**: Trigger admin inbox notification when upgrade request is submitted
+- [x] **UPG-09**: Trigger admin inbox notification when upgrade request is submitted
 
 ### ADM — Admin Inbox Teacher Upgrades
 
@@ -102,11 +102,11 @@
 | UPG-02 | Phase 16 | Complete |
 | UPG-03 | Phase 17 | Pending |
 | UPG-04 | Phase 17 | Pending |
-| UPG-05 | Phase 17 | Pending |
-| UPG-06 | Phase 17 | Pending |
+| UPG-05 | Phase 17 | Complete |
+| UPG-06 | Phase 17 | Complete |
 | UPG-07 | Phase 17 | Pending |
 | UPG-08 | Phase 16 | Complete |
-| UPG-09 | Phase 17 | Pending |
+| UPG-09 | Phase 17 | Complete |
 | ADM-01 | Phase 18 | Pending |
 | ADM-02 | Phase 18 | Pending |
 | ADM-03 | Phase 18 | Pending |

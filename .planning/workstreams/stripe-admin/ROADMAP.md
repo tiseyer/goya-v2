@@ -75,7 +75,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 17-01-PLAN.md — Server actions (uploadCertificate + createUpgradeCheckoutSession) + checkout.session.completed webhook handler (UPG-05, UPG-06, UPG-09)
+- [x] 17-01-PLAN.md — Server actions (uploadCertificate + createUpgradeCheckoutSession) + checkout.session.completed webhook handler (UPG-05, UPG-06, UPG-09)
 - [ ] 17-02-PLAN.md — Multi-step /upgrade page (Steps 1–3) + /upgrade/success confirmation page (UPG-03, UPG-04, UPG-05, UPG-07)
 
 ### Phase 18: Admin Inbox — Teacher Upgrades
@@ -130,5 +130,5 @@ Plans:
 | 20. Fix Broken Admin Pages | 1/1 | Complete    | 2026-03-24 |
 | 15. Subscriptions Page | 1/2 | Complete    | 2026-03-25 |
 | 16. Upgrade CTA | 1/1 | Complete    | 2026-03-25 |
-| 17. Upgrade Page | 0/2 | Not started | - |
+| 17. Upgrade Page | 1/2 | In Progress|  |
 | 18. Admin Inbox — Teacher Upgrades | 0/2 | Not started | - |

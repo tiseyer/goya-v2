@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 16-01-PLAN.md
-last_updated: "2026-03-25T09:15:11.395Z"
+status: Ready to execute
+stopped_at: Completed 17-01-PLAN.md
+last_updated: "2026-03-25T10:04:29.990Z"
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
 ---
 
 # Project State — stripe-admin workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 16 — upgrade-cta
+**Current focus:** Phase 17 — upgrade-page
 
 ## Current Position
 
-Phase: 17
-Plan: Not started
+Phase: 17 (upgrade-page) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Plan: Not started
 | Phase 13 P01 | 8 | 2 tasks | 4 files |
 | Phase 19 P01 | 5 | 2 tasks | 1 files |
 | Phase 20-fix-broken-admin-pages P01 | 4 | 3 tasks | 5 files |
+| Phase 17-upgrade-page P01 | 21 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,8 @@ Plan: Not started
 - [16-01]: Name-based Teacher Membership match (includes 'teacher' && 'membership') — stripe_product_id nullable on local products table; 22 existing products unprovided; Stripe ID prod_UCTigELsOhovuE added as secondary check
 - [16-01]: isStaff guard included in Teacher Membership filter — admin/moderator bypass isProductVisible but should not see upgrade-only product entry point
 - [16-01]: hasPendingUpgrade query uses (supabase as any) — upgrade_requests not in generated types; consistent with codebase pattern
+- [Phase 17-upgrade-page]: mode:payment with capture_method:manual for delayed capture — subscription created on admin approval in Phase 18
+- [Phase 17-upgrade-page]: (supabase as any) cast for upgrade_requests table — not in generated types; consistent with codebase pattern
 
 ### Pending Todos
 
@@ -115,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T00:15:00Z
-Stopped at: Completed 16-01-PLAN.md
+Last session: 2026-03-25T10:04:29.985Z
+Stopped at: Completed 17-01-PLAN.md
 Resume file: None
