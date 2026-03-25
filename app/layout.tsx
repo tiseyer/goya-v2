@@ -64,7 +64,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const headersList = await headers();
-  const pathname = headersList.get("next-url") || "";
+  const pathname = headersList.get("x-pathname") || "";
   const hideNav = pathname.startsWith("/onboarding") || pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/maintenance");
   const hideFooter = pathname.startsWith("/maintenance") || pathname.startsWith("/members");
   const fullFooterPaths = ["/", "/privacy", "/terms", "/code-of-conduct", "/code-of-ethics"];

@@ -367,7 +367,6 @@ export default function MembersPage() {
   const [search, setSearch] = useState('');
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [listCollapsed, setListCollapsed] = useState(false);
   const [listWidth, setListWidth] = useState(440);
   const [mobileMapOpen, setMobileMapOpen] = useState(false);
   const [mobileProfileMember, setMobileProfileMember] = useState<Member | null>(null);
@@ -488,41 +487,27 @@ export default function MembersPage() {
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Filters */}
           <div className="w-[260px] shrink-0 border-r border-goya-border bg-surface overflow-y-auto">
-            <div className="flex items-center justify-between px-4 pt-4 pb-2">
-              <h1 className="text-sm font-bold text-foreground">Members</h1>
-              <button onClick={() => setListCollapsed(c => !c)}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-foreground-tertiary hover:text-foreground hover:bg-surface-muted transition-all"
-                title={listCollapsed ? 'Show list' : 'Hide list'}>
-                <svg className={`w-4 h-4 transition-transform ${listCollapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                </svg>
-              </button>
-            </div>
-            <div className="px-4 pb-4">{filtersContent}</div>
+            <div className="px-4 pt-4 pb-4">{filtersContent}</div>
           </div>
           {/* Middle: List / Profile */}
-          {!listCollapsed && (
-            <>
-              <div className="overflow-hidden flex flex-col border-r border-goya-border" style={{ width: listWidth, minWidth: 280 }}>
-                {selectedMember ? (
-                  <InlineProfile member={selectedMember} onBack={handleBack} />
-                ) : (
-                  <div className="flex-1 overflow-y-auto divide-y divide-goya-border-muted">
-                    {filtered.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-full text-foreground-tertiary py-16">
-                        <svg className="w-10 h-10 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <p className="font-medium text-sm">No members found</p>
-                        <button onClick={clearFilters} className="mt-2 text-xs text-primary hover:underline">Clear filters</button>
-                      </div>
-                    ) : filtered.map(m => <MemberCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />)}
+          <div className="overflow-hidden flex flex-col border-r border-goya-border" style={{ width: listWidth, minWidth: 280 }}>
+            {selectedMember ? (
+              <InlineProfile member={selectedMember} onBack={handleBack} />
+            ) : (
+              <div className="flex-1 overflow-y-auto divide-y divide-goya-border-muted">
+                {filtered.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-foreground-tertiary py-16">
+                    <svg className="w-10 h-10 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <p className="font-medium text-sm">No members found</p>
+                    <button onClick={clearFilters} className="mt-2 text-xs text-primary hover:underline">Clear filters</button>
                   </div>
-                )}
+                ) : filtered.map(m => <MemberCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />)}
               </div>
-              <ResizeDivider onDrag={handleResize} />
-            </>
-          )}
+            )}
+          </div>
+          <ResizeDivider onDrag={handleResize} />
           {/* Right: Map */}
           <div className="flex-1 min-w-0">
             <MapPanel allMembers={members} filteredMembers={filtered} highlightedId={highlightedId} onMemberClick={handleMapMemberClick} isVisible={true} />

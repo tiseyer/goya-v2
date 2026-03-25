@@ -92,11 +92,14 @@ export async function middleware(request: NextRequest) {
 
   // Fast path: skip auth entirely for public paths when maintenance is off
   if (!maintenanceActive && !isProtectedPath && !isOnboardingPath) {
-    return NextResponse.next({ request: { headers: request.headers } })
+    const res = NextResponse.next({ request: { headers: request.headers } })
+    res.headers.set('x-pathname', pathname)
+    return res
   }
 
   // ─── Set up Supabase client (needed for session refresh + auth) ──────────────
   let response = NextResponse.next({ request: { headers: request.headers } })
+  response.headers.set('x-pathname', pathname)
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
