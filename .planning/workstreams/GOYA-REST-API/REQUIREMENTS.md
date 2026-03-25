@@ -9,15 +9,15 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 ### Auth & Infrastructure
 
-- [ ] **AUTH-01**: API key table (`api_keys`) stores key hash, name, permissions, created_by, last_used, active
+- [x] **AUTH-01**: API key table (`api_keys`) stores key hash, name, permissions, created_by, last_used, active
 - [ ] **AUTH-02**: Middleware validates API keys on all `/api/v1/` routes
 - [ ] **AUTH-03**: Rate limiting enforced per key (100 req/min)
-- [ ] **AUTH-04**: All responses follow consistent format: `{ success, data, error, meta }`
+- [x] **AUTH-04**: All responses follow consistent format: `{ success, data, error, meta }`
 - [ ] **AUTH-05**: `/api/v1/health` endpoint returns status + version without auth
 - [ ] **AUTH-06**: Admin-only endpoints check for admin role in addition to API key
 - [ ] **AUTH-07**: Shared route handler factory reduces repetition across endpoints
 - [ ] **AUTH-08**: Business logic lives in `/lib/api/` service files, not route handlers
-- [ ] **AUTH-09**: Supabase service role client used for all API operations (bypass RLS)
+- [x] **AUTH-09**: Supabase service role client used for all API operations (bypass RLS)
 
 ### Users
 
@@ -133,15 +133,15 @@ None — full spec included in v1.6.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Pending |
 | AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Pending |
 | AUTH-06 | Phase 1 | Pending |
 | AUTH-07 | Phase 1 | Pending |
 | AUTH-08 | Phase 1 | Pending |
-| AUTH-09 | Phase 1 | Pending |
+| AUTH-09 | Phase 1 | Complete |
 | PAGE-01 | Phase 1 | Pending |
 | AUDT-01 | Phase 1 | Pending |
 | USER-01 | Phase 2 | Pending |

@@ -29,7 +29,7 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
   5. All list endpoints accept `page`, `limit`, `sort`, `order` params and return paginated results; every write operation produces an `audit_log` row
 **Plans**: 4 plans
 Plans:
-- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
+- [x] 01-01-PLAN.md — API keys migration, response types, response helpers
 - [ ] 01-02-PLAN.md — Handler factory and pagination utilities
 - [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
 - [ ] 01-04-PLAN.md — Health endpoint and migration push
@@ -141,7 +141,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 1/4 | In Progress|  |
 | 2. Users | 0/? | Not started | - |
 | 3. Events | 0/? | Not started | - |
 | 4. Courses | 0/? | Not started | - |

@@ -1,16 +1,15 @@
 ---
 gsd_state_version: 1.0
-workstream: GOYA-REST-API
 milestone: v1.6
-milestone_name: Open Gates
-status: Ready to plan
-stopped_at: null
-last_updated: "2026-03-25"
+milestone_name: milestone
+status: Ready to execute
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-03-25T00:23:20.352Z"
 progress:
   total_phases: 8
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 4
+  completed_plans: 1
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -20,20 +19,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 01 — foundation
 
 ## Current Position
 
-Phase: 1 of 8 (Foundation)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-25 — Roadmap created, workstream initialized
-
-Progress: [░░░░░░░░░░] 0%
+Phase: 01 (foundation) — EXECUTING
+Plan: 2 of 4
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: -
 - Total execution time: 0 hours
@@ -45,6 +41,7 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 *Updated after each plan completion*
+| Phase 01 P01 | 127 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -55,6 +52,8 @@ Progress: [░░░░░░░░░░] 0%
 - Shared handler factory in `/lib/api/` — reduce repetition
 - Business logic in `/lib/api/` service files, not route handlers
 - API keys stored as hashed values — security requirement
+- [Phase 01]: RLS enabled on api_keys with no policies — enforces service-role-only access at DB level
+- [Phase 01]: API version pinned as constant in response.ts — easy to bump for major changes
 
 ### Pending Todos
 
@@ -66,6 +65,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25
-Stopped at: Roadmap created — ready to plan Phase 1
+Last session: 2026-03-25T00:23:20.348Z
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None
