@@ -28,10 +28,11 @@ interface Product {
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, upgradeHref }: { product: Product; upgradeHref?: string }) {
+  const isTeacherMembership = product.name.toLowerCase().includes('teacher') && product.name.toLowerCase().includes('membership')
   return (
     <Link
-      href={`/addons/${product.slug}`}
+      href={upgradeHref ?? `/addons/${product.slug}`}
       className="group bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden"
     >
       {/* Image area */}
@@ -65,7 +66,7 @@ function ProductCard({ product }: { product: Product }) {
         </div>
         <div className="mt-2 text-center">
           <span className="text-xs font-semibold text-slate-600 border border-slate-300 rounded-lg px-3 py-1.5 inline-block group-hover:border-primary-dark group-hover:text-primary-dark transition-colors">
-            {product.has_variants ? 'Select Options' : 'Add to Profile'}
+            {product.has_variants ? 'Select Options' : (isTeacherMembership ? 'Upgrade' : 'Add to Profile')}
           </span>
         </div>
       </div>
@@ -87,6 +88,21 @@ export default async function AddonsPage() {
     .select('role, designations')
     .eq('id', user.id)
     .single()
+
+  // Check for pending upgrade request
+  let hasPendingUpgrade = false
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: pendingUpgrade } = await (supabase as any)
+      .from('upgrade_requests')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('status', 'pending')
+      .maybeSingle()
+    hasPendingUpgrade = pendingUpgrade !== null
+  } catch {
+    hasPendingUpgrade = false
+  }
 
   // 3. Check if user is school owner (principal_trainer_id column)
   let isSchoolOwner = false
@@ -119,6 +135,20 @@ export default async function AddonsPage() {
     ? ((products ?? []) as Product[])
     : ((products ?? []) as Product[]).filter(p => isProductVisible(p, userCtx))
 
+  // Filter Teacher Membership: show only for eligible roles without a pending request
+  const isUpgradeEligible = role === 'student' || role === 'wellness_practitioner'
+  const TEACHER_MEMBERSHIP_PRODUCT_ID = 'prod_UCTigELsOhovuE'
+  const filteredProducts = visibleProducts.filter(p => {
+    // Teacher Membership: match by Stripe product ID or by name (fallback for un-provisioned products)
+    const isTeacherMembership =
+      (p as Product & { stripe_product_id?: string }).stripe_product_id === TEACHER_MEMBERSHIP_PRODUCT_ID ||
+      (p.name.toLowerCase().includes('teacher') && p.name.toLowerCase().includes('membership'))
+    if (isTeacherMembership) {
+      return isUpgradeEligible && !hasPendingUpgrade && !isStaff
+    }
+    return true
+  })
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -132,20 +162,31 @@ export default async function AddonsPage() {
       <div className="border-b border-slate-200 bg-white sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <p className="text-sm text-slate-500">
-            Showing <span className="font-semibold text-slate-800">{visibleProducts.length}</span> products
+            Showing <span className="font-semibold text-slate-800">{filteredProducts.length}</span> products
           </p>
         </div>
       </div>
 
       {/* Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {visibleProducts.length === 0 ? (
+        {filteredProducts.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-slate-500 text-sm">No products available for your account at this time.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-            {visibleProducts.map(p => <ProductCard key={p.slug} product={p} />)}
+            {filteredProducts.map(p => {
+              const isTeacherMembershipProduct =
+                (p as Product & { stripe_product_id?: string }).stripe_product_id === TEACHER_MEMBERSHIP_PRODUCT_ID ||
+                (p.name.toLowerCase().includes('teacher') && p.name.toLowerCase().includes('membership'))
+              return (
+                <ProductCard
+                  key={p.slug}
+                  product={p}
+                  upgradeHref={isTeacherMembershipProduct ? '/upgrade' : undefined}
+                />
+              )
+            })}
           </div>
         )}
       </div>
