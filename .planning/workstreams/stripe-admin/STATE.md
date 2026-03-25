@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 17-01-PLAN.md
-last_updated: "2026-03-25T10:04:29.990Z"
+status: Phase complete — ready for verification
+stopped_at: "Checkpoint reached: 17-02 Task 3 human-verify"
+last_updated: "2026-03-25T11:15:52.466Z"
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State — stripe-admin workstream
@@ -106,6 +106,7 @@ Plan: 2 of 2
 - [16-01]: hasPendingUpgrade query uses (supabase as any) — upgrade_requests not in generated types; consistent with codebase pattern
 - [Phase 17-upgrade-page]: mode:payment with capture_method:manual for delayed capture — subscription created on admin approval in Phase 18
 - [Phase 17-upgrade-page]: (supabase as any) cast for upgrade_requests table — not in generated types; consistent with codebase pattern
+- [Phase 17-upgrade-page]: Client-side step state (useState<1|2|3>) over URL-based steps — sequential wizard with no deep-link requirement
 
 ### Pending Todos
 
@@ -118,6 +119,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T10:04:29.985Z
-Stopped at: Completed 17-01-PLAN.md
+Last session: 2026-03-25T11:15:14.361Z
+Stopped at: Checkpoint reached: 17-02 Task 3 human-verify
 Resume file: None

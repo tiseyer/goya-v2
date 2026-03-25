@@ -11,7 +11,7 @@ Seven phases deliver the Subscriptions page Stripe integration and Teacher Upgra
 - [x] **Phase 14: Fix Role Display Bug** - Fix admin/moderator "Guest" display on Subscriptions page (completed 2026-03-24)
 - [ ] **Phase 15: Subscriptions Page — Real Stripe Data** - Replace placeholder with live Stripe membership, designations, school, Customer Portal
 - [x] **Phase 16: Upgrade CTA** - Show upgrade prompts for students/WPs on Subscriptions page and in Shop (completed 2026-03-25)
-- [ ] **Phase 17: Upgrade Page** - Multi-step /upgrade page with certificate upload and Stripe delayed capture
+- [x] **Phase 17: Upgrade Page** - Multi-step /upgrade page with certificate upload and Stripe delayed capture (completed 2026-03-25)
 - [ ] **Phase 18: Admin Inbox — Teacher Upgrades** - Admin approve/reject flow with payment capture and role change
 - [x] **Phase 19: Supabase Schema** - Create upgrade_requests and user_designations tables with RLS (completed 2026-03-24)
 - [x] **Phase 20: Fix Broken Admin Pages** - Fix 3 crashing admin pages + add Create Product button (completed 2026-03-24)
@@ -76,7 +76,7 @@ Plans:
 
 Plans:
 - [x] 17-01-PLAN.md — Server actions (uploadCertificate + createUpgradeCheckoutSession) + checkout.session.completed webhook handler (UPG-05, UPG-06, UPG-09)
-- [ ] 17-02-PLAN.md — Multi-step /upgrade page (Steps 1–3) + /upgrade/success confirmation page (UPG-03, UPG-04, UPG-05, UPG-07)
+- [x] 17-02-PLAN.md — Multi-step /upgrade page (Steps 1–3) + /upgrade/success confirmation page (UPG-03, UPG-04, UPG-05, UPG-07)
 
 ### Phase 18: Admin Inbox — Teacher Upgrades
 **Goal**: Admins can approve or reject teacher upgrade requests with payment capture and role change
@@ -130,5 +130,5 @@ Plans:
 | 20. Fix Broken Admin Pages | 1/1 | Complete    | 2026-03-24 |
 | 15. Subscriptions Page | 1/2 | Complete    | 2026-03-25 |
 | 16. Upgrade CTA | 1/1 | Complete    | 2026-03-25 |
-| 17. Upgrade Page | 1/2 | In Progress|  |
+| 17. Upgrade Page | 2/2 | Complete   | 2026-03-25 |
 | 18. Admin Inbox — Teacher Upgrades | 0/2 | Not started | - |
