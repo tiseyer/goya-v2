@@ -36,14 +36,14 @@ function Avatar({ src, name, size = 48, className = '' }: { src?: string; name: 
         src={src}
         alt={name}
         className={`rounded-full object-cover ${className}`}
-        style={{ width: size, height: size }}
+        style={{ width: size, height: size, minWidth: size, minHeight: size }}
       />
     );
   }
   return (
     <div
       className={`rounded-full bg-primary-100 dark:bg-primary-dark/30 flex items-center justify-center text-primary dark:text-primary-light font-semibold ${className}`}
-      style={{ width: size, height: size, fontSize: size * 0.35 }}
+      style={{ width: size, height: size, minWidth: size, minHeight: size, fontSize: size * 0.35 }}
     >
       {initials}
     </div>
@@ -77,8 +77,8 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
 
 // ─── Multi-chip filter (expandable) ───────────────────────────────────────────
 
-function ChipGroup({ options, selected, onChange, label }: { options: string[]; selected: string[]; onChange: (v: string[]) => void; label: string }) {
-  const [expanded, setExpanded] = useState(false);
+function ChipGroup({ options, selected, onChange, label, defaultCollapsed = true }: { options: string[]; selected: string[]; onChange: (v: string[]) => void; label: string; defaultCollapsed?: boolean }) {
+  const [expanded, setExpanded] = useState(!defaultCollapsed);
   const visible = options.slice(0, expanded ? options.length : 6);
   const toggle = (opt: string) => onChange(selected.includes(opt) ? selected.filter(v => v !== opt) : [...selected, opt]);
 
@@ -103,37 +103,119 @@ function ChipGroup({ options, selected, onChange, label }: { options: string[]; 
   );
 }
 
+// ─── Searchable country dropdown ──────────────────────────────────────────────
+
+function CountrySelect({ options, selected, onChange }: { options: string[]; selected: string[]; onChange: (v: string[]) => void }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  useEffect(() => { if (open && inputRef.current) inputRef.current.focus(); }, [open]);
+
+  const filtered = query ? options.filter(o => o.toLowerCase().includes(query.toLowerCase())) : options;
+  const toggle = (opt: string) => onChange(selected.includes(opt) ? selected.filter(v => v !== opt) : [...selected, opt]);
+
+  return (
+    <div ref={ref} className="relative">
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground-tertiary mb-2">Country</div>
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-3 py-2 text-sm bg-surface border border-goya-border rounded-xl hover:border-primary/40 transition-colors text-left"
+      >
+        <span className={selected.length === 0 ? 'text-foreground-tertiary' : 'text-foreground'}>
+          {selected.length === 0 ? 'All countries' : `${selected.length} selected`}
+        </span>
+        <svg className={`w-4 h-4 text-foreground-tertiary transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {selected.map(c => (
+            <button key={c} onClick={() => toggle(c)} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors">
+              {c}
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          ))}
+        </div>
+      )}
+      {open && (
+        <div className="absolute z-50 mt-1 w-full bg-surface border border-goya-border rounded-xl shadow-elevated overflow-hidden">
+          <div className="p-2 border-b border-goya-border">
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search countries..."
+              className="w-full px-2.5 py-1.5 text-xs bg-background border border-goya-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 text-foreground placeholder:text-foreground-tertiary"
+            />
+          </div>
+          <div className="overflow-y-auto max-h-48 p-1">
+            {filtered.length === 0 ? (
+              <div className="px-3 py-2 text-xs text-foreground-tertiary">No countries found</div>
+            ) : filtered.map(country => (
+              <button
+                key={country}
+                onClick={() => toggle(country)}
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-lg hover:bg-surface-muted transition-colors text-left"
+              >
+                <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${selected.includes(country) ? 'bg-primary border-primary' : 'border-goya-border'}`}>
+                  {selected.includes(country) && (
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  )}
+                </span>
+                <span className="text-foreground">{country}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Member card ──────────────────────────────────────────────────────────────
+
+const CARD_HEIGHT = 152;
+const AVATAR_SIZE = 56;
 
 function MemberCard({ member, highlighted, onSelect }: { member: Member; highlighted: boolean; onSelect: (id: string) => void }) {
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => { if (highlighted && ref.current) ref.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, [highlighted]);
   const intro = member.introduction || member.bio;
-  const truncatedIntro = intro && intro.length > 250 ? intro.slice(0, 247) + '...' : intro;
+  const truncatedIntro = intro && intro.length > 180 ? intro.slice(0, 177) + '...' : intro;
 
   return (
     <button ref={ref} onClick={() => onSelect(member.id)}
-      className={`w-full text-left p-5 transition-all group ${highlighted ? 'bg-primary-50 dark:bg-primary/10' : 'hover:bg-surface-muted'}`}>
-      <div className="flex gap-4">
-        <Avatar src={member.photo} name={member.name} size={72} className="shrink-0 ring-2 ring-goya-border" />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-foreground text-[15px] leading-tight truncate">{member.name}</h3>
-            {member.is_verified && <VerifiedBadge size={15} />}
+      className={`w-full text-left px-5 py-4 transition-all group overflow-hidden ${highlighted ? 'bg-primary-50 dark:bg-primary/10' : 'hover:bg-surface-muted'}`}
+      style={{ height: CARD_HEIGHT }}>
+      <div className="flex gap-3.5 h-full">
+        <Avatar src={member.photo} name={member.name} size={AVATAR_SIZE} className="shrink-0 ring-2 ring-goya-border" />
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex items-center gap-2 mb-0.5">
+            <h3 className="font-semibold text-foreground text-[14px] leading-tight truncate">{member.name}</h3>
+            {member.is_verified && <VerifiedBadge size={14} />}
             {member.featured && (
               <svg className="w-3.5 h-3.5 text-primary-light shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
             )}
           </div>
-          <div className="flex items-center gap-1.5 text-foreground-tertiary text-xs mb-2">
+          <div className="flex items-center gap-1.5 text-foreground-tertiary text-[11px] mb-1.5">
             <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             {member.city}, {member.country}
           </div>
-          <div className="flex flex-wrap gap-1.5 mb-2.5">
+          <div className="flex flex-wrap gap-1 mb-1.5">
             <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full border ${getMemberBadge(member.role)}`}>
               {ROLE_SHORT[member.role] ?? member.role}
             </span>
@@ -141,7 +223,7 @@ function MemberCard({ member, highlighted, onSelect }: { member: Member; highlig
               <span key={d} className="text-[10px] bg-background-tertiary text-foreground-secondary px-2 py-0.5 rounded-full font-medium">{d}</span>
             ))}
           </div>
-          {truncatedIntro && <p className="text-foreground-secondary text-[13px] leading-relaxed line-clamp-3">{truncatedIntro}</p>}
+          {truncatedIntro && <p className="text-foreground-secondary text-[12px] leading-relaxed line-clamp-2 flex-1">{truncatedIntro}</p>}
         </div>
       </div>
     </button>
@@ -312,7 +394,7 @@ export default function MembersPage() {
 
   const handleMobileSelect = useCallback((id: string) => { const member = members.find(m => m.id === id); if (member) setMobileProfileMember(member); }, []);
   const handleBack = useCallback(() => { setSelectedMember(null); setHighlightedId(null); }, []);
-  const handleResize = useCallback((delta: number) => { setListWidth(prev => Math.max(320, Math.min(700, prev + delta))); }, []);
+  const handleResize = useCallback((delta: number) => { setListWidth(prev => Math.max(280, Math.min(700, prev + delta))); }, []);
   const handleMapMemberClick = useCallback((id: string) => { setHighlightedId(id); const member = members.find(m => m.id === id); if (member) setSelectedMember(member); }, []);
 
   // ── Filters panel ───────────────────────────────────────────────────────────
@@ -330,15 +412,16 @@ export default function MembersPage() {
           </button>
         )}
       </div>
+      <div className="text-xs text-foreground-tertiary font-medium tabular-nums">{filtered.length} of {members.length} members</div>
       <div>
         <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground-tertiary mb-2">Role</div>
         <div className="flex flex-wrap gap-1.5">
           {ROLES.map(role => <FilterChip key={role} label={role === 'All' ? 'All' : ROLE_SHORT[role] ?? role} active={roleFilter === role} onClick={() => setRoleFilter(role)} />)}
         </div>
       </div>
-      <ChipGroup label="Country" options={availableCountries} selected={countryFilter} onChange={setCountryFilter} />
+      <CountrySelect options={availableCountries} selected={countryFilter} onChange={setCountryFilter} />
       <ChipGroup label="Designation" options={allDesignations} selected={designationFilter} onChange={setDesignationFilter} />
-      <ChipGroup label="Style" options={allTeachingStyles} selected={styleFilter} onChange={setStyleFilter} />
+      <ChipGroup label="Style" options={allTeachingStyles} selected={styleFilter} onChange={setStyleFilter} defaultCollapsed />
       {hasFilters && (
         <button onClick={clearFilters} className="text-xs text-primary hover:text-primary-dark font-medium flex items-center gap-1 transition-colors">
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -352,7 +435,7 @@ export default function MembersPage() {
   return (
     <>
       {/* Mobile */}
-      <div className="lg:hidden min-h-screen bg-background">
+      <div className="lg:hidden h-[calc(100vh-64px)] flex flex-col bg-background overflow-hidden">
         {mobileProfileMember && (
           <div className="fixed inset-0 z-50 bg-background"><InlineProfile member={mobileProfileMember} onBack={() => setMobileProfileMember(null)} /></div>
         )}
@@ -367,7 +450,7 @@ export default function MembersPage() {
               onMemberClick={(id) => { const m = members.find(x => x.id === id); if (m) { setMobileMapOpen(false); setMobileProfileMember(m); } }} isVisible={mobileMapOpen} />
           </div>
         )}
-        <div className="px-4 pt-4 pb-3 border-b border-goya-border bg-surface">
+        <div className="px-4 pt-4 pb-3 border-b border-goya-border bg-surface shrink-0">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-lg font-bold text-foreground">Members</h1>
             <span className="text-xs text-foreground-tertiary font-medium">{filtered.length} of {members.length}</span>
@@ -383,7 +466,7 @@ export default function MembersPage() {
             {ROLES.map(role => <FilterChip key={role} label={role === 'All' ? 'All' : ROLE_SHORT[role] ?? role} active={roleFilter === role} onClick={() => setRoleFilter(role)} />)}
           </div>
         </div>
-        <div className="divide-y divide-goya-border">
+        <div className="flex-1 overflow-y-auto divide-y divide-goya-border">
           {filtered.length === 0 ? (
             <div className="py-16 text-center text-foreground-tertiary">
               <p className="text-sm font-medium">No members found</p>
@@ -401,33 +484,26 @@ export default function MembersPage() {
       </div>
 
       {/* Desktop */}
-      <div className="hidden lg:flex flex-col h-[calc(100vh-64px)] bg-background">
-        <div className="flex items-center justify-between px-5 py-2.5 border-b border-goya-border bg-surface shrink-0">
-          <div className="flex items-center gap-3">
-            <h1 className="text-base font-bold text-foreground">Members</h1>
-            <span className="text-xs text-foreground-tertiary font-medium tabular-nums">{filtered.length} of {members.length}</span>
-            {hasFilters && (
-              <button onClick={clearFilters} className="text-xs text-primary hover:text-primary-dark font-medium flex items-center gap-1 transition-colors">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                Clear
-              </button>
-            )}
-          </div>
-          <button onClick={() => setListCollapsed(c => !c)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-foreground-secondary hover:text-foreground hover:bg-surface-muted transition-all"
-            title={listCollapsed ? 'Show list' : 'Hide list'}>
-            <svg className={`w-4 h-4 transition-transform ${listCollapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
-            {listCollapsed ? 'Show List' : 'Hide List'}
-          </button>
-        </div>
+      <div className="hidden lg:flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-background">
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Filters */}
-          <div className="w-[260px] shrink-0 border-r border-goya-border bg-surface overflow-y-auto p-4">{filtersContent}</div>
+          <div className="w-[260px] shrink-0 border-r border-goya-border bg-surface overflow-y-auto">
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <h1 className="text-sm font-bold text-foreground">Members</h1>
+              <button onClick={() => setListCollapsed(c => !c)}
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-foreground-tertiary hover:text-foreground hover:bg-surface-muted transition-all"
+                title={listCollapsed ? 'Show list' : 'Hide list'}>
+                <svg className={`w-4 h-4 transition-transform ${listCollapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                </svg>
+              </button>
+            </div>
+            <div className="px-4 pb-4">{filtersContent}</div>
+          </div>
           {/* Middle: List / Profile */}
           {!listCollapsed && (
             <>
-              <div className="overflow-hidden flex flex-col border-r border-goya-border" style={{ width: listWidth }}>
+              <div className="overflow-hidden flex flex-col border-r border-goya-border" style={{ width: listWidth, minWidth: 280 }}>
                 {selectedMember ? (
                   <InlineProfile member={selectedMember} onBack={handleBack} />
                 ) : (
