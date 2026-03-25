@@ -30,8 +30,8 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
 **Plans**: 4 plans
 Plans:
 - [x] 01-01-PLAN.md — API keys migration, response types, response helpers
-- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
-- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
+- [x] 01-02-PLAN.md — Handler factory and pagination utilities
+- [x] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
 - [ ] 01-04-PLAN.md — Health endpoint and migration push
 
 ### Phase 2: Users

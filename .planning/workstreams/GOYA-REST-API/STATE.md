@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 15-02-PLAN.md
-last_updated: "2026-03-25T04:36:32.589Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-03-25T07:50:00Z"
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 01 (foundation) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ Plan: 3 of 4
 *Updated after each plan completion*
 | Phase 01 P01 | 127 | 2 tasks | 3 files |
 | Phase 15 P02 | 15 | 2 tasks | 3 files |
+| Phase 01 P03 | 35 min | 1 task | 1 file |
 
 ## Accumulated Context
 
@@ -55,6 +56,9 @@ Plan: 3 of 4
 - API keys stored as hashed values — security requirement
 - [Phase 01]: RLS enabled on api_keys with no policies — enforces service-role-only access at DB level
 - [Phase 01]: API version pinned as constant in response.ts — easy to bump for major changes
+- [Phase 01 P03]: as any cast on Supabase client for api_keys queries — table exists in DB but not in generated types (types regeneration deferred)
+- [Phase 01 P03]: Fire-and-forget last_used_at/request_count update — usage tracking is best-effort
+- [Phase 01 P03]: In-memory rate limiter with periodic cleanup every 1000 calls — avoids background timers
 - [Phase 15]: Inline Separator function component — no separate file needed for a single-use 4-line component
 - [Phase 15]: Optimistic UI in DesignationsBox (filter local state) — avoids full page reload; softDeleteDesignation still calls revalidatePath for next hard navigation
 
@@ -68,6 +72,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T04:36:32.586Z
-Stopped at: Completed 15-02-PLAN.md
+Last session: 2026-03-25T07:50:00Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
