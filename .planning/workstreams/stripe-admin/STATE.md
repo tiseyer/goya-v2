@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: milestone
-status: Milestone complete
-stopped_at: Completed 20-01-PLAN.md
-last_updated: "2026-03-24T16:42:28.472Z"
+status: Executing Phase 15
+stopped_at: Completed 15-01-PLAN.md
+last_updated: "2026-03-24T23:40:00Z"
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 6
+  completed_plans: 4
 ---
 
 # Project State — stripe-admin workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 19 — supabase-schema
+**Current focus:** Phase 15 — subscriptions-page
 
 ## Current Position
 
-Phase: 20
-Plan: Not started
+Phase: 15 (subscriptions-page) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -97,6 +97,9 @@ Plan: Not started
 - [Phase 13]: Pure computation functions (no Supabase/React) in lib/analytics/ — all business logic isolated for testability
 - [Phase 19]: Added updated_at column to upgrade_requests (required by update_updated_at_column trigger — plan SQL omitted it)
 - [Phase 20-01]: audit_log not in generated types — (supabase as any) cast consistent with codebase pattern
+- [15-01]: user_designations not in generated types — (supabase as any) cast with explicit row type annotation; consistent pattern
+- [15-01]: getSupabaseService() in fetchSubscriptionsData — stripe_orders has admin-only RLS, service role required to read user's own orders
+- [15-01]: JS-side product name classification ('Membership') — avoids DB-level query complexity; plan specifies this approach
 
 ### Pending Todos
 
@@ -109,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T16:40:17.581Z
-Stopped at: Completed 20-01-PLAN.md
+Last session: 2026-03-24T23:40:00Z
+Stopped at: Completed 15-01-PLAN.md
 Resume file: None
