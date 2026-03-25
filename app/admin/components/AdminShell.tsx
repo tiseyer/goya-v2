@@ -95,7 +95,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     type: 'link',
-    href: '/admin/impersonation-log',
+    href: '/admin/audit-log',
     label: 'Audit Log',
     paths: [
       'M15 12a3 3 0 11-6 0 3 3 0 016 0z',
