@@ -10,7 +10,7 @@ Seven phases deliver the Subscriptions page Stripe integration and Teacher Upgra
 
 - [x] **Phase 14: Fix Role Display Bug** - Fix admin/moderator "Guest" display on Subscriptions page (completed 2026-03-24)
 - [ ] **Phase 15: Subscriptions Page — Real Stripe Data** - Replace placeholder with live Stripe membership, designations, school, Customer Portal
-- [ ] **Phase 16: Upgrade CTA** - Show upgrade prompts for students/WPs on Subscriptions page and in Shop
+- [x] **Phase 16: Upgrade CTA** - Show upgrade prompts for students/WPs on Subscriptions page and in Shop (completed 2026-03-25)
 - [ ] **Phase 17: Upgrade Page** - Multi-step /upgrade page with certificate upload and Stripe delayed capture
 - [ ] **Phase 18: Admin Inbox — Teacher Upgrades** - Admin approve/reject flow with payment capture and role change
 - [x] **Phase 19: Supabase Schema** - Create upgrade_requests and user_designations tables with RLS (completed 2026-03-24)
@@ -56,6 +56,9 @@ Plans:
   3. If upgrade request is pending: CTA hidden everywhere, info card shown on Subscriptions page, Teacher Membership hidden in Shop
 **Plans**: 1 plan
 **UI hint**: yes
+
+Plans:
+- [x] 16-01-PLAN.md — Extend queries, add CTA/pending cards to subscriptions page, conditionally show Teacher Membership in /addons (UPG-01, UPG-02, UPG-08)
 
 ### Phase 17: Upgrade Page (/upgrade)
 **Goal**: Multi-step upgrade page with certificate upload, Stripe delayed capture, and success page
@@ -121,7 +124,7 @@ Plans:
 | 19. Supabase Schema | 1/1 | Complete    | 2026-03-24 |
 | 14. Fix Role Display Bug | 0/1 | Complete    | 2026-03-24 |
 | 20. Fix Broken Admin Pages | 1/1 | Complete    | 2026-03-24 |
-| 15. Subscriptions Page | 1/2 | Executing   | - |
-| 16. Upgrade CTA | 0/1 | Not started | - |
+| 15. Subscriptions Page | 1/2 | Complete    | 2026-03-25 |
+| 16. Upgrade CTA | 1/1 | Complete    | 2026-03-25 |
 | 17. Upgrade Page | 0/2 | Not started | - |
 | 18. Admin Inbox — Teacher Upgrades | 0/2 | Not started | - |
