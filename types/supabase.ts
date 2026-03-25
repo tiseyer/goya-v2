@@ -14,6 +14,65 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          id: string
+          category: string
+          action: string
+          severity: string
+          actor_id: string | null
+          actor_name: string | null
+          actor_role: string | null
+          target_type: string | null
+          target_id: string | null
+          target_label: string | null
+          description: string | null
+          metadata: Json
+          ip_address: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          category: string
+          action: string
+          severity?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          actor_role?: string | null
+          target_type?: string | null
+          target_id?: string | null
+          target_label?: string | null
+          description?: string | null
+          metadata?: Json
+          ip_address?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          category?: string
+          action?: string
+          severity?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          actor_role?: string | null
+          target_type?: string | null
+          target_id?: string | null
+          target_label?: string | null
+          description?: string | null
+          metadata?: Json
+          ip_address?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comment_reactions: {
         Row: {
           comment_id: string

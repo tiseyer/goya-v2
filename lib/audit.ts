@@ -1,4 +1,5 @@
 import { getSupabaseService } from '@/lib/supabase/service';
+import type { Json } from '@/types/supabase';
 
 type AuditCategory = 'admin' | 'user' | 'system';
 type AuditSeverity = 'info' | 'warning' | 'error';
@@ -14,7 +15,7 @@ interface AuditEntry {
   target_id?: string;
   target_label?: string;
   description?: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, Json>;
   ip_address?: string;
 }
 
