@@ -37,7 +37,10 @@ export default async function SettingsSubscriptionsPage() {
     ownsSchool,
     schoolName,
     designations,
+    hasPendingUpgrade,
   } = await fetchSubscriptionsData(user.id)
+
+  const isUpgradeEligible = profile.role === 'student' || profile.role === 'wellness_practitioner'
 
   const basePlanName = baseMembership
     ? baseMembership.productName
@@ -63,6 +66,35 @@ export default async function SettingsSubscriptionsPage() {
           <PortalButton stripeCustomerId={profile.stripeCustomerId} />
         )}
       </div>
+
+      {/* Upgrade CTA / Pending State — only for students and wellness practitioners */}
+      {isUpgradeEligible && (
+        <>
+          <Separator />
+          {hasPendingUpgrade ? (
+            <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6">
+              <p className="text-sm font-medium text-[#1B3A5C]">Upgrade Request Pending</p>
+              <p className="text-sm text-[#6B7280] mt-1">Your upgrade request is pending verification. You&apos;ll be notified within 48 hours.</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-[#1B3A5C]">Ready to become a GOYA Certified Teacher?</p>
+                <p className="text-sm text-[#6B7280] mt-1">Upgrade your membership and unlock teacher credentials.</p>
+              </div>
+              <a
+                href="/upgrade"
+                className="flex items-center gap-1.5 whitespace-nowrap bg-[#1B3A5C] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#162f4a] transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                  <path fillRule="evenodd" d="M10 17a.75.75 0 01-.75-.75V5.612L5.29 9.77a.75.75 0 01-1.08-1.04l5.25-5.5a.75.75 0 011.08 0l5.25 5.5a.75.75 0 11-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0110 17z" clipRule="evenodd" />
+                </svg>
+                Upgrade to Teacher Membership
+              </a>
+            </div>
+          )}
+        </>
+      )}
 
       {/* BOX 2 — Additional Subscriptions (only if any) */}
       {additionalSubscriptions.length > 0 && (
