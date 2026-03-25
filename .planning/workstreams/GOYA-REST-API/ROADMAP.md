@@ -27,7 +27,12 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
   3. Every response — success or error — follows `{ success, data, error, meta }` exactly
   4. `GET /api/v1/health` responds with status + version without requiring any API key
   5. All list endpoints accept `page`, `limit`, `sort`, `order` params and return paginated results; every write operation produces an `audit_log` row
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
+- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
+- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
+- [ ] 01-04-PLAN.md — Health endpoint and migration push
 
 ### Phase 2: Users
 **Goal**: Callers can list, retrieve, and update users plus read their associated credits, certifications, and verifications
@@ -38,7 +43,12 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
   2. `GET /api/v1/users/:id` returns the full user profile; an unknown ID returns 404
   3. `PATCH /api/v1/users/:id` updates role, status, or membership and produces an audit log entry
   4. Sub-resource endpoints (`/credits`, `/certifications`, `/verifications`) each return the correct data for the given user
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
+- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
+- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
+- [ ] 01-04-PLAN.md — Health endpoint and migration push
 
 ### Phase 3: Events
 **Goal**: Callers can create, read, update, and delete events and manage user registrations
@@ -48,7 +58,12 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
   1. `GET /api/v1/events` returns events filterable by date range, status, and type with pagination
   2. `POST /api/v1/events` creates an event and returns the new record; `DELETE /api/v1/events/:id` removes it
   3. `POST /api/v1/events/:id/registrations` registers a user; `DELETE /api/v1/events/:id/registrations/:userId` unregisters them; both log to audit
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
+- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
+- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
+- [ ] 01-04-PLAN.md — Health endpoint and migration push
 
 ### Phase 4: Courses
 **Goal**: Callers can manage courses and track learner enrollment progress through the API
@@ -58,7 +73,12 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
   1. `GET /api/v1/courses` returns courses filterable with pagination; `GET /api/v1/courses/:id` returns full detail
   2. `POST /api/v1/courses` creates a course; `PATCH /api/v1/courses/:id` updates it; `DELETE /api/v1/courses/:id` removes it — all with audit entries
   3. `GET /api/v1/courses/:id/enrollments` lists enrollees; `POST` enrolls a user; `PATCH /courses/:id/enrollments/:userId` updates progress or completion status
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
+- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
+- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
+- [ ] 01-04-PLAN.md — Health endpoint and migration push
 
 ### Phase 5: Credits & Verifications
 **Goal**: Callers can submit, review, and manage CPD credit records and verification records
@@ -68,7 +88,12 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
   1. `GET /api/v1/credits` returns submissions filterable by status, user, and date; `GET /credits/summary/:userId` returns total hours broken down by category
   2. `POST /api/v1/credits` creates a submission; `PATCH /credits/:id` updates status (approve/reject/pending) with an audit log row
   3. Verifications endpoints (`GET`, `POST`, `PATCH`, `DELETE`) are fully functional with consistent response format and audit logging for writes
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
+- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
+- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
+- [ ] 01-04-PLAN.md — Health endpoint and migration push
 
 ### Phase 6: Analytics
 **Goal**: Callers can retrieve aggregated platform metrics across members, memberships, revenue, engagement, and credits
@@ -78,7 +103,12 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
   1. `GET /api/v1/analytics/overview` returns total members, active members, and new-this-month count
   2. `GET /api/v1/analytics/memberships` and `/revenue` return time-series stats without making live Stripe API calls
   3. `GET /api/v1/analytics/engagement` and `/credits` return participation and submission statistics derived from local Supabase tables
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
+- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
+- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
+- [ ] 01-04-PLAN.md — Health endpoint and migration push
 
 ### Phase 7: Add-ons, Admin Settings & Webhooks
 **Goal**: Callers can manage add-on products, assign them to users, read/update admin settings, and trigger internal actions via incoming webhooks
@@ -88,7 +118,12 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
   1. Add-on CRUD endpoints create, update, and delete add-on records; user-assignment endpoints correctly add and remove add-ons for a given user
   2. `GET /api/v1/admin/settings` returns all settings; `PATCH` updates them in bulk or individually — admin role check enforced on all four endpoints
   3. All three webhook endpoints (`/trigger`, `/payment`, `/notify`) accept valid payloads and return 200; malformed payloads return 400
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
+- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
+- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
+- [ ] 01-04-PLAN.md — Health endpoint and migration push
 
 ### Phase 8: Admin UI & Documentation
 **Goal**: Admins can manage API keys through the admin panel and every API endpoint is documented with example requests and responses
