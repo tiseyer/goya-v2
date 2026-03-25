@@ -292,3 +292,21 @@ html:not(.no-transitions) body * {
   outline: 2px solid var(--goya-primary);
   outline-offset: 2px;
 }
+
+/* ─── Mapbox popup styling (members directory) ─────────────────────────── */
+.goya-popup .mapboxgl-popup-content {
+  border-radius: 10px;
+  padding: 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  border: 1px solid var(--goya-border, #e2e8f0);
+  background: var(--goya-surface, #fff);
+  color: var(--foreground, #1e293b);
+}
+.goya-popup .mapboxgl-popup-tip {
+  border-top-color: var(--goya-surface, #fff);
+}
+.goya-map-pin:hover {
+  transform: scale(1.15) !important;
+}
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
