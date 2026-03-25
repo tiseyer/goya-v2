@@ -9,8 +9,8 @@ Seven phases deliver the Subscriptions page Stripe integration and Teacher Upgra
 **Phase Numbering:** Continues from v1.2 (Phases 8–13). This milestone uses Phases 14–20.
 
 - [x] **Phase 14: Fix Role Display Bug** - Fix admin/moderator "Guest" display on Subscriptions page (completed 2026-03-24)
-- [x] **Phase 15: Subscriptions Page — Real Stripe Data** - Replace placeholder with live Stripe membership, designations, school, Customer Portal (completed 2026-03-25)
-- [ ] **Phase 16: Upgrade CTA** - Show upgrade prompts for students/WPs on Subscriptions page and in Shop
+- [ ] **Phase 15: Subscriptions Page — Real Stripe Data** - Replace placeholder with live Stripe membership, designations, school, Customer Portal
+- [x] **Phase 16: Upgrade CTA** - Show upgrade prompts for students/WPs on Subscriptions page and in Shop (completed 2026-03-25)
 - [ ] **Phase 17: Upgrade Page** - Multi-step /upgrade page with certificate upload and Stripe delayed capture
 - [ ] **Phase 18: Admin Inbox — Teacher Upgrades** - Admin approve/reject flow with payment capture and role change
 - [x] **Phase 19: Supabase Schema** - Create upgrade_requests and user_designations tables with RLS (completed 2026-03-24)
@@ -58,7 +58,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 16-01-PLAN.md — Extend queries, add CTA/pending cards to subscriptions page, conditionally show Teacher Membership in /addons (UPG-01, UPG-02, UPG-08)
+- [x] 16-01-PLAN.md — Extend queries, add CTA/pending cards to subscriptions page, conditionally show Teacher Membership in /addons (UPG-01, UPG-02, UPG-08)
 
 ### Phase 17: Upgrade Page (/upgrade)
 **Goal**: Multi-step upgrade page with certificate upload, Stripe delayed capture, and success page
@@ -125,6 +125,6 @@ Plans:
 | 14. Fix Role Display Bug | 0/1 | Complete    | 2026-03-24 |
 | 20. Fix Broken Admin Pages | 1/1 | Complete    | 2026-03-24 |
 | 15. Subscriptions Page | 1/2 | Complete    | 2026-03-25 |
-| 16. Upgrade CTA | 0/1 | Not started | - |
+| 16. Upgrade CTA | 1/1 | Complete    | 2026-03-25 |
 | 17. Upgrade Page | 0/2 | Not started | - |
 | 18. Admin Inbox — Teacher Upgrades | 0/2 | Not started | - |

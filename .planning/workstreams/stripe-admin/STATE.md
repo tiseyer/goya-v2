@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: milestone
 status: Ready to plan
-stopped_at: Completed 15-01-PLAN.md
-last_updated: "2026-03-25T04:45:08.235Z"
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-03-25T00:15:00.000Z"
 progress:
   total_phases: 7
-  completed_phases: 4
-  total_plans: 5
-  completed_plans: 5
+  completed_phases: 5
+  total_plans: 7
+  completed_plans: 6
 ---
 
 # Project State — stripe-admin workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 15 — subscriptions-page
+**Current focus:** Phase 16 — upgrade-cta
 
 ## Current Position
 
 Phase: 16
-Plan: Not started
+Plan: 01 (Complete)
 
 ## Performance Metrics
 
@@ -100,6 +100,9 @@ Plan: Not started
 - [15-01]: user_designations not in generated types — (supabase as any) cast with explicit row type annotation; consistent pattern
 - [15-01]: getSupabaseService() in fetchSubscriptionsData — stripe_orders has admin-only RLS, service role required to read user's own orders
 - [15-01]: JS-side product name classification ('Membership') — avoids DB-level query complexity; plan specifies this approach
+- [16-01]: Name-based Teacher Membership match (includes 'teacher' && 'membership') — stripe_product_id nullable on local products table; 22 existing products unprovided; Stripe ID prod_UCTigELsOhovuE added as secondary check
+- [16-01]: isStaff guard included in Teacher Membership filter — admin/moderator bypass isProductVisible but should not see upgrade-only product entry point
+- [16-01]: hasPendingUpgrade query uses (supabase as any) — upgrade_requests not in generated types; consistent with codebase pattern
 
 ### Pending Todos
 
@@ -112,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T23:40:00Z
-Stopped at: Completed 15-01-PLAN.md
+Last session: 2026-03-25T00:15:00Z
+Stopped at: Completed 16-01-PLAN.md
 Resume file: None

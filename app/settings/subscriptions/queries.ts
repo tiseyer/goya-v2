@@ -28,6 +28,7 @@ export type SubscriptionsData = {
   ownsSchool: boolean
   schoolName: string | null
   designations: DesignationItem[]
+  hasPendingUpgrade: boolean
 }
 
 export async function fetchSubscriptionsData(userId: string): Promise<SubscriptionsData> {
@@ -133,6 +134,15 @@ export async function fetchSubscriptionsData(userId: string): Promise<Subscripti
     purchaseDate: row.purchase_date,
   }))
 
+  // Step 8: Check upgrade_requests for a pending request by this user
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: pendingUpgrade } = await (supabase as any)
+    .from('upgrade_requests')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('status', 'pending')
+    .maybeSingle()
+
   return {
     profile: {
       role: profile?.role ?? 'student',
@@ -143,5 +153,6 @@ export async function fetchSubscriptionsData(userId: string): Promise<Subscripti
     ownsSchool: school !== null,
     schoolName: school?.name ?? null,
     designations,
+    hasPendingUpgrade: pendingUpgrade !== null,
   }
 }
