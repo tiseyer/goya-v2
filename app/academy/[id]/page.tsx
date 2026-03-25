@@ -1,27 +1,77 @@
-'use client';
-
-import { useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { courses } from '@/lib/academy-data';
-import { useState } from 'react';
+import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import type { Course, UserCourseProgress } from '@/lib/types';
+import { enrollAndStart } from './actions';
+import CourseEnrollCard from './CourseEnrollCard';
 
-export default function CoursePage() {
-  const { id } = useParams<{ id: string }>();
-  const course = courses.find(c => c.id === id);
-  const [markedComplete, setMarkedComplete] = useState(false);
+export const dynamic = 'force-dynamic';
 
-  if (!course) return null;
+const LEVEL_COLORS: Record<string, string> = {
+  Beginner:     'text-emerald-600 bg-emerald-50 border-emerald-200',
+  Intermediate: 'text-amber-600 bg-amber-50 border-amber-200',
+  Advanced:     'text-rose-600 bg-rose-50 border-rose-200',
+  'All Levels': 'text-slate-600 bg-slate-100 border-slate-200',
+};
 
-  const related = courses.filter(c => c.id !== course.id && c.category === course.category).slice(0, 3);
+const CATEGORY_COLORS: Record<string, string> = {
+  Workshop:         'text-teal-700 bg-teal-50 border-teal-200',
+  'Yoga Sequence':  'text-green-700 bg-green-50 border-green-200',
+  'Dharma Talk':    'text-blue-700 bg-blue-50 border-blue-200',
+  'Music Playlist': 'text-pink-700 bg-pink-50 border-pink-200',
+  Research:         'text-slate-600 bg-slate-100 border-slate-200',
+};
+
+export default async function CourseOverviewPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const supabase = await createSupabaseServerClient();
+
+  // Fetch course
+  const { data: courseData } = await supabase
+    .from('courses')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (!courseData) notFound();
+  const course = courseData as Course;
+
+  // Auth + progress
+  const { data: { user } } = await supabase.auth.getUser();
+  let progress: UserCourseProgress | null = null;
+  if (user) {
+    const { data } = await supabase
+      .from('user_course_progress')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('course_id', id)
+      .maybeSingle();
+    progress = (data as UserCourseProgress | null) ?? null;
+  }
+
+  const isEnrolled   = !!progress;
+  const isCompleted  = progress?.status === 'completed';
+  const isInProgress = progress?.status === 'in_progress';
+  const lessonTitle  = `Video – ${course.title}`;
+
+  // Bind server action to this course id
+  const boundEnroll = enrollAndStart.bind(null, id);
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="bg-[#1a2744] pt-24 pb-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <div
+        className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8"
+        style={{ background: `linear-gradient(135deg, ${course.gradient_from}dd, ${course.gradient_to}dd)` }}
+      >
+        <div className="max-w-6xl mx-auto">
           <Link
             href="/academy"
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm font-medium mb-8 transition-colors group"
+            className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-sm mb-8 transition-colors group"
           >
             <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -29,176 +79,167 @@ export default function CoursePage() {
             Back to Academy
           </Link>
 
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="text-xs font-semibold bg-white/10 text-slate-300 px-3 py-1 rounded-full border border-white/15">
+          {/* Badges */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${CATEGORY_COLORS[course.category] ?? 'text-slate-600 bg-slate-100 border-slate-200'}`}>
               {course.category}
             </span>
-            <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-              course.access === 'Free' ? 'bg-emerald-400 text-white' : 'bg-[#2dd4bf] text-[#1a2744]'
+            <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+              course.access === 'free'
+                ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                : 'text-white bg-white/20 border-white/30'
             }`}>
-              {course.access}
+              {course.access === 'free' ? 'Free' : 'Members Only'}
             </span>
-            <span className="text-xs text-slate-400">{course.level}</span>
+            {course.level && (
+              <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${LEVEL_COLORS[course.level] ?? 'text-slate-600 bg-slate-100 border-slate-200'}`}>
+                {course.level}
+              </span>
+            )}
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">{course.title}</h1>
-          <p className="text-slate-300 text-base mb-5 max-w-2xl">{course.description}</p>
-          <div className="flex flex-wrap items-center gap-5 text-sm text-slate-400">
-            <span className="flex items-center gap-1.5">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              {course.instructor}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {course.duration}
-            </span>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 max-w-3xl">{course.title}</h1>
+          {course.short_description && (
+            <p className="text-white/85 text-base max-w-2xl mb-5">{course.short_description}</p>
+          )}
+
+          {/* Meta row */}
+          <div className="flex flex-wrap items-center gap-5 text-sm text-white/75">
+            {course.instructor && (
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                {course.instructor}
+              </span>
+            )}
+            {course.duration && (
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {course.duration}
+              </span>
+            )}
             <span className="flex items-center gap-1.5">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
               </svg>
-              {course.lessons} lessons
+              1 Lesson
             </span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main: video player */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Vimeo embed */}
-            <div className="relative w-full rounded-2xl overflow-hidden shadow-lg" style={{ paddingTop: '56.25%' }}>
-              <iframe
-                className="absolute inset-0 w-full h-full"
-                src="https://player.vimeo.com/video/76979871"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowFullScreen
-              />
+      {/* Main content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
+
+          {/* LEFT column */}
+          <div className="space-y-6">
+
+            {/* About this Course */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
+              <h2 className="text-lg font-bold text-[#1B3A5C] mb-4">About this Course</h2>
+              <p className="text-[#374151] leading-relaxed">
+                {course.description || course.short_description || 'Full details coming soon.'}
+              </p>
+              <p className="text-slate-500 text-sm leading-relaxed mt-3">
+                This course is part of the GOYA Academy curriculum and may qualify for Continuing Education (CE) credit hours toward your GOYA registration renewal.
+              </p>
             </div>
 
-            {/* Progress display */}
-            {course.status === 'in_progress' && !markedComplete && (
-              <div className="mt-4 p-4 bg-white rounded-xl border border-slate-100">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-slate-700">Your Progress</span>
-                  <span className="text-sm font-bold text-[#2dd4bf]">{course.userProgress}%</span>
-                </div>
-                <div className="w-full bg-slate-100 rounded-full h-2">
-                  <div className="bg-[#2dd4bf] h-2 rounded-full transition-all" style={{ width: `${course.userProgress}%` }} />
-                </div>
+            {/* Course Content */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-[#1B3A5C]">Course Content</h2>
+                <span className="text-xs text-slate-400 font-medium">1 lesson{course.duration ? ` · ${course.duration}` : ''}</span>
               </div>
-            )}
 
-            {/* Mark as complete */}
-            {(course.status === 'in_progress' || course.status === 'completed' || markedComplete) && (
-              <button
-                onClick={() => setMarkedComplete(true)}
-                disabled={course.status === 'completed' || markedComplete}
-                className={`w-full mt-4 py-3 font-bold rounded-xl transition-colors ${
-                  course.status === 'completed' || markedComplete
-                    ? 'bg-green-500 text-white cursor-default'
-                    : 'bg-[#2dd4bf] text-[#1a2744] hover:bg-[#14b8a6]'
-                }`}
-              >
-                {course.status === 'completed' || markedComplete ? '✓ Completed' : '✓ Mark as Complete'}
-              </button>
-            )}
+              {/* Lesson row */}
+              <div className={`border border-slate-100 rounded-xl overflow-hidden ${!isEnrolled ? 'opacity-90' : ''}`}>
+                {isEnrolled ? (
+                  <Link
+                    href={`/academy/${id}/lesson`}
+                    className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors group"
+                  >
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                      isCompleted
+                        ? 'bg-green-500 border-green-500'
+                        : 'border-[#4E87A0]'
+                    }`}>
+                      {isCompleted && (
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      {isInProgress && (
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#4E87A0]" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium text-[#1B3A5C] group-hover:text-[#4E87A0] transition-colors truncate">
+                          {lessonTitle}
+                        </span>
+                      </div>
+                    </div>
+                    {course.duration && (
+                      <span className="text-xs text-slate-400 shrink-0">{course.duration}</span>
+                    )}
+                    <svg className="w-4 h-4 text-slate-300 shrink-0 group-hover:text-[#4E87A0] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-4 p-4">
+                    <div className="w-6 h-6 rounded-full border-2 border-slate-200 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm text-slate-400 truncate">{lessonTitle}</span>
+                      </div>
+                    </div>
+                    {course.duration && (
+                      <span className="text-xs text-slate-300 shrink-0">{course.duration}</span>
+                    )}
+                    <svg className="w-4 h-4 text-slate-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
 
-            {/* Course info */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-100 shadow-sm">
-              <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <span className="w-1 h-4 bg-[#2dd4bf] rounded-full" />
-                About this Course
-              </h2>
-              <p className="text-slate-600 leading-relaxed text-[15px]">{course.description}</p>
-              <p className="text-slate-500 text-sm leading-relaxed mt-3">
-                This course is part of the GOYA Academy curriculum and may qualify for Continuing Education (CE) credit hours toward your GOYA registration renewal. Check your member dashboard for eligibility.
-              </p>
+              {!isEnrolled && (
+                <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Enroll to access lesson content
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Enroll CTA */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-              <div className={`w-full h-2 rounded-full mb-5 bg-gradient-to-r ${course.gradient}`} />
-              {course.access === 'Free' ? (
-                <>
-                  <p className="text-2xl font-bold text-[#1a2744] mb-1">Free</p>
-                  <p className="text-slate-500 text-xs mb-5">No login required to watch</p>
-                  <button className="w-full bg-[#2dd4bf] text-[#1a2744] py-3 rounded-xl text-sm font-bold hover:bg-[#14b8a6] transition-colors">
-                    Start Watching
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm font-semibold text-slate-700 mb-1">Members Only</p>
-                  <p className="text-slate-500 text-xs mb-5">Available with a GOYA membership</p>
-                  <Link
-                    href="/register"
-                    className="block w-full bg-[#2dd4bf] text-[#1a2744] py-3 rounded-xl text-sm font-bold hover:bg-[#14b8a6] transition-colors text-center"
-                  >
-                    Join GOYA to Watch
-                  </Link>
-                  <Link
-                    href="/login"
-                    className="block w-full mt-2 border border-slate-200 text-slate-600 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition-colors text-center"
-                  >
-                    Sign In
-                  </Link>
-                </>
-              )}
-            </div>
-
-            {/* Course details */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-              <h3 className="text-sm font-semibold text-slate-900 mb-4">Course Details</h3>
-              <div className="space-y-3 text-sm">
-                {[
-                  { label: 'Instructor', value: course.instructor },
-                  { label: 'Duration', value: course.duration },
-                  { label: 'Lessons', value: `${course.lessons} lessons` },
-                  { label: 'Level', value: course.level },
-                  { label: 'Category', value: course.category },
-                  { label: 'Access', value: course.access },
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
-                    <span className="text-slate-400">{label}</span>
-                    <span className="font-medium text-slate-700 text-right">{value}</span>
-                  </div>
-                ))}
-              </div>
+          {/* RIGHT column — sticky card */}
+          <div>
+            <div className="sticky top-24">
+              <CourseEnrollCard
+                course={course}
+                userId={user?.id ?? null}
+                progress={progress}
+                enrollAction={boundEnroll}
+              />
             </div>
           </div>
         </div>
-
-        {/* Related courses */}
-        {related.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-xl font-bold text-[#1a2744] mb-6">More in {course.category}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              {related.map(c => (
-                <Link
-                  key={c.id}
-                  href={`/academy/${c.id}`}
-                  className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col"
-                >
-                  <div className={`bg-gradient-to-br ${c.gradient} h-28`} />
-                  <div className="p-4">
-                    <h3 className="font-semibold text-[#1a2744] text-sm mb-1 group-hover:text-[#0e9f8a] transition-colors line-clamp-2">
-                      {c.title}
-                    </h3>
-                    <p className="text-xs text-slate-400">{c.instructor} · {c.duration}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

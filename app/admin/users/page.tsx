@@ -27,6 +27,13 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
 
   const supabase = await createSupabaseServerClient();
 
+  // Fetch current admin's role
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  const { data: adminProfile } = authUser
+    ? await supabase.from('profiles').select('role').eq('id', authUser.id).single()
+    : { data: null };
+  const adminRole = adminProfile?.role ?? undefined;
+
   // Build query
   let query = supabase
     .from('profiles')
@@ -90,7 +97,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
       </div>
 
       {/* Table */}
-      <AdminUsersTable users={users ?? []} />
+      <AdminUsersTable users={users ?? []} adminRole={adminRole} />
 
       {/* Pagination */}
       <Suspense>

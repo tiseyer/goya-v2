@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SwitchToButton from './SwitchToButton';
 
 export type UserRow = {
   id: string;
@@ -32,7 +33,7 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export default function AdminUsersTable({ users }: { users: UserRow[] }) {
+export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]; adminRole?: string }) {
   if (users.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-[#E5E7EB] p-12 text-center">
@@ -130,12 +131,17 @@ export default function AdminUsersTable({ users }: { users: UserRow[] }) {
 
                 {/* Actions */}
                 <td className="px-4 py-3">
-                  <Link
-                    href={`/admin/users/${user.id}`}
-                    className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#374151] hover:text-[#1B3A5C] hover:border-[#1B3A5C] transition-colors"
-                  >
-                    Edit
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/admin/users/${user.id}`}
+                      className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#374151] hover:text-[#1B3A5C] hover:border-[#1B3A5C] transition-colors"
+                    >
+                      Edit
+                    </Link>
+                    {adminRole === 'admin' && user.role !== 'admin' && user.role !== 'moderator' && (
+                      <SwitchToButton userId={user.id} />
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

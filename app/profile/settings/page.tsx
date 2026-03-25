@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { updateProfile } from './actions';
 
 const INPUT = 'w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2dd4bf]/40 focus:border-[#2dd4bf] transition-colors placeholder:text-slate-400';
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide';
@@ -107,9 +108,8 @@ export default function ProfileSettingsPage() {
       const { data: p } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       if (p) {
         setProfile(p);
-        const nameParts = (p.full_name ?? '').split(' ');
-        setFirstName(nameParts[0] ?? '');
-        setLastName(nameParts.slice(1).join(' '));
+        setFirstName(p.first_name ?? '');
+        setLastName(p.last_name ?? '');
         setEmail(user.email ?? '');
         setBio(p.bio ?? '');
         setLocation(p.location ?? '');
@@ -128,7 +128,7 @@ export default function ProfileSettingsPage() {
         setLineage(p.lineage ?? []);
         setProgramsOffered(p.programs_offered ?? []);
         setSchoolEstablished(p.established_year?.toString() ?? '');
-        setDeliveryFormat(p.delivery_format ?? '');
+        setDeliveryFormat(p.practice_format ?? '');
       }
       setLoading(false);
     }
@@ -143,8 +143,9 @@ export default function ProfileSettingsPage() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const { error } = await supabase.from('profiles').update({
-      full_name: `${firstName} ${lastName}`.trim(),
+    const { error } = await updateProfile({
+      first_name: firstName,
+      last_name: lastName,
       bio, location, website, instagram, youtube,
       introduction,
       video_intro_url: videoIntroUrl,
@@ -158,10 +159,10 @@ export default function ProfileSettingsPage() {
       lineage,
       programs_offered: programsOffered,
       established_year: schoolEstablished ? parseInt(schoolEstablished) : null,
-      delivery_format: deliveryFormat,
-    }).eq('id', user.id);
+      practice_format: deliveryFormat || null,
+    });
     setSaving(false);
-    if (error) showToast(error.message, 'error');
+    if (error) showToast(error, 'error');
     else showToast('Profile updated');
   }
 

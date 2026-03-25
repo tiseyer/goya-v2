@@ -1,13 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useCart } from '@/app/context/CartContext';
 import MiniCart from './MiniCart';
+import GOYABadge from './GOYABadge';
 import { useConnections } from '@/app/context/ConnectionsContext';
+import { ThemeInline } from '@/app/components/ThemeToggle';
 import type { NotifRecord } from '@/app/context/ConnectionsContext';
+import { useImpersonation } from '@/app/context/ImpersonationContext';
+import { endImpersonation } from '@/app/actions/impersonation';
+import { getNotifications, markNotificationsRead, getUnreadNotificationCount } from '@/lib/messaging';
+import type { AppNotification } from '@/lib/types';
 
 // ─── config ───────────────────────────────────────────────────────────────────
 
@@ -212,33 +218,92 @@ function NotifItem({ notif, onAccept, onDecline }: {
   return null;
 }
 
+// ─── Relative time ────────────────────────────────────────────────────────────
+
+function relTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days === 1) return 'Yesterday';
+  return `${days}d ago`;
+}
+
 // ─── Notifications / Messages widget ─────────────────────────────────────────
 
 function MessagesWidget() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { notifications, unreadCount, acceptRequest, declineRequest, markAllRead } = useConnections();
+  const { notifications: connNotifs, unreadCount: connUnread, acceptRequest, declineRequest, markAllRead: markConnRead } = useConnections();
   useClickOutside(ref, () => setOpen(false));
 
-  function handleOpen() {
-    setOpen(o => !o);
+  // DB notifications (new messages, etc.)
+  const [dbNotifs, setDbNotifs] = useState<AppNotification[]>([]);
+  const [dbUnread, setDbUnread] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setCurrentUserId(data.user.id);
+    });
+  }, []);
+
+  const loadDbNotifs = useCallback(async () => {
+    if (!currentUserId) return;
+    const [notifs, count] = await Promise.all([
+      getNotifications(currentUserId, 5),
+      getUnreadNotificationCount(currentUserId),
+    ]);
+    setDbNotifs(notifs);
+    setDbUnread(count);
+  }, [currentUserId]);
+
+  useEffect(() => { loadDbNotifs(); }, [loadDbNotifs]);
+
+  // Realtime subscription for notifications
+  useEffect(() => {
+    if (!currentUserId) return;
+    const ch = supabase
+      .channel('header-notifications')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${currentUserId}`,
+      }, () => { loadDbNotifs(); })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [currentUserId, loadDbNotifs]);
+
+  const totalUnread = connUnread + dbUnread;
+
+  async function handleMarkAllRead() {
+    markConnRead();
+    if (currentUserId) {
+      await markNotificationsRead(currentUserId);
+      setDbUnread(0);
+      setDbNotifs(prev => prev.map(n => ({ ...n, read_at: new Date().toISOString() })));
+    }
   }
 
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={handleOpen}
+        onClick={() => setOpen(o => !o)}
         className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
           open ? 'bg-[#4E87A0] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
         }`}
-        aria-label={`Notifications (${unreadCount} unread)`}
+        aria-label={`Notifications (${totalUnread} unread)`}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        {unreadCount > 0 && (
+        {totalUnread > 0 && (
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {totalUnread > 9 ? '9+' : totalUnread}
           </span>
         )}
       </button>
@@ -249,15 +314,15 @@ function MessagesWidget() {
           <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between">
             <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">
               Notifications
-              {unreadCount > 0 && (
+              {totalUnread > 0 && (
                 <span className="ml-2 bg-[#4E87A0] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                  {unreadCount} new
+                  {totalUnread} new
                 </span>
               )}
             </p>
-            {notifications.length > 0 && (
+            {(connNotifs.length > 0 || dbNotifs.length > 0) && (
               <button
-                onClick={markAllRead}
+                onClick={handleMarkAllRead}
                 className="text-[10px] text-[#4E87A0] hover:text-[#3A7190] font-semibold transition-colors"
               >
                 Mark all read
@@ -267,24 +332,67 @@ function MessagesWidget() {
 
           {/* Notification list */}
           <div className="max-h-96 overflow-y-auto divide-y divide-[#E5E7EB]">
-            {notifications.length === 0 ? (
+            {/* Connection request notifications (with accept/decline) */}
+            {connNotifs.map(notif => (
+              <NotifItem
+                key={notif.id}
+                notif={notif}
+                onAccept={() => { acceptRequest(notif.connectionId, notif.fromUserId); }}
+                onDecline={() => { declineRequest(notif.connectionId, notif.fromUserId); }}
+              />
+            ))}
+
+            {/* DB notifications (messages, etc.) */}
+            {dbNotifs.map(notif => (
+              <Link
+                key={notif.id}
+                href={notif.link ?? '/messages'}
+                onClick={() => setOpen(false)}
+                className={`flex gap-3 items-start px-4 py-3 hover:bg-slate-50 transition-colors ${!notif.read_at ? 'bg-[#4E87A0]/5' : ''}`}
+              >
+                {notif.actor?.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={notif.actor.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-slate-200" />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
+                    <span className="text-white text-[10px] font-bold">
+                      {(notif.actor?.full_name ?? '?')[0]?.toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-[#374151] leading-snug">
+                    <span className="font-semibold text-[#1B3A5C]">{notif.actor?.full_name ?? 'Someone'}</span>
+                    {' '}{notif.type === 'new_message' ? 'sent you a message' : notif.title}
+                  </p>
+                  {notif.body && (
+                    <p className="text-[10px] text-slate-400 mt-0.5 truncate">{notif.body}</p>
+                  )}
+                </div>
+                <span className="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">{relTime(notif.created_at)}</span>
+              </Link>
+            ))}
+
+            {connNotifs.length === 0 && dbNotifs.length === 0 && (
               <div className="px-4 py-8 text-center">
                 <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0l-8 5-8-5" />
                 </svg>
                 <p className="text-sm text-[#6B7280] font-medium">No notifications yet</p>
-                <p className="text-xs text-slate-400 mt-1">Connection requests will appear here.</p>
+                <p className="text-xs text-slate-400 mt-1">Messages and connection requests appear here.</p>
               </div>
-            ) : (
-              notifications.map(notif => (
-                <NotifItem
-                  key={notif.id}
-                  notif={notif}
-                  onAccept={() => { acceptRequest(notif.connectionId, notif.fromSlug); }}
-                  onDecline={() => { declineRequest(notif.connectionId, notif.fromSlug); }}
-                />
-              ))
             )}
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-[#E5E7EB] px-4 py-2.5">
+            <Link
+              href="/settings/inbox"
+              onClick={() => setOpen(false)}
+              className="text-xs text-[#4E87A0] hover:text-[#3A7190] font-semibold transition-colors"
+            >
+              View all →
+            </Link>
           </div>
         </div>
       )}
@@ -294,16 +402,45 @@ function MessagesWidget() {
 
 // ─── User menu ────────────────────────────────────────────────────────────────
 
-function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { userName: string; userMrn: string; userInitials: string; userRole?: string; onLogout: () => void }) {
+function UserMenu({
+  userName,
+  userMrn,
+  userInitials,
+  userRole,
+  userId,
+  userMemberType,
+  userSchoolId,
+  onLogout,
+  isImpersonating,
+  adminName,
+  impersonatedName,
+  impersonatedInitials,
+}: {
+  userName: string;
+  userMrn: string;
+  userInitials: string;
+  userRole?: string;
+  userId?: string;
+  userMemberType?: string;
+  userSchoolId?: string;
+  onLogout: () => void;
+  isImpersonating?: boolean;
+  adminName?: string;
+  impersonatedName?: string;
+  impersonatedInitials?: string;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setOpen(false));
 
+  const displayName = isImpersonating && impersonatedName ? impersonatedName : userName;
+  const displayInitials = isImpersonating && impersonatedInitials ? impersonatedInitials : userInitials;
+
   const menuItems = [
-    { label: 'My Profile',      href: '/profile',            icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-    { label: 'Profile Settings', href: '/profile/settings',  icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' },
-    { label: 'Subscriptions',   href: '#',                   icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
-    { label: 'Messages',        href: '#',                   icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+    { label: 'My Profile',      href: userId ? `/members/${userId}` : '#', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+    { label: 'Credits & Hours',  href: '/credits',            icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+    ...(userMemberType === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' }] : []),
+    { label: 'Messages',        href: '/messages',           icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
   ];
 
   return (
@@ -316,10 +453,10 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
         aria-label="User menu"
       >
         {/* Avatar */}
-        <div className="w-7 h-7 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
-          <span className="text-white text-[10px] font-black">{userInitials}</span>
+        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+          <span className="text-white text-[10px] font-black">{displayInitials}</span>
         </div>
-        <span className="text-sm font-medium text-[#1B3A5C] hidden lg:block">{userName}</span>
+        <span className="text-sm font-medium text-[#1B3A5C] hidden lg:block">{displayName}</span>
         <svg className={`w-3.5 h-3.5 text-[#6B7280] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
@@ -329,12 +466,18 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
         <Dropdown>
           {/* User header */}
           <div className="px-4 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
-              <span className="text-white text-xs font-black">{userInitials}</span>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+              <span className="text-white text-xs font-black">{displayInitials}</span>
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#1B3A5C]">{userName}</p>
-              {userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>}
+              <p className="text-sm font-semibold text-[#1B3A5C]">{displayName}</p>
+              {isImpersonating ? (
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full mt-0.5">
+                  Viewing as — admin: {adminName ?? 'Admin'}
+                </span>
+              ) : (
+                userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>
+              )}
             </div>
           </div>
 
@@ -355,9 +498,20 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
             ))}
           </div>
 
-          {/* Admin Settings */}
-          {(userRole === 'admin' || userRole === 'moderator') && (
+          {/* Settings + Admin Settings — admin/moderator, hidden when impersonating */}
+          {!isImpersonating && (userRole === 'admin' || userRole === 'moderator') && (
             <div className="border-t border-[#E5E7EB] py-1.5">
+              <Link
+                href="/settings"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+              >
+                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Settings
+              </Link>
               <Link
                 href="/admin"
                 onClick={() => setOpen(false)}
@@ -371,6 +525,75 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
               </Link>
             </div>
           )}
+
+          {/* Settings — regular users, hidden when impersonating */}
+          {!isImpersonating && userRole !== 'admin' && userRole !== 'moderator' && (
+            <div className="border-t border-[#E5E7EB] py-1.5">
+              <Link
+                href="/settings"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+              >
+                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Settings
+              </Link>
+            </div>
+          )}
+
+          {/* School Settings / Register School (teacher role) — hidden when impersonating */}
+          {!isImpersonating && userRole === 'teacher' && (
+            <div className="border-t border-[#E5E7EB] py-1.5">
+              {userSchoolId ? (
+                <Link
+                  href={`/schools/${userSchoolId}/settings`}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h6" />
+                  </svg>
+                  School Settings
+                </Link>
+              ) : (
+                <Link
+                  href="/schools/create"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Register School
+                </Link>
+              )}
+            </div>
+          )}
+
+          {/* Switch Back — only shown when impersonating */}
+          {isImpersonating && (
+            <div className="border-t border-[#E5E7EB] py-1.5">
+              <form action={endImpersonation}>
+                <button
+                  type="submit"
+                  onClick={() => setOpen(false)}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-amber-700 hover:text-amber-900 hover:bg-amber-50 transition-colors"
+                >
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+                  </svg>
+                  Switch Back to Admin
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Theme quick switch */}
+          <div className="border-t border-[#E5E7EB] px-4 py-2">
+            <ThemeInline />
+          </div>
 
           {/* Logout */}
           <div className="border-t border-[#E5E7EB] py-1.5">
@@ -390,28 +613,122 @@ function UserMenu({ userName, userMrn, userInitials, userRole, onLogout }: { use
   );
 }
 
-// ─── Mobile cart link (used inside hamburger menu) ───────────────────────────
+// ─── Mobile cart toggle (hamburger menu — toggles inline mini-cart) ──────────
 
-function MobileCartLink({ onClose }: { onClose: () => void }) {
-  const { itemCount } = useCart();
+function MobileCartToggle({ onNavClose }: { onNavClose: () => void }) {
+  const [expanded, setExpanded] = useState(false);
+  const { items, itemCount, removeItem, subtotal, totalSignUpFees } = useCart();
+  const total = subtotal + totalSignUpFees;
+
   return (
-    <Link
-      href="/cart"
-      onClick={onClose}
-      className="flex items-center justify-between px-4 py-2.5 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm font-medium transition-colors"
-    >
-      <span className="flex items-center gap-2">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-        Cart
-      </span>
-      {itemCount > 0 && (
-        <span className="bg-[#8b1a1a] text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-          {itemCount > 9 ? '9+' : itemCount}
+    <div>
+      {/* Toggle row */}
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm font-medium transition-colors"
+      >
+        <span className="flex items-center gap-2">
+          <span className="relative">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {itemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#8b1a1a] text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
+                {itemCount > 9 ? '9+' : itemCount}
+              </span>
+            )}
+          </span>
+          Cart
         </span>
+        <svg
+          className={`w-4 h-4 text-slate-400 transition-transform ${expanded ? 'rotate-180' : ''}`}
+          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Inline cart content */}
+      {expanded && (
+        <div className="mx-1 mt-1 mb-1 bg-white border border-[#E5E7EB] rounded-xl overflow-hidden">
+          {items.length === 0 ? (
+            <div className="px-4 py-6 text-center">
+              <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <p className="text-sm font-medium text-[#374151] mb-1">Your cart is empty</p>
+              <p className="text-xs text-[#6B7280]">Add designations and upgrades to get started.</p>
+            </div>
+          ) : (
+            <>
+              <ul className="max-h-56 overflow-y-auto divide-y divide-[#E5E7EB]">
+                {items.map(item => (
+                  <li key={item.id} className="flex items-center gap-3 px-4 py-3">
+                    <div className="shrink-0 bg-slate-50 rounded-lg p-1 border border-[#E5E7EB]">
+                      <GOYABadge acronym={item.acronym} lines={item.badgeLines} size={40} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-[#1B3A5C] leading-snug truncate">{item.name}</p>
+                      <p className="text-xs text-[#6B7280] mt-0.5">
+                        ${item.price.toFixed(2)}
+                        {item.priceType.includes('recurring') ? <span className="text-slate-400">/yr</span> : ''}
+                        {item.quantity > 1 && <span className="text-slate-400"> × {item.quantity}</span>}
+                      </p>
+                      {item.signUpFee ? (
+                        <p className="text-[10px] text-slate-400">+ ${item.signUpFee.toFixed(2)} sign-up</p>
+                      ) : null}
+                    </div>
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="shrink-0 text-slate-400 hover:text-rose-500 transition-colors p-1 rounded hover:bg-rose-50"
+                      aria-label={`Remove ${item.name}`}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="px-4 py-3 border-t border-[#E5E7EB] bg-slate-50">
+                <div className="space-y-1 mb-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-[#6B7280]">Subtotal</span>
+                    <span className="text-[#374151] font-medium">${subtotal.toFixed(2)}</span>
+                  </div>
+                  {totalSignUpFees > 0 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[#6B7280]">Sign-up fees</span>
+                      <span className="text-[#374151] font-medium">${totalSignUpFees.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-1.5 border-t border-[#E5E7EB]">
+                    <span className="text-sm font-semibold text-[#1B3A5C]">Total</span>
+                    <span className="text-sm font-bold text-[#1B3A5C]">${total.toFixed(2)}</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link
+                    href="/cart"
+                    onClick={onNavClose}
+                    className="flex-1 text-center py-2.5 rounded-lg border border-[#E5E7EB] text-xs font-semibold text-[#374151] hover:text-[#1B3A5C] hover:border-slate-300 transition-colors"
+                  >
+                    View Cart
+                  </Link>
+                  <Link
+                    href="/checkout"
+                    onClick={onNavClose}
+                    className="flex-1 text-center py-2.5 rounded-lg bg-[#1B3A5C] text-xs font-semibold text-white hover:bg-[#162d4a] transition-colors"
+                  >
+                    Checkout
+                  </Link>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       )}
-    </Link>
+    </div>
   );
 }
 
@@ -456,30 +773,77 @@ function CartWidget() {
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [maintenanceActive, setMaintenanceActive] = useState(false);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
+  const { isImpersonating, targetProfile, adminProfile } = useImpersonation();
+
+  function checkMaintenance(role: string | undefined) {
+    if (role !== 'admin' && role !== 'moderator') return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('site_settings')
+      .select('key, value')
+      .in('key', ['maintenance_mode_enabled', 'maintenance_mode_scheduled', 'maintenance_start_utc', 'maintenance_end_utc'])
+      .then(({ data }: { data: Array<{ key: string; value: string }> | null }) => {
+        if (!data) return;
+        const map: Record<string, string> = {};
+        data.forEach(r => { map[r.key] = r.value ?? ''; });
+        const enabled = map.maintenance_mode_enabled === 'true';
+        const scheduled = map.maintenance_mode_scheduled === 'true';
+        const now = Date.now();
+        let active = enabled;
+        if (!active && scheduled) {
+          const start = map.maintenance_start_utc ? new Date(map.maintenance_start_utc).getTime() : 0;
+          const end   = map.maintenance_end_utc   ? new Date(map.maintenance_end_utc).getTime()   : 0;
+          active = start > 0 && end > 0 && now >= start && now <= end;
+        }
+        setMaintenanceActive(active);
+      });
+  }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user ?? null);
       if (data.user) {
         supabase.from('profiles').select('*').eq('id', data.user.id).single()
-          .then(({ data: p }) => setProfile(p));
+          .then(({ data: p }) => {
+            setProfile(p);
+            checkMaintenance(p?.role);
+            if (p?.role === 'teacher') {
+              (supabase as any).from('schools').select('id').eq('owner_id', data.user!.id).maybeSingle()
+                .then(({ data: s }: { data: { id: string } | null }) => setSchoolId(s?.id ?? null));
+            }
+          });
       }
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         supabase.from('profiles').select('*').eq('id', session.user.id).single()
-          .then(({ data: p }) => setProfile(p));
+          .then(({ data: p }) => {
+            setProfile(p);
+            checkMaintenance(p?.role);
+            if (p?.role === 'teacher') {
+              (supabase as any).from('schools').select('id').eq('owner_id', session.user!.id).maybeSingle()
+                .then(({ data: s }: { data: { id: string } | null }) => setSchoolId(s?.id ?? null));
+            } else {
+              setSchoolId(null);
+            }
+          });
       } else {
         setProfile(null);
+        setMaintenanceActive(false);
+        setSchoolId(null);
       }
     });
     return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isLoggedIn = !!user;
@@ -494,19 +858,38 @@ export default function Header() {
     });
   };
 
+  const impersonatedName = isImpersonating && targetProfile
+    ? (targetProfile.full_name ?? targetProfile.email ?? 'User')
+    : undefined;
+  const impersonatedInitials = isImpersonating && targetProfile
+    ? getInitials(targetProfile.full_name, targetProfile.email)
+    : undefined;
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E7EB] shadow-sm">
+    <header className={`fixed ${isImpersonating ? 'top-10' : 'top-0'} left-0 right-0 z-50 bg-white border-b border-[#E5E7EB] shadow-sm`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
 
           {/* Logo */}
           <Link href="/" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/GOYA Logo Black.png" alt="GOYA" style={{ width: '120px', height: 'auto' }} />
+            <img src="/images/GOYA Logo Blue.png" alt="GOYA" style={{ width: '120px', height: 'auto' }} />
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-0.5">
+            {isLoggedIn && (
+              <Link
+                href="/dashboard"
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  pathname === '/dashboard'
+                    ? 'text-[#1B3A5C] bg-slate-100'
+                    : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+                }`}
+              >
+                Dashboard
+              </Link>
+            )}
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={label}
@@ -520,21 +903,6 @@ export default function Header() {
                 {label}
               </Link>
             ))}
-            {(profile?.role === 'admin' || profile?.role === 'moderator') && (
-              <Link
-                href="/admin"
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                  pathname.startsWith('/admin')
-                    ? 'text-[#1B3A5C] bg-slate-100'
-                    : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
-                }`}
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                Admin
-              </Link>
-            )}
           </nav>
 
           {/* Right side */}
@@ -544,8 +912,30 @@ export default function Header() {
                 <SearchWidget />
                 <MessagesWidget />
                 <CartWidget />
+                {(profile?.role === 'admin' || profile?.role === 'moderator') && maintenanceActive && (
+                  <Link
+                    href="/admin/settings"
+                    className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg hover:bg-amber-100 transition-colors"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Maintenance
+                  </Link>
+                )}
                 <div className="w-px h-5 bg-[#E5E7EB] mx-1" />
-                <UserMenu userName={userName} userMrn={userMrn} userInitials={userInitials} userRole={profile?.role} onLogout={handleLogout} />
+                <UserMenu
+                  userName={userName}
+                  userMrn={userMrn}
+                  userInitials={userInitials}
+                  userRole={profile?.role}
+                  userId={isImpersonating && targetProfile ? targetProfile.id : profile?.id}
+                  userMemberType={isImpersonating && targetProfile ? (targetProfile.member_type ?? undefined) : profile?.member_type}
+                  userSchoolId={schoolId ?? undefined}
+                  onLogout={handleLogout}
+                  isImpersonating={isImpersonating}
+                  adminName={adminProfile?.full_name ?? 'Admin'}
+                  impersonatedName={impersonatedName}
+                  impersonatedInitials={impersonatedInitials}
+                />
               </>
             ) : (
               <>
@@ -560,78 +950,180 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="lg:hidden text-[#374151] hover:text-[#1B3A5C] p-2 rounded-lg hover:bg-slate-100 transition-colors"
-            aria-label="Toggle menu"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {menuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
+          {/* Mobile controls: hamburger + avatar/login */}
+          <div className="lg:hidden flex items-center gap-1">
+            {/* Hamburger — nav only */}
+            <button
+              onClick={() => { setNavOpen(o => !o); setProfileOpen(false); }}
+              className="text-[#374151] hover:text-[#1B3A5C] p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              aria-label="Toggle navigation"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {navOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+            {/* Avatar (logged in) or Login button (logged out) */}
+            {isLoggedIn ? (
+              <button
+                onClick={() => { setProfileOpen(o => !o); setNavOpen(false); }}
+                className="flex items-center justify-center rounded-full focus:outline-none"
+                aria-label="Account menu"
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+                  <span className="text-white text-[10px] font-black">{impersonatedInitials ?? userInitials}</span>
+                </div>
+              </button>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-[#4E87A0] hover:text-[#4E87A0] transition-colors"
+                aria-label="Sign in"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
+      {/* ── Mobile nav overlay (hamburger) ─────────────────────────────────── */}
+      {navOpen && (
         <div className="lg:hidden bg-white border-t border-[#E5E7EB] px-4 py-4 space-y-1">
-          {/* Mobile cart link */}
-          <MobileCartLink onClose={() => setMenuOpen(false)} />
+          {isLoggedIn && (
+            <Link
+              href="/dashboard"
+              onClick={() => setNavOpen(false)}
+              className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname === '/dashboard'
+                  ? 'text-[#1B3A5C] bg-slate-100'
+                  : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+              }`}
+            >
+              Dashboard
+            </Link>
+          )}
           {NAV_LINKS.map(({ href, label }) => (
             <Link
               key={label}
               href={href}
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-2.5 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm font-medium transition-colors"
+              onClick={() => setNavOpen(false)}
+              className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname === href
+                  ? 'text-[#1B3A5C] bg-slate-100'
+                  : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+              }`}
             >
               {label}
             </Link>
           ))}
-          {isLoggedIn ? (
-            <div className="pt-3 mt-3 border-t border-[#E5E7EB] space-y-1">
-              <div className="flex items-center gap-3 px-4 py-2">
-                <div className="w-8 h-8 rounded-full bg-[#4E87A0] flex items-center justify-center">
-                  <span className="text-white text-xs font-black">{userInitials}</span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#1B3A5C]">{userName}</p>
-                  {userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>}
-                </div>
+          <MobileCartToggle onNavClose={() => setNavOpen(false)} />
+        </div>
+      )}
+
+      {/* ── Mobile profile bottom sheet (avatar) ────────────────────────────── */}
+      {profileOpen && isLoggedIn && (
+        <div className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40" onClick={() => setProfileOpen(false)} />
+          {/* Sheet */}
+          <div className="relative bg-white rounded-t-2xl overflow-hidden animate-[slideUp_0.2s_ease-out]">
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 bg-slate-200 rounded-full" />
+            </div>
+            {/* User header */}
+            <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+                <span className="text-white text-xs font-black">{impersonatedInitials ?? userInitials}</span>
               </div>
+              <div>
+                <p className="text-sm font-semibold text-[#1B3A5C]">{impersonatedName ?? userName}</p>
+                {isImpersonating ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full mt-0.5">
+                    Viewing as — admin: {adminProfile?.full_name ?? 'Admin'}
+                  </span>
+                ) : (
+                  userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>
+                )}
+              </div>
+            </div>
+            {/* Menu items */}
+            <div className="px-3 py-2 space-y-0.5">
               {[
-                { label: 'My Profile', href: '/profile' },
-                { label: 'Profile Settings', href: '/profile/settings' },
-                { label: 'Subscriptions', href: '#' },
-                { label: 'Messages', href: '#' },
+                { label: 'My Profile', href: (isImpersonating && targetProfile ? targetProfile.id : profile?.id) ? `/members/${isImpersonating && targetProfile ? targetProfile.id : profile?.id}` : '#' },
+                { label: 'Credits & Hours', href: '/credits' },
+                ...((isImpersonating ? targetProfile?.member_type : profile?.member_type) === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours' }] : []),
+                { label: 'Messages', href: '/messages' },
               ].map(item => (
-                <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                <Link key={item.label} href={item.href} onClick={() => setProfileOpen(false)}
+                  className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                 >
                   {item.label}
                 </Link>
               ))}
-              {(profile?.role === 'admin' || profile?.role === 'moderator') && (
-                <Link href="/admin" onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 rounded-lg text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+              {!isImpersonating && (profile?.role === 'admin' || profile?.role === 'moderator') && (
+                <>
+                  <Link href="/settings" onClick={() => setProfileOpen(false)}
+                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  >
+                    Settings
+                  </Link>
+                  <Link href="/admin" onClick={() => setProfileOpen(false)}
+                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  >
+                    Admin Settings
+                  </Link>
+                </>
+              )}
+              {!isImpersonating && profile?.role !== 'admin' && profile?.role !== 'moderator' && (
+                <Link href="/settings" onClick={() => setProfileOpen(false)}
+                  className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                 >
-                  Admin Settings
+                  Settings
                 </Link>
               )}
-              <button onClick={handleLogout} className="w-full text-left px-4 py-2 rounded-lg text-rose-500 hover:bg-rose-50 text-sm transition-colors">
+              {!isImpersonating && profile?.role === 'teacher' && (
+                schoolId ? (
+                  <Link href={`/schools/${schoolId}/settings`} onClick={() => setProfileOpen(false)}
+                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  >
+                    School Settings
+                  </Link>
+                ) : (
+                  <Link href="/schools/create" onClick={() => setProfileOpen(false)}
+                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                  >
+                    Register School
+                  </Link>
+                )
+              )}
+              {isImpersonating && (
+                <form action={endImpersonation}>
+                  <button
+                    type="submit"
+                    onClick={() => setProfileOpen(false)}
+                    className="w-full text-left px-4 py-3 rounded-xl text-amber-700 hover:bg-amber-50 text-sm transition-colors"
+                  >
+                    ↩ Switch Back to Admin
+                  </button>
+                </form>
+              )}
+            </div>
+            <div className="px-3 pb-4">
+              <button
+                onClick={() => { setProfileOpen(false); handleLogout(); }}
+                className="w-full text-left px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 text-sm font-medium transition-colors"
+              >
                 Logout
               </button>
             </div>
-          ) : (
-            <div className="pt-3 mt-3 border-t border-[#E5E7EB] flex flex-col gap-2">
-              <Link href="/sign-in" className="block px-4 py-2.5 text-[#374151] hover:text-[#1B3A5C] text-sm font-medium">Sign In</Link>
-              <Link href="/register" className="block bg-[#4E87A0] text-white px-4 py-2.5 rounded-lg text-sm font-semibold text-center hover:bg-[#3A7190] transition-colors">Join GOYA</Link>
-            </div>
-          )}
+          </div>
         </div>
       )}
     </header>
