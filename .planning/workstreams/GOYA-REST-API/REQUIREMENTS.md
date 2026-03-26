@@ -23,10 +23,10 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 - [x] **USER-01**: GET `/users` lists users with filters (role, membership status, date range, search)
 - [x] **USER-02**: GET `/users/:id` returns full user profile
-- [ ] **USER-03**: PATCH `/users/:id` updates role, status, membership
-- [ ] **USER-04**: GET `/users/:id/credits` returns credit & teaching hours
-- [ ] **USER-05**: GET `/users/:id/certifications` returns user certifications
-- [ ] **USER-06**: GET `/users/:id/verifications` returns user verifications
+- [x] **USER-03**: PATCH `/users/:id` updates role, status, membership
+- [x] **USER-04**: GET `/users/:id/credits` returns credit & teaching hours
+- [x] **USER-05**: GET `/users/:id/certifications` returns user certifications
+- [x] **USER-06**: GET `/users/:id/verifications` returns user verifications
 
 ### Events
 
@@ -146,10 +146,10 @@ None — full spec included in v1.6.
 | AUDT-01 | Phase 1 | Pending |
 | USER-01 | Phase 2 | Complete |
 | USER-02 | Phase 2 | Complete |
-| USER-03 | Phase 2 | Pending |
-| USER-04 | Phase 2 | Pending |
-| USER-05 | Phase 2 | Pending |
-| USER-06 | Phase 2 | Pending |
+| USER-03 | Phase 2 | Complete |
+| USER-04 | Phase 2 | Complete |
+| USER-05 | Phase 2 | Complete |
+| USER-06 | Phase 2 | Complete |
 | EVNT-01 | Phase 3 | Pending |
 | EVNT-02 | Phase 3 | Pending |
 | EVNT-03 | Phase 3 | Pending |
