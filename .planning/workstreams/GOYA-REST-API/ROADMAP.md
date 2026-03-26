@@ -43,12 +43,10 @@ Plans:
   2. `GET /api/v1/users/:id` returns the full user profile; an unknown ID returns 404
   3. `PATCH /api/v1/users/:id` updates role, status, or membership and produces an audit log entry
   4. Sub-resource endpoints (`/credits`, `/certifications`, `/verifications`) each return the correct data for the given user
-**Plans**: 4 plans
+**Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
-- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
-- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
-- [ ] 01-04-PLAN.md — Health endpoint and migration push
+- [ ] 02-01-PLAN.md — Users service layer, list endpoint, detail endpoint
+- [ ] 02-02-PLAN.md — User update (PATCH) with audit logging, credits/certifications/verifications sub-resources
 
 ### Phase 3: Events
 **Goal**: Callers can create, read, update, and delete events and manage user registrations
@@ -142,7 +140,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-03-25 |
-| 2. Users | 0/? | Not started | - |
+| 2. Users | 0/2 | Not started | - |
 | 3. Events | 0/? | Not started | - |
 | 4. Courses | 0/? | Not started | - |
 | 5. Credits & Verifications | 0/? | Not started | - |
