@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-26T09:10:32.233Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-03-26T09:21:38.014Z"
 progress:
   total_phases: 8
-  completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
+  completed_phases: 6
+  total_plans: 14
+  completed_plans: 14
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** Phase 05 — credits-and-verifications
+**Current focus:** Phase 06 — analytics
 
 ## Current Position
 
-Phase: 6
-Plan: Not started
+Phase: 06 (analytics) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Plan: Not started
 | Phase 04-courses P02 | 3 | 2 tasks | 3 files |
 | Phase 05 P02 | 3 | 2 tasks | 3 files |
 | Phase 05-credits-and-verifications P01 | 3 | 2 tasks | 4 files |
+| Phase 06 P02 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,9 @@ Plan: Not started
 - [Phase 05]: createVerification uses UPDATE not INSERT — initiating verification means setting pending status on existing profile
 - [Phase 05]: is_verified boolean auto-synced in updateVerification service layer — single source of truth, callers only set verification_status
 - [Phase 05-credits-and-verifications]: getCreditSummary aggregates in JS matching getUserCreditTotals pattern; ALLOWED_CREDIT_UPDATE_FIELDS restricted to status+rejection_reason only
+- [Phase 06]: getEngagementStats uses Promise.all for parallel queries then filters in JS by Set of valid IDs — respects soft-delete without complex JOIN
+- [Phase 06]: getCreditStats aggregates in JS matching getCreditSummary pattern from credits service
+- [Phase 06]: No audit logging on analytics endpoints — read-only aggregated data, no per-record access
 
 ### Pending Todos
 
@@ -106,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T09:05:30.288Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-03-26T09:21:22.987Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None

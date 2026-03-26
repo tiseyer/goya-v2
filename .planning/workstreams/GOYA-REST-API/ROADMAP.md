@@ -11,7 +11,7 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
 - [x] **Phase 3: Events** - Events CRUD with registration management (completed 2026-03-26)
 - [x] **Phase 4: Courses** - Courses CRUD with enrollment management (completed 2026-03-26)
 - [x] **Phase 5: Credits & Verifications** - Credits CRUD with summary endpoint + verifications CRUD (completed 2026-03-26)
-- [ ] **Phase 6: Analytics** - Five analytics aggregation endpoints
+- [x] **Phase 6: Analytics** - Five analytics aggregation endpoints (completed 2026-03-26)
 - [ ] **Phase 7: Add-ons, Admin Settings & Webhooks** - Add-ons CRUD with user assignments, admin settings, incoming webhook endpoints
 - [ ] **Phase 8: Admin UI & Documentation** - API key management page in admin panel + full API reference
 
@@ -97,8 +97,8 @@ Plans:
   3. `GET /api/v1/analytics/engagement` and `/credits` return participation and submission statistics derived from local Supabase tables
 **Plans**: 2 plans
 Plans:
-- [ ] 06-01-PLAN.md — Analytics service layer, overview/memberships/revenue endpoints (reuses lib/analytics/metrics.ts)
-- [ ] 06-02-PLAN.md — Engagement and credits analytics endpoints
+- [x] 06-01-PLAN.md — Analytics service layer, overview/memberships/revenue endpoints (reuses lib/analytics/metrics.ts)
+- [x] 06-02-PLAN.md — Engagement and credits analytics endpoints
 
 ### Phase 7: Add-ons, Admin Settings & Webhooks
 **Goal**: Callers can manage add-on products, assign them to users, read/update admin settings, and trigger internal actions via incoming webhooks
@@ -136,6 +136,6 @@ Plans:
 | 3. Events | 2/2 | Complete   | 2026-03-26 |
 | 4. Courses | 2/2 | Complete   | 2026-03-26 |
 | 5. Credits & Verifications | 2/2 | Complete   | 2026-03-26 |
-| 6. Analytics | 0/2 | Not started | - |
+| 6. Analytics | 2/2 | Complete   | 2026-03-26 |
 | 7. Add-ons, Admin Settings & Webhooks | 0/? | Not started | - |
 | 8. Admin UI & Documentation | 0/? | Not started | - |
