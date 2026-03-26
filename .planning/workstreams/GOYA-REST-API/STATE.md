@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to plan
+status: Executing Phase 18
 stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-03-25T11:39:40.255Z"
+last_updated: "2026-03-26T05:17:39.181Z"
 progress:
   total_phases: 8
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 6
+  completed_plans: 5
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** Phase 01 — foundation
+**Current focus:** Phase 18 — admin-inbox-teacher-upgrades
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
+Phase: 18 (admin-inbox-teacher-upgrades) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Plan: Not started
 | Phase 01 P02 | 15 min | 2 tasks | 3 files |
 | Phase 01 P03 | 35 min | 1 task | 1 file |
 | Phase 01 P04 | 20 min | 2 tasks | 1 file |
+| Phase 02 P01 | 8 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,8 @@ Plan: Not started
 - [Phase 15]: Optimistic UI in DesignationsBox (filter local state) — avoids full page reload; softDeleteDesignation still calls revalidatePath for next hard navigation
 - [Phase 01 P04]: Health endpoint has no auth/rate-limit — AUTH-05 requires public access
 - [Phase 01 P04]: api_keys migration applied via supabase db query --linked — duplicate 20260341 timestamp prefix blocked standard db push
+- [Phase 02 P01]: as any cast on Supabase client for profiles queries — same pattern as middleware.ts, profiles not in generated types
+- [Phase 02 P01]: UUID regex validation in [id] route handler returns 400 before any DB call for invalid formats
 
 ### Pending Todos
 
@@ -75,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T10:40:00Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-03-26T00:00:00Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

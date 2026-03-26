@@ -21,8 +21,8 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 ### Users
 
-- [ ] **USER-01**: GET `/users` lists users with filters (role, membership status, date range, search)
-- [ ] **USER-02**: GET `/users/:id` returns full user profile
+- [x] **USER-01**: GET `/users` lists users with filters (role, membership status, date range, search)
+- [x] **USER-02**: GET `/users/:id` returns full user profile
 - [ ] **USER-03**: PATCH `/users/:id` updates role, status, membership
 - [ ] **USER-04**: GET `/users/:id/credits` returns credit & teaching hours
 - [ ] **USER-05**: GET `/users/:id/certifications` returns user certifications
@@ -144,8 +144,8 @@ None — full spec included in v1.6.
 | AUTH-09 | Phase 1 | Complete |
 | PAGE-01 | Phase 1 | Pending |
 | AUDT-01 | Phase 1 | Pending |
-| USER-01 | Phase 2 | Pending |
-| USER-02 | Phase 2 | Pending |
+| USER-01 | Phase 2 | Complete |
+| USER-02 | Phase 2 | Complete |
 | USER-03 | Phase 2 | Pending |
 | USER-04 | Phase 2 | Pending |
 | USER-05 | Phase 2 | Pending |

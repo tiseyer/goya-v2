@@ -45,7 +45,7 @@ Plans:
   4. Sub-resource endpoints (`/credits`, `/certifications`, `/verifications`) each return the correct data for the given user
 **Plans**: 2 plans
 Plans:
-- [ ] 02-01-PLAN.md — Users service layer, list endpoint, detail endpoint
+- [x] 02-01-PLAN.md — Users service layer, list endpoint, detail endpoint
 - [ ] 02-02-PLAN.md — User update (PATCH) with audit logging, credits/certifications/verifications sub-resources
 
 ### Phase 3: Events
@@ -140,7 +140,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-03-25 |
-| 2. Users | 0/2 | Not started | - |
+| 2. Users | 1/2 | In progress | - |
 | 3. Events | 0/? | Not started | - |
 | 4. Courses | 0/? | Not started | - |
 | 5. Credits & Verifications | 0/? | Not started | - |
