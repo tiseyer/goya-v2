@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.3 Subscriptions & Teacher Upgrade (Shipped: 2026-03-26)
+
+**Phases completed:** 7 phases (14–20), 10 plans, 29 requirements
+**Files changed:** 60 | **Lines added:** ~4,800
+**Timeline:** 2026-03-24 → 2026-03-26 (3 days)
+
+**Key accomplishments:**
+
+- Subscriptions page with real Stripe data: base membership, additional subs, school membership, designations with soft-delete, Customer Portal ("Verwalten" button)
+- Multi-step /upgrade page: info → certificate upload (Supabase Storage) → Stripe delayed capture checkout (capture_method: "manual")
+- Admin inbox Teacher Upgrades tab: approve captures payment + creates subscription + changes role; reject cancels payment intent
+- Upgrade CTA for students/WPs with pending state handling (hides CTA when request is pending)
+- Supabase schema: upgrade_requests and user_designations tables with RLS
+- Fixed 3 crashing admin pages (orders pagination, analytics NaN safety, audit-log service role) + admin/moderator role display bug
+
+---
+
 ## v1.2 Stripe Admin & Shop (Shipped: 2026-03-24)
 
 **Phases completed:** 6 phases (8–13), 17 plans, 47 tasks
