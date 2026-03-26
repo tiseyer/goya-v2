@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-03-26T07:54:47.627Z"
+status: Ready to execute
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-26T08:13:39.233Z"
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** Phase 02 — users
+**Current focus:** Phase 03 — events
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
+Phase: 03 (events) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: Not started
 | Phase 02 P01 | 8 min | 2 tasks | 3 files |
 | Phase 18-admin-inbox-teacher-upgrades P01 | 5 | 1 tasks | 1 files |
 | Phase 02 P02 | 10 | 2 tasks | 5 files |
+| Phase 03 P01 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,9 @@ Plan: Not started
 - [Phase 18-admin-inbox-teacher-upgrades]: Errors per Stripe call returned as { success: false, error } — no redirect() so client components can surface them
 - [Phase 02]: PATCH body validation: allowlist check first (unknown keys 400), then enum value check per field
 - [Phase 02]: PATCH 404 vs 500 disambiguation: if updateUser fails, call getUserById to distinguish not-found from DB error
+- [Phase 03]: Events service uses getSupabaseService() as any — events table not in generated types, same pattern as users/profiles
+- [Phase 03]: listEvents always filters .is('deleted_at', null) — soft-deleted events never appear in list results
+- [Phase 03]: deleteEvent sets both deleted_at AND status='deleted' for dual-state tracking
 
 ### Pending Todos
 
@@ -84,6 +88,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T07:45:54.570Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-03-26T08:13:39.230Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None

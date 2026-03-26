@@ -58,7 +58,7 @@ Plans:
   3. `POST /api/v1/events/:id/registrations` registers a user; `DELETE /api/v1/events/:id/registrations/:userId` unregisters them; both log to audit
 **Plans**: 2 plans
 Plans:
-- [ ] 03-01-PLAN.md — Events service layer, CRUD endpoints (list, detail, create, update, soft-delete)
+- [x] 03-01-PLAN.md — Events service layer, CRUD endpoints (list, detail, create, update, soft-delete)
 - [ ] 03-02-PLAN.md — Event registrations migration, register/unregister endpoints with spot tracking
 
 ### Phase 4: Courses
@@ -139,7 +139,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-03-25 |
 | 2. Users | 2/2 | Complete | 2026-03-26 |
-| 3. Events | 0/2 | Not started | - |
+| 3. Events | 1/2 | In Progress|  |
 | 4. Courses | 0/? | Not started | - |
 | 5. Credits & Verifications | 0/? | Not started | - |
 | 6. Analytics | 0/? | Not started | - |
