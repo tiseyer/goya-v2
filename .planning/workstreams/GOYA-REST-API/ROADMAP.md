@@ -110,10 +110,10 @@ Plans:
   3. All three webhook endpoints (`/trigger`, `/payment`, `/notify`) accept valid payloads and return 200; malformed payloads return 400
 **Plans**: 4 plans
 Plans:
-- [ ] 07-01-PLAN.md — Add-ons service layer and CRUD endpoints (list, detail, create, update, soft-delete)
+- [x] 07-01-PLAN.md — Add-ons service layer and CRUD endpoints (list, detail, create, update, soft-delete)
 - [ ] 07-02-PLAN.md — User-addon assignment endpoints (list, assign, remove)
-- [ ] 07-03-PLAN.md — Admin settings service layer and endpoints (list all, get single, bulk update, single update)
-- [ ] 07-04-PLAN.md — Incoming webhook endpoints (trigger, payment, notify)
+- [x] 07-03-PLAN.md — Admin settings service layer and endpoints (list all, get single, bulk update, single update)
+- [x] 07-04-PLAN.md — Incoming webhook endpoints (trigger, payment, notify)
 
 ### Phase 8: Admin UI & Documentation
 **Goal**: Admins can manage API keys through the admin panel and every API endpoint is documented with example requests and responses
@@ -137,5 +137,5 @@ Plans:
 | 4. Courses | 2/2 | Complete   | 2026-03-26 |
 | 5. Credits & Verifications | 2/2 | Complete   | 2026-03-26 |
 | 6. Analytics | 2/2 | Complete   | 2026-03-26 |
-| 7. Add-ons, Admin Settings & Webhooks | 0/4 | Planning complete | - |
+| 7. Add-ons, Admin Settings & Webhooks | 3/4 | In Progress|  |
 | 8. Admin UI & Documentation | 0/? | Not started | - |

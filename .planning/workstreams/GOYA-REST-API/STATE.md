@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-26T09:26:18.372Z"
+status: Ready to execute
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-03-26T09:37:27.986Z"
 progress:
   total_phases: 8
   completed_phases: 6
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 18
+  completed_plans: 17
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** Phase 06 — analytics
+**Current focus:** Phase 07 — addons-admin-settings-webhooks
 
 ## Current Position
 
-Phase: 7
-Plan: Not started
+Phase: 07 (addons-admin-settings-webhooks) — EXECUTING
+Plan: 4 of 4
 
 ## Performance Metrics
 
@@ -56,6 +56,9 @@ Plan: Not started
 | Phase 05-credits-and-verifications P01 | 3 | 2 tasks | 4 files |
 | Phase 06 P02 | 4 | 2 tasks | 3 files |
 | Phase 06 P01 | 7 | 2 tasks | 4 files |
+| Phase 07 P03 | 2 | 2 tasks | 3 files |
+| Phase 07 P01 | 3 | 2 tasks | 3 files |
+| Phase 07 P04 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -103,6 +106,11 @@ Plan: Not started
 - [Phase 06]: Analytics service reuses lib/analytics/metrics.ts pure functions — no duplicate computation logic
 - [Phase 06]: No Stripe API calls in analytics endpoints — all computed from local Supabase mirror tables
 - [Phase 06]: Auto granularity: diffDays <= 60 → daily time-series, else weekly
+- [Phase 07]: Admin endpoints use requirePermission(key, 'admin') — admin permission supersedes all others per middleware design
+- [Phase 07]: updateSettings loops entries individually and returns getAllSettings() for full post-update state
+- [Phase 07]: Setting key validated with /^[a-z0-9_]+$/ regex before DB call — prevents injection, matches known site_settings key format
+- [Phase 07]: GET /api/v1/addons/:id returns even inactive products for admin visibility
+- [Phase 07]: Add-on soft-delete uses is_active=false (not deleted_at) per products table schema
 
 ### Pending Todos
 
@@ -114,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T09:21:56.653Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-03-26T09:37:21.244Z
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None
