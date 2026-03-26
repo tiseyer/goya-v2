@@ -82,12 +82,10 @@ Plans:
   1. `GET /api/v1/credits` returns submissions filterable by status, user, and date; `GET /credits/summary/:userId` returns total hours broken down by category
   2. `POST /api/v1/credits` creates a submission; `PATCH /credits/:id` updates status (approve/reject/pending) with an audit log row
   3. Verifications endpoints (`GET`, `POST`, `PATCH`, `DELETE`) are fully functional with consistent response format and audit logging for writes
-**Plans**: 4 plans
+**Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
-- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
-- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
-- [ ] 01-04-PLAN.md — Health endpoint and migration push
+- [ ] 05-01-PLAN.md — Credits service layer, CRUD endpoints (list, detail, create, update), summary endpoint
+- [ ] 05-02-PLAN.md — Verifications service layer, CRUD endpoints (list, detail, create, update, delete/reset)
 
 ### Phase 6: Analytics
 **Goal**: Callers can retrieve aggregated platform metrics across members, memberships, revenue, engagement, and credits
@@ -139,7 +137,7 @@ Plans:
 | 2. Users | 2/2 | Complete | 2026-03-26 |
 | 3. Events | 2/2 | Complete   | 2026-03-26 |
 | 4. Courses | 2/2 | Complete   | 2026-03-26 |
-| 5. Credits & Verifications | 0/? | Not started | - |
+| 5. Credits & Verifications | 0/2 | Planned | - |
 | 6. Analytics | 0/? | Not started | - |
 | 7. Add-ons, Admin Settings & Webhooks | 0/? | Not started | - |
 | 8. Admin UI & Documentation | 0/? | Not started | - |
