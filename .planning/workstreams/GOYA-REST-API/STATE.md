@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Executing Phase 18
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-03-26T05:17:39.181Z"
+status: Ready to execute
+stopped_at: Completed 18-01-PLAN.md
+last_updated: "2026-03-26T05:38:28.167Z"
 progress:
   total_phases: 8
   completed_phases: 1
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 18 (admin-inbox-teacher-upgrades) — EXECUTING
-Plan: 1 of 2
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Plan: 1 of 2
 | Phase 01 P03 | 35 min | 1 task | 1 file |
 | Phase 01 P04 | 20 min | 2 tasks | 1 file |
 | Phase 02 P01 | 8 min | 2 tasks | 3 files |
+| Phase 18-admin-inbox-teacher-upgrades P01 | 5 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ Plan: 1 of 2
 - [Phase 01 P04]: api_keys migration applied via supabase db query --linked — duplicate 20260341 timestamp prefix blocked standard db push
 - [Phase 02 P01]: as any cast on Supabase client for profiles queries — same pattern as middleware.ts, profiles not in generated types
 - [Phase 02 P01]: UUID regex validation in [id] route handler returns 400 before any DB call for invalid formats
+- [Phase 18-admin-inbox-teacher-upgrades]: Auth guard fetches admin role via getSupabaseService() (service role) rather than session-based RLS
+- [Phase 18-admin-inbox-teacher-upgrades]: Errors per Stripe call returned as { success: false, error } — no redirect() so client components can surface them
 
 ### Pending Todos
 
@@ -78,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T00:00:00Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-03-26T05:38:28.164Z
+Stopped at: Completed 18-01-PLAN.md
 Resume file: None
