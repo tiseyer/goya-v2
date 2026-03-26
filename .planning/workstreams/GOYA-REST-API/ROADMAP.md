@@ -95,12 +95,10 @@ Plans:
   1. `GET /api/v1/analytics/overview` returns total members, active members, and new-this-month count
   2. `GET /api/v1/analytics/memberships` and `/revenue` return time-series stats without making live Stripe API calls
   3. `GET /api/v1/analytics/engagement` and `/credits` return participation and submission statistics derived from local Supabase tables
-**Plans**: 4 plans
+**Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
-- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
-- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
-- [ ] 01-04-PLAN.md — Health endpoint and migration push
+- [ ] 06-01-PLAN.md — Analytics service layer, overview/memberships/revenue endpoints (reuses lib/analytics/metrics.ts)
+- [ ] 06-02-PLAN.md — Engagement and credits analytics endpoints
 
 ### Phase 7: Add-ons, Admin Settings & Webhooks
 **Goal**: Callers can manage add-on products, assign them to users, read/update admin settings, and trigger internal actions via incoming webhooks
@@ -138,6 +136,6 @@ Plans:
 | 3. Events | 2/2 | Complete   | 2026-03-26 |
 | 4. Courses | 2/2 | Complete   | 2026-03-26 |
 | 5. Credits & Verifications | 2/2 | Complete   | 2026-03-26 |
-| 6. Analytics | 0/? | Not started | - |
+| 6. Analytics | 0/2 | Not started | - |
 | 7. Add-ons, Admin Settings & Webhooks | 0/? | Not started | - |
 | 8. Admin UI & Documentation | 0/? | Not started | - |
