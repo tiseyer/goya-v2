@@ -91,6 +91,10 @@ Plans:
 **Plans**: 2 plans
 **UI hint**: yes
 
+Plans:
+- [ ] 18-01-PLAN.md — Server actions: approveUpgradeRequest + rejectUpgradeRequest (ADM-03, ADM-04)
+- [ ] 18-02-PLAN.md — UI: TeacherUpgradesTab with sub-tabs + request cards + updated page.tsx (ADM-01, ADM-02, ADM-05)
+
 ### Phase 19: Supabase Schema
 **Goal**: Database tables for upgrade requests and user designations exist with proper RLS
 **Depends on**: Nothing (first phase to execute — other phases depend on this)
