@@ -8,7 +8,7 @@ export type EventStatus = 'published' | 'draft' | 'cancelled' | 'deleted';
 export type CourseCategory = 'Workshop' | 'Yoga Sequence' | 'Dharma Talk' | 'Music Playlist' | 'Research';
 export type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced' | 'All Levels';
 export type CourseAccess = 'members_only' | 'free';
-export type CourseStatus = 'published' | 'draft';
+export type CourseStatus = 'published' | 'draft' | 'deleted';
 export type ProgressStatus = 'in_progress' | 'completed';
 
 export interface Profile {
@@ -107,6 +107,7 @@ export interface Course {
   gradient_from: string;
   gradient_to: string;
   status: CourseStatus;
+  deleted_at: string | null;
   created_at: string;
   updated_at: string;
 }
