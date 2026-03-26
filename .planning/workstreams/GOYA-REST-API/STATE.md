@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
 status: Phase complete — ready for verification
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-26T09:05:23.206Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-26T09:05:30.292Z"
 progress:
   total_phases: 8
   completed_phases: 5
@@ -94,6 +94,7 @@ Plan: 2 of 2
 - [Phase 05]: Verifications service queries profiles table — verification data is profile-level, not a separate entity table
 - [Phase 05]: createVerification uses UPDATE not INSERT — initiating verification means setting pending status on existing profile
 - [Phase 05]: is_verified boolean auto-synced in updateVerification service layer — single source of truth, callers only set verification_status
+- [Phase 05-credits-and-verifications]: getCreditSummary aggregates in JS matching getUserCreditTotals pattern; ALLOWED_CREDIT_UPDATE_FIELDS restricted to status+rejection_reason only
 
 ### Pending Todos
 
@@ -105,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T09:05:05.192Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-03-26T09:05:30.288Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
