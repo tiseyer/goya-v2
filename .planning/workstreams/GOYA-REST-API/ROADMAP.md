@@ -71,7 +71,7 @@ Plans:
   3. `GET /api/v1/courses/:id/enrollments` lists enrollees; `POST` enrolls a user; `PATCH /courses/:id/enrollments/:userId` updates progress or completion status
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md — Courses soft-delete migration, service layer, CRUD endpoints (list, detail, create, update, soft-delete)
+- [x] 04-01-PLAN.md — Courses soft-delete migration, service layer, CRUD endpoints (list, detail, create, update, soft-delete)
 - [ ] 04-02-PLAN.md — Enrollment management endpoints (list, enroll, update progress)
 
 ### Phase 5: Credits & Verifications
@@ -138,7 +138,7 @@ Plans:
 | 1. Foundation | 4/4 | Complete | 2026-03-25 |
 | 2. Users | 2/2 | Complete | 2026-03-26 |
 | 3. Events | 2/2 | Complete   | 2026-03-26 |
-| 4. Courses | 0/2 | Not started | - |
+| 4. Courses | 1/2 | In Progress|  |
 | 5. Credits & Verifications | 0/? | Not started | - |
 | 6. Analytics | 0/? | Not started | - |
 | 7. Add-ons, Admin Settings & Webhooks | 0/? | Not started | - |

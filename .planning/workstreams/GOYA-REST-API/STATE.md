@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-03-26T08:25:19.218Z"
+status: Ready to execute
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-26T08:40:14.307Z"
 progress:
   total_phases: 8
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 10
+  completed_plans: 9
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** Phase 03 — events
+**Current focus:** Phase 04 — courses
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
+Phase: 04 (courses) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Plan: Not started
 | Phase 02 P02 | 10 | 2 tasks | 5 files |
 | Phase 03 P01 | 3 | 2 tasks | 3 files |
 | Phase 03 P02 | 4 | 2 tasks | 4 files |
+| Phase 04-courses P01 | 15 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,10 @@ Plan: Not started
 - [Phase 03]: deleteEvent sets both deleted_at AND status='deleted' for dual-state tracking
 - [Phase 03]: event_registrations.user_id has no FK to profiles — plain uuid consistent with codebase pattern
 - [Phase 03]: Migration applied via supabase db query --linked due to duplicate timestamp blocking db push
+- [Phase 04-courses]: Courses service uses getSupabaseService() as any — courses table not in generated types, same pattern as events/users
+- [Phase 04-courses]: Migration applied via supabase db query --linked due to batch push failing on pre-existing policies in earlier migrations (same pattern as Phase 03)
+- [Phase 04-courses]: listCourses always filters .is('deleted_at', null) — soft-deleted courses never appear in list results
+- [Phase 04-courses]: deleteCourse sets both deleted_at AND status='deleted' for dual-state tracking, consistent with events pattern
 
 ### Pending Todos
 
@@ -91,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T08:21:12.883Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-03-26T08:40:14.303Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None

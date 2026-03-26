@@ -30,21 +30,21 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 ### Events
 
-- [ ] **EVNT-01**: GET `/events` lists events with filters (date range, status, type)
-- [ ] **EVNT-02**: GET `/events/:id` returns event details
-- [ ] **EVNT-03**: POST `/events` creates an event
-- [ ] **EVNT-04**: PATCH `/events/:id` updates an event
-- [ ] **EVNT-05**: DELETE `/events/:id` deletes an event
-- [ ] **EVNT-06**: POST `/events/:id/registrations` registers a user for an event
-- [ ] **EVNT-07**: DELETE `/events/:id/registrations/:userId` unregisters a user
+- [x] **EVNT-01**: GET `/events` lists events with filters (date range, status, type)
+- [x] **EVNT-02**: GET `/events/:id` returns event details
+- [x] **EVNT-03**: POST `/events` creates an event
+- [x] **EVNT-04**: PATCH `/events/:id` updates an event
+- [x] **EVNT-05**: DELETE `/events/:id` deletes an event
+- [x] **EVNT-06**: POST `/events/:id/registrations` registers a user for an event
+- [x] **EVNT-07**: DELETE `/events/:id/registrations/:userId` unregisters a user
 
 ### Courses
 
-- [ ] **CRSE-01**: GET `/courses` lists courses with filters
-- [ ] **CRSE-02**: GET `/courses/:id` returns course details
-- [ ] **CRSE-03**: POST `/courses` creates a course
-- [ ] **CRSE-04**: PATCH `/courses/:id` updates a course
-- [ ] **CRSE-05**: DELETE `/courses/:id` deletes a course
+- [x] **CRSE-01**: GET `/courses` lists courses with filters
+- [x] **CRSE-02**: GET `/courses/:id` returns course details
+- [x] **CRSE-03**: POST `/courses` creates a course
+- [x] **CRSE-04**: PATCH `/courses/:id` updates a course
+- [x] **CRSE-05**: DELETE `/courses/:id` deletes a course
 - [ ] **CRSE-06**: GET `/courses/:id/enrollments` lists enrollments
 - [ ] **CRSE-07**: POST `/courses/:id/enrollments` enrolls a user
 - [ ] **CRSE-08**: PATCH `/courses/:id/enrollments/:userId` updates progress/completion
@@ -150,18 +150,18 @@ None — full spec included in v1.6.
 | USER-04 | Phase 2 | Complete |
 | USER-05 | Phase 2 | Complete |
 | USER-06 | Phase 2 | Complete |
-| EVNT-01 | Phase 3 | Pending |
-| EVNT-02 | Phase 3 | Pending |
-| EVNT-03 | Phase 3 | Pending |
-| EVNT-04 | Phase 3 | Pending |
-| EVNT-05 | Phase 3 | Pending |
-| EVNT-06 | Phase 3 | Pending |
-| EVNT-07 | Phase 3 | Pending |
-| CRSE-01 | Phase 4 | Pending |
-| CRSE-02 | Phase 4 | Pending |
-| CRSE-03 | Phase 4 | Pending |
-| CRSE-04 | Phase 4 | Pending |
-| CRSE-05 | Phase 4 | Pending |
+| EVNT-01 | Phase 3 | Complete |
+| EVNT-02 | Phase 3 | Complete |
+| EVNT-03 | Phase 3 | Complete |
+| EVNT-04 | Phase 3 | Complete |
+| EVNT-05 | Phase 3 | Complete |
+| EVNT-06 | Phase 3 | Complete |
+| EVNT-07 | Phase 3 | Complete |
+| CRSE-01 | Phase 4 | Complete |
+| CRSE-02 | Phase 4 | Complete |
+| CRSE-03 | Phase 4 | Complete |
+| CRSE-04 | Phase 4 | Complete |
+| CRSE-05 | Phase 4 | Complete |
 | CRSE-06 | Phase 4 | Pending |
 | CRSE-07 | Phase 4 | Pending |
 | CRSE-08 | Phase 4 | Pending |
