@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-03-26T08:51:42.198Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-26T09:05:23.206Z"
 progress:
   total_phases: 8
-  completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
+  completed_phases: 5
+  total_plans: 12
+  completed_plans: 12
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** Phase 04 — courses
+**Current focus:** Phase 05 — credits-and-verifications
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
+Phase: 05 (credits-and-verifications) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -52,6 +52,8 @@ Plan: Not started
 | Phase 03 P02 | 4 | 2 tasks | 4 files |
 | Phase 04-courses P01 | 15 | 2 tasks | 5 files |
 | Phase 04-courses P02 | 3 | 2 tasks | 3 files |
+| Phase 05 P02 | 3 | 2 tasks | 3 files |
+| Phase 05-credits-and-verifications P01 | 3 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -89,6 +91,9 @@ Plan: Not started
 - [Phase 04-courses]: ENROLLMENTS_SORT_FIELDS exported from courses service - consistent with COURSES_SORT_FIELDS pattern
 - [Phase 04-courses]: updateEnrollment auto-clears completed_at when status reverts to in_progress - prevents stale completion dates
 - [Phase 04-courses]: Unknown field rejection in PATCH enrollment body - allowlist only status and completed_at, 400 on unknown keys
+- [Phase 05]: Verifications service queries profiles table — verification data is profile-level, not a separate entity table
+- [Phase 05]: createVerification uses UPDATE not INSERT — initiating verification means setting pending status on existing profile
+- [Phase 05]: is_verified boolean auto-synced in updateVerification service layer — single source of truth, callers only set verification_status
 
 ### Pending Todos
 
@@ -100,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T08:47:58.953Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-26T09:05:05.192Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None

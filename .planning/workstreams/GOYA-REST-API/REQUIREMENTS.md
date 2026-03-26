@@ -45,9 +45,9 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 - [x] **CRSE-03**: POST `/courses` creates a course
 - [x] **CRSE-04**: PATCH `/courses/:id` updates a course
 - [x] **CRSE-05**: DELETE `/courses/:id` deletes a course
-- [ ] **CRSE-06**: GET `/courses/:id/enrollments` lists enrollments
-- [ ] **CRSE-07**: POST `/courses/:id/enrollments` enrolls a user
-- [ ] **CRSE-08**: PATCH `/courses/:id/enrollments/:userId` updates progress/completion
+- [x] **CRSE-06**: GET `/courses/:id/enrollments` lists enrollments
+- [x] **CRSE-07**: POST `/courses/:id/enrollments` enrolls a user
+- [x] **CRSE-08**: PATCH `/courses/:id/enrollments/:userId` updates progress/completion
 
 ### Credits
 
@@ -59,11 +59,11 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 ### Verifications
 
-- [ ] **VERF-01**: GET `/verifications` lists verifications with filters
-- [ ] **VERF-02**: GET `/verifications/:id` returns verification details
-- [ ] **VERF-03**: POST `/verifications` creates a verification
-- [ ] **VERF-04**: PATCH `/verifications/:id` updates verification status
-- [ ] **VERF-05**: DELETE `/verifications/:id` deletes a verification
+- [x] **VERF-01**: GET `/verifications` lists verifications with filters
+- [x] **VERF-02**: GET `/verifications/:id` returns verification details
+- [x] **VERF-03**: POST `/verifications` creates a verification
+- [x] **VERF-04**: PATCH `/verifications/:id` updates verification status
+- [x] **VERF-05**: DELETE `/verifications/:id` deletes a verification
 
 ### Analytics
 
@@ -162,19 +162,19 @@ None — full spec included in v1.6.
 | CRSE-03 | Phase 4 | Complete |
 | CRSE-04 | Phase 4 | Complete |
 | CRSE-05 | Phase 4 | Complete |
-| CRSE-06 | Phase 4 | Pending |
-| CRSE-07 | Phase 4 | Pending |
-| CRSE-08 | Phase 4 | Pending |
+| CRSE-06 | Phase 4 | Complete |
+| CRSE-07 | Phase 4 | Complete |
+| CRSE-08 | Phase 4 | Complete |
 | CRED-01 | Phase 5 | Pending |
 | CRED-02 | Phase 5 | Pending |
 | CRED-03 | Phase 5 | Pending |
 | CRED-04 | Phase 5 | Pending |
 | CRED-05 | Phase 5 | Pending |
-| VERF-01 | Phase 5 | Pending |
-| VERF-02 | Phase 5 | Pending |
-| VERF-03 | Phase 5 | Pending |
-| VERF-04 | Phase 5 | Pending |
-| VERF-05 | Phase 5 | Pending |
+| VERF-01 | Phase 5 | Complete |
+| VERF-02 | Phase 5 | Complete |
+| VERF-03 | Phase 5 | Complete |
+| VERF-04 | Phase 5 | Complete |
+| VERF-05 | Phase 5 | Complete |
 | ANLY-01 | Phase 6 | Pending |
 | ANLY-02 | Phase 6 | Pending |
 | ANLY-03 | Phase 6 | Pending |

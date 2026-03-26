@@ -10,7 +10,7 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
 - [ ] **Phase 2: Users** - Full users API with profile sub-resources (credits, certifications, verifications)
 - [x] **Phase 3: Events** - Events CRUD with registration management (completed 2026-03-26)
 - [x] **Phase 4: Courses** - Courses CRUD with enrollment management (completed 2026-03-26)
-- [ ] **Phase 5: Credits & Verifications** - Credits CRUD with summary endpoint + verifications CRUD
+- [x] **Phase 5: Credits & Verifications** - Credits CRUD with summary endpoint + verifications CRUD (completed 2026-03-26)
 - [ ] **Phase 6: Analytics** - Five analytics aggregation endpoints
 - [ ] **Phase 7: Add-ons, Admin Settings & Webhooks** - Add-ons CRUD with user assignments, admin settings, incoming webhook endpoints
 - [ ] **Phase 8: Admin UI & Documentation** - API key management page in admin panel + full API reference
@@ -84,8 +84,8 @@ Plans:
   3. Verifications endpoints (`GET`, `POST`, `PATCH`, `DELETE`) are fully functional with consistent response format and audit logging for writes
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Credits service layer, CRUD endpoints (list, detail, create, update), summary endpoint
-- [ ] 05-02-PLAN.md — Verifications service layer, CRUD endpoints (list, detail, create, update, delete/reset)
+- [x] 05-01-PLAN.md — Credits service layer, CRUD endpoints (list, detail, create, update), summary endpoint
+- [x] 05-02-PLAN.md — Verifications service layer, CRUD endpoints (list, detail, create, update, delete/reset)
 
 ### Phase 6: Analytics
 **Goal**: Callers can retrieve aggregated platform metrics across members, memberships, revenue, engagement, and credits
@@ -137,7 +137,7 @@ Plans:
 | 2. Users | 2/2 | Complete | 2026-03-26 |
 | 3. Events | 2/2 | Complete   | 2026-03-26 |
 | 4. Courses | 2/2 | Complete   | 2026-03-26 |
-| 5. Credits & Verifications | 0/2 | Planned | - |
+| 5. Credits & Verifications | 2/2 | Complete   | 2026-03-26 |
 | 6. Analytics | 0/? | Not started | - |
 | 7. Add-ons, Admin Settings & Webhooks | 0/? | Not started | - |
 | 8. Admin UI & Documentation | 0/? | Not started | - |
