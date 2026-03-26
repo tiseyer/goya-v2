@@ -1,29 +1,62 @@
-import { createSupabaseServerClient } from '@/lib/supabaseServer';
-import SchoolRegistrationsTab from './SchoolRegistrationsTab';
+import Link from 'next/link'
+import { createSupabaseServerClient } from '@/lib/supabaseServer'
+import { getSupabaseService } from '@/lib/supabase/service'
+import SchoolRegistrationsTab from './SchoolRegistrationsTab'
+import TeacherUpgradesTab from './TeacherUpgradesTab'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
-export default async function InboxPage() {
-  const supabase = await createSupabaseServerClient();
+export default async function InboxPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>
+}) {
+  const { tab } = await searchParams
+  const activeTab = tab === 'upgrades' ? 'upgrades' : 'schools'
+
+  const supabase = await createSupabaseServerClient()
 
   // Fetch all schools with owner profile info
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: schoolsData } = await supabase
     .from('schools')
     .select(`
       id, name, logo_url, city, country, status, rejection_reason, created_at,
       owner:owner_id (id, full_name, email)
     `)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
 
   // The join returns owner as an array; normalize to single object for the component
   const schools = (schoolsData ?? []).map((s) => ({
     ...s,
     owner: Array.isArray(s.owner) ? s.owner[0] ?? null : s.owner,
-  }));
-  const pendingSchoolCount = schools.filter(
-    (s) => s.status === 'pending'
-  ).length;
+  }))
+  const pendingSchoolCount = schools.filter((s) => s.status === 'pending').length
+
+  // Fetch upgrade requests with joined profile info (service role needed for joined query)
+  const supabaseService = getSupabaseService()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: upgradeData } = await (supabaseService as any)
+    .from('upgrade_requests')
+    .select(`
+      id, user_id, status, certificate_urls,
+      stripe_payment_intent_id, stripe_subscription_id,
+      rejection_reason, created_at, reviewed_at,
+      profile:user_id (id, full_name, email, role, created_at)
+    `)
+    .order('created_at', { ascending: false })
+
+  // Normalize profile (Supabase join returns as array)
+  const upgradeRequests = (upgradeData ?? []).map((r: {
+    profile: unknown
+    status: string
+    [key: string]: unknown
+  }) => ({
+    ...r,
+    status: r.status as 'pending' | 'approved' | 'rejected',
+    profile: Array.isArray(r.profile) ? r.profile[0] ?? null : r.profile,
+  }))
+
+  const pendingUpgradeCount = upgradeRequests.filter((r: { status: string }) => r.status === 'pending').length
 
   return (
     <div className="p-6 sm:p-8 max-w-7xl mx-auto">
@@ -31,7 +64,7 @@ export default async function InboxPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#1B3A5C]">Inbox</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Review school registrations and other pending requests
+          Review school registrations and teacher upgrade requests
         </p>
       </div>
 
@@ -40,20 +73,43 @@ export default async function InboxPage() {
         {/* Tab bar */}
         <div className="border-b border-slate-200">
           <div className="flex items-center gap-0">
-            <button className="relative px-5 py-3 text-sm font-semibold text-[#00B5A3] border-b-2 border-[#00B5A3] -mb-px transition-colors">
+            <Link
+              href="/admin/inbox?tab=schools"
+              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
+                activeTab === 'schools'
+                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
+                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
+              }`}
+            >
               School Registrations
               {pendingSchoolCount > 0 && (
                 <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
                   {pendingSchoolCount}
                 </span>
               )}
-            </button>
+            </Link>
+            <Link
+              href="/admin/inbox?tab=upgrades"
+              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
+                activeTab === 'upgrades'
+                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
+                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
+              }`}
+            >
+              Teacher Upgrades
+              {pendingUpgradeCount > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+                  {pendingUpgradeCount}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* School Registrations Tab Content */}
-      <SchoolRegistrationsTab initialSchools={schools} />
+      {/* Tab content */}
+      {activeTab === 'schools' && <SchoolRegistrationsTab initialSchools={schools} />}
+      {activeTab === 'upgrades' && <TeacherUpgradesTab initialRequests={upgradeRequests} />}
     </div>
-  );
+  )
 }
