@@ -1,9 +1,10 @@
 import { getSupabaseService } from '@/lib/supabase/service';
 import { paginationToRange } from '@/lib/api/pagination';
 import type { PaginationParams } from '@/lib/api/types';
-import type { CourseCategory, CourseLevel, CourseAccess, CourseStatus } from '@/lib/types';
+import type { CourseCategory, CourseLevel, CourseAccess, CourseStatus, ProgressStatus } from '@/lib/types';
 
 export const COURSES_SORT_FIELDS = ['created_at', 'updated_at', 'title', 'category', 'level', 'status'];
+export const ENROLLMENTS_SORT_FIELDS = ['enrolled_at', 'completed_at', 'status'];
 
 export interface ListCoursesParams {
   pagination: PaginationParams;
@@ -183,4 +184,121 @@ export async function deleteCourse(id: string) {
     .single();
 
   return { data, error };
+}
+
+/**
+ * List enrollments for a course with pagination.
+ * Per CRSE-06.
+ */
+export async function listEnrollments(courseId: string, pagination: PaginationParams) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = getSupabaseService() as any;
+
+  // Verify the course exists and is not deleted
+  const { data: course } = await getCourseById(courseId);
+  if (!course) {
+    return { data: null, count: null, error: 'COURSE_NOT_FOUND' as const };
+  }
+
+  let query = supabase
+    .from('user_course_progress')
+    .select('*', { count: 'exact' })
+    .eq('course_id', courseId);
+
+  query = query.order(pagination.sort, { ascending: pagination.order === 'asc' });
+
+  const [from, to] = paginationToRange(pagination);
+  query = query.range(from, to);
+
+  const { data, count, error } = await query;
+  return { data, count, error };
+}
+
+/**
+ * Enroll a user in a course.
+ * Per CRSE-07.
+ * - Returns COURSE_NOT_FOUND if the course does not exist or is soft-deleted.
+ * - Returns ALREADY_ENROLLED if the user is already enrolled.
+ */
+export async function enrollUser(courseId: string, userId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = getSupabaseService() as any;
+
+  // Verify the course exists and is not deleted
+  const { data: course } = await getCourseById(courseId);
+  if (!course) {
+    return { data: null, error: 'COURSE_NOT_FOUND' as const };
+  }
+
+  // Check if already enrolled
+  const { data: existing } = await supabase
+    .from('user_course_progress')
+    .select('id')
+    .eq('course_id', courseId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (existing) {
+    return { data: null, error: 'ALREADY_ENROLLED' as const };
+  }
+
+  // Insert enrollment
+  const { data: enrollment, error: insertError } = await supabase
+    .from('user_course_progress')
+    .insert({ course_id: courseId, user_id: userId, status: 'in_progress' })
+    .select()
+    .single();
+
+  if (insertError || !enrollment) {
+    return { data: null, error: insertError ?? 'INSERT_FAILED' };
+  }
+
+  return { data: enrollment, error: null };
+}
+
+/**
+ * Update enrollment progress for a user in a course.
+ * Per CRSE-08.
+ * - Auto-sets completed_at when status becomes 'completed'.
+ * - Auto-clears completed_at when status reverts to 'in_progress'.
+ * - Returns NOT_FOUND if the enrollment does not exist.
+ */
+export async function updateEnrollment(
+  courseId: string,
+  userId: string,
+  updates: { status?: ProgressStatus; completed_at?: string | null }
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = getSupabaseService() as any;
+
+  const hasStatus = updates.status !== undefined;
+  const hasCompletedAt = updates.completed_at !== undefined;
+
+  if (!hasStatus && !hasCompletedAt) {
+    return { data: null, error: new Error('No valid fields to update') };
+  }
+
+  // Build update payload with auto-completion timestamp logic
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updatePayload: Record<string, any> = { ...updates };
+
+  if (hasStatus && updates.status === 'completed' && !hasCompletedAt) {
+    updatePayload.completed_at = new Date().toISOString();
+  } else if (hasStatus && updates.status === 'in_progress') {
+    updatePayload.completed_at = null;
+  }
+
+  const { data, error } = await supabase
+    .from('user_course_progress')
+    .update(updatePayload)
+    .eq('course_id', courseId)
+    .eq('user_id', userId)
+    .select()
+    .single();
+
+  if (error || !data) {
+    return { data: null, error: 'NOT_FOUND' as const };
+  }
+
+  return { data, error: null };
 }
