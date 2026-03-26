@@ -190,3 +190,94 @@ export async function deleteEvent(id: string) {
 
   return { data, error };
 }
+
+/**
+ * Register a user for an event.
+ * Per EVNT-06.
+ * - Returns ALREADY_REGISTERED if the user is already registered.
+ * - Returns NO_SPOTS if the event has spots tracking and none remain.
+ * - Decrements spots_remaining on successful registration when spots are tracked.
+ */
+export async function registerUser(eventId: string, userId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = getSupabaseService() as any;
+
+  // Check event exists and is not deleted
+  const { data: event } = await getEventById(eventId);
+  if (!event) {
+    return { data: null, error: 'EVENT_NOT_FOUND' as const };
+  }
+
+  // Check if already registered
+  const { data: existing } = await supabase
+    .from('event_registrations')
+    .select('id')
+    .eq('event_id', eventId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (existing) {
+    return { data: null, error: 'ALREADY_REGISTERED' as const };
+  }
+
+  // Check spots availability (only when spots are tracked)
+  if (event.spots_remaining !== null && event.spots_remaining <= 0) {
+    return { data: null, error: 'NO_SPOTS' as const };
+  }
+
+  // Insert registration
+  const { data: registration, error: insertError } = await supabase
+    .from('event_registrations')
+    .insert({ event_id: eventId, user_id: userId })
+    .select()
+    .single();
+
+  if (insertError || !registration) {
+    return { data: null, error: insertError ?? 'INSERT_FAILED' };
+  }
+
+  // Decrement spots_remaining if spots are tracked
+  if (event.spots_remaining !== null) {
+    await supabase
+      .from('events')
+      .update({ spots_remaining: event.spots_remaining - 1 })
+      .eq('id', eventId);
+  }
+
+  return { data: registration, error: null };
+}
+
+/**
+ * Unregister a user from an event.
+ * Per EVNT-07.
+ * - Returns NOT_FOUND if no registration exists.
+ * - Increments spots_remaining when spots are tracked.
+ */
+export async function unregisterUser(eventId: string, userId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = getSupabaseService() as any;
+
+  // Delete the registration
+  const { data: deleted, error: deleteError } = await supabase
+    .from('event_registrations')
+    .delete()
+    .eq('event_id', eventId)
+    .eq('user_id', userId)
+    .select()
+    .single();
+
+  if (deleteError || !deleted) {
+    return { data: null, error: 'NOT_FOUND' as const };
+  }
+
+  // Increment spots_remaining if event tracks spots
+  const { data: event } = await getEventById(eventId);
+  if (event && event.spots_remaining !== null) {
+    await supabase
+      .from('events')
+      .update({ spots_remaining: event.spots_remaining + 1 })
+      .eq('id', eventId);
+  }
+
+  return { data: deleted, error: null };
+}
