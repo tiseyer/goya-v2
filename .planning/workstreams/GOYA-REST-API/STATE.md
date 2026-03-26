@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
 status: Phase complete — ready for verification
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-03-26T09:21:38.014Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-26T09:21:56.656Z"
 progress:
   total_phases: 8
   completed_phases: 6
@@ -55,6 +55,7 @@ Plan: 2 of 2
 | Phase 05 P02 | 3 | 2 tasks | 3 files |
 | Phase 05-credits-and-verifications P01 | 3 | 2 tasks | 4 files |
 | Phase 06 P02 | 4 | 2 tasks | 3 files |
+| Phase 06 P01 | 7 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,9 @@ Plan: 2 of 2
 - [Phase 06]: getEngagementStats uses Promise.all for parallel queries then filters in JS by Set of valid IDs — respects soft-delete without complex JOIN
 - [Phase 06]: getCreditStats aggregates in JS matching getCreditSummary pattern from credits service
 - [Phase 06]: No audit logging on analytics endpoints — read-only aggregated data, no per-record access
+- [Phase 06]: Analytics service reuses lib/analytics/metrics.ts pure functions — no duplicate computation logic
+- [Phase 06]: No Stripe API calls in analytics endpoints — all computed from local Supabase mirror tables
+- [Phase 06]: Auto granularity: diffDays <= 60 → daily time-series, else weekly
 
 ### Pending Todos
 
@@ -110,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T09:21:22.987Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-03-26T09:21:56.653Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
