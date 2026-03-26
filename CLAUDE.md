@@ -13,3 +13,8 @@ When resolved, move to "Resolved" and mark RESOLVED.
 - The file lists all deliverables with checkboxes, check them off as work completes
 
 These files are the source of truth for project health (LOG.md) and billing/planning (activity/).
+
+### After every /gsd:quick task
+- Create `activity/quick-tasks/quick-task_TaskName_DD-MM-YYYY.md`
+- TaskName: short-kebab-case summary of what was done
+- File contains: task description, status, solution

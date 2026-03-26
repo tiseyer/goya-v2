@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: Redesign Membership Directory
 status: New
 stopped_at: Created
-last_updated: "2026-03-26T09:20:21Z"
+last_updated: "2026-03-26T09:25:23Z"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -33,4 +33,6 @@ Workstream created. Ready for milestone planning.
 |---|-------------|------|--------|-----------|
 | 260326-moy | Create tracking structure (LOG.md, activity/) and update CLAUDE.md with standing instructions | 2026-03-26 | 7e4fd1d | [260326-moy-create-tracking-structure-log-md-activit](./quick/260326-moy-create-tracking-structure-log-md-activit/) |
 
-Last activity: 2026-03-26 - Completed quick task 260326-moy: Create tracking structure (LOG.md, activity/) and update CLAUDE.md with standing instructions
+| 260326-mt5 | Add quick task tracking to activity structure | 2026-03-26 | pending | [260326-mt5-add-quick-task-tracking-to-activity-stru](./quick/260326-mt5-add-quick-task-tracking-to-activity-stru/) |
+
+Last activity: 2026-03-26 - Completed quick task 260326-mt5: Add quick task tracking to activity structure
