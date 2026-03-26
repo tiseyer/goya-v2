@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/credits-expiring",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/admin-digest",
+      "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/stripe-events",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+# Requirements: GOYA v2 — v1.1 Connections & Inbox
+
+**Defined:** 2026-03-23
+**Core Value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
+
+## v1.1 Requirements
+
+### Database
+
+- [x] **DB-01**: A `connections` table exists with requester_id, recipient_id, type (`peer`/`mentorship`/`faculty`), status (`pending`/`accepted`/`declined`), and timestamps
+- [x] **DB-02**: RLS policies on `connections` ensure users can only read/write their own connections
+- [x] **DB-03**: Migration is committed to `supabase/migrations/` and pushed via `npx supabase db push`
+- [ ] **DB-04**: `ConnectionsContext` and `ConnectButton` read from and write to Supabase (localStorage mock and `connections-data.ts` removed)
+
+### Profile Page
+
+- [ ] **PROF-01**: Student viewing a teacher profile sees "Request Mentorship" instead of "Connect"
+- [ ] **PROF-02**: Teacher or wellness practitioner viewing a school profile sees "Apply as Faculty"
+- [ ] **PROF-03**: Teacher viewing a school they own sees "Manage School" instead of "Apply as Faculty"
+- [ ] **PROF-04**: Teacher viewing another teacher profile sees the standard "Connect" button
+
+### Settings — Connections
+
+- [ ] **CONN-01**: User can view connections in tabs: My Connections, My Mentors, My Mentees, My Faculty, My Schools (principal teacher tab only for school owners)
+- [ ] **CONN-02**: Each connection entry shows current status (pending sent / accepted)
+- [ ] **CONN-03**: User can remove an accepted connection
+
+### Settings — Inbox
+
+- [ ] **INBOX-01**: User can view all incoming connection requests (peer, mentorship, faculty) in a list
+- [ ] **INBOX-02**: User can accept or decline each request from the inbox
+- [ ] **INBOX-03**: User can filter requests by type (all / peer / mentorship / faculty)
+- [ ] **INBOX-04**: Notification dropdown link updated from "View all messages" to "View all" pointing to `/settings/inbox`
+
+### Admin
+
+- [ ] **ADM-01**: Admin can view any user's connections in a Connections tab on the user detail page
+- [ ] **ADM-02**: Admin can remove any connection from the user's Connections tab
+
+## Future Requirements
+
+### Notifications
+
+- **NOTF-01**: User receives email notification when a connection request is accepted
+- **NOTF-02**: User can configure notification preferences for connection events
+
+### Connections Extended
+
+- **CONN-EXT-01**: User can search/filter their connections list
+- **CONN-EXT-02**: User can export their connections
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Notification preferences UI | Deferred from v1.0 — separate milestone |
+| Account deletion | High-risk operation, deferred |
+| Password change in settings | Handled via forgot-password flow |
+| DMs in Inbox | Inbox is connection requests only; DMs handled by /messages |
+| Connection recommendations | Algorithmic feature, deferred to v2+ |
+| Bulk connection management | Low priority for v1.1 |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| DB-01 | Phase 4 | Complete |
+| DB-02 | Phase 4 | Complete |
+| DB-03 | Phase 4 | Complete |
+| DB-04 | Phase 4 | Pending |
+| PROF-01 | Phase 5 | Pending |
+| PROF-02 | Phase 5 | Pending |
+| PROF-03 | Phase 5 | Pending |
+| PROF-04 | Phase 5 | Pending |
+| CONN-01 | Phase 6 | Pending |
+| CONN-02 | Phase 6 | Pending |
+| CONN-03 | Phase 6 | Pending |
+| INBOX-01 | Phase 6 | Pending |
+| INBOX-02 | Phase 6 | Pending |
+| INBOX-03 | Phase 6 | Pending |
+| INBOX-04 | Phase 6 | Pending |
+| ADM-01 | Phase 7 | Pending |
+| ADM-02 | Phase 7 | Pending |
+
+**Coverage:**
+- v1.1 requirements: 17 total
+- Mapped to phases: 17
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-03-23*
+*Last updated: 2026-03-23 — traceability populated after roadmap creation*

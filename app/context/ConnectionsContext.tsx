@@ -10,16 +10,17 @@ export type ConnStatus = 'pending_sent' | 'pending_received' | 'accepted';
 export interface ConnRecord {
   connectionId: string;
   status: ConnStatus;
-  memberSlug: string;
+  memberId: string;  // UUID from profiles.id
   memberName: string;
   memberPhoto: string;
   role: 'requester' | 'receiver';
+  type: 'peer' | 'mentorship' | 'faculty';
 }
 
 export interface NotifRecord {
   id: string;
   type: 'connection_request' | 'connection_accepted' | 'connection_declined';
-  fromSlug: string;
+  fromUserId: string;  // UUID
   fromName: string;
   fromPhoto: string;
   connectionId: string;
@@ -28,66 +29,20 @@ export interface NotifRecord {
 }
 
 interface ConnectionsContextType {
-  connections: Record<string, ConnRecord>; // keyed by member slug
+  connections: Record<string, ConnRecord>; // keyed by UUID
   notifications: NotifRecord[];
   unreadCount: number;
-  getStatus: (slug: string) => ConnStatus | null;
-  sendRequest: (slug: string, name: string, photo: string) => void;
-  acceptRequest: (connectionId: string, fromSlug: string) => void;
-  declineRequest: (connectionId: string, fromSlug: string) => void;
+  getStatus: (userId: string) => ConnStatus | null;
+  sendRequest: (userId: string, name: string, photo: string, type?: 'peer' | 'mentorship' | 'faculty') => Promise<void>;
+  acceptRequest: (connectionId: string, fromUserId: string) => Promise<void>;
+  declineRequest: (connectionId: string, fromUserId: string) => Promise<void>;
+  removeConnection: (connectionId: string, otherUserId: string) => Promise<void>;
   markAllRead: () => void;
 }
 
 // ─── Context ─────────────────────────────────────────────────────────────────
 
 const ConnectionsContext = createContext<ConnectionsContextType | null>(null);
-
-// ─── Demo seed: incoming request from Jennifer Walsh ─────────────────────────
-
-const DEMO_CONN_ID = 'demo-conn-jennifer';
-const DEMO_NOTIF_ID = 'demo-notif-jennifer';
-
-function buildDemoSeed(): { conn: ConnRecord; notif: NotifRecord } {
-  return {
-    conn: {
-      connectionId: DEMO_CONN_ID,
-      status: 'pending_received',
-      memberSlug: 'jennifer-walsh',
-      memberName: 'Jennifer Walsh',
-      memberPhoto: 'https://randomuser.me/api/portraits/women/2.jpg',
-      role: 'receiver',
-    },
-    notif: {
-      id: DEMO_NOTIF_ID,
-      type: 'connection_request',
-      fromSlug: 'jennifer-walsh',
-      fromName: 'Jennifer Walsh',
-      fromPhoto: 'https://randomuser.me/api/portraits/women/2.jpg',
-      connectionId: DEMO_CONN_ID,
-      read: false,
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    },
-  };
-}
-
-// ─── Storage helpers ──────────────────────────────────────────────────────────
-
-const LS_CONNECTIONS = 'goya-connections';
-const LS_NOTIFICATIONS = 'goya-notifications';
-const LS_SEEDED = 'goya-demo-seeded';
-
-function loadFromLS<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveToLS(key: string, value: unknown) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* noop */ }
-}
 
 // ─── Provider ────────────────────────────────────────────────────────────────
 
@@ -96,32 +51,49 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<NotifRecord[]>([]);
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
 
-  // Load persisted state + seed demo data
+  // Get auth user ID on mount
   useEffect(() => {
-    const savedConns = loadFromLS<Record<string, ConnRecord>>(LS_CONNECTIONS) ?? {};
-    const savedNotifs = loadFromLS<NotifRecord[]>(LS_NOTIFICATIONS) ?? [];
-    const alreadySeeded = localStorage.getItem(LS_SEEDED);
-
-    if (!alreadySeeded) {
-      // First visit: seed an incoming connection request from Jennifer Walsh
-      const seed = buildDemoSeed();
-      const conns = { ...savedConns, [seed.conn.memberSlug]: seed.conn };
-      const notifs = [seed.notif, ...savedNotifs];
-      setConnections(conns);
-      setNotifications(notifs);
-      saveToLS(LS_CONNECTIONS, conns);
-      saveToLS(LS_NOTIFICATIONS, notifs);
-      localStorage.setItem(LS_SEEDED, '1');
-    } else {
-      setConnections(savedConns);
-      setNotifications(savedNotifs);
-    }
-
-    // Check auth
     supabase.auth.getUser().then(({ data }) => {
       setSupabaseUserId(data.user?.id ?? null);
     });
   }, []);
+
+  // Load connections from Supabase on mount (once auth user is known)
+  useEffect(() => {
+    if (!supabaseUserId) return;
+    supabase
+      .from('connections')
+      .select(`
+        *,
+        requester:profiles!connections_requester_id_fkey(id, full_name, avatar_url),
+        recipient:profiles!connections_recipient_id_fkey(id, full_name, avatar_url)
+      `)
+      .or(`requester_id.eq.${supabaseUserId},recipient_id.eq.${supabaseUserId}`)
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, ConnRecord> = {};
+          for (const row of data) {
+            const otherId = row.requester_id === supabaseUserId ? row.recipient_id : row.requester_id;
+            const role: 'requester' | 'receiver' = row.requester_id === supabaseUserId ? 'requester' : 'receiver';
+            const displayStatus: ConnStatus =
+              row.status === 'pending' && role === 'requester' ? 'pending_sent' :
+              row.status === 'pending' && role === 'receiver' ? 'pending_received' :
+              row.status as ConnStatus;
+            const otherProfile = row.requester_id === supabaseUserId ? row.recipient : row.requester;
+            map[otherId] = {
+              connectionId: row.id,
+              status: displayStatus,
+              memberId: otherId,
+              memberName: otherProfile?.full_name ?? '',
+              memberPhoto: otherProfile?.avatar_url ?? '',
+              role,
+              type: row.type ?? 'peer',
+            };
+          }
+          setConnections(map);
+        }
+      });
+  }, [supabaseUserId]);
 
   // Supabase Realtime: subscribe to real notifications for logged-in user
   useEffect(() => {
@@ -142,18 +114,14 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
           const notif: NotifRecord = {
             id: row.id as string,
             type: row.type as NotifRecord['type'],
-            fromSlug: row.from_user_id as string,
+            fromUserId: row.from_user_id as string,
             fromName: 'Member', // would join with profiles table in production
             fromPhoto: 'https://randomuser.me/api/portraits/lego/1.jpg',
             connectionId: row.connection_id as string,
             read: false,
             createdAt: row.created_at as string,
           };
-          setNotifications(prev => {
-            const next = [notif, ...prev];
-            saveToLS(LS_NOTIFICATIONS, next);
-            return next;
-          });
+          setNotifications(prev => [notif, ...prev]);
         }
       )
       .subscribe();
@@ -161,83 +129,99 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
     return () => { supabase.removeChannel(channel); };
   }, [supabaseUserId]);
 
-  // Persist connections whenever they change
-  const persistConnections = useCallback((conns: Record<string, ConnRecord>) => {
-    setConnections(conns);
-    saveToLS(LS_CONNECTIONS, conns);
-  }, []);
-
-  const persistNotifications = useCallback((notifs: NotifRecord[]) => {
-    setNotifications(notifs);
-    saveToLS(LS_NOTIFICATIONS, notifs);
-  }, []);
-
   // ── Actions ────────────────────────────────────────────────────────────────
 
-  const getStatus = useCallback((slug: string): ConnStatus | null => {
-    return connections[slug]?.status ?? null;
+  const getStatus = useCallback((userId: string): ConnStatus | null => {
+    return connections[userId]?.status ?? null;
   }, [connections]);
 
-  const sendRequest = useCallback((slug: string, name: string, photo: string) => {
-    const connectionId = `conn-${Date.now()}-${slug}`;
-    const conn: ConnRecord = {
-      connectionId,
-      status: 'pending_sent',
-      memberSlug: slug,
-      memberName: name,
-      memberPhoto: photo,
-      role: 'requester',
-    };
-    persistConnections({ ...connections, [slug]: conn });
+  const sendRequest = useCallback(async (recipientId: string, name: string, photo: string, type: 'peer' | 'mentorship' | 'faculty' = 'peer') => {
+    if (!supabaseUserId) return;
 
-    // In production: insert into Supabase connections table + notification for receiver
-  }, [connections, persistConnections]);
+    // Guard: check for existing connection in either direction (bidirectional duplicate check)
+    const { data: existing } = await supabase
+      .from('connections')
+      .select('id')
+      .or(
+        `and(requester_id.eq.${supabaseUserId},recipient_id.eq.${recipientId}),and(requester_id.eq.${recipientId},recipient_id.eq.${supabaseUserId})`
+      )
+      .maybeSingle();
 
-  const acceptRequest = useCallback((connectionId: string, fromSlug: string) => {
-    const existing = connections[fromSlug];
-    if (!existing) return;
+    if (existing) return; // already exists in either direction
 
-    // Update connection to accepted
-    const updatedConn: ConnRecord = { ...existing, status: 'accepted' };
-    const newConns = { ...connections, [fromSlug]: updatedConn };
-    persistConnections(newConns);
+    const { data, error } = await supabase
+      .from('connections')
+      .insert({ requester_id: supabaseUserId, recipient_id: recipientId, type, status: 'pending' })
+      .select()
+      .single();
 
-    // Mark the incoming notification as read + update its type implicitly (it's accepted now)
-    const updatedNotifs = notifications.map(n =>
-      n.connectionId === connectionId ? { ...n, read: true } : n
-    );
-    // Add an "accepted" confirmation visible in history
-    const acceptedNotif: NotifRecord = {
-      id: `accepted-${Date.now()}`,
-      type: 'connection_accepted',
-      fromSlug,
-      fromName: existing.memberName,
-      fromPhoto: existing.memberPhoto,
-      connectionId,
-      read: true,
-      createdAt: new Date().toISOString(),
-    };
-    persistNotifications([acceptedNotif, ...updatedNotifs.filter(n => n.connectionId !== connectionId)]);
+    if (!error && data) {
+      setConnections(prev => ({
+        ...prev,
+        [recipientId]: {
+          connectionId: data.id,
+          status: 'pending_sent',
+          memberId: recipientId,
+          memberName: name,
+          memberPhoto: photo,
+          role: 'requester',
+          type,
+        },
+      }));
+    }
+  }, [supabaseUserId]);
 
-    // In production: supabase update connections, insert notification for requester
-  }, [connections, notifications, persistConnections, persistNotifications]);
+  const acceptRequest = useCallback(async (connectionId: string, fromUserId: string) => {
+    const { error } = await supabase
+      .from('connections')
+      .update({ status: 'accepted' })
+      .eq('id', connectionId);
 
-  const declineRequest = useCallback((connectionId: string, fromSlug: string) => {
-    // Remove the connection record
-    const { [fromSlug]: _removed, ...rest } = connections;
-    persistConnections(rest);
+    if (!error) {
+      setConnections(prev => {
+        const existing = prev[fromUserId];
+        if (!existing) return prev;
+        return { ...prev, [fromUserId]: { ...existing, status: 'accepted' } };
+      });
+      // Mark related notification as read
+      setNotifications(prev =>
+        prev.map(n => n.connectionId === connectionId ? { ...n, read: true } : n)
+      );
+    }
+  }, []);
 
-    // Mark notification as read, remove it from list
-    const updatedNotifs = notifications.filter(n => n.connectionId !== connectionId);
-    persistNotifications(updatedNotifs);
+  const declineRequest = useCallback(async (connectionId: string, fromUserId: string) => {
+    const { error } = await supabase
+      .from('connections')
+      .update({ status: 'declined' })
+      .eq('id', connectionId);
 
-    // In production: supabase update connection status to 'declined', insert notif for requester
-  }, [connections, notifications, persistConnections, persistNotifications]);
+    if (!error) {
+      setConnections(prev => {
+        const { [fromUserId]: _removed, ...rest } = prev;
+        return rest;
+      });
+      setNotifications(prev => prev.filter(n => n.connectionId !== connectionId));
+    }
+  }, []);
+
+  const removeConnection = useCallback(async (connectionId: string, otherUserId: string) => {
+    const { error } = await supabase
+      .from('connections')
+      .delete()
+      .eq('id', connectionId);
+
+    if (!error) {
+      setConnections(prev => {
+        const { [otherUserId]: _removed, ...rest } = prev;
+        return rest;
+      });
+    }
+  }, []);
 
   const markAllRead = useCallback(() => {
-    const updated = notifications.map(n => ({ ...n, read: true }));
-    persistNotifications(updated);
-  }, [notifications, persistNotifications]);
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.read && n.type === 'connection_request').length;
 
@@ -250,6 +234,7 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
       sendRequest,
       acceptRequest,
       declineRequest,
+      removeConnection,
       markAllRead,
     }}>
       {children}
