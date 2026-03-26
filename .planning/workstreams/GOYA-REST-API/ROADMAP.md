@@ -9,7 +9,7 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
 - [x] **Phase 1: Foundation** - API key system, middleware, rate limiting, response format, health endpoint, handler factory, service layer, pagination, audit logging
 - [ ] **Phase 2: Users** - Full users API with profile sub-resources (credits, certifications, verifications)
 - [x] **Phase 3: Events** - Events CRUD with registration management (completed 2026-03-26)
-- [ ] **Phase 4: Courses** - Courses CRUD with enrollment management
+- [x] **Phase 4: Courses** - Courses CRUD with enrollment management (completed 2026-03-26)
 - [ ] **Phase 5: Credits & Verifications** - Credits CRUD with summary endpoint + verifications CRUD
 - [ ] **Phase 6: Analytics** - Five analytics aggregation endpoints
 - [ ] **Phase 7: Add-ons, Admin Settings & Webhooks** - Add-ons CRUD with user assignments, admin settings, incoming webhook endpoints
@@ -72,7 +72,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 04-01-PLAN.md — Courses soft-delete migration, service layer, CRUD endpoints (list, detail, create, update, soft-delete)
-- [ ] 04-02-PLAN.md — Enrollment management endpoints (list, enroll, update progress)
+- [x] 04-02-PLAN.md — Enrollment management endpoints (list, enroll, update progress)
 
 ### Phase 5: Credits & Verifications
 **Goal**: Callers can submit, review, and manage CPD credit records and verification records
@@ -138,7 +138,7 @@ Plans:
 | 1. Foundation | 4/4 | Complete | 2026-03-25 |
 | 2. Users | 2/2 | Complete | 2026-03-26 |
 | 3. Events | 2/2 | Complete   | 2026-03-26 |
-| 4. Courses | 1/2 | In Progress|  |
+| 4. Courses | 2/2 | Complete   | 2026-03-26 |
 | 5. Credits & Verifications | 0/? | Not started | - |
 | 6. Analytics | 0/? | Not started | - |
 | 7. Add-ons, Admin Settings & Webhooks | 0/? | Not started | - |

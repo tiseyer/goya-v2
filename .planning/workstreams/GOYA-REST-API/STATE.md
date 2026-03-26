@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-26T08:40:14.307Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-26T08:47:58.957Z"
 progress:
   total_phases: 8
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -51,6 +51,7 @@ Plan: 2 of 2
 | Phase 03 P01 | 3 | 2 tasks | 3 files |
 | Phase 03 P02 | 4 | 2 tasks | 4 files |
 | Phase 04-courses P01 | 15 | 2 tasks | 5 files |
+| Phase 04-courses P02 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,9 @@ Plan: 2 of 2
 - [Phase 04-courses]: Migration applied via supabase db query --linked due to batch push failing on pre-existing policies in earlier migrations (same pattern as Phase 03)
 - [Phase 04-courses]: listCourses always filters .is('deleted_at', null) — soft-deleted courses never appear in list results
 - [Phase 04-courses]: deleteCourse sets both deleted_at AND status='deleted' for dual-state tracking, consistent with events pattern
+- [Phase 04-courses]: ENROLLMENTS_SORT_FIELDS exported from courses service - consistent with COURSES_SORT_FIELDS pattern
+- [Phase 04-courses]: updateEnrollment auto-clears completed_at when status reverts to in_progress - prevents stale completion dates
+- [Phase 04-courses]: Unknown field rejection in PATCH enrollment body - allowlist only status and completed_at, 400 on unknown keys
 
 ### Pending Todos
 
@@ -96,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T08:40:14.303Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-26T08:47:58.953Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
