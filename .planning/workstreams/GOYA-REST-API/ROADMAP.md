@@ -46,7 +46,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 02-01-PLAN.md — Users service layer, list endpoint, detail endpoint
-- [ ] 02-02-PLAN.md — User update (PATCH) with audit logging, credits/certifications/verifications sub-resources
+- [x] 02-02-PLAN.md — User update (PATCH) with audit logging, credits/certifications/verifications sub-resources
 
 ### Phase 3: Events
 **Goal**: Callers can create, read, update, and delete events and manage user registrations

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 18-01-PLAN.md
-last_updated: "2026-03-26T05:38:28.167Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-03-26T07:45:54.573Z"
 progress:
   total_phases: 8
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** Phase 18 — admin-inbox-teacher-upgrades
+**Current focus:** Phase 02 — users
 
 ## Current Position
 
-Phase: 18 (admin-inbox-teacher-upgrades) — EXECUTING
+Phase: 02 (users) — EXECUTING
 Plan: 2 of 2
 
 ## Performance Metrics
@@ -47,6 +47,7 @@ Plan: 2 of 2
 | Phase 01 P04 | 20 min | 2 tasks | 1 file |
 | Phase 02 P01 | 8 min | 2 tasks | 3 files |
 | Phase 18-admin-inbox-teacher-upgrades P01 | 5 | 1 tasks | 1 files |
+| Phase 02 P02 | 10 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Plan: 2 of 2
 - [Phase 02 P01]: UUID regex validation in [id] route handler returns 400 before any DB call for invalid formats
 - [Phase 18-admin-inbox-teacher-upgrades]: Auth guard fetches admin role via getSupabaseService() (service role) rather than session-based RLS
 - [Phase 18-admin-inbox-teacher-upgrades]: Errors per Stripe call returned as { success: false, error } — no redirect() so client components can surface them
+- [Phase 02]: PATCH body validation: allowlist check first (unknown keys 400), then enum value check per field
+- [Phase 02]: PATCH 404 vs 500 disambiguation: if updateUser fails, call getUserById to distinguish not-found from DB error
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T05:38:28.164Z
-Stopped at: Completed 18-01-PLAN.md
+Last session: 2026-03-26T07:45:54.570Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
