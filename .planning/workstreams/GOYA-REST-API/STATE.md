@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-03-26T08:13:39.233Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-03-26T08:21:12.887Z"
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -49,6 +49,7 @@ Plan: 2 of 2
 | Phase 18-admin-inbox-teacher-upgrades P01 | 5 | 1 tasks | 1 files |
 | Phase 02 P02 | 10 | 2 tasks | 5 files |
 | Phase 03 P01 | 3 | 2 tasks | 3 files |
+| Phase 03 P02 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ Plan: 2 of 2
 - [Phase 03]: Events service uses getSupabaseService() as any — events table not in generated types, same pattern as users/profiles
 - [Phase 03]: listEvents always filters .is('deleted_at', null) — soft-deleted events never appear in list results
 - [Phase 03]: deleteEvent sets both deleted_at AND status='deleted' for dual-state tracking
+- [Phase 03]: event_registrations.user_id has no FK to profiles — plain uuid consistent with codebase pattern
+- [Phase 03]: Migration applied via supabase db query --linked due to duplicate timestamp blocking db push
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T08:13:39.230Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-03-26T08:21:12.883Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
