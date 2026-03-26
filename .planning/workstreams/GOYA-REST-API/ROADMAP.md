@@ -56,12 +56,10 @@ Plans:
   1. `GET /api/v1/events` returns events filterable by date range, status, and type with pagination
   2. `POST /api/v1/events` creates an event and returns the new record; `DELETE /api/v1/events/:id` removes it
   3. `POST /api/v1/events/:id/registrations` registers a user; `DELETE /api/v1/events/:id/registrations/:userId` unregisters them; both log to audit
-**Plans**: 4 plans
+**Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
-- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
-- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
-- [ ] 01-04-PLAN.md — Health endpoint and migration push
+- [ ] 03-01-PLAN.md — Events service layer, CRUD endpoints (list, detail, create, update, soft-delete)
+- [ ] 03-02-PLAN.md — Event registrations migration, register/unregister endpoints with spot tracking
 
 ### Phase 4: Courses
 **Goal**: Callers can manage courses and track learner enrollment progress through the API
@@ -135,13 +133,13 @@ Plans:
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+**Execution Order:** Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-03-25 |
-| 2. Users | 1/2 | In progress | - |
-| 3. Events | 0/? | Not started | - |
+| 2. Users | 2/2 | Complete | 2026-03-26 |
+| 3. Events | 0/2 | Not started | - |
 | 4. Courses | 0/? | Not started | - |
 | 5. Credits & Verifications | 0/? | Not started | - |
 | 6. Analytics | 0/? | Not started | - |
