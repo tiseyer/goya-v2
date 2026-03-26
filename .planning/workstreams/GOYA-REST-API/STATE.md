@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-03-26T09:37:27.986Z"
+stopped_at: Completed 07-04-PLAN.md
+last_updated: "2026-03-26T09:37:38.466Z"
 progress:
   total_phases: 8
   completed_phases: 6
@@ -111,6 +111,8 @@ Plan: 4 of 4
 - [Phase 07]: Setting key validated with /^[a-z0-9_]+$/ regex before DB call — prevents injection, matches known site_settings key format
 - [Phase 07]: GET /api/v1/addons/:id returns even inactive products for admin visibility
 - [Phase 07]: Add-on soft-delete uses is_active=false (not deleted_at) per products table schema
+- [Phase 07]: Webhook service functions return { data, error } with string errors — consistent with all other services
+- [Phase 07]: Audit log category 'system' for webhook entries — non-user-initiated system integration events
 
 ### Pending Todos
 
@@ -122,6 +124,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T09:37:21.244Z
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-03-26T09:37:38.055Z
+Stopped at: Completed 07-04-PLAN.md
 Resume file: None

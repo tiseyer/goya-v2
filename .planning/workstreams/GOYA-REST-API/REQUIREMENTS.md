@@ -51,11 +51,11 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 ### Credits
 
-- [ ] **CRED-01**: GET `/credits` lists submissions with filters (status, user, date)
-- [ ] **CRED-02**: GET `/credits/:id` returns credit details
-- [ ] **CRED-03**: POST `/credits` creates a credit submission
-- [ ] **CRED-04**: PATCH `/credits/:id` updates status (approve/reject/pending)
-- [ ] **CRED-05**: GET `/credits/summary/:userId` returns total hours by category
+- [x] **CRED-01**: GET `/credits` lists submissions with filters (status, user, date)
+- [x] **CRED-02**: GET `/credits/:id` returns credit details
+- [x] **CRED-03**: POST `/credits` creates a credit submission
+- [x] **CRED-04**: PATCH `/credits/:id` updates status (approve/reject/pending)
+- [x] **CRED-05**: GET `/credits/summary/:userId` returns total hours by category
 
 ### Verifications
 
@@ -67,29 +67,29 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 ### Analytics
 
-- [ ] **ANLY-01**: GET `/analytics/overview` returns key metrics (total members, active, new this month)
-- [ ] **ANLY-02**: GET `/analytics/memberships` returns membership stats over time
-- [ ] **ANLY-03**: GET `/analytics/revenue` returns revenue data
-- [ ] **ANLY-04**: GET `/analytics/engagement` returns course/event participation rates
-- [ ] **ANLY-05**: GET `/analytics/credits` returns credit submission stats
+- [x] **ANLY-01**: GET `/analytics/overview` returns key metrics (total members, active, new this month)
+- [x] **ANLY-02**: GET `/analytics/memberships` returns membership stats over time
+- [x] **ANLY-03**: GET `/analytics/revenue` returns revenue data
+- [x] **ANLY-04**: GET `/analytics/engagement` returns course/event participation rates
+- [x] **ANLY-05**: GET `/analytics/credits` returns credit submission stats
 
 ### Add-ons
 
-- [ ] **ADON-01**: GET `/addons` lists available add-ons
-- [ ] **ADON-02**: GET `/addons/:id` returns add-on details
-- [ ] **ADON-03**: POST `/addons` creates an add-on
-- [ ] **ADON-04**: PATCH `/addons/:id` updates an add-on
-- [ ] **ADON-05**: DELETE `/addons/:id` deletes an add-on
+- [x] **ADON-01**: GET `/addons` lists available add-ons
+- [x] **ADON-02**: GET `/addons/:id` returns add-on details
+- [x] **ADON-03**: POST `/addons` creates an add-on
+- [x] **ADON-04**: PATCH `/addons/:id` updates an add-on
+- [x] **ADON-05**: DELETE `/addons/:id` deletes an add-on
 - [ ] **ADON-06**: GET `/addons/users/:userId` returns add-ons assigned to user
 - [ ] **ADON-07**: POST `/addons/users/:userId` assigns add-on to user
 - [ ] **ADON-08**: DELETE `/addons/users/:userId/:addonId` removes add-on from user
 
 ### Admin Settings
 
-- [ ] **ADMN-01**: GET `/admin/settings` returns all settings
-- [ ] **ADMN-02**: PATCH `/admin/settings` updates settings (bulk)
-- [ ] **ADMN-03**: GET `/admin/settings/:key` returns single setting
-- [ ] **ADMN-04**: PATCH `/admin/settings/:key` updates single setting
+- [x] **ADMN-01**: GET `/admin/settings` returns all settings
+- [x] **ADMN-02**: PATCH `/admin/settings` updates settings (bulk)
+- [x] **ADMN-03**: GET `/admin/settings/:key` returns single setting
+- [x] **ADMN-04**: PATCH `/admin/settings/:key` updates single setting
 
 ### Webhooks (Incoming)
 
@@ -165,33 +165,33 @@ None — full spec included in v1.6.
 | CRSE-06 | Phase 4 | Complete |
 | CRSE-07 | Phase 4 | Complete |
 | CRSE-08 | Phase 4 | Complete |
-| CRED-01 | Phase 5 | Pending |
-| CRED-02 | Phase 5 | Pending |
-| CRED-03 | Phase 5 | Pending |
-| CRED-04 | Phase 5 | Pending |
-| CRED-05 | Phase 5 | Pending |
+| CRED-01 | Phase 5 | Complete |
+| CRED-02 | Phase 5 | Complete |
+| CRED-03 | Phase 5 | Complete |
+| CRED-04 | Phase 5 | Complete |
+| CRED-05 | Phase 5 | Complete |
 | VERF-01 | Phase 5 | Complete |
 | VERF-02 | Phase 5 | Complete |
 | VERF-03 | Phase 5 | Complete |
 | VERF-04 | Phase 5 | Complete |
 | VERF-05 | Phase 5 | Complete |
-| ANLY-01 | Phase 6 | Pending |
-| ANLY-02 | Phase 6 | Pending |
-| ANLY-03 | Phase 6 | Pending |
-| ANLY-04 | Phase 6 | Pending |
-| ANLY-05 | Phase 6 | Pending |
-| ADON-01 | Phase 7 | Pending |
-| ADON-02 | Phase 7 | Pending |
-| ADON-03 | Phase 7 | Pending |
-| ADON-04 | Phase 7 | Pending |
-| ADON-05 | Phase 7 | Pending |
+| ANLY-01 | Phase 6 | Complete |
+| ANLY-02 | Phase 6 | Complete |
+| ANLY-03 | Phase 6 | Complete |
+| ANLY-04 | Phase 6 | Complete |
+| ANLY-05 | Phase 6 | Complete |
+| ADON-01 | Phase 7 | Complete |
+| ADON-02 | Phase 7 | Complete |
+| ADON-03 | Phase 7 | Complete |
+| ADON-04 | Phase 7 | Complete |
+| ADON-05 | Phase 7 | Complete |
 | ADON-06 | Phase 7 | Pending |
 | ADON-07 | Phase 7 | Pending |
 | ADON-08 | Phase 7 | Pending |
-| ADMN-01 | Phase 7 | Pending |
-| ADMN-02 | Phase 7 | Pending |
-| ADMN-03 | Phase 7 | Pending |
-| ADMN-04 | Phase 7 | Pending |
+| ADMN-01 | Phase 7 | Complete |
+| ADMN-02 | Phase 7 | Complete |
+| ADMN-03 | Phase 7 | Complete |
+| ADMN-04 | Phase 7 | Complete |
 | WHKN-01 | Phase 7 | Pending |
 | WHKN-02 | Phase 7 | Pending |
 | WHKN-03 | Phase 7 | Pending |
