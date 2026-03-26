@@ -45,11 +45,11 @@
 
 ### ADM — Admin Inbox Teacher Upgrades
 
-- [ ] **ADM-01**: New "Teacher Upgrades" tab in /admin/inbox (same design pattern as existing "School Registrations" tab)
-- [ ] **ADM-02**: Each upgrade request card shows: user name, email, current role, member since, submitted certificates (downloadable/viewable), Stripe Payment Intent ID + authorized amount, submission date
-- [ ] **ADM-03**: Approve action: capture Stripe Payment Intent, activate Teacher Membership subscription, update user role (student/wp → teacher), update upgrade_request status to "approved", migrate designations, send user notification
-- [ ] **ADM-04**: Reject action: cancel Stripe Payment Intent (no charge), update upgrade_request status to "rejected" with rejection reason (text input modal), send user notification, restore upgrade CTA visibility
-- [ ] **ADM-05**: Sub-tabs within Teacher Upgrades: Pending | Approved | Rejected
+- [x] **ADM-01**: New "Teacher Upgrades" tab in /admin/inbox (same design pattern as existing "School Registrations" tab)
+- [x] **ADM-02**: Each upgrade request card shows: user name, email, current role, member since, submitted certificates (downloadable/viewable), Stripe Payment Intent ID + authorized amount, submission date
+- [x] **ADM-03**: Approve action: capture Stripe Payment Intent, activate Teacher Membership subscription, update user role (student/wp → teacher), update upgrade_request status to "approved", migrate designations, send user notification
+- [x] **ADM-04**: Reject action: cancel Stripe Payment Intent (no charge), update upgrade_request status to "rejected" with rejection reason (text input modal), send user notification, restore upgrade CTA visibility
+- [x] **ADM-05**: Sub-tabs within Teacher Upgrades: Pending | Approved | Rejected
 
 ### SCH — Supabase Schema
 

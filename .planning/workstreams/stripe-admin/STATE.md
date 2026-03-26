@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: milestone
-status: Ready to plan
-stopped_at: "Checkpoint reached: 17-02 Task 3 human-verify"
-last_updated: "2026-03-25T11:39:39.284Z"
+status: Active
+stopped_at: "Completed 18-02-PLAN.md"
+last_updated: "2026-03-26T07:52:09Z"
 progress:
   total_phases: 7
-  completed_phases: 6
-  total_plans: 8
-  completed_plans: 8
+  completed_phases: 7
+  total_plans: 10
+  completed_plans: 10
 ---
 
 # Project State — stripe-admin workstream
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 17 — upgrade-page
+**Current focus:** Phase 18 — admin-inbox-teacher-upgrades (complete)
 
 ## Current Position
 
 Phase: 18
-Plan: Not started
+Plan: 02 (complete — phase done)
 
 ## Performance Metrics
 
@@ -107,6 +107,9 @@ Plan: Not started
 - [Phase 17-upgrade-page]: mode:payment with capture_method:manual for delayed capture — subscription created on admin approval in Phase 18
 - [Phase 17-upgrade-page]: (supabase as any) cast for upgrade_requests table — not in generated types; consistent with codebase pattern
 - [Phase 17-upgrade-page]: Client-side step state (useState<1|2|3>) over URL-based steps — sequential wizard with no deep-link requirement
+- [18-02]: URL search param tab switching (tab=schools|upgrades) over client-side state — server component, deep-linkable
+- [18-02]: getSupabaseService() for upgrade_requests join — service role required; consistent with admin pattern
+- [18-02]: (supabase as any) cast for upgrade_requests in page.tsx — not in generated types; consistent with codebase pattern
 
 ### Pending Todos
 
@@ -119,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T11:15:14.361Z
-Stopped at: Checkpoint reached: 17-02 Task 3 human-verify
+Last session: 2026-03-26T07:52:09Z
+Stopped at: Completed 18-02-PLAN.md
 Resume file: None

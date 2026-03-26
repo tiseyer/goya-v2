@@ -12,7 +12,7 @@ Seven phases deliver the Subscriptions page Stripe integration and Teacher Upgra
 - [ ] **Phase 15: Subscriptions Page — Real Stripe Data** - Replace placeholder with live Stripe membership, designations, school, Customer Portal
 - [x] **Phase 16: Upgrade CTA** - Show upgrade prompts for students/WPs on Subscriptions page and in Shop (completed 2026-03-25)
 - [x] **Phase 17: Upgrade Page** - Multi-step /upgrade page with certificate upload and Stripe delayed capture (completed 2026-03-25)
-- [ ] **Phase 18: Admin Inbox — Teacher Upgrades** - Admin approve/reject flow with payment capture and role change
+- [x] **Phase 18: Admin Inbox — Teacher Upgrades** - Admin approve/reject flow with payment capture and role change (completed 2026-03-26)
 - [x] **Phase 19: Supabase Schema** - Create upgrade_requests and user_designations tables with RLS (completed 2026-03-24)
 - [x] **Phase 20: Fix Broken Admin Pages** - Fix 3 crashing admin pages + add Create Product button (completed 2026-03-24)
 
@@ -92,8 +92,8 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 18-01-PLAN.md — Server actions: approveUpgradeRequest + rejectUpgradeRequest (ADM-03, ADM-04)
-- [ ] 18-02-PLAN.md — UI: TeacherUpgradesTab with sub-tabs + request cards + updated page.tsx (ADM-01, ADM-02, ADM-05)
+- [x] 18-01-PLAN.md — Server actions: approveUpgradeRequest + rejectUpgradeRequest (ADM-03, ADM-04)
+- [x] 18-02-PLAN.md — UI: TeacherUpgradesTab with sub-tabs + request cards + updated page.tsx (ADM-01, ADM-02, ADM-05)
 
 ### Phase 19: Supabase Schema
 **Goal**: Database tables for upgrade requests and user designations exist with proper RLS
@@ -135,4 +135,4 @@ Plans:
 | 15. Subscriptions Page | 1/2 | Complete    | 2026-03-25 |
 | 16. Upgrade CTA | 1/1 | Complete    | 2026-03-25 |
 | 17. Upgrade Page | 2/2 | Complete    | 2026-03-25 |
-| 18. Admin Inbox — Teacher Upgrades | 0/2 | Not started | - |
+| 18. Admin Inbox — Teacher Upgrades | 2/2 | Complete    | 2026-03-26 |
