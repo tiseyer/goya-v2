@@ -69,12 +69,10 @@ Plans:
   1. `GET /api/v1/courses` returns courses filterable with pagination; `GET /api/v1/courses/:id` returns full detail
   2. `POST /api/v1/courses` creates a course; `PATCH /api/v1/courses/:id` updates it; `DELETE /api/v1/courses/:id` removes it — all with audit entries
   3. `GET /api/v1/courses/:id/enrollments` lists enrollees; `POST` enrolls a user; `PATCH /courses/:id/enrollments/:userId` updates progress or completion status
-**Plans**: 4 plans
+**Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — API keys migration, response types, response helpers
-- [ ] 01-02-PLAN.md — Handler factory and pagination utilities
-- [ ] 01-03-PLAN.md — API key validation, rate limiting, permission middleware
-- [ ] 01-04-PLAN.md — Health endpoint and migration push
+- [ ] 04-01-PLAN.md — Courses soft-delete migration, service layer, CRUD endpoints (list, detail, create, update, soft-delete)
+- [ ] 04-02-PLAN.md — Enrollment management endpoints (list, enroll, update progress)
 
 ### Phase 5: Credits & Verifications
 **Goal**: Callers can submit, review, and manage CPD credit records and verification records
@@ -140,7 +138,7 @@ Plans:
 | 1. Foundation | 4/4 | Complete | 2026-03-25 |
 | 2. Users | 2/2 | Complete | 2026-03-26 |
 | 3. Events | 2/2 | Complete   | 2026-03-26 |
-| 4. Courses | 0/? | Not started | - |
+| 4. Courses | 0/2 | Not started | - |
 | 5. Credits & Verifications | 0/? | Not started | - |
 | 6. Analytics | 0/? | Not started | - |
 | 7. Add-ons, Admin Settings & Webhooks | 0/? | Not started | - |
