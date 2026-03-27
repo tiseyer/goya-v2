@@ -5,7 +5,7 @@ import { createServerClient } from '@supabase/ssr'
 // Public paths that don't require authentication
 const PUBLIC_PATHS = [
   '/sign-in', '/sign-up', '/register', '/login', '/forgot-password', '/reset-password',
-  '/events', '/academy', '/auth/callback',
+  '/events', '/academy', '/auth/callback', '/account/set-password',
 ]
 
 // Paths that require auth
@@ -23,7 +23,7 @@ const ONBOARDING_GATED_PATHS = [
 const MAINTENANCE_BYPASS_PATHS = [
   '/maintenance',
   '/sign-in', '/sign-up', '/register', '/login', '/forgot-password', '/reset-password',
-  '/auth/callback',
+  '/auth/callback', '/account/set-password',
 ]
 
 // ─── Maintenance settings cache (60s TTL, module-level for Edge Runtime) ──────
@@ -92,8 +92,9 @@ export async function middleware(request: NextRequest) {
   const maintenanceActive = await getMaintenanceActive()
 
   // Fast path: skip auth entirely for public paths when maintenance is off
-  // Exclude `/` so we can redirect logged-in users to /dashboard
-  if (!maintenanceActive && !isProtectedPath && !isOnboardingPath && pathname !== '/') {
+  // For `/`, check if auth cookie exists — only then do full auth to redirect logged-in users
+  const hasAuthCookie = pathname === '/' && request.cookies.getAll().some(c => c.name.startsWith('sb-'))
+  if (!maintenanceActive && !isProtectedPath && !isOnboardingPath && !(pathname === '/' && hasAuthCookie)) {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set('x-pathname', pathname)
     const res = NextResponse.next({ request: { headers: requestHeaders } })
@@ -187,15 +188,22 @@ export async function middleware(request: NextRequest) {
   if (user) {
     const isOnboardingGated = ONBOARDING_GATED_PATHS.some(p => pathname.startsWith(p))
     const isAdminPath = pathname.startsWith('/admin')
+    const isSetPasswordPage = pathname === '/account/set-password'
 
-    // Only fetch profile when we need to check onboarding status
+    // ─── Fetch profile once for all auth checks ──────────────────────────────
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('onboarding_completed, role, requires_password_reset')
+      .eq('id', user.id)
+      .single()
+
+    // ─── Password reset interception (migrated users) ────────────────────────
+    // Runs before onboarding — can't onboard without setting password first
+    if (!isSetPasswordPage && profile?.requires_password_reset === true) {
+      return NextResponse.redirect(new URL('/account/set-password', request.url))
+    }
+
     if (isOnboardingGated || isOnboardingPath) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('onboarding_completed, role')
-        .eq('id', user.id)
-        .single()
-
       const onboardingCompleted = profile?.onboarding_completed ?? false
       const role = profile?.role ?? 'member'
       const isAdminOrMod = role === 'admin' || role === 'moderator'
@@ -223,14 +231,8 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // Admin paths: fetch profile to check role
+    // Admin paths: check role from already-fetched profile
     if (isAdminPath) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
       const role = profile?.role ?? 'member'
       const isAdminOrMod = role === 'admin' || role === 'moderator'
 
