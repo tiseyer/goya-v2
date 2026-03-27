@@ -2,7 +2,7 @@
 
 ## What This Is
 
-GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions through a unified settings section. Admins manage the community through a full-featured admin panel with a comprehensive Shop section for products, orders, coupons, and analytics powered by bidirectional Stripe integration.
+GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions through a unified settings section. Admins manage the community through a full-featured admin panel with a comprehensive Shop section for products, orders, coupons, and analytics powered by bidirectional Stripe integration. External services can programmatically access and manage all entities through a secure, documented REST API.
 
 ## Core Value
 
@@ -10,18 +10,9 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 ## Current State
 
-**As of v1.3 (2026-03-26):** Subscriptions & Teacher Upgrade milestone shipped. Live Stripe integration on Subscriptions page (memberships, designations with soft-delete, Customer Portal). Multi-step teacher upgrade flow with certificate upload, Stripe delayed capture, and admin approve/reject inbox. Fixed 3 crashing admin pages.
-- Supabase schema: upgrade_requests, user_designations tables
-- Fix 3 crashing admin pages (/admin/shop/orders, /admin/shop/analytics, /admin/audit-log) + add Create Product button
+**As of v1.6 (2026-03-27):** Open Gates REST API milestone shipped. Complete REST API at `/api/v1/` with 49 endpoints across 10 resource categories (users, events, courses, credits, verifications, analytics, add-ons, admin settings, webhooks, health). API key authentication with SHA-256 hashing, sliding-window rate limiting (100/min), and three permission levels (read/write/admin). Admin API key management page at `/admin/api-keys`. Comprehensive API_DOCS.md (1,958 lines).
 
-## Current State
-
-**As of v1.2 (2026-03-24):** Stripe Admin & Shop milestone shipped. Full bidirectional Stripe integration with 5 mirror tables, webhook processing for 15 event types, and complete Shop admin section:
-- **Products**: dnd-kit sortable table, CRUD with Stripe sync, price immutability handling, visibility rules (show-to/don't-show-to)
-- **Orders**: filters/search/bulk actions, detail with event timeline, refund (full/partial), subscription cancel (schedule/immediate), customer journey
-- **Coupons**: create/edit with Stripe sync, manual assignment, role/product restrictions, redemption history
-- **Analytics**: funnel + revenue metrics (ARR with subscription dedup), role-split filtering, Recharts charts, CSV export — all from local Supabase tables
-- 126 unit tests, 37/37 requirements satisfied
+Previous: v1.3 Subscriptions & Teacher Upgrade, v1.2 Stripe Admin & Shop, v1.1 Connections & Inbox, v1.0 User Settings.
 
 ## Requirements
 
@@ -86,6 +77,20 @@ Members stay professionally connected, credentialed, and engaged through a singl
 - ✓ upgrade_requests and user_designations tables with RLS — v1.3
 - ✓ Fixed 3 crashing admin pages (orders, analytics, audit-log) — v1.3
 
+<!-- v1.6 Open Gates REST API milestone -->
+- ✓ API key auth with SHA-256 hashing, rate limiting, permission levels — v1.6
+- ✓ Users API: list, detail, update, credits/certifications/verifications sub-resources — v1.6
+- ✓ Events API: CRUD + registrations with spot tracking — v1.6
+- ✓ Courses API: CRUD + enrollments with progress tracking — v1.6
+- ✓ Credits API: CRUD + summary aggregation by type — v1.6
+- ✓ Verifications API: CRUD over profiles table with auto-sync — v1.6
+- ✓ Analytics API: overview, memberships, revenue, engagement, credits — v1.6
+- ✓ Add-ons API: CRUD + user assignments — v1.6
+- ✓ Admin settings API: list/update with admin-only permission — v1.6
+- ✓ Incoming webhooks API: trigger, payment, notify endpoints — v1.6
+- ✓ Admin API key management page with create/revoke UI — v1.6
+- ✓ API_DOCS.md documenting all 49 endpoints — v1.6
+
 ### Active
 
 (No active milestone — next milestone to be defined)
@@ -130,6 +135,11 @@ Members stay professionally connected, credentialed, and engaged through a singl
 | Recharts 3.8.0 locked version | 3.7.x has React 19 blank-chart regression | ✓ Analytics charts — v1.2 |
 | Pure computation functions for analytics | Testable, reusable metrics without DB coupling | ✓ 42 unit tests — v1.2 |
 | No Stripe API calls on analytics page | Compute from local Supabase tables for speed and rate limit safety | ✓ Analytics page — v1.2 |
+| Per-route auth composition for API | middleware.ts excludes /api/ — each handler calls validateApiKey + rateLimit explicitly | ✓ All API routes — v1.6 |
+| In-memory rate limiting with sliding window | Simple, no external deps — sufficient for single-instance deployment | ✓ 100/min per key — v1.6 |
+| Service layer in lib/api/services/ | Business logic separated from route handlers | ✓ 8 service files — v1.6 |
+| Soft-delete for events and courses | Preserve data integrity — deleted_at timestamp pattern | ✓ Events + courses — v1.6 |
+| as any cast on Supabase client for API | Tables not in generated types — consistent with existing patterns | ✓ All service files — v1.6 |
 
 ## Evolution
 
@@ -142,4 +152,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-26 after v1.3 milestone*
+*Last updated: 2026-03-27 after v1.6 Open Gates milestone*
