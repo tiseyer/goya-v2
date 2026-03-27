@@ -12,7 +12,7 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
 - [x] **Phase 4: Courses** - Courses CRUD with enrollment management (completed 2026-03-26)
 - [x] **Phase 5: Credits & Verifications** - Credits CRUD with summary endpoint + verifications CRUD (completed 2026-03-26)
 - [x] **Phase 6: Analytics** - Five analytics aggregation endpoints (completed 2026-03-26)
-- [ ] **Phase 7: Add-ons, Admin Settings & Webhooks** - Add-ons CRUD with user assignments, admin settings, incoming webhook endpoints
+- [x] **Phase 7: Add-ons, Admin Settings & Webhooks** - Add-ons CRUD with user assignments, admin settings, incoming webhook endpoints (completed 2026-03-27)
 - [ ] **Phase 8: Admin UI & Documentation** - API key management page in admin panel + full API reference
 
 ## Phase Details
@@ -111,7 +111,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 07-01-PLAN.md — Add-ons service layer and CRUD endpoints (list, detail, create, update, soft-delete)
-- [ ] 07-02-PLAN.md — User-addon assignment endpoints (list, assign, remove)
+- [x] 07-02-PLAN.md — User-addon assignment endpoints (list, assign, remove)
 - [x] 07-03-PLAN.md — Admin settings service layer and endpoints (list all, get single, bulk update, single update)
 - [x] 07-04-PLAN.md — Incoming webhook endpoints (trigger, payment, notify)
 
@@ -137,5 +137,5 @@ Plans:
 | 4. Courses | 2/2 | Complete   | 2026-03-26 |
 | 5. Credits & Verifications | 2/2 | Complete   | 2026-03-26 |
 | 6. Analytics | 2/2 | Complete   | 2026-03-26 |
-| 7. Add-ons, Admin Settings & Webhooks | 3/4 | In Progress|  |
+| 7. Add-ons, Admin Settings & Webhooks | 4/4 | Complete   | 2026-03-27 |
 | 8. Admin UI & Documentation | 0/? | Not started | - |

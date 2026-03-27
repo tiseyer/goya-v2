@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 07-04-PLAN.md
-last_updated: "2026-03-26T09:37:38.466Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-27T02:08:06.348Z"
 progress:
   total_phases: 8
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 18
-  completed_plans: 17
+  completed_plans: 18
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -59,6 +59,7 @@ Plan: 4 of 4
 | Phase 07 P03 | 2 | 2 tasks | 3 files |
 | Phase 07 P01 | 3 | 2 tasks | 3 files |
 | Phase 07 P04 | 2 | 2 tasks | 4 files |
+| Phase 07-addons-admin-settings-webhooks P02 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,8 @@ Plan: 4 of 4
 - [Phase 07]: Add-on soft-delete uses is_active=false (not deleted_at) per products table schema
 - [Phase 07]: Webhook service functions return { data, error } with string errors — consistent with all other services
 - [Phase 07]: Audit log category 'system' for webhook entries — non-user-initiated system integration events
+- [Phase 07]: ALREADY_ASSIGNED returned as const string for pattern-matching in route handler — consistent with event ALREADY_REGISTERED
+- [Phase 07]: addonId in DELETE /addons/users/:userId/:addonId is user_designations.id (assignment row), not product ID
 
 ### Pending Todos
 
@@ -124,6 +127,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T09:37:38.055Z
-Stopped at: Completed 07-04-PLAN.md
+Last session: 2026-03-27T02:08:06.345Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
