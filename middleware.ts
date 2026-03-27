@@ -95,7 +95,9 @@ export async function middleware(request: NextRequest) {
   if (!maintenanceActive && !isProtectedPath && !isOnboardingPath) {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set('x-pathname', pathname)
-    return NextResponse.next({ request: { headers: requestHeaders } })
+    const res = NextResponse.next({ request: { headers: requestHeaders } })
+    res.headers.set('x-pathname', pathname)
+    return res
   }
 
   // ─── Set up Supabase client (needed for session refresh + auth) ──────────────
@@ -232,6 +234,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Ensure x-pathname is on the final response (setAll may have replaced it)
+  response.headers.set('x-pathname', pathname)
   return response
 }
 

@@ -103,7 +103,7 @@ export default function RegisterPage() {
       <div className="text-center mb-6">
         <Link href="/">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/GOYA Logo Blue.png" alt="GOYA" className="h-8 mx-auto" />
+          <img src="/images/GOYA Logo Blue.png" alt="GOYA" className="w-40 mx-auto" />
         </Link>
       </div>
 
