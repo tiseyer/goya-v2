@@ -92,7 +92,8 @@ export async function middleware(request: NextRequest) {
   const maintenanceActive = await getMaintenanceActive()
 
   // Fast path: skip auth entirely for public paths when maintenance is off
-  if (!maintenanceActive && !isProtectedPath && !isOnboardingPath) {
+  // Exclude `/` so we can redirect logged-in users to /dashboard
+  if (!maintenanceActive && !isProtectedPath && !isOnboardingPath && pathname !== '/') {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set('x-pathname', pathname)
     const res = NextResponse.next({ request: { headers: requestHeaders } })
@@ -175,6 +176,11 @@ export async function middleware(request: NextRequest) {
   if (isProtectedPath && !user) {
     const next = encodeURIComponent(pathname)
     return NextResponse.redirect(new URL(`/sign-in?next=${next}`, request.url))
+  }
+
+  // ─── Logged-in users on / → /dashboard ─────────────────────────────────────
+  if (pathname === '/' && user) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Onboarding redirect logic for authenticated users

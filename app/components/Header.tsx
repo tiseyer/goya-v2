@@ -17,11 +17,17 @@ import type { AppNotification } from '@/lib/types';
 
 // ─── config ───────────────────────────────────────────────────────────────────
 
-const NAV_LINKS = [
+const NAV_LINKS_LOGGED_IN = [
   { href: '/members', label: 'Members' },
   { href: '/events',  label: 'Events'  },
   { href: '/academy', label: 'Academy' },
   { href: '/addons',  label: 'Add-Ons' },
+];
+
+const NAV_LINKS_LOGGED_OUT = [
+  { href: '/members', label: 'Members' },
+  { href: '/events',  label: 'Events'  },
+  { href: '/academy', label: 'Academy' },
 ];
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -874,8 +880,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
 
-          {/* Logo */}
-          <Link href="/" className="shrink-0">
+          {/* Logo — links to /dashboard when logged in, / when logged out */}
+          <Link href={isLoggedIn ? '/dashboard' : '/'} className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/GOYA Logo Blue.png" alt="GOYA" style={{ width: '120px', height: 'auto' }} />
           </Link>
@@ -894,7 +900,7 @@ export default function Header() {
                 Dashboard
               </Link>
             )}
-            {NAV_LINKS.map(({ href, label }) => (
+            {(isLoggedIn ? NAV_LINKS_LOGGED_IN : NAV_LINKS_LOGGED_OUT).map(({ href, label }) => (
               <Link
                 key={label}
                 href={href}
@@ -948,11 +954,10 @@ export default function Header() {
               </>
             ) : (
               <>
-                <CartWidget />
                 <Link href="/sign-in" className="text-[#374151] hover:text-[#1B3A5C] text-sm font-medium transition-colors px-3 py-2">
                   Sign In
                 </Link>
-                <Link href="/register" className="bg-[#4E87A0] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#3A7190] transition-colors">
+                <Link href="/register" className="bg-[#4E87A0] text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-[#3A7190] transition-colors">
                   Join GOYA
                 </Link>
               </>
@@ -1019,7 +1024,7 @@ export default function Header() {
               Dashboard
             </Link>
           )}
-          {NAV_LINKS.map(({ href, label }) => (
+          {(isLoggedIn ? NAV_LINKS_LOGGED_IN : NAV_LINKS_LOGGED_OUT).map(({ href, label }) => (
             <Link
               key={label}
               href={href}
@@ -1033,7 +1038,25 @@ export default function Header() {
               {label}
             </Link>
           ))}
-          <MobileCartToggle onNavClose={() => setNavOpen(false)} />
+          {isLoggedIn && <MobileCartToggle onNavClose={() => setNavOpen(false)} />}
+          {!isLoggedIn && !authLoading && (
+            <div className="pt-2 border-t border-[#E5E7EB] mt-2 space-y-2">
+              <Link
+                href="/sign-in"
+                onClick={() => setNavOpen(false)}
+                className="block px-4 py-2.5 rounded-lg text-sm font-medium text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setNavOpen(false)}
+                className="block text-center px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#4E87A0] text-white hover:bg-[#3A7190] transition-colors"
+              >
+                Join GOYA
+              </Link>
+            </div>
+          )}
         </div>
       )}
 
