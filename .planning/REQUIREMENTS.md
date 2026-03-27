@@ -1,92 +1,171 @@
-# Requirements: GOYA v2 — v1.1 Connections & Inbox
+# Requirements: GOYA v2
 
-**Defined:** 2026-03-23
+**Defined:** 2026-03-27
 **Core Value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## v1.1 Requirements
+## v1.8 Requirements
 
-### Database
+Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 
-- [x] **DB-01**: A `connections` table exists with requester_id, recipient_id, type (`peer`/`mentorship`/`faculty`), status (`pending`/`accepted`/`declined`), and timestamps
-- [x] **DB-02**: RLS policies on `connections` ensure users can only read/write their own connections
-- [x] **DB-03**: Migration is committed to `supabase/migrations/` and pushed via `npx supabase db push`
-- [ ] **DB-04**: `ConnectionsContext` and `ConnectButton` read from and write to Supabase (localStorage mock and `connections-data.ts` removed)
+### Encrypted Key Management
 
-### Profile Page
+- [ ] **KEYS-01**: Admin can store third-party API keys encrypted with AES-256-GCM in Supabase
+- [ ] **KEYS-02**: Server-side encryption/decryption service using SECRETS_MASTER_KEY env variable
+- [ ] **KEYS-03**: Admin can add AI provider keys with provider (OpenAI/Anthropic) and model selection
+- [ ] **KEYS-04**: AI Providers section shows display name, provider, model, created date — never raw key
+- [ ] **KEYS-05**: Admin can edit and delete AI provider keys
+- [ ] **KEYS-06**: General third-party keys CRUD with category filter (Auth, Analytics, Payments, Other)
+- [ ] **KEYS-07**: Third Party Keys tab in /admin/api-keys fully implemented (replaces placeholder)
+- [ ] **KEYS-08**: SECRETS_MASTER_KEY added to .env.local.example with openssl generation command
 
-- [ ] **PROF-01**: Student viewing a teacher profile sees "Request Mentorship" instead of "Connect"
-- [ ] **PROF-02**: Teacher or wellness practitioner viewing a school profile sees "Apply as Faculty"
-- [ ] **PROF-03**: Teacher viewing a school they own sees "Manage School" instead of "Apply as Faculty"
-- [ ] **PROF-04**: Teacher viewing another teacher profile sees the standard "Connect" button
+### Chat Widget
 
-### Settings — Connections
+- [ ] **CHAT-01**: Floating chat button visible on all public pages, hidden on /admin/* routes
+- [ ] **CHAT-02**: Chat window opens as 380x560px panel on desktop, fullscreen on mobile
+- [ ] **CHAT-03**: Chat header with Mattea avatar, name, online indicator
+- [ ] **CHAT-04**: Message bubbles (user right, Mattea left with avatar) with text input and send button
+- [ ] **CHAT-05**: "New Chat" button starts fresh conversation, "Delete" button clears history
+- [ ] **CHAT-06**: Opening greeting: "Namaste! I'm Mattea, your GOYA guide. How can I help you today?"
+- [ ] **CHAT-07**: Logged-in users' chats persist by user ID in Supabase
+- [ ] **CHAT-08**: Guest users' chats persist via anonymous session ID with cookie
+- [ ] **CHAT-09**: Returning users see previous conversation, not blank chat
+- [ ] **CHAT-10**: Escalation triggers when: low confidence, explicit human request, or 2 failed attempts
+- [ ] **CHAT-11**: Escalation message shown to user with 48-hour response promise
+- [ ] **CHAT-12**: Widget only visible when chatbot is_active in config (checked via public endpoint)
 
-- [ ] **CONN-01**: User can view connections in tabs: My Connections, My Mentors, My Mentees, My Faculty, My Schools (principal teacher tab only for school owners)
-- [ ] **CONN-02**: Each connection entry shows current status (pending sent / accepted)
-- [ ] **CONN-03**: User can remove an accepted connection
+### Admin Chatbot
 
-### Settings — Inbox
+- [ ] **ADMIN-01**: /admin/chatbot page with sidebar entry between Audit Log and API Keys
+- [ ] **ADMIN-02**: Four tabs styled like /admin/settings: Configuration, FAQ, Conversations, API Connections
+- [ ] **ADMIN-03**: Configuration: chatbot name, profile image upload, active toggle, AI key selector, system prompt, guest retention days
+- [ ] **ADMIN-04**: Default avatar downloaded from GOYA website and stored in Supabase storage
+- [ ] **ADMIN-05**: FAQ tab with search, Add FAQ button, table with Question/Answer/Status/Actions
+- [ ] **ADMIN-06**: FAQ inline editing with dropdown expand, Save/Cancel, Published/Draft toggle
+- [ ] **ADMIN-07**: Conversations tab listing all sessions with user/guest info, message count, escalation badge
+- [ ] **ADMIN-08**: Conversation viewer shows full read-only chat history
+- [ ] **ADMIN-09**: Conversations filterable by all/logged-in/guests/escalated, searchable by name/ID
+- [ ] **ADMIN-10**: API Connections tab with toggleable tools (Events, Teachers, Courses, FAQ)
+- [ ] **ADMIN-11**: Each tool shows description and enable/disable toggle
 
-- [ ] **INBOX-01**: User can view all incoming connection requests (peer, mentorship, faculty) in a list
-- [ ] **INBOX-02**: User can accept or decline each request from the inbox
-- [ ] **INBOX-03**: User can filter requests by type (all / peer / mentorship / faculty)
-- [ ] **INBOX-04**: Notification dropdown link updated from "View all messages" to "View all" pointing to `/settings/inbox`
+### Support Tickets
 
-### Admin
+- [ ] **SUPP-01**: Support Tickets tab added to /admin/inbox (third tab)
+- [ ] **SUPP-02**: Table with User, Question, Created, Status (Open/In Progress/Resolved), Actions
+- [ ] **SUPP-03**: View action opens escalated conversation with reply field
+- [ ] **SUPP-04**: Admin reply stored and delivered to user (in-app or in widget for guests)
+- [ ] **SUPP-05**: Status toggle between Open, In Progress, Resolved
 
-- [ ] **ADM-01**: Admin can view any user's connections in a Connections tab on the user detail page
-- [ ] **ADM-02**: Admin can remove any connection from the user's Connections tab
+### AI Backend
+
+- [ ] **AI-01**: POST /api/chatbot/message endpoint accepting session_id, message, anonymous_id
+- [ ] **AI-02**: Reads chatbot config (active key, model, system prompt, enabled tools) from DB
+- [ ] **AI-03**: Decrypts selected AI provider key server-side using SECRETS_MASTER_KEY
+- [ ] **AI-04**: Calls OpenAI or Anthropic based on provider, with streaming response
+- [ ] **AI-05**: FAQ items injected as context in system prompt (XML-delimited)
+- [ ] **AI-06**: Full conversation history passed for session continuity
+- [ ] **AI-07**: Enabled tools registered as function definitions for AI provider
+- [ ] **AI-08**: User and assistant messages saved to chat_messages table
+- [ ] **AI-09**: Escalation detection creates support_ticket and returns escalation flag
+- [ ] **AI-10**: Rate limited: max 20 messages per session per hour (distributed)
+- [ ] **AI-11**: Public endpoint (no auth for guests) with session validation
+
+### Infrastructure
+
+- [ ] **INFRA-01**: Supabase migration: secrets table with admin-only RLS
+- [ ] **INFRA-02**: Supabase migration: chatbot_config single-row upsert table
+- [ ] **INFRA-03**: Supabase migration: faq_items table with admin write, public read for chatbot
+- [ ] **INFRA-04**: Supabase migration: chat_sessions and chat_messages tables with session-owner RLS
+- [ ] **INFRA-05**: Supabase migration: support_tickets table with admin-only RLS and session FK
+- [ ] **INFRA-06**: Guest chat cleanup cron endpoint for expired sessions
+- [ ] **INFRA-07**: Node.js runtime for chat route (not Edge — crypto module required)
 
 ## Future Requirements
 
-### Notifications
+### Deferred to v2+
 
-- **NOTF-01**: User receives email notification when a connection request is accepted
-- **NOTF-02**: User can configure notification preferences for connection events
-
-### Connections Extended
-
-- **CONN-EXT-01**: User can search/filter their connections list
-- **CONN-EXT-02**: User can export their connections
+- **DEFER-01**: Voice input/output for chat widget
+- **DEFER-02**: Fine-tuning from conversation history (GDPR compliance required)
+- **DEFER-03**: Live agent handoff (real-time WebSocket) — async ticket escalation sufficient for current scale
+- **DEFER-04**: pgvector embedding for FAQ items (RAG with cosine similarity search)
+- **DEFER-05**: Confidence-gated responses based on cosine similarity threshold
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Notification preferences UI | Deferred from v1.0 — separate milestone |
-| Account deletion | High-risk operation, deferred |
-| Password change in settings | Handled via forgot-password flow |
-| DMs in Inbox | Inbox is connection requests only; DMs handled by /messages |
-| Connection recommendations | Algorithmic feature, deferred to v2+ |
-| Bulk connection management | Low priority for v1.1 |
+| Multi-language chatbot | Single-language (English/German) sufficient for GOYA community |
+| WhatsApp/Telegram integration | Web-only chatbot covers primary use case |
+| Payment processing in chat | Handled via existing Stripe integration, not chatbot |
+| User-specific tools (credits, enrollments) | Requires auth-gated tool access; defer to v2 |
+| Notification preferences | Out of scope since v1.0 |
+| Account deletion in settings | High-risk operation, deferred |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | Phase 4 | Complete |
-| DB-02 | Phase 4 | Complete |
-| DB-03 | Phase 4 | Complete |
-| DB-04 | Phase 4 | Pending |
-| PROF-01 | Phase 5 | Pending |
-| PROF-02 | Phase 5 | Pending |
-| PROF-03 | Phase 5 | Pending |
-| PROF-04 | Phase 5 | Pending |
-| CONN-01 | Phase 6 | Pending |
-| CONN-02 | Phase 6 | Pending |
-| CONN-03 | Phase 6 | Pending |
-| INBOX-01 | Phase 6 | Pending |
-| INBOX-02 | Phase 6 | Pending |
-| INBOX-03 | Phase 6 | Pending |
-| INBOX-04 | Phase 6 | Pending |
-| ADM-01 | Phase 7 | Pending |
-| ADM-02 | Phase 7 | Pending |
+| KEYS-01 | — | Pending |
+| KEYS-02 | — | Pending |
+| KEYS-03 | — | Pending |
+| KEYS-04 | — | Pending |
+| KEYS-05 | — | Pending |
+| KEYS-06 | — | Pending |
+| KEYS-07 | — | Pending |
+| KEYS-08 | — | Pending |
+| CHAT-01 | — | Pending |
+| CHAT-02 | — | Pending |
+| CHAT-03 | — | Pending |
+| CHAT-04 | — | Pending |
+| CHAT-05 | — | Pending |
+| CHAT-06 | — | Pending |
+| CHAT-07 | — | Pending |
+| CHAT-08 | — | Pending |
+| CHAT-09 | — | Pending |
+| CHAT-10 | — | Pending |
+| CHAT-11 | — | Pending |
+| CHAT-12 | — | Pending |
+| ADMIN-01 | — | Pending |
+| ADMIN-02 | — | Pending |
+| ADMIN-03 | — | Pending |
+| ADMIN-04 | — | Pending |
+| ADMIN-05 | — | Pending |
+| ADMIN-06 | — | Pending |
+| ADMIN-07 | — | Pending |
+| ADMIN-08 | — | Pending |
+| ADMIN-09 | — | Pending |
+| ADMIN-10 | — | Pending |
+| ADMIN-11 | — | Pending |
+| SUPP-01 | — | Pending |
+| SUPP-02 | — | Pending |
+| SUPP-03 | — | Pending |
+| SUPP-04 | — | Pending |
+| SUPP-05 | — | Pending |
+| AI-01 | — | Pending |
+| AI-02 | — | Pending |
+| AI-03 | — | Pending |
+| AI-04 | — | Pending |
+| AI-05 | — | Pending |
+| AI-06 | — | Pending |
+| AI-07 | — | Pending |
+| AI-08 | — | Pending |
+| AI-09 | — | Pending |
+| AI-10 | — | Pending |
+| AI-11 | — | Pending |
+| INFRA-01 | — | Pending |
+| INFRA-02 | — | Pending |
+| INFRA-03 | — | Pending |
+| INFRA-04 | — | Pending |
+| INFRA-05 | — | Pending |
+| INFRA-06 | — | Pending |
+| INFRA-07 | — | Pending |
 
 **Coverage:**
-- v1.1 requirements: 17 total
-- Mapped to phases: 17
-- Unmapped: 0 ✓
+- v1.8 requirements: 49 total
+- Mapped to phases: 0
+- Unmapped: 49
 
 ---
-*Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 — traceability populated after roadmap creation*
+*Requirements defined: 2026-03-27*
+*Last updated: 2026-03-27 after initial definition*
