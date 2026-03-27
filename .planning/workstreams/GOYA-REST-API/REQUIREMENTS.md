@@ -68,31 +68,31 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TABS-01 | — | Pending |
-| TABS-02 | — | Pending |
-| KEYS-01 | — | Pending |
-| KEYS-02 | — | Pending |
-| SECR-01 | — | Pending |
-| SECR-02 | — | Pending |
-| SECR-03 | — | Pending |
-| SECR-04 | — | Pending |
-| SECR-05 | — | Pending |
-| SECR-06 | — | Pending |
-| SECR-07 | — | Pending |
-| SECR-08 | — | Pending |
-| SECR-09 | — | Pending |
-| SECR-10 | — | Pending |
-| SECR-11 | — | Pending |
-| ENDP-01 | — | Pending |
-| ENDP-02 | — | Pending |
-| ENDP-03 | — | Pending |
-| ENDP-04 | — | Pending |
+| TABS-01 | Phase 9 | Pending |
+| TABS-02 | Phase 9 | Pending |
+| KEYS-01 | Phase 9 | Pending |
+| KEYS-02 | Phase 9 | Pending |
+| SECR-01 | Phase 10 | Pending |
+| SECR-02 | Phase 10 | Pending |
+| SECR-03 | Phase 10 | Pending |
+| SECR-04 | Phase 10 | Pending |
+| SECR-05 | Phase 10 | Pending |
+| SECR-06 | Phase 10 | Pending |
+| SECR-07 | Phase 10 | Pending |
+| SECR-08 | Phase 10 | Pending |
+| SECR-09 | Phase 10 | Pending |
+| SECR-10 | Phase 10 | Pending |
+| SECR-11 | Phase 10 | Pending |
+| ENDP-01 | Phase 11 | Pending |
+| ENDP-02 | Phase 11 | Pending |
+| ENDP-03 | Phase 11 | Pending |
+| ENDP-04 | Phase 11 | Pending |
 
 **Coverage:**
 - v1.7 requirements: 19 total
-- Mapped to phases: 0
-- Unmapped: 19 ⚠️
+- Mapped to phases: 19
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-27*
-*Last updated: 2026-03-27 after initial definition*
+*Last updated: 2026-03-27 after roadmap creation*
