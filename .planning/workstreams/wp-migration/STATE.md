@@ -18,14 +18,14 @@ See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 
 ## Current Position
 **Status:** In progress
-**Current Phase:** Phase 1 (complete)
-**Current Plan:** 02-01 (next)
+**Current Phase:** Phase 2 (in progress)
+**Current Plan:** 02-02 (next)
 **Last Activity:** 2026-03-27
-**Last Activity Description:** Completed Plan 01-02 — BuddyBoss xprofile, avatar URL, and WooCommerce subscription enrichment; active subscription filter activated
+**Last Activity Description:** Completed Plan 02-01 — Migration infrastructure (requires_password_reset column, .gitignore, README) and 25 dummy test users in WP export format
 
 ## Progress
 **Phases Complete:** 1 (Phase 1 — WP Export Plugin)
-**Plans Complete:** 2 (01-01, 01-02)
+**Plans Complete:** 3 (01-01, 01-02, 02-01)
 
 ## Decisions Made
 
@@ -38,6 +38,8 @@ See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 | 2026-03-27 | Direct SQL JOIN on bp_xprofile_data + bp_xprofile_fields | Avoids N+1 queries; single round trip for all xprofile field values |
 | 2026-03-27 | Skip (legacy) groups via stripos on group name | Preserves forward compatibility if new legacy groups are added |
 | 2026-03-27 | Post-enrichment array_filter for active subscription status | Subscription data must be populated before filtering |
+| 2026-03-27 | dummy-users.json git-ignored by design; only migration/README.md committed | migration/*.json rule protects real user export data |
+| 2026-03-27 | Applied 20260354 migration via supabase db query --linked (bypassed db push conflict) | Pre-existing out-of-order migration conflict blocks db push; direct query confirmed successful |
 
 ## Performance Metrics
 
@@ -45,7 +47,8 @@ See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 |-------|------|----------|-------|-------|
 | 01 | 01 | 1m 32s | 1/1 | 1 |
 | 01 | 02 | 5m | 2/2 | 1 |
+| 02 | 01 | ~5m | 2/2 | 4 |
 
 ## Session Continuity
-**Stopped At:** Completed 01-02-PLAN.md (BuddyBoss + WooCommerce enrichment — Phase 1 complete)
-**Resume File:** .planning/workstreams/wp-migration/phases/01-wp-export-plugin/01-02-SUMMARY.md
+**Stopped At:** Completed 02-01-PLAN.md (Migration infrastructure + 25 dummy test users)
+**Resume File:** .planning/workstreams/wp-migration/phases/02-import-script-test-data/02-01-SUMMARY.md

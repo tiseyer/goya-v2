@@ -39,7 +39,7 @@ Plans:
   5. migration/*.json is in .gitignore and migration/README.md documents the full pipeline
 **Plans:** 2 plans
 Plans:
-- [ ] 02-01-PLAN.md — Infrastructure (gitignore, Supabase migration, README) and 25 dummy test users
+- [x] 02-01-PLAN.md — Infrastructure (gitignore, Supabase migration, README) and 25 dummy test users
 - [ ] 02-02-PLAN.md — Import script with skip/overwrite modes, field mapping, and test run
 
 ### Phase 3: Password Reset Flow
@@ -73,6 +73,6 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. WP Export Plugin | 2/2 | Complete | 2026-03-27 |
-| 2. Import Script & Test Data | 0/2 | In progress | - |
+| 2. Import Script & Test Data | 1/2 | In progress | - |
 | 3. Password Reset Flow | 0/? | Not started | - |
 | 4. Admin Migration Page | 0/? | Not started | - |
