@@ -113,7 +113,7 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 ### Documentation
 
-- [ ] **DOCS-01**: `API_DOCS.md` documents every endpoint with example request/response
+- [x] **DOCS-01**: `API_DOCS.md` documents every endpoint with example request/response
 
 ## Future Requirements
 
@@ -198,7 +198,7 @@ None — full spec included in v1.6.
 | AKUI-01 | Phase 8 | Complete |
 | AKUI-02 | Phase 8 | Complete |
 | AKUI-03 | Phase 8 | Complete |
-| DOCS-01 | Phase 8 | Pending |
+| DOCS-01 | Phase 8 | Complete |
 
 **Coverage:**
 - v1.6 requirements: 55 total

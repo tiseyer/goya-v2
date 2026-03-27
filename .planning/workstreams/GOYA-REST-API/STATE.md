@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: milestone
-status: Executing Phase 08
-stopped_at: "Paused at checkpoint: 08-01 Task 3 human-verify"
-last_updated: "2026-03-27T02:23:34.340Z"
+status: Ready to execute
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-27T02:24:19.136Z"
 progress:
   total_phases: 8
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 20
-  completed_plans: 19
+  completed_plans: 20
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 08 (admin-ui-and-documentation) — EXECUTING
-Plan: 1 of 2
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Plan: 1 of 2
 | Phase 07 P04 | 2 | 2 tasks | 4 files |
 | Phase 07-addons-admin-settings-webhooks P02 | 2 | 2 tasks | 3 files |
 | Phase 08-admin-ui-and-documentation P01 | 3 | 2 tasks | 4 files |
+| Phase 08-admin-ui-and-documentation P02 | 10 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,8 @@ Plan: 1 of 2
 - [Phase 07]: ALREADY_ASSIGNED returned as const string for pattern-matching in route handler — consistent with event ALREADY_REGISTERED
 - [Phase 07]: addonId in DELETE /addons/users/:userId/:addonId is user_designations.id (assignment row), not product ID
 - [Phase 08-admin-ui-and-documentation]: createApiKey returns rawKey in server action response — shown once, never persisted to client state after dismiss
+- [Phase 08-admin-ui-and-documentation]: Analytics endpoints documented as requiring read (not admin) — matches actual implementation
+- [Phase 08-admin-ui-and-documentation]: DELETE /addons/users/:userId/:addonId takes user_designations.id (assignment row ID), not product ID — documented in API_DOCS.md
 
 ### Pending Todos
 
@@ -129,6 +132,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T02:23:34.336Z
-Stopped at: Paused at checkpoint: 08-01 Task 3 human-verify
+Last session: 2026-03-27T02:24:19.133Z
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None

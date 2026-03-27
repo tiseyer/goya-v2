@@ -13,7 +13,7 @@ Build a complete REST API under `/api/v1/` that exposes every GOYA entity to ext
 - [x] **Phase 5: Credits & Verifications** - Credits CRUD with summary endpoint + verifications CRUD (completed 2026-03-26)
 - [x] **Phase 6: Analytics** - Five analytics aggregation endpoints (completed 2026-03-26)
 - [x] **Phase 7: Add-ons, Admin Settings & Webhooks** - Add-ons CRUD with user assignments, admin settings, incoming webhook endpoints (completed 2026-03-27)
-- [ ] **Phase 8: Admin UI & Documentation** - API key management page in admin panel + full API reference
+- [x] **Phase 8: Admin UI & Documentation** - API key management page in admin panel + full API reference (completed 2026-03-27)
 
 ## Phase Details
 
@@ -138,4 +138,4 @@ Plans:
 | 5. Credits & Verifications | 2/2 | Complete   | 2026-03-26 |
 | 6. Analytics | 2/2 | Complete   | 2026-03-26 |
 | 7. Add-ons, Admin Settings & Webhooks | 4/4 | Complete   | 2026-03-27 |
-| 8. Admin UI & Documentation | 0/? | Not started | - |
+| 8. Admin UI & Documentation | 2/2 | Complete   | 2026-03-27 |
