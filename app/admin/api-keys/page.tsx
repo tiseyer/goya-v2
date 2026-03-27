@@ -2,8 +2,10 @@ import Link from 'next/link'
 import { getSupabaseService } from '@/lib/supabase/service'
 import type { ApiKeyRow } from '@/lib/api/types'
 import OwnKeysTab from './OwnKeysTab'
-import SecretsPlaceholder from './SecretsPlaceholder'
+import SecretsTab from './SecretsTab'
 import EndpointsPlaceholder from './EndpointsPlaceholder'
+import { listSecrets, seedSecrets } from './secrets-actions'
+import type { SecretListItem } from './secrets-actions'
 
 export default async function ApiKeysPage({
   searchParams,
@@ -31,6 +33,11 @@ export default async function ApiKeysPage({
   }
 
   const apiKeys = (keys ?? []) as ApiKeyRow[]
+
+  // Seed placeholder entries on first visit (no-op if already seeded)
+  await seedSecrets()
+  const secretsResult = await listSecrets()
+  const initialSecrets: SecretListItem[] = secretsResult.success ? secretsResult.secrets : []
 
   return (
     <div className="p-6 lg:p-8">
@@ -82,7 +89,7 @@ export default async function ApiKeysPage({
 
       {/* Tab content */}
       {activeTab === 'keys' && <OwnKeysTab initialKeys={apiKeys} />}
-      {activeTab === 'secrets' && <SecretsPlaceholder />}
+      {activeTab === 'secrets' && <SecretsTab initialSecrets={initialSecrets} />}
       {activeTab === 'endpoints' && <EndpointsPlaceholder />}
     </div>
   )

@@ -208,6 +208,53 @@ export async function updateSecret(
 }
 
 /**
+ * Seed placeholder entries for known third-party keys.
+ * No-op if admin_secrets already has any rows.
+ */
+export async function seedSecrets(): Promise<void> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { count } = await (getSupabaseService() as any)
+      .from('admin_secrets')
+      .select('id', { count: 'exact', head: true })
+
+    if (count !== null && count > 0) {
+      return // Already seeded
+    }
+
+    const seeds: Array<{ key_name: string; category: SecretCategory; description: string }> = [
+      // Auth
+      { key_name: 'GOOGLE_CLIENT_ID', category: 'Auth', description: 'Google OAuth client ID' },
+      { key_name: 'GOOGLE_CLIENT_SECRET', category: 'Auth', description: 'Google OAuth client secret' },
+      { key_name: 'APPLE_SERVICE_ID', category: 'Auth', description: 'Apple Sign-In service ID' },
+      { key_name: 'APPLE_PRIVATE_KEY', category: 'Auth', description: 'Apple Sign-In private key' },
+      // Analytics
+      { key_name: 'GA4_MEASUREMENT_ID', category: 'Analytics', description: 'Google Analytics 4 measurement ID' },
+      { key_name: 'CLARITY_PROJECT_ID', category: 'Analytics', description: 'Microsoft Clarity project ID' },
+      { key_name: 'META_PIXEL_ID', category: 'Analytics', description: 'Meta/Facebook Pixel ID' },
+      // AI
+      { key_name: 'ANTHROPIC_API_KEY', category: 'AI', description: 'Anthropic API key for Claude' },
+    ]
+
+    const { encrypted, iv } = encrypt('REPLACE_ME')
+
+    const rows = seeds.map((s) => ({
+      key_name: s.key_name,
+      encrypted_value: encrypted,
+      iv,
+      category: s.category,
+      description: s.description,
+      created_by: null,
+    }))
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (getSupabaseService() as any).from('admin_secrets').insert(rows)
+  } catch {
+    // Seed failure is non-fatal — UI still works without placeholder entries
+  }
+}
+
+/**
  * Hard-delete a secret by ID.
  */
 export async function deleteSecret(
