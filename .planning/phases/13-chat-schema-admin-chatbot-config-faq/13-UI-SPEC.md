@@ -180,7 +180,7 @@ Question | Answer | Status | Created | By | Actions
 Row: [truncated Q] | [truncated A] | [Published] | date | name | Edit  Delete
   ↳ [expanded] Question textarea full-width
                 Answer textarea full-width
-                [Save]  [Cancel]
+                [Save Changes]  [Discard Changes]
 ```
 
 Conversations Tab (placeholder):
@@ -231,7 +231,7 @@ API Connections Tab (placeholder):
 | Empty (no FAQ entries) | Centered: icon + "No FAQ entries yet" heading + body + "Add FAQ" button |
 | Search with no results | Centered: "No FAQ entries match your search." (no button) |
 | Row hover | `hover:bg-slate-50` |
-| Row expanded (edit mode) | Row expands inline below truncated view — Question textarea + Answer textarea + "Save" (primary) + "Cancel" (text button) |
+| Row expanded (edit mode) | Row expands inline below truncated view — Question textarea + Answer textarea + "Save Changes" (primary) + "Discard Changes" (text button) |
 | Only one row expanded at a time | Opening a new row collapses the currently open one |
 | Status badge click | Optimistic toggle — badge color swaps immediately, server action runs in background |
 | Status toggle saving | Badge opacity 60% during save |
@@ -294,8 +294,8 @@ API Connections Tab (placeholder):
 | FAQ status badge: draft | "Draft" |
 | FAQ row action: edit | "Edit" |
 | FAQ row action: delete | "Delete" |
-| FAQ inline edit save | "Save" |
-| FAQ inline edit cancel | "Cancel" |
+| FAQ inline edit save | "Save Changes" |
+| FAQ inline edit cancel | "Discard Changes" |
 | FAQ delete confirm prompt | "Sure?" |
 | FAQ delete confirm button | "Delete" |
 | FAQ delete cancel | "Keep Entry" |
@@ -319,7 +319,7 @@ API Connections Tab (placeholder):
 
 Destructive actions in this phase:
 1. **Delete FAQ entry** — inline confirmation within the row: "Sure?" + red "Delete" button + "Keep Entry". No separate modal dialog.
-   - "Keep Entry" used instead of "Cancel" to distinguish from the edit-mode "Cancel" button that may be visible simultaneously.
+   - "Keep Entry" used instead of "Cancel" to distinguish from the edit-mode "Discard Changes" button that may be visible simultaneously.
    - Matches inline pattern established in SecretsTab and AiProvidersSection.
 
 ---
