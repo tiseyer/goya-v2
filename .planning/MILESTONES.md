@@ -1,5 +1,34 @@
 # Milestones
 
+## v1.6 Open Gates (Shipped: 2026-03-27)
+
+**Phases completed:** 8 phases, 20 plans, 27 tasks
+
+**Key accomplishments:**
+
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- lib/api/services/users.ts
+- lib/api/services/users.ts (additions)
+- Five-endpoint events API with paginated list (5 filters), create/update/delete with field validation, soft-delete via deleted_at, and audit logging on all write operations
+- One-liner:
+- Five-endpoint courses REST API with soft-delete support: migration, service layer, and route handlers following Phase 03 events pattern
+- Enrollment sub-resources for courses: list, enroll with duplicate detection, and progress update with auto-completed_at timestamps against user_course_progress table
+- 5 credits REST endpoints (list/create/detail/update-status/summary) with paginated filtering, field allowlist PATCH, and per-user approved-credit aggregation by type
+- 5-endpoint verifications REST API over profiles table with is_verified auto-sync and audit logging for all write operations
+- Three analytics REST endpoints wrapping computeFunnelMetrics + computeRevenueMetrics from local Supabase tables — no Stripe API calls, with auto time-series granularity selection
+- Parallel-query engagement analytics (events/registrations/courses/enrollments) and credit submission statistics aggregated in JS, exposed via two authenticated GET endpoints with date filtering
+- One-liner:
+- One-liner:
+- Admin settings CRUD over REST API — four endpoints reading/writing site_settings table, all enforcing admin permission with audit logging on writes
+- Three incoming webhook POST endpoints (trigger, payment, notify) with typed validation, console logging, and audit trail — integration points for external automation tools like Make.com
+- Admin CRUD UI for API keys with one-time raw key display, optimistic revoke, and usage stats table.
+- Comprehensive API_DOCS.md (1958 lines, 49 endpoints, 10 resource categories) with auth, rate limiting, full request/response examples for every route in Phases 1-7
+
+---
+
 ## v1.3 Subscriptions & Teacher Upgrade (Shipped: 2026-03-26)
 
 **Phases completed:** 7 phases (14–20), 10 plans, 29 requirements
