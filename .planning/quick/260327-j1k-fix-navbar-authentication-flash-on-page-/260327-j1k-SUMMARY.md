@@ -20,7 +20,7 @@ decisions:
 metrics:
   duration: ~3min
   completed: 2026-03-27
-  tasks_completed: 1
+  tasks_completed: 2
   tasks_total: 2
   files_modified: 1
 ---
@@ -54,12 +54,14 @@ None — plan executed exactly as written.
 | Task | Description | Commit |
 |------|-------------|--------|
 | 1 | Add auth loading state and skeleton placeholders | 8c31667 |
+| 2 | Human verification checkpoint | Approved |
 
-## Status
+## Known Stubs
 
-Awaiting human verification at checkpoint (Task 2).
+None.
 
 ## Self-Check: PASSED
 
-- File exists: app/components/Header.tsx — FOUND
-- Commit 8c31667 — FOUND
+- File exists: app/components/Header.tsx -- FOUND
+- Commit 8c31667 -- FOUND
+- Human verification: APPROVED
