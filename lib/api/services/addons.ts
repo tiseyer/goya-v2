@@ -184,3 +184,85 @@ export async function deleteAddon(id: string) {
 
   return { data, error };
 }
+
+// ---------------------------------------------------------------------------
+// User-addon assignment functions (user_designations table)
+// ---------------------------------------------------------------------------
+
+export interface AssignAddonParams {
+  stripe_product_id: string;
+  stripe_price_id: string;
+}
+
+/**
+ * Return all active add-on designations for a user, joined with product info.
+ * Per ADON-06.
+ */
+export async function getUserAddons(userId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = getSupabaseService() as any;
+
+  const { data, error } = await supabase
+    .from('user_designations')
+    .select('*, products(name, full_name, category, slug)')
+    .eq('user_id', userId)
+    .is('deleted_at', null);
+
+  return { data, error };
+}
+
+/**
+ * Assign a product to a user by inserting a user_designations row.
+ * Returns ALREADY_ASSIGNED if the user already has an active assignment for that product.
+ * Per ADON-07.
+ */
+export async function assignAddonToUser(userId: string, params: AssignAddonParams) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = getSupabaseService() as any;
+
+  // Check for existing active assignment
+  const { data: existing } = await supabase
+    .from('user_designations')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('stripe_product_id', params.stripe_product_id)
+    .is('deleted_at', null)
+    .maybeSingle();
+
+  if (existing) {
+    return { data: null, error: 'ALREADY_ASSIGNED' as const };
+  }
+
+  const { data, error } = await supabase
+    .from('user_designations')
+    .insert({
+      user_id: userId,
+      stripe_product_id: params.stripe_product_id,
+      stripe_price_id: params.stripe_price_id,
+    })
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+/**
+ * Soft-delete a user_designations row (assignment) by setting deleted_at.
+ * addonId is the user_designations.id (assignment row ID, not the product ID).
+ * Per ADON-08.
+ */
+export async function removeAddonFromUser(userId: string, addonId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = getSupabaseService() as any;
+
+  const { data, error } = await supabase
+    .from('user_designations')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', addonId)
+    .eq('user_id', userId)
+    .is('deleted_at', null)
+    .select()
+    .single();
+
+  return { data, error };
+}
