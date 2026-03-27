@@ -1,5 +1,19 @@
 # Milestones
 
+## v1.7 API Settings Page (Shipped: 2026-03-27)
+
+**Phases completed:** 3 phases (9-11), 4 plans, 19 requirements
+
+**Key accomplishments:**
+
+- Three-tab admin interface at `/admin/api-keys` (Own Keys, Third Party Keys, Endpoints)
+- AES-256-GCM encrypted secrets manager with admin-only RLS, category filter, search, CRUD modals
+- Auto-generated endpoint documentation tab displaying 52 API endpoints across 10 domain categories
+- SECRETS_MASTER_KEY env var with server-side encryption service (lib/secrets/encryption.ts)
+- 8 pre-populated placeholder entries for known third-party keys (Google OAuth, GA4, Clarity, Meta Pixel, Anthropic)
+
+---
+
 ## v1.6 Open Gates (Shipped: 2026-03-27)
 
 **Phases completed:** 8 phases, 20 plans, 27 tasks
