@@ -80,9 +80,9 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 - [x] **ADON-03**: POST `/addons` creates an add-on
 - [x] **ADON-04**: PATCH `/addons/:id` updates an add-on
 - [x] **ADON-05**: DELETE `/addons/:id` deletes an add-on
-- [ ] **ADON-06**: GET `/addons/users/:userId` returns add-ons assigned to user
-- [ ] **ADON-07**: POST `/addons/users/:userId` assigns add-on to user
-- [ ] **ADON-08**: DELETE `/addons/users/:userId/:addonId` removes add-on from user
+- [x] **ADON-06**: GET `/addons/users/:userId` returns add-ons assigned to user
+- [x] **ADON-07**: POST `/addons/users/:userId` assigns add-on to user
+- [x] **ADON-08**: DELETE `/addons/users/:userId/:addonId` removes add-on from user
 
 ### Admin Settings
 
@@ -93,9 +93,9 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 ### Webhooks (Incoming)
 
-- [ ] **WHKN-01**: POST `/webhooks/trigger` accepts generic event with type + payload
-- [ ] **WHKN-02**: POST `/webhooks/payment` accepts payment events
-- [ ] **WHKN-03**: POST `/webhooks/notify` sends notification to user(s)
+- [x] **WHKN-01**: POST `/webhooks/trigger` accepts generic event with type + payload
+- [x] **WHKN-02**: POST `/webhooks/payment` accepts payment events
+- [x] **WHKN-03**: POST `/webhooks/notify` sends notification to user(s)
 
 ### Pagination & Sorting
 
@@ -107,9 +107,9 @@ Requirements for the Open Gates milestone. Each maps to roadmap phases.
 
 ### Admin UI
 
-- [ ] **AKUI-01**: Admin page at `/admin/api-keys` for creating API keys
-- [ ] **AKUI-02**: Admin page at `/admin/api-keys` for revoking API keys
-- [ ] **AKUI-03**: Admin page at `/admin/api-keys` for viewing API key usage
+- [x] **AKUI-01**: Admin page at `/admin/api-keys` for creating API keys
+- [x] **AKUI-02**: Admin page at `/admin/api-keys` for revoking API keys
+- [x] **AKUI-03**: Admin page at `/admin/api-keys` for viewing API key usage
 
 ### Documentation
 
@@ -185,19 +185,19 @@ None — full spec included in v1.6.
 | ADON-03 | Phase 7 | Complete |
 | ADON-04 | Phase 7 | Complete |
 | ADON-05 | Phase 7 | Complete |
-| ADON-06 | Phase 7 | Pending |
-| ADON-07 | Phase 7 | Pending |
-| ADON-08 | Phase 7 | Pending |
+| ADON-06 | Phase 7 | Complete |
+| ADON-07 | Phase 7 | Complete |
+| ADON-08 | Phase 7 | Complete |
 | ADMN-01 | Phase 7 | Complete |
 | ADMN-02 | Phase 7 | Complete |
 | ADMN-03 | Phase 7 | Complete |
 | ADMN-04 | Phase 7 | Complete |
-| WHKN-01 | Phase 7 | Pending |
-| WHKN-02 | Phase 7 | Pending |
-| WHKN-03 | Phase 7 | Pending |
-| AKUI-01 | Phase 8 | Pending |
-| AKUI-02 | Phase 8 | Pending |
-| AKUI-03 | Phase 8 | Pending |
+| WHKN-01 | Phase 7 | Complete |
+| WHKN-02 | Phase 7 | Complete |
+| WHKN-03 | Phase 7 | Complete |
+| AKUI-01 | Phase 8 | Complete |
+| AKUI-02 | Phase 8 | Complete |
+| AKUI-03 | Phase 8 | Complete |
 | DOCS-01 | Phase 8 | Pending |
 
 **Coverage:**
