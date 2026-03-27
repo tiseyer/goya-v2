@@ -46,7 +46,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
     .select('id, email, full_name, username, role, subscription_status, is_verified, created_at, avatar_url, member_type', { count: 'exact' });
 
   if (search) {
-    query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,username.ilike.%${search}%`);
+    query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,username.ilike.%${search}%,mrn.ilike.%${search}%`);
   }
   if (role) {
     query = query.eq('role', role);

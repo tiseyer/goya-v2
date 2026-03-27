@@ -33,7 +33,7 @@ export default async function AdminUserDetailPage({
   // Fetch the target user's profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, email, full_name, username, role, member_type, subscription_status, is_verified, verification_status, onboarding_completed, created_at, avatar_url')
+    .select('id, email, full_name, username, role, member_type, subscription_status, is_verified, verification_status, onboarding_completed, created_at, avatar_url, mrn')
     .eq('id', id)
     .single();
 
@@ -121,6 +121,10 @@ export default async function AdminUserDetailPage({
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
             <h2 className="text-base font-bold text-[#1B3A5C] mb-4">Profile Information</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1">Member Number (MRN)</p>
+                <p className="text-sm text-[#1B3A5C] font-mono">{profile.mrn || '—'}</p>
+              </div>
               <div>
                 <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1">Username</p>
                 <p className="text-sm text-[#1B3A5C]">{profile.username || '—'}</p>

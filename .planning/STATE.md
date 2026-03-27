@@ -84,6 +84,7 @@ None yet.
 | 260327-l8q | Fix theme toggle buttons in navbar dropdown to span full width as segmented control | 2026-03-27 | 98430af | [260327-l8q](./quick/260327-l8q-fix-theme-toggle-buttons-in-navbar-dropd/) |
 | 260327-lpc | Remove label text from theme toggle — show icons only | 2026-03-27 | 6430dad | [260327-lpc](./quick/260327-lpc-remove-label-text-from-theme-toggle-show/) |
 | 260327-ldq | Implement MRN system - generation, storage, uniqueness, backfill | 2026-03-27 | 8938ce5 | [260327-ldq](./quick/260327-ldq-implement-mrn-system-generation-storage-/) |
+| 260327-nep | Admin MRN display and search fixes | 2026-03-27 | — | [260327-nep](./quick/260327-nep-admin-mrn-display-and-search-fixes/) |
 
 ## Session Continuity
 
