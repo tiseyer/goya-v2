@@ -22,7 +22,7 @@ Phases 1–11 covered User Settings, Connections & Inbox, Stripe Admin & Shop, S
 
 **Milestone Goal:** Add an AI-powered support chatbot ("Mattea") with encrypted third-party key management, admin configuration, FAQ knowledge base, tool-use capabilities, and escalation-to-human workflow.
 
-- [ ] **Phase 12: Encrypted Secrets + Key Management** - Secrets infrastructure and Third Party Keys admin UI
+- [x] **Phase 12: Encrypted Secrets + Key Management** - Secrets infrastructure and Third Party Keys admin UI
 - [ ] **Phase 13: Chat Schema + Admin Chatbot Config + FAQ** - All database migrations, chatbot config page, and FAQ management
 - [ ] **Phase 14: AI Backend + Streaming Chat Widget** - AI route, streaming, chat widget, rate limiting
 - [ ] **Phase 15: Escalation + Support Tickets + Conversations Admin** - Escalation flow, support tickets, conversations viewer, cron cleanup
@@ -42,7 +42,7 @@ Phases 1–11 covered User Settings, Connections & Inbox, Stripe Admin & Shop, S
 **Plans**: 2 plans
 Plans:
 - [x] 12-01-PLAN.md — Migration + AI provider constants + server actions
-- [ ] 12-02-PLAN.md — AI Providers UI section + SecretsTab refactor + human-verify
+- [x] 12-02-PLAN.md — AI Providers UI section + SecretsTab refactor + human-verify
 **UI hint**: yes
 
 ### Phase 13: Chat Schema + Admin Chatbot Config + FAQ
