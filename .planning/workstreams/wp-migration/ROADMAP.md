@@ -24,7 +24,7 @@ Build a complete WordPress-to-Supabase user migration pipeline. Phase 1 creates 
   4. Plugin performs zero writes to the WordPress database
 **Plans:** 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — Plugin scaffold, admin page, core WP user export with chunking and filters
+- [x] 01-01-PLAN.md — Plugin scaffold, admin page, core WP user export with chunking and filters
 - [ ] 01-02-PLAN.md — BuddyBoss xprofile, avatar URL, and WooCommerce subscription enrichment
 
 ### Phase 2: Import Script & Test Data
@@ -69,7 +69,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. WP Export Plugin | 0/2 | Planned | - |
+| 1. WP Export Plugin | 1/2 | In progress | - |
 | 2. Import Script & Test Data | 0/? | Not started | - |
 | 3. Password Reset Flow | 0/? | Not started | - |
 | 4. Admin Migration Page | 0/? | Not started | - |

@@ -7,16 +7,16 @@
 
 ### WP Export Plugin
 
-- [ ] **WPEX-01**: Plugin installs as standard WordPress plugin (zip-uploadable) at migration/wp-goya-exporter/
-- [ ] **WPEX-02**: Admin page at Tools > GOYA Export with chunk size selector (100/250/500), offset input, and export buttons
-- [ ] **WPEX-03**: Export Chunk button downloads JSON file named goya-export-chunk-{offset}-{limit}.json
-- [ ] **WPEX-04**: Export All button exports everything with slow-operation warning for 4000+ users
-- [ ] **WPEX-05**: Per-user JSON includes core WP fields (ID, email, display_name, first/last name, role, registered_at)
+- [x] **WPEX-01**: Plugin installs as standard WordPress plugin (zip-uploadable) at migration/wp-goya-exporter/
+- [x] **WPEX-02**: Admin page at Tools > GOYA Export with chunk size selector (100/250/500), offset input, and export buttons
+- [x] **WPEX-03**: Export Chunk button downloads JSON file named goya-export-chunk-{offset}-{limit}.json
+- [x] **WPEX-04**: Export All button exports everything with slow-operation warning for 4000+ users
+- [x] **WPEX-05**: Per-user JSON includes core WP fields (ID, email, display_name, first/last name, role, registered_at)
 - [ ] **WPEX-06**: Per-user JSON includes all BuddyBoss xprofile fields (General, About, Practice, Teaching, School, Socials, Languages, Location)
 - [ ] **WPEX-07**: Per-user JSON includes avatar URL via BuddyBoss avatar functions
 - [ ] **WPEX-08**: Per-user JSON includes WooCommerce subscriptions with stripe_customer_id and stripe_subscription_id
-- [ ] **WPEX-09**: Plugin is read-only — zero writes to the WordPress database
-- [ ] **WPEX-10**: Filter options: export all / only active members / only specific roles
+- [x] **WPEX-09**: Plugin is read-only — zero writes to the WordPress database
+- [x] **WPEX-10**: Filter options: export all / only active members / only specific roles
 
 ### Import Script
 
@@ -84,16 +84,16 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WPEX-01 | Phase 1 | Pending |
-| WPEX-02 | Phase 1 | Pending |
-| WPEX-03 | Phase 1 | Pending |
-| WPEX-04 | Phase 1 | Pending |
-| WPEX-05 | Phase 1 | Pending |
-| WPEX-06 | Phase 1 | Pending |
-| WPEX-07 | Phase 1 | Pending |
-| WPEX-08 | Phase 1 | Pending |
-| WPEX-09 | Phase 1 | Pending |
-| WPEX-10 | Phase 1 | Pending |
+| WPEX-01 | Phase 1 | Complete (01-01) |
+| WPEX-02 | Phase 1 | Complete (01-01) |
+| WPEX-03 | Phase 1 | Complete (01-01) |
+| WPEX-04 | Phase 1 | Complete (01-01) |
+| WPEX-05 | Phase 1 | Complete (01-01) |
+| WPEX-06 | Phase 1 | Pending (01-02) |
+| WPEX-07 | Phase 1 | Pending (01-02) |
+| WPEX-08 | Phase 1 | Pending (01-02) |
+| WPEX-09 | Phase 1 | Complete (01-01) |
+| WPEX-10 | Phase 1 | Complete (01-01) |
 | IMPT-01 | Phase 2 | Pending |
 | IMPT-02 | Phase 2 | Pending |
 | IMPT-03 | Phase 2 | Pending |
