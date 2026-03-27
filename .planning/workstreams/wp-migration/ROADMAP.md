@@ -32,12 +32,15 @@ Plans:
 **Depends on**: Phase 1 (needs export format)
 **Requirements**: IMPT-01, IMPT-02, IMPT-03, IMPT-04, IMPT-05, IMPT-06, IMPT-07, IMPT-08, IMPT-09, IMPT-10, IMPT-11, IMPT-12, TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, INFR-01, INFR-02, INFR-03
 **Success Criteria** (what must be TRUE):
-  1. `npx ts-node migration/import-users.ts --file=migration/dummy-users.json --mode=skip` imports at least 20 of 25 dummy users
+  1. `npx tsx migration/import-users.ts --file=migration/dummy-users.json --mode=skip` imports at least 20 of 25 dummy users
   2. Imported users have correct roles (student/teacher/wellness_practitioner/admin), MRNs, and profile data in Supabase
   3. Skip mode skips existing emails without error; overwrite mode updates profile data only
   4. Migration log JSON file is produced with per-user results
   5. migration/*.json is in .gitignore and migration/README.md documents the full pipeline
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 02-01-PLAN.md — Infrastructure (gitignore, Supabase migration, README) and 25 dummy test users
+- [ ] 02-02-PLAN.md — Import script with skip/overwrite modes, field mapping, and test run
 
 ### Phase 3: Password Reset Flow
 **Goal**: Migrated users are redirected to set a new password on first login before accessing any other page
@@ -70,6 +73,6 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. WP Export Plugin | 2/2 | Complete | 2026-03-27 |
-| 2. Import Script & Test Data | 0/? | Not started | - |
+| 2. Import Script & Test Data | 0/2 | In progress | - |
 | 3. Password Reset Flow | 0/? | Not started | - |
 | 4. Admin Migration Page | 0/? | Not started | - |
