@@ -6,7 +6,7 @@ Extend `/admin/api-keys` into a three-tab admin interface. The existing API key 
 
 ## Phases
 
-- [ ] **Phase 9: Tab Shell & Own Keys Migration** - Three-tab layout at `/admin/api-keys` with existing key management moved into Own Keys tab
+- [x] **Phase 9: Tab Shell & Own Keys Migration** - Three-tab layout at `/admin/api-keys` with existing key management moved into Own Keys tab (completed 2026-03-27)
 - [x] **Phase 10: Secrets Management** - Encrypted secrets table, encryption service, CRUD API routes, and full secrets admin UI (completed 2026-03-27)
 - [x] **Phase 11: Endpoints Documentation** - Auto-scanned endpoint documentation tab with search, filter, and grouped display
 
