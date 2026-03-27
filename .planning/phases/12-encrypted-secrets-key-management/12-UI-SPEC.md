@@ -5,6 +5,7 @@ status: draft
 shadcn_initialized: false
 preset: none
 created: 2026-03-27
+revised: 2026-03-27
 ---
 
 # Phase 12 — UI Design Contract
@@ -55,14 +56,19 @@ Source: Observed from `app/admin/api-keys/SecretsTab.tsx` and `SecretModal.tsx`
 
 | Role | Size | Weight | Line Height | Classes |
 |------|------|--------|-------------|---------|
-| Page heading | 24px (text-2xl) | 700 (bold) | 1.2 | `text-2xl font-bold text-[#1B3A5C]` |
+| Page heading | 24px (text-2xl) | 600 (semibold) | 1.2 | `text-2xl font-semibold text-[#1B3A5C]` |
 | Section heading | 16px (text-base) | 600 (semibold) | 1.2 | `text-base font-semibold text-[#1B3A5C]` |
 | Body / table cell | 14px (text-sm) | 400 (regular) | 1.5 | `text-sm text-[#374151]` |
 | Caption / meta | 12px (text-xs) | 400 (regular) | 1.4 | `text-xs text-[#6B7280]` |
-| Badge / label | 10px (text-[10px]) | 600 (semibold) | 1.0 | `text-[10px] font-semibold uppercase tracking-widest` |
-| Monospace (key name, model ID) | 14px (text-sm) | 500 (medium) | 1.5 | `text-sm font-medium text-[#1B3A5C] font-mono` |
+| Badge / label | 12px (text-xs) | 600 (semibold) | 1.0 | `text-xs font-semibold uppercase tracking-widest` |
+| Monospace (key name, model ID) | 14px (text-sm) | 600 (semibold) | 1.5 | `text-sm font-semibold text-[#1B3A5C] font-mono` |
 
-Active weights: regular (400) and semibold (600) — bold (700) reserved for page-level headings only.
+Active weights: regular (400) and semibold (600) only. No other weights used in this phase.
+
+Revision notes:
+- Page heading weight changed from 700 to 600 — collapsed to 2-weight system
+- Monospace weight changed from 500 to 600 — collapsed to 2-weight system
+- Badge size changed from 10px to 12px (text-xs) with uppercase + tracking-widest — removes 5th size
 
 Source: `design-system/MASTER.md` §3, observed from `SecretsTab.tsx`
 
@@ -80,7 +86,7 @@ Source: `design-system/MASTER.md` §3, observed from `SecretsTab.tsx`
 | Destructive subtle | `#fef2f2` / `#fee2e2` | Delete button hover bg, error banner bg |
 
 Accent reserved for:
-- Primary CTA button backgrounds (Add AI Provider Key, Add Secret, Save Changes)
+- Primary CTA button backgrounds (Add AI Provider Key, Add Secret, Update Key)
 - Active tab indicator (bottom border `border-[#00B5A3]`, text `text-[#00B5A3]`)
 - Section headings (`text-[#1B3A5C]`)
 - Monospace key name text in table rows
@@ -137,6 +143,10 @@ The Third Party Keys tab splits into two vertically stacked sections:
 
 AI Providers section renders ABOVE the existing general secrets section. Section heading uses `text-base font-semibold text-[#1B3A5C]`.
 
+### Focal Point
+
+The primary focal point of the screen is the **AI Providers section heading row** — specifically the "Add AI Provider Key" button in the top-right of that section. This is the primary action users arrive to perform. The section heading `text-2xl font-semibold text-[#1B3A5C]` at the top of the tab anchors the eye before scanning down to the table.
+
 ---
 
 ## Interaction States
@@ -147,7 +157,7 @@ AI Providers section renders ABOVE the existing general secrets section. Section
 |-------|--------|
 | Empty (no AI keys) | Lock icon + "No AI provider keys yet. Add one to power the chatbot." |
 | Row hover | `hover:bg-slate-50` |
-| Delete pending confirmation | Inline "Sure?" + red Delete button + Cancel — identical to SecretsTab pattern |
+| Delete pending confirmation | Inline "Sure?" + red Delete button + "Keep Key" — identical to SecretsTab pattern except cancel label |
 | Saving (modal submit) | Button shows "Saving..." with `disabled:opacity-50` |
 
 ### AI Provider Modal
@@ -175,8 +185,9 @@ After saving an AI provider key, the raw key value is NEVER displayed. The table
 | Primary CTA (add secret) | "Add Secret" (existing — no change) |
 | Modal title (add AI) | "Add AI Provider Key" |
 | Modal title (edit AI) | "Edit AI Provider Key" |
-| Modal save button (add) | "Add Key" |
-| Modal save button (edit) | "Save Changes" |
+| Modal save button (add) | "Add Provider Key" |
+| Modal save button (edit) | "Update Key" |
+| Modal cancel button | "Discard" |
 | Empty state heading (AI section) | "No AI provider keys yet" |
 | Empty state body (AI section) | "Add an OpenAI or Anthropic key to power the chatbot." |
 | Empty state (filtered general secrets) | "No secrets match your filters." |
@@ -185,8 +196,8 @@ After saving an AI provider key, the raw key value is NEVER displayed. The table
 | Error state (save failed) | "Failed to save key. Check the value and try again." |
 | Delete confirm prompt | "Sure?" |
 | Delete confirm button | "Delete" |
+| Delete cancel (inline) | "Keep Key" |
 | Delete loading | "Deleting..." |
-| Modal cancel | "Cancel" |
 | Provider dropdown label | "Provider" |
 | Model dropdown label | "Model" |
 | API Key label | "API Key" |
@@ -201,8 +212,14 @@ After saving an AI provider key, the raw key value is NEVER displayed. The table
 | Stripe note (existing, keep) | "Stripe keys (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, etc.) are managed via environment variables, not this secrets manager." |
 
 Destructive actions in this phase:
-1. Delete AI Provider Key — inline confirmation: "Sure?" + red "Delete" button + "Cancel" (matches existing SecretsTab pattern, no separate dialog)
-2. Delete General Secret — existing inline pattern, no change
+1. Delete AI Provider Key — inline confirmation: "Sure?" + red "Delete" button + "Keep Key" (no separate dialog)
+2. Delete General Secret — existing inline pattern, no change to existing "Cancel" label in that component
+
+Revision notes:
+- Modal cancel changed from "Cancel" to "Discard" — avoids duplicate "Cancel" labeling
+- Inline delete cancel changed from "Cancel" to "Keep Key" — communicates what is preserved
+- "Add Key" (modal save, add mode) changed to "Add Provider Key" — more specific
+- "Save Changes" (modal save, edit mode) changed to "Update Key" — action-specific verb
 
 ---
 
