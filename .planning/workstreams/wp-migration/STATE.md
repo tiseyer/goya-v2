@@ -14,18 +14,18 @@ status: In progress
 See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Every existing GOYA member transitions to v2 with profile, subscriptions, and billing intact.
-**Current focus:** v1.0 WP Migration — Phase 2 in progress
+**Current focus:** v1.0 WP Migration — Phase 3 in progress
 
 ## Current Position
 **Status:** In progress
-**Current Phase:** Phase 2 (in progress)
-**Current Plan:** 02-03 (next, if any; else Phase 3)
+**Current Phase:** Phase 3 (in progress — awaiting human verify checkpoint)
+**Current Plan:** 03-01 (awaiting Task 3 human verification)
 **Last Activity:** 2026-03-27
-**Last Activity Description:** Completed Plan 02-02 — Import script (migration/import-users.ts) with skip/overwrite modes; all 25 dummy users imported successfully (0 errors)
+**Last Activity Description:** Completed Plan 03-01 tasks 1-2 — middleware password reset interception + set-password page/action; awaiting human verify checkpoint
 
 ## Progress
-**Phases Complete:** 1 (Phase 1 — WP Export Plugin)
-**Plans Complete:** 4 (01-01, 01-02, 02-01, 02-02)
+**Phases Complete:** 2 (Phase 1 — WP Export Plugin, Phase 2 — Import Script & Test Data)
+**Plans Complete:** 5 (01-01, 01-02, 02-01, 02-02, 03-01 partial — tasks 1-2 of 3)
 
 ## Decisions Made
 
@@ -49,6 +49,7 @@ See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 | 01 | 02 | 5m | 2/2 | 1 |
 | 02 | 01 | ~5m | 2/2 | 4 |
 | 02 | 02 | ~15m | 2/2 | 3 |
+| 03 | 01 | ~8m | 2/3 | 3 |
 
 ## Decisions Made (continued)
 
@@ -56,7 +57,10 @@ See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 |------|----------|-----------|
 | 2026-03-27 | Profiles table email lookup instead of listUsers() | Efficient at any scale; listUsers() paginates and is slow for 4000+ users |
 | 2026-03-27 | Map WP profile fields to actual live DB columns (bio, city, country, teaching_styles, teaching_focus_arr, influences_arr) | 002_profile_fields.sql not applied to linked project; plan spec diverged from live schema |
+| 2026-03-27 | Consolidated profile queries in middleware into single upfront fetch | Reduces DB round trips per request; requires_password_reset added alongside onboarding_completed and role |
+| 2026-03-27 | Password reset check runs before onboarding in middleware | Migrated users must set real password before onboarding can proceed |
+| 2026-03-27 | Redirect to / after password set (not /dashboard directly) | Ensures middleware onboarding check runs naturally on next request |
 
 ## Session Continuity
-**Stopped At:** Completed 02-02-PLAN.md (Import script + 25 dummy users verified)
-**Resume File:** .planning/workstreams/wp-migration/phases/02-import-script-test-data/02-02-SUMMARY.md
+**Stopped At:** 03-01-PLAN.md Task 3 checkpoint:human-verify — awaiting end-to-end verification
+**Resume File:** .planning/workstreams/wp-migration/phases/03-password-reset-flow/03-01-SUMMARY.md
