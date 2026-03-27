@@ -1,5 +1,8 @@
 import { Suspense } from 'react';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import { getSupabaseService } from '@/lib/supabase/service';
+import { getUserCreditStatus } from '@/lib/credits';
+import type { CreditStatus } from '@/lib/credits';
 import AdminUsersTable from './AdminUsersTable';
 import AdminUsersFilters from './AdminUsersFilters';
 import AdminUsersPagination from './AdminUsersPagination';
@@ -13,15 +16,16 @@ function str(v: string | string[] | undefined): string {
 export default async function UsersPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
 
-  const search   = str(params.search);
-  const role     = str(params.role);
-  const verified = str(params.verified);
-  const status   = str(params.status);
-  const dateFrom = str(params.from);
-  const dateTo   = str(params.to);
-  const sort     = str(params.sort) || 'newest';
-  const page     = Math.max(1, parseInt(str(params.page) || '1', 10));
-  const pageSize = [25, 50, 100].includes(parseInt(str(params.pageSize), 10))
+  const search       = str(params.search);
+  const role         = str(params.role);
+  const verified     = str(params.verified);
+  const status       = str(params.status);
+  const creditStatus = str(params.creditStatus) as CreditStatus | '';
+  const dateFrom     = str(params.from);
+  const dateTo       = str(params.to);
+  const sort         = str(params.sort) || 'newest';
+  const page         = Math.max(1, parseInt(str(params.page) || '1', 10));
+  const pageSize     = [25, 50, 100].includes(parseInt(str(params.pageSize), 10))
     ? parseInt(str(params.pageSize), 10)
     : 25;
 
@@ -34,10 +38,12 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
     : { data: null };
   const adminRole = adminProfile?.role ?? undefined;
 
-  // Build query
+  // Build query — when credit status filter is active, fetch a larger pool then filter in-app
+  const isCreditFiltered = creditStatus === 'green' || creditStatus === 'yellow' || creditStatus === 'red';
+
   let query = supabase
     .from('profiles')
-    .select('id, email, full_name, username, role, subscription_status, is_verified, created_at, avatar_url', { count: 'exact' });
+    .select('id, email, full_name, username, role, subscription_status, is_verified, created_at, avatar_url, member_type', { count: 'exact' });
 
   if (search) {
     query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,username.ilike.%${search}%`);
@@ -58,15 +64,50 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
     default:          query = query.order('created_at', { ascending: false }); break;
   }
 
-  const from = (page - 1) * pageSize;
-  const to   = from + pageSize - 1;
-  query = query.range(from, to);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let users: any[] = [];
+  let totalCount = 0;
+  let totalPages = 1;
+  let displayedCount = 0;
 
-  const { data: users, count } = await query;
+  if (isCreditFiltered) {
+    // Fetch a larger pool (up to 200), compute credit status, then paginate manually
+    const poolQuery = query.range(0, 199);
+    const { data: poolData } = await poolQuery;
 
-  const totalCount  = count ?? 0;
-  const totalPages  = Math.max(1, Math.ceil(totalCount / pageSize));
-  const displayedCount = users?.length ?? 0;
+    const serviceSupabase = getSupabaseService();
+    const pool = poolData ?? [];
+
+    // Compute credit status for each user in parallel
+    const withStatus = await Promise.all(
+      pool.map(async (user) => {
+        const isTeacher = (user as { member_type?: string }).member_type === 'teacher';
+        const cs = await getUserCreditStatus(user.id, serviceSupabase, isTeacher);
+        return { user, overall: cs.overall };
+      })
+    );
+
+    // Filter to matching status
+    const filtered = withStatus
+      .filter((item) => item.overall === creditStatus)
+      .map((item) => item.user);
+
+    totalCount = filtered.length;
+    totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+    const from = (page - 1) * pageSize;
+    users = filtered.slice(from, from + pageSize);
+    displayedCount = users.length;
+  } else {
+    const from = (page - 1) * pageSize;
+    const to   = from + pageSize - 1;
+    query = query.range(from, to);
+
+    const { data: queryData, count } = await query;
+    users = queryData ?? [];
+    totalCount = count ?? 0;
+    totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+    displayedCount = users.length;
+  }
 
   return (
     <div className="p-6 lg:p-8">
@@ -89,6 +130,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
             initialRole={role}
             initialVerified={verified}
             initialStatus={status}
+            initialCreditStatus={creditStatus}
             initialDateFrom={dateFrom}
             initialDateTo={dateTo}
             initialSort={sort}

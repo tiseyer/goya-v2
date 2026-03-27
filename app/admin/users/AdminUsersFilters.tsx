@@ -8,6 +8,7 @@ interface Props {
   initialRole: string;
   initialVerified: string;
   initialStatus: string;
+  initialCreditStatus: string;
   initialDateFrom: string;
   initialDateTo: string;
   initialSort: string;
@@ -18,6 +19,7 @@ export default function AdminUsersFilters({
   initialRole,
   initialVerified,
   initialStatus,
+  initialCreditStatus,
   initialDateFrom,
   initialDateTo,
   initialSort,
@@ -111,6 +113,18 @@ export default function AdminUsersFilters({
         <option value="">All Status</option>
         <option value="member">Member</option>
         <option value="guest">Guest</option>
+      </select>
+
+      {/* Credit Status */}
+      <select
+        defaultValue={initialCreditStatus}
+        onChange={e => updateParam('creditStatus', e.target.value)}
+        className={selectClass}
+      >
+        <option value="">All Credits</option>
+        <option value="green">On Track</option>
+        <option value="yellow">Expiring Soon</option>
+        <option value="red">Needs Attention</option>
       </select>
 
       {/* Date from */}
