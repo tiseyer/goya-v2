@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
-import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Header from "./components/Header";
@@ -9,6 +8,8 @@ import Footer from "./components/Footer";
 import SlimFooter from "./components/SlimFooter";
 import ClientProviders from "./components/ClientProviders";
 import ImpersonationBanner from "./components/ImpersonationBanner";
+import ConsentGatedScripts from "./components/ConsentGatedScripts";
+import CookieConsent from "./components/CookieConsent";
 import { getImpersonationState } from "@/lib/impersonation";
 
 const geistSans = Geist({
@@ -83,34 +84,10 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-background text-foreground flex flex-col`}
       >
-        {/* GA4 */}
-        {ga4Id && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
-              strategy="afterInteractive"
-            />
-            <Script id="ga4-init" strategy="afterInteractive">{`
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${ga4Id}');
-            `}</Script>
-          </>
-        )}
-
-        {/* Microsoft Clarity */}
-        {clarityId && (
-          <Script id="clarity-init" strategy="afterInteractive">{`
-(function(c,l,a,r,i,t,y){
-  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window,document,"clarity","script","${clarityId}");
-          `}</Script>
-        )}
-
         <ClientProviders impersonationState={impersonationState}>
+          {/* Analytics scripts — gated behind cookie consent */}
+          <ConsentGatedScripts ga4Id={ga4Id} clarityId={clarityId} />
+
           <ImpersonationBanner state={impersonationState} />
           {!hideNav && <Header />}
           <main className={`${!hideNav ? (impersonationState.isImpersonating ? 'pt-26' : 'pt-16') : ''} flex-1`}>
@@ -118,9 +95,12 @@ gtag('config', '${ga4Id}');
           </main>
           {showFullFooter && <Footer />}
           {showSlimFooter && <SlimFooter />}
+
+          {/* Cookie consent banner + floating button */}
+          <CookieConsent />
         </ClientProviders>
 
-        {/* Vercel Analytics — always on */}
+        {/* Vercel Analytics — always on (necessary/first-party) */}
         <Analytics />
       </body>
     </html>

@@ -107,7 +107,7 @@ export function ThemeInline() {
   if (!mounted) return null;
 
   return (
-    <div className="flex items-center justify-center gap-1">
+    <div className="flex w-full bg-surface-muted rounded-lg p-1">
       {THEMES.map((t) => {
         const active = theme === t.key;
         return (
@@ -119,13 +119,14 @@ export function ThemeInline() {
             }}
             title={t.label}
             className={[
-              'p-2 rounded-lg transition-all duration-150 cursor-pointer',
+              'flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all duration-150 cursor-pointer',
               active
-                ? 'bg-primary/15 text-primary'
-                : 'text-foreground-tertiary hover:text-foreground-secondary hover:bg-surface-muted',
+                ? 'bg-surface text-primary shadow-sm'
+                : 'text-foreground-tertiary hover:text-foreground-secondary',
             ].join(' ')}
           >
             {t.icon}
+            <span>{t.label}</span>
           </button>
         );
       })}
