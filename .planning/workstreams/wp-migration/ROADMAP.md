@@ -22,7 +22,10 @@ Build a complete WordPress-to-Supabase user migration pipeline. Phase 1 creates 
   2. Export produces valid JSON with all specified fields per user (core WP, BuddyBoss xprofile, avatar URL, WooCommerce subscriptions with Stripe IDs)
   3. Chunk export produces correctly named files (goya-export-chunk-{offset}-{limit}.json)
   4. Plugin performs zero writes to the WordPress database
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Plugin scaffold, admin page, core WP user export with chunking and filters
+- [ ] 01-02-PLAN.md — BuddyBoss xprofile, avatar URL, and WooCommerce subscription enrichment
 
 ### Phase 2: Import Script & Test Data
 **Goal**: Admins can run the CLI import script against exported JSON files and see users created in Supabase with correct profiles, roles, MRNs, and subscription data
@@ -66,7 +69,7 @@ Build a complete WordPress-to-Supabase user migration pipeline. Phase 1 creates 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. WP Export Plugin | 0/? | Not started | - |
+| 1. WP Export Plugin | 0/2 | Planned | - |
 | 2. Import Script & Test Data | 0/? | Not started | - |
 | 3. Password Reset Flow | 0/? | Not started | - |
 | 4. Admin Migration Page | 0/? | Not started | - |
