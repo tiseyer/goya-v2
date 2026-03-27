@@ -18,13 +18,13 @@ created: 2026-03-27
 
 | Property | Value |
 |----------|-------|
-| Tool | none — custom Tailwind token system (`app/globals.css` CSS variables) |
+| Tool | none — custom GOYA design system (design-system/MASTER.md + app/globals.css) |
 | Preset | not applicable |
 | Component library | none (custom components, no Radix/shadcn) |
-| Icon library | Inline SVG (heroicons-style, `stroke="currentColor"`) |
-| Font | Geist Sans (`--font-sans`) + Geist Mono (`--font-mono`) |
+| Icon library | lucide-react v1.7.0 (confirmed in package.json) — inline SVG also acceptable for admin-specific icons following AdminShell pattern |
+| Font | Geist Sans (--font-sans) + Geist Mono (--font-mono) |
 
-Source: `app/globals.css`, Phase 12 UI-SPEC, `app/admin/api-keys/page.tsx`
+Source: `package.json`, `app/globals.css`, `design-system/MASTER.md`, `app/admin/api-keys/page.tsx`
 
 ---
 
@@ -45,11 +45,11 @@ Declared values (multiples of 4):
 Exceptions:
 - Table cells use `px-4 py-3` (16px horizontal, 12px vertical) — matches admin table pattern
 - Inline FAQ expand area uses `px-4 py-4` (16px all sides)
-- Tab bar links use `px-5 py-3` — matches `/admin/api-keys` pattern
+- Tab bar links use `px-5 py-3` — matches `/admin/api-keys` pattern exactly
 - Touch targets minimum 44px height for interactive controls (toggle, dropdowns)
 - Page outer padding: `p-6 lg:p-8`
 
-Source: observed from `app/admin/api-keys/page.tsx`, `app/admin/settings/page.tsx`, Phase 12 UI-SPEC
+Source: `app/admin/api-keys/page.tsx`, `app/admin/settings/page.tsx`
 
 ---
 
@@ -57,16 +57,16 @@ Source: observed from `app/admin/api-keys/page.tsx`, `app/admin/settings/page.ts
 
 | Role | Size | Weight | Line Height | Classes |
 |------|------|--------|-------------|---------|
-| Page heading | 24px (text-2xl) | 600 (semibold) | 1.2 | `text-2xl font-bold text-[#1B3A5C]` |
+| Page heading | 24px (text-2xl) | 700 (bold) | 1.2 | `text-2xl font-bold text-[#1B3A5C]` |
 | Section heading | 16px (text-base) | 600 (semibold) | 1.2 | `text-base font-semibold text-[#1B3A5C]` |
 | Body / table cell | 14px (text-sm) | 400 (regular) | 1.5 | `text-sm text-[#374151]` |
 | Caption / meta / helper | 12px (text-xs) | 400 (regular) | 1.4 | `text-xs text-[#6B7280]` |
 
-Active weights: regular (400) and semibold (600) only. No bold (700), medium (500), or light (300) used.
+Active weights: regular (400) and bold (700) for page heading, semibold (600) for section headings. No medium (500) or light (300).
 
-Note: The page heading class in `api-keys/page.tsx` uses `font-bold` which maps to 700 — keep consistent with existing admin page headings in that file. All other headings use `font-semibold`.
+Note: Page heading uses `font-bold` (700) matching `api-keys/page.tsx` line 51. Section card headers use `font-semibold` (600) matching `settings/page.tsx` Section component.
 
-Source: Phase 12 UI-SPEC §Typography, `app/admin/api-keys/page.tsx` line 51, `app/admin/settings/page.tsx` Section component
+Source: `app/admin/api-keys/page.tsx` line 51, `app/admin/settings/page.tsx` Section component
 
 ---
 
@@ -74,26 +74,25 @@ Source: Phase 12 UI-SPEC §Typography, `app/admin/api-keys/page.tsx` line 51, `a
 
 | Role | Value | Usage |
 |------|-------|-------|
-| Dominant (60%) | `#ffffff` / `--goya-surface #f8f9fa` | Page background, section card backgrounds, modal background |
-| Secondary (30%) | `#f1f5f9` (slate-100) / `#f8fafc` (slate-50) | Table header bg, table row dividers, section background |
-| Accent (10%) | `#1B3A5C` (primary-dark) | Page/section headings, primary CTA button backgrounds |
-| Accent interaction | `#00B5A3` (teal — existing tab pattern) | Active tab indicator border-bottom + active tab text |
-| Toggle ON | `#00B5A3` | Chatbot is_active toggle (on), FAQ Published toggle (on) — matches settings Toggle |
-| Destructive | `#dc2626` (red-600) | Delete button text, inline delete confirm button bg |
-| Destructive subtle | `#fef2f2` / `#fee2e2` | Delete hover bg, error banner bg |
-| Status — Published | `bg-emerald-50 text-emerald-700` | FAQ Published badge |
-| Status — Draft | `bg-yellow-50 text-yellow-700` | FAQ Draft badge |
+| Dominant (60%) | `#f8f9fa` (--background-secondary / bg-surface-muted) | Admin main content area background |
+| Secondary (30%) | `#ffffff` (bg-white) | Section card backgrounds, tab content panels, modal background |
+| Accent (10%) | `#00B5A3` (teal — established admin tab pattern) | Active tab indicator, toggle-on state, focus rings |
+| Destructive | `#dc2626` (red-600) | Delete button text, inline delete confirm |
+| Destructive subtle | `#fef2f2` / `#fee2e2` | Delete hover background, error banner background |
+| Status — Published | `bg-emerald-50 text-emerald-700` | FAQ Published clickable badge |
+| Status — Draft | `bg-yellow-50 text-yellow-700` | FAQ Draft clickable badge |
 
-Accent reserved for:
-- Primary CTA button backgrounds ("Save Configuration", "Add FAQ")
-- Active tab indicator (bottom border `border-[#00B5A3]`, text `text-[#00B5A3]`)
-- Page heading and section heading text (`text-[#1B3A5C]`)
-- Sidebar active item (inherited from AdminShell — `sidebar-active-bg`, `sidebar-active-fg`)
+Accent (#00B5A3) reserved for:
+- Active tab bottom border (`border-b-2 border-[#00B5A3]`) and active tab text (`text-[#00B5A3]`)
+- Toggle switch on-state background (`bg-[#00B5A3]`) for chatbot is_active toggle
 - Focus rings on form inputs (`focus:ring-2 focus:ring-[#00B5A3]`)
+- NOT used for CTA buttons — primary CTA uses `bg-primary-light` (#4e87a0) per design-system/MASTER.md
 
-Note: `#00B5A3` teal is the existing admin active-tab color. It is NOT a GOYA brand token defined in `globals.css` but is the established pattern across all admin tab bars. Keep consistent.
+Note: `#00B5A3` teal is the existing admin active-tab color established across all admin tab bars. It is NOT a GOYA brand token in `globals.css` but is a consistent admin UI pattern. Maintain consistency — do not replace with primary blue.
 
-Source: Phase 12 UI-SPEC §Color, `app/admin/api-keys/page.tsx` lines 63-89, `app/admin/settings/page.tsx` Toggle component
+Sidebar: inherits from AdminShell — `bg-white border-r border-slate-200` in light mode.
+
+Source: `app/admin/api-keys/page.tsx` lines 63-89, `app/admin/settings/page.tsx` Toggle component, `design-system/MASTER.md` section 1
 
 ---
 
@@ -103,11 +102,11 @@ Source: Phase 12 UI-SPEC §Color, `app/admin/api-keys/page.tsx` lines 63-89, `ap
 
 | Component | File | Notes |
 |-----------|------|-------|
-| AdminShell + NAV_ITEMS | `app/admin/components/AdminShell.tsx` | Add Chatbot entry at index 9 (between Audit Log and API Keys) |
+| AdminShell + NAV_ITEMS | `app/admin/components/AdminShell.tsx` | Add Chatbot entry at index 9 (between Audit Log at index 8 and API Keys at index 9) |
 | Tab bar pattern | `app/admin/api-keys/page.tsx` | Copy tab link pattern exactly — `Link`, `searchParams`, `border-b-2 border-[#00B5A3]` |
-| Section card | `app/admin/settings/page.tsx` (`Section` component) | `bg-white rounded-xl border border-[#E5E7EB] shadow-sm` |
-| Toggle | `app/admin/settings/page.tsx` (`Toggle` component) | `role="switch"`, `bg-[#00B5A3]` when on |
-| Toast pattern | `app/admin/settings/page.tsx` | Fixed bottom-right, auto-dismiss 5s, matches existing admin settings |
+| Section card | `app/admin/settings/page.tsx` (Section component) | `bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden` |
+| Toggle | `app/admin/settings/page.tsx` (Toggle component) | `role="switch"`, `bg-[#00B5A3]` when on, `bg-[#E5E7EB]` when off |
+| Toast pattern | `app/admin/settings/page.tsx` | Fixed bottom-right, auto-dismiss 5s |
 
 ### New (build in this phase)
 
@@ -116,9 +115,26 @@ Source: Phase 12 UI-SPEC §Color, `app/admin/api-keys/page.tsx` lines 63-89, `ap
 | ChatbotPage | `app/admin/chatbot/page.tsx` | Server component — tab routing via `?tab=` searchParams |
 | ConfigurationTab | `app/admin/chatbot/ConfigurationTab.tsx` | Client component — chatbot config form with server action |
 | FaqTab | `app/admin/chatbot/FaqTab.tsx` | Client component — FAQ table, search, inline editing |
-| FaqRow | `app/admin/chatbot/FaqRow.tsx` | Table row + inline expand/collapse for edit |
+| FaqRow | `app/admin/chatbot/FaqRow.tsx` | Table row + inline expand/collapse for edit mode |
 | FaqModal | `app/admin/chatbot/FaqModal.tsx` | "Add FAQ" modal with Question + Answer fields |
-| PlaceholderTab | `app/admin/chatbot/PlaceholderTab.tsx` | Reusable placeholder for Conversations and API Connections |
+| PlaceholderTab | `app/admin/chatbot/PlaceholderTab.tsx` | Reusable placeholder for Conversations and API Connections tabs |
+
+### Sidebar Nav Entry
+
+Insert at NAV_ITEMS index 9 in `app/admin/components/AdminShell.tsx` (between Audit Log at index 8 and API Keys):
+
+```ts
+{
+  type: 'link',
+  href: '/admin/chatbot',
+  label: 'Chatbot',
+  paths: [
+    'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
+  ],
+}
+```
+
+Source: CONTEXT.md decisions — "positioned between Audit Log and API Keys in AdminShell NAV_ITEMS"
 
 ### Layout Pattern
 
@@ -139,8 +155,8 @@ Configuration Tab layout:
 ```
 ┌─────────────────────────────────┐
 │  Identity                       │
-│  Name field                     │
-│  Avatar upload + preview        │
+│  Chatbot Name field             │
+│  Profile image upload + preview │
 │  Active toggle                  │
 └─────────────────────────────────┘
 ┌─────────────────────────────────┐
@@ -157,12 +173,14 @@ Configuration Tab layout:
 
 FAQ Tab layout:
 ```
-[Search FAQ...]              [+ Add FAQ]
-──────────────────────────────────────────
-Question  | Answer  | Status | Created | By | Actions
-──────────────────────────────────────────
-Row: truncated question | truncated answer | Published/Draft badge | date | name | Edit Delete
-  ↳ [expanded] Question textarea | Answer textarea | [Save] [Cancel]
+[Search FAQ...]                              [+ Add FAQ]
+─────────────────────────────────────────────────────────
+Question | Answer | Status | Created | By | Actions
+─────────────────────────────────────────────────────────
+Row: [truncated Q] | [truncated A] | [Published] | date | name | Edit  Delete
+  ↳ [expanded] Question textarea full-width
+                Answer textarea full-width
+                [Save]  [Cancel]
 ```
 
 Conversations Tab (placeholder):
@@ -183,9 +201,10 @@ API Connections Tab (placeholder):
 └─────────────────────────────────┘
 ```
 
-### Focal Point
+### Focal Points
 
-The primary focal point on load (Configuration tab default) is the **chatbot name field** at the top of the Identity section. On the FAQ tab the focal point is the **"Add FAQ" button** in the toolbar top-right.
+- Configuration tab (default on load): **Chatbot Name field** at top of Identity section
+- FAQ tab: **"Add FAQ" button** in toolbar top-right
 
 ---
 
@@ -198,38 +217,39 @@ The primary focal point on load (Configuration tab default) is the **chatbot nam
 | Initial load | Fields pre-populated from DB via server component fetch |
 | Active toggle ON | `bg-[#00B5A3]` toggle, label reads "Active" |
 | Active toggle OFF | `bg-[#E5E7EB]` toggle, label reads "Inactive" |
-| AI Key selector empty (no AI keys created yet) | Dropdown shows "No AI provider keys found — add one in API Keys" (disabled option) |
-| Saving | "Save Configuration" button shows "Saving..." with `disabled:opacity-50` |
+| AI Key selector — no keys exist | Disabled option: "No AI provider keys found — add one in API Keys" |
+| Saving | "Save Configuration" button shows "Saving..." + disabled state (`disabled:opacity-50`) |
 | Save success | Toast bottom-right: "Configuration saved" — auto-dismiss 5s |
 | Save failed | Toast bottom-right: "Failed to save. Please try again." — auto-dismiss 5s |
-| Avatar upload | File input triggers native picker, preview updates optimistically |
-| Avatar upload error | Inline error below upload: "Upload failed. Use JPG or PNG under 2 MB." |
+| Avatar file selected | Local preview updates immediately via URL.createObjectURL |
+| Avatar upload error (on save) | Inline error below upload field: "Upload failed. Use JPG or PNG under 2 MB." |
 
 ### FAQ Tab
 
 | State | Visual |
 |-------|--------|
-| Empty (no FAQ entries) | Centered: document icon + "No FAQ entries yet" + "Add your first FAQ to help the chatbot answer common questions." + "Add FAQ" button |
-| Search with no results | Centered: "No FAQ entries match your search." |
+| Empty (no FAQ entries) | Centered: icon + "No FAQ entries yet" heading + body + "Add FAQ" button |
+| Search with no results | Centered: "No FAQ entries match your search." (no button) |
 | Row hover | `hover:bg-slate-50` |
-| Row expanded (edit mode) | Row visually indented, shows Question textarea + Answer textarea + "Save" (primary) + "Cancel" (text button) |
-| Status toggle (Published/Draft) | Click badge → instant optimistic toggle via server action |
-| Status toggle saving | Badge opacity 60% during save, restores on complete |
-| Status toggle failed | Badge reverts to prior state + toast "Failed to update status." |
-| Delete row | Inline "Sure?" + red "Delete" + "Cancel" — no separate dialog |
+| Row expanded (edit mode) | Row expands inline below truncated view — Question textarea + Answer textarea + "Save" (primary) + "Cancel" (text button) |
+| Only one row expanded at a time | Opening a new row collapses the currently open one |
+| Status badge click | Optimistic toggle — badge color swaps immediately, server action runs in background |
+| Status toggle saving | Badge opacity 60% during save |
+| Status toggle failed | Badge reverts + toast "Failed to update status." |
+| Row delete initiated | Inline "Sure?" + red "Delete" + "Cancel" — row does not collapse or shift |
 | Deleting | Row fades to 50% opacity, buttons disabled |
-| Add FAQ modal | Overlay with Question input + Answer textarea + "Save FAQ" + "Discard" |
-| Add FAQ modal saving | "Saving..." with `disabled:opacity-50` |
-| Add FAQ save success | Modal closes, row appears at top of table |
+| Add FAQ modal | Overlay `max-w-md` centered, Question input + Answer textarea + "Save FAQ" + "Discard" |
+| Add FAQ saving | Button shows "Saving..." + `disabled:opacity-50` |
+| Add FAQ success | Modal closes, new row appears at top of table |
 
-### Form Fields (Configuration Tab)
+### Form Field Validation (Configuration Tab)
 
-| Field | Validation |
-|-------|-----------|
-| Chatbot name | Required, max 100 chars. Empty = shows inline "Name is required." |
-| System prompt | Required, textarea min 2 rows. Empty = shows inline "System prompt is required." |
-| Guest retention days | Required number 1–365. Out of range = "Enter a number between 1 and 365." |
-| AI Key selector | Optional (chatbot can be inactive without a key). No validation error. |
+| Field | Rule | Error copy |
+|-------|------|------------|
+| Chatbot name | Required, max 100 chars | "Name is required." |
+| System prompt | Required | "System prompt is required." |
+| Guest retention days | Required number 1–365 | "Enter a number between 1 and 365." |
+| AI Key selector | Optional — no validation error | — |
 
 ---
 
@@ -256,29 +276,32 @@ The primary focal point on load (Configuration tab default) is the **chatbot nam
 | Config field: system prompt helper | "This is the personality and instruction set sent to the AI with every conversation." |
 | Config field: retention days label | "Guest Session Retention (days)" |
 | Config field: retention days helper | "Guest chat sessions older than this many days are automatically deleted." |
+| Config field: avatar label | "Profile Image" |
+| Config field: avatar helper | "Recommended: 200×200px. JPG, PNG, or WebP, max 2 MB." |
 | Primary CTA (config) | "Save Configuration" |
+| Primary CTA loading (config) | "Saving..." |
 | Save success toast | "Configuration saved" |
 | Save failed toast | "Failed to save. Please try again." |
-| Primary CTA (FAQ) | "Add FAQ" |
+| Primary CTA (FAQ toolbar) | "Add FAQ" |
 | FAQ search placeholder | "Search FAQ entries..." |
-| FAQ table col: question | "Question" |
-| FAQ table col: answer | "Answer" |
-| FAQ table col: status | "Status" |
-| FAQ table col: created | "Created" |
-| FAQ table col: created by | "By" |
-| FAQ table col: actions | "Actions" |
+| FAQ table column: question | "Question" |
+| FAQ table column: answer | "Answer" |
+| FAQ table column: status | "Status" |
+| FAQ table column: created | "Created" |
+| FAQ table column: created by | "By" |
+| FAQ table column: actions | "Actions" |
 | FAQ status badge: published | "Published" |
 | FAQ status badge: draft | "Draft" |
 | FAQ row action: edit | "Edit" |
 | FAQ row action: delete | "Delete" |
-| FAQ inline edit: save | "Save" |
-| FAQ inline edit: cancel | "Cancel" |
+| FAQ inline edit save | "Save" |
+| FAQ inline edit cancel | "Cancel" |
 | FAQ delete confirm prompt | "Sure?" |
 | FAQ delete confirm button | "Delete" |
 | FAQ delete cancel | "Cancel" |
 | FAQ empty state heading | "No FAQ entries yet" |
 | FAQ empty state body | "Add your first FAQ to help the chatbot answer common questions." |
-| FAQ no results (search) | "No FAQ entries match your search." |
+| FAQ no search results | "No FAQ entries match your search." |
 | FAQ status toggle failed toast | "Failed to update status." |
 | Add FAQ modal title | "Add FAQ Entry" |
 | Add FAQ modal: question label | "Question" |
@@ -288,38 +311,34 @@ The primary focal point on load (Configuration tab default) is the **chatbot nam
 | Add FAQ modal: save button | "Save FAQ" |
 | Add FAQ modal: save loading | "Saving..." |
 | Add FAQ modal: cancel button | "Discard" |
-| Edit FAQ modal title | "Edit FAQ Entry" |
-| Edit FAQ modal: save button | "Save Changes" |
-| Avatar upload failed | "Upload failed. Use JPG or PNG under 2 MB." |
+| Avatar upload error (inline) | "Upload failed. Use JPG or PNG under 2 MB." |
 | Conversations placeholder heading | "Coming in Phase 15" |
 | Conversations placeholder body | "Conversation history viewer will be available here." |
 | API Connections placeholder heading | "Coming in Phase 15" |
 | API Connections placeholder body | "Tool connection toggles will be available here." |
 
 Destructive actions in this phase:
-1. Delete FAQ entry — inline confirmation: "Sure?" + red "Delete" button + "Cancel" (no separate dialog)
-   - No delete modal — matches the inline pattern from SecretsTab/AiProvidersSection
-2. No other destructive actions in this phase
+1. **Delete FAQ entry** — inline confirmation within the row: "Sure?" + red "Delete" button + "Cancel". No separate modal dialog.
+   - Matches inline pattern established in SecretsTab and AiProvidersSection
 
 ---
 
 ## Layout Constraints
 
-- Max content width: `max-w-7xl` (inherited from AdminShell layout)
+- Max content width: `max-w-7xl` (inherited from AdminShell main area)
 - Page outer padding: `p-6 lg:p-8`
-- Tab bar: flush with section below, `border-b border-slate-200`, tab links `px-5 py-3`
+- Tab bar: flush `border-b border-slate-200`, tab links `px-5 py-3 text-sm font-semibold -mb-px`
 - Section cards: `bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden`
 - Section card header: `px-6 py-4 border-b border-[#E5E7EB]`
 - Section card body: `px-6 py-5 space-y-4`
 - Vertical gap between section cards: `mt-6`
-- FAQ table: `w-full min-w-[640px]` with horizontal scroll wrapper
-- FAQ table header: `bg-slate-50` row, `text-xs font-semibold uppercase tracking-widest text-[#6B7280]`
+- FAQ table: `w-full min-w-[640px]` with `overflow-x-auto` wrapper
+- FAQ table header row: `bg-slate-50 text-xs font-semibold uppercase tracking-widest text-[#6B7280]`
 - Inline FAQ edit expand area: `bg-slate-50 border-t border-slate-200 px-4 py-4`
-- Add FAQ modal: `max-w-md` centered with `backdrop-blur-sm` backdrop
-- Configuration form max-width: unrestricted (full card width)
-- System prompt textarea: `min-h-[120px]`
+- Add FAQ modal: `max-w-md` centered, `backdrop-blur-sm` backdrop overlay
+- System prompt textarea: `min-h-[120px] resize-y`
 - Avatar preview: `w-16 h-16 rounded-full object-cover border border-[#E5E7EB]`
-- "Save Configuration" button: right-aligned below last section card, not inside a card
+- "Save Configuration" button: right-aligned (`flex justify-end`) below last section card, not inside a card, `mt-6`
 
 ---
 
@@ -330,7 +349,7 @@ Destructive actions in this phase:
 | shadcn official | none | not applicable — project does not use shadcn |
 | Third-party | none | not applicable |
 
-No third-party component registries used in this phase. All UI extends existing project components.
+No third-party component registries used in this phase. All UI extends existing project components inline.
 
 ---
 
