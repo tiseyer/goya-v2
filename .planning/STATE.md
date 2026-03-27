@@ -5,7 +5,7 @@
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-03-27 — Milestone v1.8 started
+Last activity: 2026-03-27 - Completed quick task 260327-l8q: Fix theme toggle buttons in navbar dropdown to span full width as segmented control
 
 ## Project Reference
 
@@ -21,3 +21,9 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 - Admin inbox at `/admin/inbox` has School Registrations and Teacher Upgrades tabs
 - REST API has 49 endpoints across 10 resource categories — chatbot tools can leverage these
 - Per-route auth composition pattern: middleware.ts excludes /api/, handlers validate explicitly
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260327-l8q | Fix theme toggle buttons in navbar dropdown to span full width as segmented control | 2026-03-27 | 8d73c5f | [260327-l8q-fix-theme-toggle-buttons-in-navbar-dropd](./quick/260327-l8q-fix-theme-toggle-buttons-in-navbar-dropd/) |
