@@ -91,9 +91,24 @@ Previous: v1.3 Subscriptions & Teacher Upgrade, v1.2 Stripe Admin & Shop, v1.1 C
 - ✓ Admin API key management page with create/revoke UI — v1.6
 - ✓ API_DOCS.md documenting all 49 endpoints — v1.6
 
+## Current Milestone: v1.7 API Settings Page
+
+**Goal:** Extend `/admin/api-keys` into a three-tab admin interface for own API keys, encrypted third-party secrets, and auto-generated endpoint documentation.
+
+**Target features:**
+- Move existing API key management into "Own Keys" tab
+- Encrypted secrets manager for third-party API keys (AES-256, Supabase-stored, CRUD with categories)
+- Auto-generated endpoint documentation from `/app/api/**` route scanning
+
 ### Active
 
-(No active milestone — next milestone to be defined)
+- [ ] Three-tab interface at `/admin/api-keys` (Own Keys, Third Party Keys, Endpoints)
+- [ ] Encrypted secrets table in Supabase with admin-only RLS
+- [ ] Server-side encryption/decryption service using SECRETS_MASTER_KEY
+- [ ] CRUD API routes for secrets management
+- [ ] Secrets admin UI with category filter, search, masked values
+- [ ] Auto-scanned endpoint documentation (~49 endpoints) grouped by domain
+- [ ] SECRETS_MASTER_KEY added to .env.local.example with generation instructions
 
 ### Out of Scope
 
@@ -152,4 +167,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-27 after v1.6 Open Gates milestone*
+*Last updated: 2026-03-27 after v1.7 API Settings Page milestone started*

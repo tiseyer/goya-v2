@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6
-milestone_name: milestone
-status: v1.6 milestone complete
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-27T02:31:27.719Z"
+milestone: v1.7
+milestone_name: API Settings Page
+status: Defining requirements
+stopped_at: null
+last_updated: "2026-03-27T06:50:00.000Z"
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 20
-  completed_plans: 20
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State — GOYA-REST-API workstream
@@ -19,12 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** Phase 08 — admin-ui-and-documentation
+**Current focus:** v1.7 API Settings Page — defining requirements
 
 ## Current Position
 
-Phase: 08
-Plan: Not started
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-27 — Milestone v1.7 started
 
 ## Performance Metrics
 
