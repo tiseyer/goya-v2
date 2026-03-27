@@ -8,7 +8,7 @@ Build a complete WordPress-to-Supabase user migration pipeline. Phase 1 creates 
 
 - [x] **Phase 1: WP Export Plugin** - Self-contained WordPress plugin that exports user data as chunked JSON
 - [x] **Phase 2: Import Script & Test Data** - Node.js import script with skip/overwrite modes, dummy test data, and migration infrastructure
-- [ ] **Phase 3: Password Reset Flow** - Middleware interception and set-password page for migrated users
+- [x] **Phase 3: Password Reset Flow** - Middleware interception and set-password page for migrated users
 - [ ] **Phase 4: Admin Migration Page** - Admin UI for uploading JSON files and running imports with live progress
 
 ## Phase Details
@@ -65,7 +65,10 @@ Plans:
   2. Admin can upload JSON file(s), select mode, and click Start Import
   3. Live progress shows processing count, success/skipped/error counts
   4. Error list shows failed emails with reasons; migration log is downloadable
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — Extract shared import module + POST /api/admin/migration/import API route
+- [ ] 04-02-PLAN.md — Admin migration page UI with upload, progress, errors, log download + sidebar link
 **UI hint**: yes
 
 ## Progress
@@ -77,4 +80,4 @@ Plans:
 | 1. WP Export Plugin | 2/2 | Complete | 2026-03-27 |
 | 2. Import Script & Test Data | 2/2 | Complete | 2026-03-27 |
 | 3. Password Reset Flow | 1/1 | Complete | 2026-03-27 |
-| 4. Admin Migration Page | 0/? | Not started | - |
+| 4. Admin Migration Page | 0/2 | In progress | - |
