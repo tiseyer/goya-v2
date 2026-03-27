@@ -65,8 +65,8 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "";
-  const hideNav = pathname.startsWith("/onboarding") || pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/maintenance");
-  const hideFooter = pathname.startsWith("/maintenance") || pathname.startsWith("/members");
+  const hideNav = pathname.startsWith("/onboarding") || pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/sign-in") || pathname.startsWith("/forgot-password") || pathname.startsWith("/maintenance");
+  const hideFooter = pathname.startsWith("/maintenance") || pathname.startsWith("/members") || pathname.startsWith("/sign-in") || pathname.startsWith("/forgot-password") || pathname.startsWith("/register") || pathname.startsWith("/login") || pathname.startsWith("/onboarding");
   const fullFooterPaths = ["/", "/privacy", "/terms", "/code-of-conduct", "/code-of-ethics"];
   const showFullFooter = !hideFooter && fullFooterPaths.includes(pathname);
   const showSlimFooter = !hideFooter && !showFullFooter;
