@@ -19,17 +19,17 @@ Requirements for the API Settings Page milestone. Each maps to roadmap phases.
 
 ### Secrets Management
 
-- [ ] **SECR-01**: Admin can view a list of stored third-party secrets showing name, category, description, and last updated — never raw values
-- [ ] **SECR-02**: Admin can create a new secret with name, value, category, and description via modal
-- [ ] **SECR-03**: Admin can edit an existing secret with pre-filled fields and masked value with option to update
-- [ ] **SECR-04**: Admin can delete a secret with confirmation dialog
-- [ ] **SECR-05**: Admin can filter secrets by category (Auth, Analytics, Payments, AI, Other)
-- [ ] **SECR-06**: Admin can search secrets by name
-- [ ] **SECR-07**: Secrets are encrypted at rest using AES-256 with SECRETS_MASTER_KEY
-- [ ] **SECR-08**: Supabase migration creates secrets table with admin-only RLS
-- [ ] **SECR-09**: Raw decrypted values only returned on explicit single-key fetch, never in bulk list
-- [ ] **SECR-10**: SECRETS_MASTER_KEY added to .env.local.example with generation instructions
-- [ ] **SECR-11**: Pre-populated category structure with placeholder entries for known keys (Google OAuth, GA4, Clarity, Meta Pixel, Anthropic, etc.)
+- [x] **SECR-01**: Admin can view a list of stored third-party secrets showing name, category, description, and last updated — never raw values
+- [x] **SECR-02**: Admin can create a new secret with name, value, category, and description via modal
+- [x] **SECR-03**: Admin can edit an existing secret with pre-filled fields and masked value with option to update
+- [x] **SECR-04**: Admin can delete a secret with confirmation dialog
+- [x] **SECR-05**: Admin can filter secrets by category (Auth, Analytics, Payments, AI, Other)
+- [x] **SECR-06**: Admin can search secrets by name
+- [x] **SECR-07**: Secrets are encrypted at rest using AES-256 with SECRETS_MASTER_KEY
+- [x] **SECR-08**: Supabase migration creates secrets table with admin-only RLS
+- [x] **SECR-09**: Raw decrypted values only returned on explicit single-key fetch, never in bulk list
+- [x] **SECR-10**: SECRETS_MASTER_KEY added to .env.local.example with generation instructions
+- [x] **SECR-11**: Pre-populated category structure with placeholder entries for known keys (Google OAuth, GA4, Clarity, Meta Pixel, Anthropic, etc.)
 
 ### Endpoints Documentation
 
@@ -72,17 +72,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TABS-02 | Phase 9 | Pending |
 | KEYS-01 | Phase 9 | Pending |
 | KEYS-02 | Phase 9 | Pending |
-| SECR-01 | Phase 10 | Pending |
-| SECR-02 | Phase 10 | Pending |
-| SECR-03 | Phase 10 | Pending |
-| SECR-04 | Phase 10 | Pending |
-| SECR-05 | Phase 10 | Pending |
-| SECR-06 | Phase 10 | Pending |
-| SECR-07 | Phase 10 | Pending |
-| SECR-08 | Phase 10 | Pending |
-| SECR-09 | Phase 10 | Pending |
-| SECR-10 | Phase 10 | Pending |
-| SECR-11 | Phase 10 | Pending |
+| SECR-01 | Phase 10 | Complete |
+| SECR-02 | Phase 10 | Complete |
+| SECR-03 | Phase 10 | Complete |
+| SECR-04 | Phase 10 | Complete |
+| SECR-05 | Phase 10 | Complete |
+| SECR-06 | Phase 10 | Complete |
+| SECR-07 | Phase 10 | Complete |
+| SECR-08 | Phase 10 | Complete |
+| SECR-09 | Phase 10 | Complete |
+| SECR-10 | Phase 10 | Complete |
+| SECR-11 | Phase 10 | Complete |
 | ENDP-01 | Phase 11 | Pending |
 | ENDP-02 | Phase 11 | Pending |
 | ENDP-03 | Phase 11 | Pending |
