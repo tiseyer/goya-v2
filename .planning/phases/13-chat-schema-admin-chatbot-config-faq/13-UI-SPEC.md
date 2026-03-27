@@ -57,16 +57,16 @@ Source: `app/admin/api-keys/page.tsx`, `app/admin/settings/page.tsx`
 
 | Role | Size | Weight | Line Height | Classes |
 |------|------|--------|-------------|---------|
-| Page heading | 24px (text-2xl) | 700 (bold) | 1.2 | `text-2xl font-bold text-[#1B3A5C]` |
+| Page heading | 24px (text-2xl) | 600 (semibold) | 1.2 | `text-2xl font-semibold text-[#1B3A5C]` |
 | Section heading | 16px (text-base) | 600 (semibold) | 1.2 | `text-base font-semibold text-[#1B3A5C]` |
 | Body / table cell | 14px (text-sm) | 400 (regular) | 1.5 | `text-sm text-[#374151]` |
 | Caption / meta / helper | 12px (text-xs) | 400 (regular) | 1.4 | `text-xs text-[#6B7280]` |
 
-Active weights: regular (400) and bold (700) for page heading, semibold (600) for section headings. No medium (500) or light (300).
+Active weights: regular (400) and semibold (600). No bold (700), medium (500), or light (300).
 
-Note: Page heading uses `font-bold` (700) matching `api-keys/page.tsx` line 51. Section card headers use `font-semibold` (600) matching `settings/page.tsx` Section component.
+Note: Page heading uses `font-semibold` (600) — the 24px size creates sufficient hierarchy over the 16px section headings without needing a heavier weight. Both page heading and section headings share weight 600; size alone differentiates them.
 
-Source: `app/admin/api-keys/page.tsx` line 51, `app/admin/settings/page.tsx` Section component
+Source: `app/admin/settings/page.tsx` Section component; weight collapsed from 3 to 2 per UI-SPEC revision 2026-03-27.
 
 ---
 
@@ -236,7 +236,7 @@ API Connections Tab (placeholder):
 | Status badge click | Optimistic toggle — badge color swaps immediately, server action runs in background |
 | Status toggle saving | Badge opacity 60% during save |
 | Status toggle failed | Badge reverts + toast "Failed to update status." |
-| Row delete initiated | Inline "Sure?" + red "Delete" + "Cancel" — row does not collapse or shift |
+| Row delete initiated | Inline "Sure?" + red "Delete" + "Keep Entry" — row does not collapse or shift |
 | Deleting | Row fades to 50% opacity, buttons disabled |
 | Add FAQ modal | Overlay `max-w-md` centered, Question input + Answer textarea + "Save FAQ" + "Discard" |
 | Add FAQ saving | Button shows "Saving..." + `disabled:opacity-50` |
@@ -298,7 +298,7 @@ API Connections Tab (placeholder):
 | FAQ inline edit cancel | "Cancel" |
 | FAQ delete confirm prompt | "Sure?" |
 | FAQ delete confirm button | "Delete" |
-| FAQ delete cancel | "Cancel" |
+| FAQ delete cancel | "Keep Entry" |
 | FAQ empty state heading | "No FAQ entries yet" |
 | FAQ empty state body | "Add your first FAQ to help the chatbot answer common questions." |
 | FAQ no search results | "No FAQ entries match your search." |
@@ -318,8 +318,9 @@ API Connections Tab (placeholder):
 | API Connections placeholder body | "Tool connection toggles will be available here." |
 
 Destructive actions in this phase:
-1. **Delete FAQ entry** — inline confirmation within the row: "Sure?" + red "Delete" button + "Cancel". No separate modal dialog.
-   - Matches inline pattern established in SecretsTab and AiProvidersSection
+1. **Delete FAQ entry** — inline confirmation within the row: "Sure?" + red "Delete" button + "Keep Entry". No separate modal dialog.
+   - "Keep Entry" used instead of "Cancel" to distinguish from the edit-mode "Cancel" button that may be visible simultaneously.
+   - Matches inline pattern established in SecretsTab and AiProvidersSection.
 
 ---
 
