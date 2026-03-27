@@ -51,9 +51,12 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. The Endpoints tab displays all discovered routes (~49 endpoints) without any manual data entry
   2. Each endpoint row shows method, path, auth type, and a description
-  3. Endpoints are grouped under domain headers (Auth, Users, Events, Courses, Credits, Shop, Admin, Webhooks, External API)
+  3. Endpoints are grouped under domain headers (Health, Users, Events, Courses, Credits, Verifications, Analytics, Add-ons, Admin, Webhooks)
   4. Admin can type in a search box or pick a category filter and only matching endpoints are shown
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 11-01-PLAN.md — Endpoint registry, EndpointsTab component with search/filter/grouped display
+
 **UI hint**: yes
 
 ## Progress
@@ -64,4 +67,4 @@ Plans:
 |-------|----------------|--------|-----------|
 | 9. Tab Shell & Own Keys Migration | 1/1 | Complete | 2026-03-27 |
 | 10. Secrets Management | 2/2 | Complete    | 2026-03-27 |
-| 11. Endpoints Documentation | 0/? | Not started | - |
+| 11. Endpoints Documentation | 0/1 | Not started | - |
