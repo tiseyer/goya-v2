@@ -779,6 +779,7 @@ export default function Header() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [maintenanceActive, setMaintenanceActive] = useState(false);
   const [schoolId, setSchoolId] = useState<string | null>(null);
   const { isImpersonating, targetProfile, adminProfile } = useImpersonation();
@@ -814,12 +815,15 @@ export default function Header() {
         supabase.from('profiles').select('*').eq('id', data.user.id).single()
           .then(({ data: p }) => {
             setProfile(p);
+            setAuthLoading(false);
             checkMaintenance(p?.role);
             if (p?.role === 'teacher') {
               supabase.from('schools').select('id').eq('owner_id', data.user!.id).maybeSingle()
                 .then(({ data: s }: { data: { id: string } | null }) => setSchoolId(s?.id ?? null));
             }
           });
+      } else {
+        setAuthLoading(false);
       }
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -847,7 +851,7 @@ export default function Header() {
   }, []);
 
   const isLoggedIn = !!user;
-  const userName = profile?.full_name ?? user?.email?.split('@')[0] ?? '';
+  const userName = profile?.full_name ?? '';
   const userMrn = profile?.mrn ?? '';
   const userInitials = getInitials(profile?.full_name, user?.email);
   const handleLogout = () => {
@@ -878,7 +882,7 @@ export default function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-0.5">
-            {isLoggedIn && (
+            {!authLoading && isLoggedIn && (
               <Link
                 href="/dashboard"
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
@@ -907,7 +911,12 @@ export default function Header() {
 
           {/* Right side */}
           <div className="hidden lg:flex items-center gap-2 ml-auto">
-            {isLoggedIn ? (
+            {authLoading ? (
+              <>
+                <div className="w-20 h-8 bg-slate-100 rounded-lg animate-pulse" />
+                <div className="w-8 h-8 bg-slate-100 rounded-full animate-pulse" />
+              </>
+            ) : isLoggedIn ? (
               <>
                 <SearchWidget />
                 <MessagesWidget />
@@ -967,7 +976,9 @@ export default function Header() {
               </svg>
             </button>
             {/* Avatar (logged in) or Login button (logged out) */}
-            {isLoggedIn ? (
+            {authLoading ? (
+              <div className="w-8 h-8 bg-slate-100 rounded-full animate-pulse" />
+            ) : isLoggedIn ? (
               <button
                 onClick={() => { setProfileOpen(o => !o); setNavOpen(false); }}
                 className="flex items-center justify-center rounded-full focus:outline-none"
@@ -995,7 +1006,7 @@ export default function Header() {
       {/* ── Mobile nav overlay (hamburger) ─────────────────────────────────── */}
       {navOpen && (
         <div className="lg:hidden bg-white border-t border-[#E5E7EB] px-4 py-4 space-y-1">
-          {isLoggedIn && (
+          {!authLoading && isLoggedIn && (
             <Link
               href="/dashboard"
               onClick={() => setNavOpen(false)}
@@ -1027,7 +1038,7 @@ export default function Header() {
       )}
 
       {/* ── Mobile profile bottom sheet (avatar) ────────────────────────────── */}
-      {profileOpen && isLoggedIn && (
+      {profileOpen && !authLoading && isLoggedIn && (
         <div className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end">
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/40" onClick={() => setProfileOpen(false)} />
