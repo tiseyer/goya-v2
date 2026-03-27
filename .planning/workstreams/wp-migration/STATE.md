@@ -14,18 +14,18 @@ status: In progress
 See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Every existing GOYA member transitions to v2 with profile, subscriptions, and billing intact.
-**Current focus:** v1.0 WP Migration — Phase 1 in progress
+**Current focus:** v1.0 WP Migration — Phase 2 in progress
 
 ## Current Position
 **Status:** In progress
 **Current Phase:** Phase 2 (in progress)
-**Current Plan:** 02-02 (next)
+**Current Plan:** 02-03 (next, if any; else Phase 3)
 **Last Activity:** 2026-03-27
-**Last Activity Description:** Completed Plan 02-01 — Migration infrastructure (requires_password_reset column, .gitignore, README) and 25 dummy test users in WP export format
+**Last Activity Description:** Completed Plan 02-02 — Import script (migration/import-users.ts) with skip/overwrite modes; all 25 dummy users imported successfully (0 errors)
 
 ## Progress
 **Phases Complete:** 1 (Phase 1 — WP Export Plugin)
-**Plans Complete:** 3 (01-01, 01-02, 02-01)
+**Plans Complete:** 4 (01-01, 01-02, 02-01, 02-02)
 
 ## Decisions Made
 
@@ -48,7 +48,15 @@ See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 | 01 | 01 | 1m 32s | 1/1 | 1 |
 | 01 | 02 | 5m | 2/2 | 1 |
 | 02 | 01 | ~5m | 2/2 | 4 |
+| 02 | 02 | ~15m | 2/2 | 3 |
+
+## Decisions Made (continued)
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-03-27 | Profiles table email lookup instead of listUsers() | Efficient at any scale; listUsers() paginates and is slow for 4000+ users |
+| 2026-03-27 | Map WP profile fields to actual live DB columns (bio, city, country, teaching_styles, teaching_focus_arr, influences_arr) | 002_profile_fields.sql not applied to linked project; plan spec diverged from live schema |
 
 ## Session Continuity
-**Stopped At:** Completed 02-01-PLAN.md (Migration infrastructure + 25 dummy test users)
-**Resume File:** .planning/workstreams/wp-migration/phases/02-import-script-test-data/02-01-SUMMARY.md
+**Stopped At:** Completed 02-02-PLAN.md (Import script + 25 dummy users verified)
+**Resume File:** .planning/workstreams/wp-migration/phases/02-import-script-test-data/02-02-SUMMARY.md
