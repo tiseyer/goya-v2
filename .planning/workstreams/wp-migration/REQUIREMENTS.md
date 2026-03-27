@@ -84,53 +84,53 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WPEX-01 | — | Pending |
-| WPEX-02 | — | Pending |
-| WPEX-03 | — | Pending |
-| WPEX-04 | — | Pending |
-| WPEX-05 | — | Pending |
-| WPEX-06 | — | Pending |
-| WPEX-07 | — | Pending |
-| WPEX-08 | — | Pending |
-| WPEX-09 | — | Pending |
-| WPEX-10 | — | Pending |
-| IMPT-01 | — | Pending |
-| IMPT-02 | — | Pending |
-| IMPT-03 | — | Pending |
-| IMPT-04 | — | Pending |
-| IMPT-05 | — | Pending |
-| IMPT-06 | — | Pending |
-| IMPT-07 | — | Pending |
-| IMPT-08 | — | Pending |
-| IMPT-09 | — | Pending |
-| IMPT-10 | — | Pending |
-| IMPT-11 | — | Pending |
-| IMPT-12 | — | Pending |
-| TEST-01 | — | Pending |
-| TEST-02 | — | Pending |
-| TEST-03 | — | Pending |
-| TEST-04 | — | Pending |
-| TEST-05 | — | Pending |
-| PWRS-01 | — | Pending |
-| PWRS-02 | — | Pending |
-| PWRS-03 | — | Pending |
-| PWRS-04 | — | Pending |
-| PWRS-05 | — | Pending |
-| ADMN-01 | — | Pending |
-| ADMN-02 | — | Pending |
-| ADMN-03 | — | Pending |
-| ADMN-04 | — | Pending |
-| ADMN-05 | — | Pending |
-| ADMN-06 | — | Pending |
-| ADMN-07 | — | Pending |
-| INFR-01 | — | Pending |
-| INFR-02 | — | Pending |
-| INFR-03 | — | Pending |
+| WPEX-01 | Phase 1 | Pending |
+| WPEX-02 | Phase 1 | Pending |
+| WPEX-03 | Phase 1 | Pending |
+| WPEX-04 | Phase 1 | Pending |
+| WPEX-05 | Phase 1 | Pending |
+| WPEX-06 | Phase 1 | Pending |
+| WPEX-07 | Phase 1 | Pending |
+| WPEX-08 | Phase 1 | Pending |
+| WPEX-09 | Phase 1 | Pending |
+| WPEX-10 | Phase 1 | Pending |
+| IMPT-01 | Phase 2 | Pending |
+| IMPT-02 | Phase 2 | Pending |
+| IMPT-03 | Phase 2 | Pending |
+| IMPT-04 | Phase 2 | Pending |
+| IMPT-05 | Phase 2 | Pending |
+| IMPT-06 | Phase 2 | Pending |
+| IMPT-07 | Phase 2 | Pending |
+| IMPT-08 | Phase 2 | Pending |
+| IMPT-09 | Phase 2 | Pending |
+| IMPT-10 | Phase 2 | Pending |
+| IMPT-11 | Phase 2 | Pending |
+| IMPT-12 | Phase 2 | Pending |
+| TEST-01 | Phase 2 | Pending |
+| TEST-02 | Phase 2 | Pending |
+| TEST-03 | Phase 2 | Pending |
+| TEST-04 | Phase 2 | Pending |
+| TEST-05 | Phase 2 | Pending |
+| PWRS-01 | Phase 3 | Pending |
+| PWRS-02 | Phase 3 | Pending |
+| PWRS-03 | Phase 3 | Pending |
+| PWRS-04 | Phase 3 | Pending |
+| PWRS-05 | Phase 3 | Pending |
+| ADMN-01 | Phase 4 | Pending |
+| ADMN-02 | Phase 4 | Pending |
+| ADMN-03 | Phase 4 | Pending |
+| ADMN-04 | Phase 4 | Pending |
+| ADMN-05 | Phase 4 | Pending |
+| ADMN-06 | Phase 4 | Pending |
+| ADMN-07 | Phase 4 | Pending |
+| INFR-01 | Phase 2 | Pending |
+| INFR-02 | Phase 2 | Pending |
+| INFR-03 | Phase 2 | Pending |
 
 **Coverage:**
 - v1.0 requirements: 41 total
-- Mapped to phases: 0
-- Unmapped: 41 ⚠️
+- Mapped to phases: 41
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-27*

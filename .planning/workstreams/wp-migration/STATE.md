@@ -17,10 +17,10 @@ See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 **Current focus:** v1.0 WP Migration — defining roadmap
 
 ## Current Position
-**Status:** Defining roadmap
-**Current Phase:** Not started
+**Status:** Roadmap ready
+**Current Phase:** Phase 1 (not started)
 **Last Activity:** 2026-03-27
-**Last Activity Description:** Requirements defined (41 requirements)
+**Last Activity Description:** Roadmap created (4 phases, 41 requirements mapped)
 
 ## Progress
 **Phases Complete:** 0
