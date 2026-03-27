@@ -21,7 +21,10 @@ Extend `/admin/api-keys` into a three-tab admin interface. The existing API key 
   2. Tab navigation uses the same design tokens, spacing, and interaction patterns as other admin tabbed interfaces in the codebase
   3. All existing API key create, list, and revoke functionality works identically inside the Own Keys tab as it did before migration
   4. No regression: existing API keys created before this migration remain valid and visible
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 09-01-PLAN.md — Tab shell with URL-based switching and Own Keys migration
+
 **UI hint**: yes
 
 ### Phase 10: Secrets Management
@@ -55,6 +58,6 @@ Extend `/admin/api-keys` into a three-tab admin interface. The existing API key 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 9. Tab Shell & Own Keys Migration | 0/? | Not started | - |
+| 9. Tab Shell & Own Keys Migration | 0/1 | Planned | - |
 | 10. Secrets Management | 0/? | Not started | - |
 | 11. Endpoints Documentation | 0/? | Not started | - |
