@@ -2,7 +2,7 @@
 phase: 03-password-reset-flow
 plan: "01"
 subsystem: auth-middleware
-status: awaiting-human-verify
+status: complete
 tags: [middleware, auth, password-reset, migration, next-js]
 dependency_graph:
   requires: [02-02]
@@ -25,7 +25,7 @@ decisions:
 metrics:
   duration: ~8m
   completed: 2026-03-27
-  tasks_complete: 2
+  tasks_complete: 3
   tasks_total: 3
   files_created: 2
   files_modified: 1
@@ -41,7 +41,7 @@ Password reset interception for migrated WordPress users — middleware redirect
 |------|------|--------|-------|
 | 1 | Add password reset interception to middleware | 6116d52 | middleware.ts |
 | 2 | Create server action and set-password page | a85d0bf | app/account/set-password/actions.ts, app/account/set-password/page.tsx |
-| 3 | Verify password reset flow end-to-end | — | (awaiting human verification) |
+| 3 | Verify password reset flow end-to-end | (checkpoint) | Human-verified: approved |
 
 ## What Was Built
 
@@ -87,6 +87,6 @@ None — plan executed exactly as written. The consolidation of profile queries 
 
 None — all data is wired. The `requires_password_reset` flag is read from the live profiles table and the server action updates both Supabase auth and the profile flag.
 
-## Pending
+## Self-Check: PASSED
 
-Task 3 is a `checkpoint:human-verify`. Awaiting manual end-to-end verification by the user before this plan can be marked complete.
+All files exist, all commits verified, human verification approved.

@@ -43,11 +43,11 @@
 
 ### Password Reset Flow
 
-- [ ] **PWRS-01**: Middleware intercepts users with requires_password_reset: true and redirects to /account/set-password
-- [ ] **PWRS-02**: Set-password page matches auth page style (centered card, GOYA logo, no header/footer)
-- [ ] **PWRS-03**: New password + confirm password fields with submit
-- [ ] **PWRS-04**: Submit updates Supabase auth password, sets requires_password_reset: false, redirects to dashboard
-- [ ] **PWRS-05**: All routes protected except /account/set-password and auth routes for flagged users
+- [x] **PWRS-01**: Middleware intercepts users with requires_password_reset: true and redirects to /account/set-password
+- [x] **PWRS-02**: Set-password page matches auth page style (centered card, GOYA logo, no header/footer)
+- [x] **PWRS-03**: New password + confirm password fields with submit
+- [x] **PWRS-04**: Submit updates Supabase auth password, sets requires_password_reset: false, redirects to dashboard
+- [x] **PWRS-05**: All routes protected except /account/set-password and auth routes for flagged users
 
 ### Admin Migration Page
 
@@ -111,11 +111,11 @@
 | TEST-03 | Phase 2 | Pending |
 | TEST-04 | Phase 2 | Pending |
 | TEST-05 | Phase 2 | Pending |
-| PWRS-01 | Phase 3 | Pending |
-| PWRS-02 | Phase 3 | Pending |
-| PWRS-03 | Phase 3 | Pending |
-| PWRS-04 | Phase 3 | Pending |
-| PWRS-05 | Phase 3 | Pending |
+| PWRS-01 | Phase 3 | Complete (03-01) |
+| PWRS-02 | Phase 3 | Complete (03-01) |
+| PWRS-03 | Phase 3 | Complete (03-01) |
+| PWRS-04 | Phase 3 | Complete (03-01) |
+| PWRS-05 | Phase 3 | Complete (03-01) |
 | ADMN-01 | Phase 4 | Pending |
 | ADMN-02 | Phase 4 | Pending |
 | ADMN-03 | Phase 4 | Pending |
@@ -134,4 +134,4 @@
 
 ---
 *Requirements defined: 2026-03-27*
-*Last updated: 2026-03-27 after 01-02 completion (WPEX-06, WPEX-07, WPEX-08 marked complete)*
+*Last updated: 2026-03-27 after 03-01 completion (PWRS-01 through PWRS-05 marked complete)*

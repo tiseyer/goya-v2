@@ -53,7 +53,7 @@ Plans:
   4. Auth routes and /account/set-password are exempt from the redirect
 **Plans:** 1 plan
 Plans:
-- [ ] 03-01-PLAN.md — Middleware interception, set-password page with server action, and end-to-end verification
+- [x] 03-01-PLAN.md — Middleware interception, set-password page with server action, and end-to-end verification
 **UI hint**: yes
 
 ### Phase 4: Admin Migration Page
@@ -76,5 +76,5 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. WP Export Plugin | 2/2 | Complete | 2026-03-27 |
 | 2. Import Script & Test Data | 2/2 | Complete | 2026-03-27 |
-| 3. Password Reset Flow | 0/1 | In progress | - |
+| 3. Password Reset Flow | 1/1 | Complete | 2026-03-27 |
 | 4. Admin Migration Page | 0/? | Not started | - |
