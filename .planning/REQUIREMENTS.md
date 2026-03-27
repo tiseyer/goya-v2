@@ -9,14 +9,14 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 
 ### Encrypted Key Management
 
-- [ ] **KEYS-01**: Admin can store third-party API keys encrypted with AES-256-GCM in Supabase
-- [ ] **KEYS-02**: Server-side encryption/decryption service using SECRETS_MASTER_KEY env variable
-- [ ] **KEYS-03**: Admin can add AI provider keys with provider (OpenAI/Anthropic) and model selection
+- [x] **KEYS-01**: Admin can store third-party API keys encrypted with AES-256-GCM in Supabase
+- [x] **KEYS-02**: Server-side encryption/decryption service using SECRETS_MASTER_KEY env variable
+- [x] **KEYS-03**: Admin can add AI provider keys with provider (OpenAI/Anthropic) and model selection
 - [ ] **KEYS-04**: AI Providers section shows display name, provider, model, created date — never raw key
 - [ ] **KEYS-05**: Admin can edit and delete AI provider keys
 - [ ] **KEYS-06**: General third-party keys CRUD with category filter (Auth, Analytics, Payments, Other)
 - [ ] **KEYS-07**: Third Party Keys tab in /admin/api-keys fully implemented (replaces placeholder)
-- [ ] **KEYS-08**: SECRETS_MASTER_KEY added to .env.local.example with openssl generation command
+- [x] **KEYS-08**: SECRETS_MASTER_KEY added to .env.local.example with openssl generation command
 
 ### Chat Widget
 
@@ -71,7 +71,7 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Supabase migration: secrets table with admin-only RLS
+- [x] **INFRA-01**: Supabase migration: secrets table with admin-only RLS
 - [ ] **INFRA-02**: Supabase migration: chatbot_config single-row upsert table
 - [ ] **INFRA-03**: Supabase migration: faq_items table with admin write, public read for chatbot
 - [ ] **INFRA-04**: Supabase migration: chat_sessions and chat_messages tables with session-owner RLS
@@ -106,14 +106,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| KEYS-01 | Phase 12 | Pending |
-| KEYS-02 | Phase 12 | Pending |
-| KEYS-03 | Phase 12 | Pending |
+| KEYS-01 | Phase 12 | Complete |
+| KEYS-02 | Phase 12 | Complete |
+| KEYS-03 | Phase 12 | Complete |
 | KEYS-04 | Phase 12 | Pending |
 | KEYS-05 | Phase 12 | Pending |
 | KEYS-06 | Phase 12 | Pending |
 | KEYS-07 | Phase 12 | Pending |
-| KEYS-08 | Phase 12 | Pending |
+| KEYS-08 | Phase 12 | Complete |
 | CHAT-01 | Phase 14 | Pending |
 | CHAT-02 | Phase 14 | Pending |
 | CHAT-03 | Phase 14 | Pending |
@@ -153,7 +153,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AI-09 | Phase 14 | Pending |
 | AI-10 | Phase 14 | Pending |
 | AI-11 | Phase 14 | Pending |
-| INFRA-01 | Phase 12 | Pending |
+| INFRA-01 | Phase 12 | Complete |
 | INFRA-02 | Phase 13 | Pending |
 | INFRA-03 | Phase 13 | Pending |
 | INFRA-04 | Phase 13 | Pending |

@@ -3,11 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: AI-Support-System
 status: executing
-stopped_at: Roadmap created — ready to begin Phase 12 planning
-last_updated: "2026-03-27T08:40:03.449Z"
-last_activity: 2026-03-27 - Completed quick task 260327-ldq: Implement MRN system
+stopped_at: Completed 12-01-PLAN.md
+last_updated: "2026-03-27T09:41:00Z"
+last_activity: 2026-03-27 -- Phase 12 Plan 01 completed
 progress:
-  percent: 0
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 2
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -17,32 +21,33 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 11 — endpoints-documentation
+**Current focus:** Phase 12 — encrypted-secrets-key-management
 
 ## Current Position
 
-Phase: 11 (endpoints-documentation) — EXECUTING
-Plan: 1 of 1
-Status: Executing Phase 11
-Last activity: 2026-03-27 - Completed quick task 260327-ldq: Implement MRN system
+Phase: 12 (encrypted-secrets-key-management) — EXECUTING
+Plan: 2 of 2
+Status: Plan 01 complete — ready for Plan 02
+Last activity: 2026-03-27 -- Phase 12 Plan 01 completed
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0 (this milestone)
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 1 (this milestone)
+- Average duration: ~5 min
+- Total execution time: ~5 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 12-encrypted-secrets-key-management P01 | 2 tasks | ~5 min | 3 files |
 
 *Updated after each plan completion*
+| Phase 11-endpoints-documentation P01 | 8 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -54,6 +59,10 @@ Recent decisions affecting current work:
 - v1.7: Third Party Keys tab at /admin/api-keys is a placeholder — Phase 12 activates it
 - v1.6: Per-route auth composition — /api/ excluded from middleware; chatbot route validates explicitly
 - v1.6: In-memory rate limiter sufficient for REST API — chatbot needs distributed (Upstash/Vercel KV)
+- [Phase 11-endpoints-documentation]: Static typed array for endpoint registry — no DB needed, endpoints are stable API surface
+- [Phase 11-endpoints-documentation]: No props on EndpointsTab — imports static data directly, simpler component API
+- [Phase 12-01]: listSecrets filters provider IS NULL — AI keys excluded from general secrets view; dedicated listAiProviderKeys for AI tab
+- [Phase 12-01]: seedSecrets no longer seeds ANTHROPIC_API_KEY — AI keys use dedicated createAiProviderKey flow
 
 ### Blockers/Concerns
 
@@ -76,6 +85,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27
-Stopped at: Roadmap created — ready to begin Phase 12 planning
+Last session: 2026-03-27T09:41:00Z
+Stopped at: Completed 12-01-PLAN.md
 Resume file: None

@@ -41,7 +41,7 @@ Phases 1–11 covered User Settings, Connections & Inbox, Stripe Admin & Shop, S
   5. Server-side decryption service reads SECRETS_MASTER_KEY from env and can round-trip encrypt/decrypt any stored secret
 **Plans**: 2 plans
 Plans:
-- [ ] 12-01-PLAN.md — Migration + AI provider constants + server actions
+- [x] 12-01-PLAN.md — Migration + AI provider constants + server actions
 - [ ] 12-02-PLAN.md — AI Providers UI section + SecretsTab refactor + human-verify
 **UI hint**: yes
 
@@ -93,7 +93,7 @@ Phases execute in numeric order: 12 → 13 → 14 → 15
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 12. Encrypted Secrets + Key Management | v1.8 | 0/2 | Planning complete | - |
+| 12. Encrypted Secrets + Key Management | v1.8 | 1/2 | Executing | - |
 | 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 0/TBD | Not started | - |
 | 14. AI Backend + Streaming Chat Widget | v1.8 | 0/TBD | Not started | - |
 | 15. Escalation + Support Tickets + Conversations Admin | v1.8 | 0/TBD | Not started | - |
