@@ -91,24 +91,34 @@ Previous: v1.3 Subscriptions & Teacher Upgrade, v1.2 Stripe Admin & Shop, v1.1 C
 - ✓ Admin API key management page with create/revoke UI — v1.6
 - ✓ API_DOCS.md documenting all 49 endpoints — v1.6
 
-## Current Milestone: v1.7 API Settings Page
+## Current Milestone: v1.8 AI-Support-System
 
-**Goal:** Extend `/admin/api-keys` into a three-tab admin interface for own API keys, encrypted third-party secrets, and auto-generated endpoint documentation.
+**Goal:** Add an AI-powered support chatbot ("Mattea") with encrypted third-party key management, admin configuration, FAQ knowledge base, tool-use capabilities, and escalation-to-human workflow.
 
 **Target features:**
-- Move existing API key management into "Own Keys" tab
-- Encrypted secrets manager for third-party API keys (AES-256, Supabase-stored, CRUD with categories)
-- Auto-generated endpoint documentation from `/app/api/**` route scanning
+- Encrypted third-party key manager with dedicated AI Providers section (AES-256, Supabase-stored)
+- Floating chat widget ("Mattea") on all public pages with guest and logged-in persistence
+- Admin chatbot page with Configuration, FAQ, Conversations, and API Connections tabs
+- Support ticket escalation flow integrated into admin inbox
+- AI backend with provider-agnostic calls, FAQ context, and toggleable tool use
 
 ### Active
 
-- [ ] Three-tab interface at `/admin/api-keys` (Own Keys, Third Party Keys, Endpoints)
-- [ ] Encrypted secrets table in Supabase with admin-only RLS
+- [ ] Encrypted secrets table with AES-256 encryption and admin-only RLS
 - [ ] Server-side encryption/decryption service using SECRETS_MASTER_KEY
-- [ ] CRUD API routes for secrets management
-- [ ] Secrets admin UI with category filter, search, masked values
-- [ ] Auto-scanned endpoint documentation (~49 endpoints) grouped by domain
-- [ ] SECRETS_MASTER_KEY added to .env.local.example with generation instructions
+- [ ] AI Providers CRUD UI with provider/model selection (OpenAI, Anthropic)
+- [ ] General third-party keys CRUD with categories (Auth, Analytics, Payments, Other)
+- [ ] Floating chat widget on public pages (desktop panel + mobile fullscreen)
+- [ ] Chat persistence for logged-in users (user_id) and guests (anonymous cookie ID)
+- [ ] Guest chat expiry with configurable retention and cleanup cron
+- [ ] Admin chatbot config page: name, avatar, active toggle, AI key selector, system prompt
+- [ ] FAQ management with CRUD, published/draft status, inline editing
+- [ ] Conversations viewer with filters (all/logged-in/guests/escalated)
+- [ ] API Connections tab with toggleable tools (Events, Teachers, Courses, FAQ)
+- [ ] Support tickets tab in admin inbox with escalation from chatbot
+- [ ] AI backend route: provider-agnostic calls, FAQ context injection, tool calling
+- [ ] Escalation detection (low confidence, explicit request, repeated failures)
+- [ ] Rate limiting for chatbot API (20 messages/session/hour)
 
 ### Out of Scope
 
@@ -167,4 +177,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-27 after v1.7 API Settings Page milestone started*
+*Last updated: 2026-03-27 after v1.8 AI-Support-System milestone started*
