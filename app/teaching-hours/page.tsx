@@ -117,11 +117,7 @@ export default async function TeachingHoursPage() {
           <h2 className="text-base font-semibold text-[#1B3A5C] mb-1">Log Teaching Hours</h2>
           <p className="text-sm text-slate-500 mb-5">Record classes, workshops, or private sessions you have taught.</p>
 
-          <p className="text-xs text-rose-600 bg-rose-50 border border-rose-100 rounded-lg px-3 py-2 mb-5">
-            Please allow up to 5 business days for these hours to appear on your profile.
-          </p>
-
-          <CreditSubmissionFormToggle teachingOnly={true} />
+          <CreditSubmissionFormToggle isTeacher={true} teachingOnly={true} />
         </div>
 
         {/* Teaching Hours History */}

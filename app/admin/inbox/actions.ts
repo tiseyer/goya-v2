@@ -176,3 +176,81 @@ export async function rejectUpgradeRequest(
 
   return { success: true }
 }
+
+export async function approveCreditEntry(
+  entryId: string,
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createSupabaseServerActionClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  const serviceClient = getSupabaseService()
+  const { data: adminProfile } = await serviceClient
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (
+    !adminProfile ||
+    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+  ) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (serviceClient as any)
+    .from('credit_entries')
+    .update({ status: 'approved' })
+    .eq('id', entryId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/admin/inbox')
+  return { success: true }
+}
+
+export async function rejectCreditEntry(
+  entryId: string,
+  reason: string,
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createSupabaseServerActionClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  const serviceClient = getSupabaseService()
+  const { data: adminProfile } = await serviceClient
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (
+    !adminProfile ||
+    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+  ) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (serviceClient as any)
+    .from('credit_entries')
+    .update({
+      status: 'rejected',
+      rejection_reason: reason.trim() || null,
+    })
+    .eq('id', entryId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/admin/inbox')
+  return { success: true }
+}

@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import CreditSubmissionForm from './CreditSubmissionForm';
 
 interface Props {
+  isTeacher?: boolean;
   teachingOnly?: boolean;
 }
 
-export default function CreditSubmissionFormToggle({ teachingOnly = false }: Props) {
+export default function CreditSubmissionFormToggle({ isTeacher = false, teachingOnly = false }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -41,7 +42,7 @@ export default function CreditSubmissionFormToggle({ teachingOnly = false }: Pro
         </svg>
         Hide form
       </button>
-      <CreditSubmissionForm teachingOnly={teachingOnly} onSuccess={handleSuccess} />
+      <CreditSubmissionForm isTeacher={isTeacher} teachingOnly={teachingOnly} onSuccess={handleSuccess} />
     </div>
   );
 }

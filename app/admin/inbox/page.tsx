@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
 import SchoolRegistrationsTab from './SchoolRegistrationsTab'
 import TeacherUpgradesTab from './TeacherUpgradesTab'
+import CreditsTab from './CreditsTab'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +13,7 @@ export default async function InboxPage({
   searchParams: Promise<{ tab?: string }>
 }) {
   const { tab } = await searchParams
-  const activeTab = tab === 'upgrades' ? 'upgrades' : 'schools'
+  const activeTab = tab === 'upgrades' ? 'upgrades' : tab === 'credits' ? 'credits' : 'schools'
 
   const supabase = await createSupabaseServerClient()
 
@@ -58,13 +59,36 @@ export default async function InboxPage({
 
   const pendingUpgradeCount = upgradeRequests.filter((r: { status: string }) => r.status === 'pending').length
 
+  // Fetch credit entries
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: creditData } = await (supabaseService as any)
+    .from('credit_entries')
+    .select(`
+      id, user_id, credit_type, amount, activity_date, description,
+      status, rejection_reason, source, created_at,
+      profile:user_id (id, full_name, email, avatar_url)
+    `)
+    .order('created_at', { ascending: false })
+
+  const creditEntries = (creditData ?? []).map((c: {
+    profile: unknown
+    status: string
+    [key: string]: unknown
+  }) => ({
+    ...c,
+    status: c.status as 'pending' | 'approved' | 'rejected',
+    profile: Array.isArray(c.profile) ? c.profile[0] ?? null : c.profile,
+  }))
+
+  const pendingCreditCount = creditEntries.filter((c: { status: string }) => c.status === 'pending').length
+
   return (
     <div className="p-6 sm:p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#1B3A5C]">Inbox</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Review school registrations and teacher upgrade requests
+          Review school registrations, teacher upgrade requests, and credit submissions
         </p>
       </div>
 
@@ -103,6 +127,21 @@ export default async function InboxPage({
                 </span>
               )}
             </Link>
+            <Link
+              href="/admin/inbox?tab=credits"
+              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
+                activeTab === 'credits'
+                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
+                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
+              }`}
+            >
+              Credits & Hours
+              {pendingCreditCount > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+                  {pendingCreditCount}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
       </div>
@@ -110,6 +149,7 @@ export default async function InboxPage({
       {/* Tab content */}
       {activeTab === 'schools' && <SchoolRegistrationsTab initialSchools={schools} />}
       {activeTab === 'upgrades' && <TeacherUpgradesTab initialRequests={upgradeRequests} />}
+      {activeTab === 'credits' && <CreditsTab initialEntries={creditEntries} />}
     </div>
   )
 }

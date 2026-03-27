@@ -164,18 +164,14 @@ export default async function CreditsPage() {
               <p className="text-sm text-slate-500">Log a new continuing education activity, karma service, or practice session.</p>
             </div>
             <Link
-              href="/resources"
+              href="/credits/learn"
               className="shrink-0 text-sm font-semibold text-[#4E87A0] border border-[#4E87A0] px-4 py-2 rounded-lg hover:bg-[#4E87A0]/5 transition-colors whitespace-nowrap"
             >
               Learn About Credits
             </Link>
           </div>
 
-          <p className="text-xs text-rose-600 bg-rose-50 border border-rose-100 rounded-lg px-3 py-2 mb-5">
-            Please allow up to 5 business days for these credits to appear on your profile.
-          </p>
-
-          <CreditSubmissionFormToggle />
+          <CreditSubmissionFormToggle isTeacher={isTeacher} />
         </div>
 
         {/* Credits History */}
