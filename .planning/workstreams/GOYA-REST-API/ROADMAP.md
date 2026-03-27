@@ -8,7 +8,7 @@ Extend `/admin/api-keys` into a three-tab admin interface. The existing API key 
 
 - [ ] **Phase 9: Tab Shell & Own Keys Migration** - Three-tab layout at `/admin/api-keys` with existing key management moved into Own Keys tab
 - [x] **Phase 10: Secrets Management** - Encrypted secrets table, encryption service, CRUD API routes, and full secrets admin UI (completed 2026-03-27)
-- [ ] **Phase 11: Endpoints Documentation** - Auto-scanned endpoint documentation tab with search, filter, and grouped display
+- [x] **Phase 11: Endpoints Documentation** - Auto-scanned endpoint documentation tab with search, filter, and grouped display
 
 ## Phase Details
 
@@ -55,7 +55,7 @@ Plans:
   4. Admin can type in a search box or pick a category filter and only matching endpoints are shown
 **Plans:** 1 plan
 Plans:
-- [ ] 11-01-PLAN.md — Endpoint registry, EndpointsTab component with search/filter/grouped display
+- [x] 11-01-PLAN.md — Endpoint registry, EndpointsTab component with search/filter/grouped display
 
 **UI hint**: yes
 
@@ -67,4 +67,4 @@ Plans:
 |-------|----------------|--------|-----------|
 | 9. Tab Shell & Own Keys Migration | 1/1 | Complete | 2026-03-27 |
 | 10. Secrets Management | 2/2 | Complete    | 2026-03-27 |
-| 11. Endpoints Documentation | 0/1 | Not started | - |
+| 11. Endpoints Documentation | 1/1 | Complete | 2026-03-27 |
