@@ -248,10 +248,21 @@ class GOYA_Exporter {
             $export_data[] = $this->build_user_data($user);
         }
 
-        // TODO: active subscription filter applied after enrichment
-        // When status_filter === 'active', this list will be post-filtered in Plan 02
-        // to retain only users with at least one active WooCommerce subscription.
-        // The enrichment (subscriptions[]) is populated in Plan 02.
+        // Apply active-only filter if selected (runs after enrichment so subscriptions[] is populated)
+        if ($status_filter === 'active') {
+            $export_data = array_filter($export_data, function($user) {
+                if (empty($user['subscriptions'])) {
+                    return false;
+                }
+                foreach ($user['subscriptions'] as $sub) {
+                    if ($sub['status'] === 'active') {
+                        return true;
+                    }
+                }
+                return false;
+            });
+            $export_data = array_values($export_data); // Re-index
+        }
 
         // Send the JSON file to the browser
         $this->send_json_download($export_data, $offset, $limit ?? $chunk_size);
@@ -263,8 +274,7 @@ class GOYA_Exporter {
 
     /**
      * Build the export object for a single WordPress user.
-     * Returns core WP fields only; BuddyBoss and WooCommerce data
-     * are populated by Plan 02 enrichment functions.
+     * Includes BuddyBoss xprofile data, avatar URL, and WooCommerce subscriptions.
      *
      * @param WP_User $user WordPress user object.
      * @return array Export data array.
@@ -278,10 +288,157 @@ class GOYA_Exporter {
             'last_name'     => $user->last_name,
             'role'          => !empty($user->roles) ? $user->roles[0] : 'subscriber',
             'registered_at' => $user->user_registered,
-            'profile'       => [], // Populated by Plan 02 (BuddyBoss xprofile)
-            'avatar_url'    => '', // Populated by Plan 02 (BuddyBoss avatar)
-            'subscriptions' => [], // Populated by Plan 02 (WooCommerce subscriptions)
+            'profile'       => $this->get_xprofile_data($user->ID),
+            'avatar_url'    => $this->get_avatar_url($user->ID),
+            'subscriptions' => $this->get_subscriptions($user->ID),
         ];
+    }
+
+    // -------------------------------------------------------------------------
+    // BuddyBoss Enrichment
+    // -------------------------------------------------------------------------
+
+    /**
+     * Get BuddyBoss xprofile data for a user, organized by field group.
+     * Skips groups marked as "(legacy)". Unserializes stored array values.
+     * Returns empty array if BuddyBoss is not active.
+     *
+     * @param int $user_id WordPress user ID.
+     * @return array Profile data keyed by snake_case group name, then field name.
+     */
+    private function get_xprofile_data(int $user_id): array {
+        // Guard: BuddyBoss not active
+        if (!function_exists('bp_is_active') || !bp_is_active('xprofile')) {
+            return [];
+        }
+
+        global $wpdb;
+
+        // Query all xprofile field values for this user
+        // JOIN bp_xprofile_data (d) with bp_xprofile_fields (f) on field_id
+        // to get field names alongside values
+        $results = $wpdb->get_results($wpdb->prepare(
+            "SELECT f.name AS field_name, f.group_id, d.value
+             FROM {$wpdb->prefix}bp_xprofile_data d
+             INNER JOIN {$wpdb->prefix}bp_xprofile_fields f ON d.field_id = f.id
+             WHERE d.user_id = %d",
+            $user_id
+        ));
+
+        // Also get group names for context
+        $groups = $wpdb->get_results(
+            "SELECT id, name FROM {$wpdb->prefix}bp_xprofile_groups"
+        );
+        $group_map = [];
+        foreach ($groups as $g) {
+            $group_map[$g->id] = $g->name;
+        }
+
+        // Build structured profile data organized by group
+        $profile = [];
+        foreach ($results as $row) {
+            $group_name = $group_map[$row->group_id] ?? 'Other';
+
+            // Skip legacy groups
+            if (stripos($group_name, '(legacy)') !== false) {
+                continue;
+            }
+
+            // Sanitize group name to snake_case key
+            $group_key = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '_', trim($group_name)));
+            $field_key = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '_', trim($row->field_name)));
+
+            // Unserialize if value is serialized (BuddyBoss stores arrays serialized)
+            $value = maybe_unserialize($row->value);
+
+            if (!isset($profile[$group_key])) {
+                $profile[$group_key] = [];
+            }
+            $profile[$group_key][$field_key] = $value;
+        }
+
+        return $profile;
+    }
+
+    /**
+     * Get the BuddyBoss avatar URL for a user.
+     * Returns URL string (not HTML img tag). Returns empty string if
+     * BuddyBoss is not active or no avatar is set.
+     *
+     * @param int $user_id WordPress user ID.
+     * @return string Avatar URL or empty string.
+     */
+    private function get_avatar_url(int $user_id): string {
+        // Guard: BuddyBoss not active
+        if (!function_exists('bp_core_fetch_avatar')) {
+            return '';
+        }
+
+        $avatar = bp_core_fetch_avatar([
+            'item_id' => $user_id,
+            'type'    => 'full',
+            'html'    => false, // Returns URL string, not HTML img tag
+        ]);
+
+        return $avatar ?: '';
+    }
+
+    // -------------------------------------------------------------------------
+    // WooCommerce Enrichment
+    // -------------------------------------------------------------------------
+
+    /**
+     * Get WooCommerce subscription data for a user.
+     * Returns empty array if WooCommerce Subscriptions is not active.
+     * Includes Stripe customer/subscription IDs from post meta.
+     *
+     * @param int $user_id WordPress user ID.
+     * @return array Subscription records.
+     */
+    private function get_subscriptions(int $user_id): array {
+        // Guard: WooCommerce Subscriptions not active
+        if (!function_exists('wcs_get_subscriptions')) {
+            return [];
+        }
+
+        $subscriptions = wcs_get_subscriptions([
+            'customer_id'            => $user_id,
+            'subscriptions_per_page' => -1,
+        ]);
+
+        $result = [];
+        foreach ($subscriptions as $sub) {
+            $sub_id   = $sub->get_id();
+            $result[] = [
+                'subscription_id'        => $sub_id,
+                'status'                 => $sub->get_status(),
+                'start_date'             => $sub->get_date('start'),
+                'end_date'               => $sub->get_date('end'),
+                'stripe_customer_id'     => get_post_meta($sub_id, '_stripe_customer_id', true),
+                'stripe_subscription_id' => get_post_meta($sub_id, '_stripe_subscription_id', true),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Check whether a user has at least one active WooCommerce subscription.
+     * Used as a fast check for the active-only status filter.
+     *
+     * @param int $user_id WordPress user ID.
+     * @return bool True if the user has an active subscription.
+     */
+    private function has_active_subscription(int $user_id): bool {
+        if (!function_exists('wcs_get_subscriptions')) {
+            return false;
+        }
+        $subs = wcs_get_subscriptions([
+            'customer_id'            => $user_id,
+            'subscription_status'    => 'active',
+            'subscriptions_per_page' => 1,
+        ]);
+        return !empty($subs);
     }
 
     // -------------------------------------------------------------------------
