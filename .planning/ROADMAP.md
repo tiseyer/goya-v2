@@ -55,7 +55,11 @@ Plans:
   3. Admin can create, edit, and delete FAQ entries with Published/Draft status toggle via inline row expansion
   4. Admin can search FAQ entries and filter by status; table shows Question, Answer, Status, and action buttons
   5. All five Supabase migrations are applied: secrets, chatbot_config, faq_items, chat_sessions/chat_messages, support_tickets
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 13-01-PLAN.md — All 4 Supabase migrations + chatbot types + server actions
+- [ ] 13-02-PLAN.md — Chatbot page shell + sidebar entry + Configuration tab
+- [ ] 13-03-PLAN.md — FAQ tab with search, inline editing, add modal + human-verify
 **UI hint**: yes
 
 ### Phase 14: AI Backend + Streaming Chat Widget
@@ -93,7 +97,7 @@ Phases execute in numeric order: 12 → 13 → 14 → 15
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 12. Encrypted Secrets + Key Management | v1.8 | 1/2 | Complete    | 2026-03-27 |
-| 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 0/TBD | Not started | - |
+| 12. Encrypted Secrets + Key Management | v1.8 | 2/2 | Complete    | 2026-03-27 |
+| 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 0/3 | Not started | - |
 | 14. AI Backend + Streaming Chat Widget | v1.8 | 0/TBD | Not started | - |
 | 15. Escalation + Support Tickets + Conversations Admin | v1.8 | 0/TBD | Not started | - |
