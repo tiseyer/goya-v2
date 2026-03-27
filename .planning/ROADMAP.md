@@ -93,7 +93,7 @@ Phases execute in numeric order: 12 → 13 → 14 → 15
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 12. Encrypted Secrets + Key Management | v1.8 | 1/2 | Executing | - |
+| 12. Encrypted Secrets + Key Management | v1.8 | 1/2 | Complete    | 2026-03-27 |
 | 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 0/TBD | Not started | - |
 | 14. AI Backend + Streaming Chat Widget | v1.8 | 0/TBD | Not started | - |
 | 15. Escalation + Support Tickets + Conversations Admin | v1.8 | 0/TBD | Not started | - |
