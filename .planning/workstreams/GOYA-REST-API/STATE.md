@@ -148,6 +148,7 @@ None yet.
 | 260327-j1k | Fix navbar authentication flash on page load | 2026-03-27 | 8c31667 | [260327-j1k-fix-navbar-authentication-flash-on-page-](./quick/260327-j1k-fix-navbar-authentication-flash-on-page-/) |
 | 260327-jbs | Redesign auth and onboarding pages to match GOYA branding with social login | 2026-03-27 | f817b50 | [260327-jbs-redesign-auth-and-onboarding-pages-to-ma](./quick/260327-jbs-redesign-auth-and-onboarding-pages-to-ma/) |
 | 260327-ky9 | Fix auth pages: hide header/footer, no scroll, visual hierarchy, centering | 2026-03-27 | ba0b573 | [260327-ky9-fix-auth-pages-hide-header-footer-no-scr](./quick/260327-ky9-fix-auth-pages-hide-header-footer-no-scr/) |
+| 260327-l5c | Fix logo size on auth pages and restore homepage header/footer | 2026-03-27 | 01624b5 | [260327-l5c-fix-logo-size-on-auth-pages-and-restore-](./quick/260327-l5c-fix-logo-size-on-auth-pages-and-restore-/) |
 
 ## Session Continuity
 
