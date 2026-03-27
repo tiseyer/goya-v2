@@ -1,14 +1,15 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.7
-milestone_name: API Settings Page
-status: Roadmap ready
-stopped_at: null
-last_updated: "2026-03-27T07:00:00.000Z"
+milestone_name: milestone
+status: executing
+stopped_at: "09-01 Task 1 complete — checkpoint:human-verify at Task 2"
+last_updated: "2026-03-27T07:35:00.000Z"
+last_activity: 2026-03-27 -- Phase 09 Plan 01 Task 1 executed (6fa8b66)
 progress:
   total_phases: 3
   completed_phases: 0
-  total_plans: 0
+  total_plans: 1
   completed_plans: 0
 ---
 
@@ -19,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** External services can programmatically access and manage all GOYA v2 entities through a secure, documented REST API.
-**Current focus:** v1.7 API Settings Page — roadmap defined, ready for Phase 9
+**Current focus:** Phase 09 — tab-shell-own-keys-migration
 
 ## Current Position
 
-Phase: Phase 9 (not started)
-Plan: —
-Status: Roadmap ready
-Last activity: 2026-03-27 - Completed quick task 260327-jbs: Redesign auth and onboarding pages to match GOYA branding with social login
+Phase: 09 (tab-shell-own-keys-migration) — EXECUTING
+Plan: 1 of 1 (at checkpoint — Task 1 done, awaiting human-verify for Task 2)
+Status: Executing Phase 09, Plan 01
+Last activity: 2026-03-27 -- Task 1 committed (6fa8b66), paused at checkpoint:human-verify
 
 ## Performance Metrics
 
@@ -123,6 +124,9 @@ Last activity: 2026-03-27 - Completed quick task 260327-jbs: Redesign auth and o
 - [Phase 08-admin-ui-and-documentation]: createApiKey returns rawKey in server action response — shown once, never persisted to client state after dismiss
 - [Phase 08-admin-ui-and-documentation]: Analytics endpoints documented as requiring read (not admin) — matches actual implementation
 - [Phase 08-admin-ui-and-documentation]: DELETE /addons/users/:userId/:addonId takes user_designations.id (assignment row ID), not product ID — documented in API_DOCS.md
+- [Phase 09-01]: Default tab is 'keys' — no param needed for Own Keys; consistent with most-used tab as default
+- [Phase 09-01]: Fetch api_keys unconditionally in page.tsx — fast query, avoids conditional fetch complexity
+- [Phase 09-01]: OwnKeysTab as thin wrapper — keeps server/client boundary clean, server component passes data to client table
 
 ### Pending Todos
 
@@ -141,6 +145,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T07:00:00.000Z
-Stopped at: Roadmap created for v1.7
+Last session: 2026-03-27T07:35:00.000Z
+Stopped at: "09-01 Task 1 complete — checkpoint:human-verify at /admin/api-keys"
 Resume file: None

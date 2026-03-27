@@ -23,7 +23,7 @@ Extend `/admin/api-keys` into a three-tab admin interface. The existing API key 
   4. No regression: existing API keys created before this migration remain valid and visible
 **Plans:** 1 plan
 Plans:
-- [ ] 09-01-PLAN.md — Tab shell with URL-based switching and Own Keys migration
+- [x] 09-01-PLAN.md — Tab shell with URL-based switching and Own Keys migration
 
 **UI hint**: yes
 
