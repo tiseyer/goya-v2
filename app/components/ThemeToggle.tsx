@@ -119,14 +119,13 @@ export function ThemeInline() {
             }}
             title={t.label}
             className={[
-              'flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all duration-150 cursor-pointer',
+              'flex-1 flex items-center justify-center py-1.5 rounded-md transition-all duration-150 cursor-pointer',
               active
                 ? 'bg-surface text-primary shadow-sm'
                 : 'text-foreground-tertiary hover:text-foreground-secondary',
             ].join(' ')}
           >
             {t.icon}
-            <span>{t.label}</span>
           </button>
         );
       })}
