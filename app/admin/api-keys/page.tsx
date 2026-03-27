@@ -3,7 +3,7 @@ import { getSupabaseService } from '@/lib/supabase/service'
 import type { ApiKeyRow } from '@/lib/api/types'
 import OwnKeysTab from './OwnKeysTab'
 import SecretsTab from './SecretsTab'
-import EndpointsPlaceholder from './EndpointsPlaceholder'
+import EndpointsTab from './EndpointsTab'
 import { listSecrets, seedSecrets } from './secrets-actions'
 import type { SecretListItem } from './secrets-actions'
 
@@ -90,7 +90,7 @@ export default async function ApiKeysPage({
       {/* Tab content */}
       {activeTab === 'keys' && <OwnKeysTab initialKeys={apiKeys} />}
       {activeTab === 'secrets' && <SecretsTab initialSecrets={initialSecrets} />}
-      {activeTab === 'endpoints' && <EndpointsPlaceholder />}
+      {activeTab === 'endpoints' && <EndpointsTab />}
     </div>
   )
 }
