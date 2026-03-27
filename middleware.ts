@@ -5,7 +5,7 @@ import { createServerClient } from '@supabase/ssr'
 // Public paths that don't require authentication
 const PUBLIC_PATHS = [
   '/sign-in', '/sign-up', '/register', '/login', '/forgot-password', '/reset-password',
-  '/events', '/academy',
+  '/events', '/academy', '/auth/callback',
 ]
 
 // Paths that require auth
@@ -23,6 +23,7 @@ const ONBOARDING_GATED_PATHS = [
 const MAINTENANCE_BYPASS_PATHS = [
   '/maintenance',
   '/sign-in', '/sign-up', '/register', '/login', '/forgot-password', '/reset-password',
+  '/auth/callback',
 ]
 
 // ─── Maintenance settings cache (60s TTL, module-level for Edge Runtime) ──────
