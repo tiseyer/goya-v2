@@ -64,7 +64,7 @@ export default async function CreditsPage() {
     .eq('id', user.id)
     .single();
 
-  const isTeacher = profile?.member_type === 'teacher';
+  const isTeacher = profile?.member_type === 'teacher' || profile?.role === 'admin';
 
   const creditStatus = await getUserCreditStatus(user.id, supabase, isTeacher);
 

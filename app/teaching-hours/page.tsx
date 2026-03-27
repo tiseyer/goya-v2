@@ -19,7 +19,7 @@ export default async function TeachingHoursPage() {
     .eq('id', user.id)
     .single();
 
-  if (profile?.member_type !== 'teacher') {
+  if (profile?.member_type !== 'teacher' && profile?.role !== 'admin') {
     redirect('/credits');
   }
 

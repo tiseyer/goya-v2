@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { submitCreditEntry } from '../actions';
 import { cn } from '@/lib/cn';
-import { GraduationCap, Heart, Flower2, Users, Info, ChevronRight, ChevronLeft, Minus, Plus, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, Heart, Flower2, Users, Info, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, Minus, Plus, CheckCircle2 } from 'lucide-react';
 import Button from '@/app/components/ui/Button';
 
 interface Props {
@@ -81,8 +81,58 @@ function InlineCalendar({
     return `${nm.getFullYear()}-${String(nm.getMonth() + 1).padStart(2, '0')}-01` <= maxDate;
   })();
 
+  const minYear = parseInt(minDate.slice(0, 4));
+  const maxYear = parseInt(maxDate.slice(0, 4));
+  const canPrevYear = year > minYear;
+  const canNextYear = year < maxYear;
+
+  function prevYear() {
+    const target = new Date(year - 1, month, 1);
+    // Clamp to minDate's month if we'd go below
+    if (`${year - 1}-${String(month + 1).padStart(2, '0')}-01` < minDate) {
+      const minMonth = parseInt(minDate.slice(5, 7)) - 1;
+      setViewDate(new Date(year - 1, minMonth, 1));
+    } else {
+      setViewDate(target);
+    }
+  }
+
+  function nextYear() {
+    const target = new Date(year + 1, month, 1);
+    // Clamp to maxDate's month if we'd go above
+    if (`${year + 1}-${String(month + 1).padStart(2, '0')}-01` > maxDate) {
+      const maxMonth = parseInt(maxDate.slice(5, 7)) - 1;
+      setViewDate(new Date(year + 1, maxMonth, 1));
+    } else {
+      setViewDate(target);
+    }
+  }
+
   return (
     <div className="max-w-xs mx-auto">
+      {/* Year navigation */}
+      <div className="flex items-center justify-center gap-3 mb-2">
+        <button
+          type="button"
+          onClick={prevYear}
+          disabled={!canPrevYear}
+          className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 disabled:opacity-20 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          aria-label="Previous year"
+        >
+          <ChevronUp className="w-3.5 h-3.5" />
+        </button>
+        <span className="text-xs font-bold text-primary-dark tabular-nums min-w-[3ch] text-center">{year}</span>
+        <button
+          type="button"
+          onClick={nextYear}
+          disabled={!canNextYear}
+          className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 disabled:opacity-20 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          aria-label="Next year"
+        >
+          <ChevronDown className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
       {/* Month navigation */}
       <div className="flex items-center justify-between mb-3">
         <button
@@ -94,7 +144,7 @@ function InlineCalendar({
           <ChevronLeft className="w-4 h-4" />
         </button>
         <span className="text-sm font-semibold text-primary-dark">
-          {MONTH_NAMES[month]} {year}
+          {MONTH_NAMES[month]}
         </span>
         <button
           type="button"
