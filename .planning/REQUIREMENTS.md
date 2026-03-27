@@ -106,66 +106,66 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| KEYS-01 | — | Pending |
-| KEYS-02 | — | Pending |
-| KEYS-03 | — | Pending |
-| KEYS-04 | — | Pending |
-| KEYS-05 | — | Pending |
-| KEYS-06 | — | Pending |
-| KEYS-07 | — | Pending |
-| KEYS-08 | — | Pending |
-| CHAT-01 | — | Pending |
-| CHAT-02 | — | Pending |
-| CHAT-03 | — | Pending |
-| CHAT-04 | — | Pending |
-| CHAT-05 | — | Pending |
-| CHAT-06 | — | Pending |
-| CHAT-07 | — | Pending |
-| CHAT-08 | — | Pending |
-| CHAT-09 | — | Pending |
-| CHAT-10 | — | Pending |
-| CHAT-11 | — | Pending |
-| CHAT-12 | — | Pending |
-| ADMIN-01 | — | Pending |
-| ADMIN-02 | — | Pending |
-| ADMIN-03 | — | Pending |
-| ADMIN-04 | — | Pending |
-| ADMIN-05 | — | Pending |
-| ADMIN-06 | — | Pending |
-| ADMIN-07 | — | Pending |
-| ADMIN-08 | — | Pending |
-| ADMIN-09 | — | Pending |
-| ADMIN-10 | — | Pending |
-| ADMIN-11 | — | Pending |
-| SUPP-01 | — | Pending |
-| SUPP-02 | — | Pending |
-| SUPP-03 | — | Pending |
-| SUPP-04 | — | Pending |
-| SUPP-05 | — | Pending |
-| AI-01 | — | Pending |
-| AI-02 | — | Pending |
-| AI-03 | — | Pending |
-| AI-04 | — | Pending |
-| AI-05 | — | Pending |
-| AI-06 | — | Pending |
-| AI-07 | — | Pending |
-| AI-08 | — | Pending |
-| AI-09 | — | Pending |
-| AI-10 | — | Pending |
-| AI-11 | — | Pending |
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| INFRA-06 | — | Pending |
-| INFRA-07 | — | Pending |
+| KEYS-01 | Phase 12 | Pending |
+| KEYS-02 | Phase 12 | Pending |
+| KEYS-03 | Phase 12 | Pending |
+| KEYS-04 | Phase 12 | Pending |
+| KEYS-05 | Phase 12 | Pending |
+| KEYS-06 | Phase 12 | Pending |
+| KEYS-07 | Phase 12 | Pending |
+| KEYS-08 | Phase 12 | Pending |
+| CHAT-01 | Phase 14 | Pending |
+| CHAT-02 | Phase 14 | Pending |
+| CHAT-03 | Phase 14 | Pending |
+| CHAT-04 | Phase 14 | Pending |
+| CHAT-05 | Phase 14 | Pending |
+| CHAT-06 | Phase 14 | Pending |
+| CHAT-07 | Phase 14 | Pending |
+| CHAT-08 | Phase 14 | Pending |
+| CHAT-09 | Phase 14 | Pending |
+| CHAT-10 | Phase 14 | Pending |
+| CHAT-11 | Phase 14 | Pending |
+| CHAT-12 | Phase 14 | Pending |
+| ADMIN-01 | Phase 13 | Pending |
+| ADMIN-02 | Phase 13 | Pending |
+| ADMIN-03 | Phase 13 | Pending |
+| ADMIN-04 | Phase 13 | Pending |
+| ADMIN-05 | Phase 13 | Pending |
+| ADMIN-06 | Phase 13 | Pending |
+| ADMIN-07 | Phase 15 | Pending |
+| ADMIN-08 | Phase 15 | Pending |
+| ADMIN-09 | Phase 15 | Pending |
+| ADMIN-10 | Phase 15 | Pending |
+| ADMIN-11 | Phase 15 | Pending |
+| SUPP-01 | Phase 15 | Pending |
+| SUPP-02 | Phase 15 | Pending |
+| SUPP-03 | Phase 15 | Pending |
+| SUPP-04 | Phase 15 | Pending |
+| SUPP-05 | Phase 15 | Pending |
+| AI-01 | Phase 14 | Pending |
+| AI-02 | Phase 14 | Pending |
+| AI-03 | Phase 14 | Pending |
+| AI-04 | Phase 14 | Pending |
+| AI-05 | Phase 14 | Pending |
+| AI-06 | Phase 14 | Pending |
+| AI-07 | Phase 14 | Pending |
+| AI-08 | Phase 14 | Pending |
+| AI-09 | Phase 14 | Pending |
+| AI-10 | Phase 14 | Pending |
+| AI-11 | Phase 14 | Pending |
+| INFRA-01 | Phase 12 | Pending |
+| INFRA-02 | Phase 13 | Pending |
+| INFRA-03 | Phase 13 | Pending |
+| INFRA-04 | Phase 13 | Pending |
+| INFRA-05 | Phase 13 | Pending |
+| INFRA-06 | Phase 15 | Pending |
+| INFRA-07 | Phase 14 | Pending |
 
 **Coverage:**
-- v1.8 requirements: 49 total
-- Mapped to phases: 0
-- Unmapped: 49
+- v1.8 requirements: 54 total
+- Mapped to phases: 54
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-27*
-*Last updated: 2026-03-27 after initial definition*
+*Last updated: 2026-03-27 after roadmap creation — all 54 requirements mapped*
