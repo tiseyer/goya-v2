@@ -20,8 +20,14 @@ const TYPE_LABELS: Record<CreditType, string> = {
 
 const STATUS_STYLES: Record<string, string> = {
   approved: 'bg-emerald-100 text-emerald-700',
-  pending:  'bg-amber-100 text-amber-700',
+  pending:  'bg-slate-100 text-slate-600',
   rejected: 'bg-rose-100 text-rose-700',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  approved: 'Approved',
+  pending:  'Pending Review',
+  rejected: 'Rejected',
 };
 
 function formatDate(dateStr: string) {
@@ -127,7 +133,7 @@ export default function CreditHistory({ filterType }: Props) {
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_STYLES[entry.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                          {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                          {STATUS_LABELS[entry.status] ?? entry.status}
                         </span>
                       </td>
                       <td className="px-4 py-3.5 text-slate-500 whitespace-nowrap text-xs">
@@ -154,7 +160,7 @@ export default function CreditHistory({ filterType }: Props) {
                       {TYPE_LABELS[entry.credit_type] ?? entry.credit_type}
                     </span>
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold shrink-0 ${STATUS_STYLES[entry.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                      {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                      {STATUS_LABELS[entry.status] ?? entry.status}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">

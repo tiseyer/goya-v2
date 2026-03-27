@@ -25,7 +25,7 @@ export async function submitCreditEntry(payload: SubmitCreditPayload) {
       activity_date: activityDate,
       description,
       source: 'manual',
-      status: 'approved',
+      status: 'pending',
     });
 
   if (error) return { error: error.message };
