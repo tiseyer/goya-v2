@@ -108,6 +108,14 @@ None - all enrollment functions query the real user_course_progress table via se
 - Enrollment endpoints complete; courses API is fully implemented (CRSE-01 through CRSE-08)
 - Phase 04 complete — ready for Phase 05 or any phase consuming course/enrollment data
 
+## Self-Check: PASSED
+
+- FOUND: app/api/v1/courses/[id]/enrollments/route.ts
+- FOUND: app/api/v1/courses/[id]/enrollments/[userId]/route.ts
+- FOUND: .planning/workstreams/GOYA-REST-API/phases/04-courses/04-02-SUMMARY.md
+- FOUND commit: e422feb (Task 1)
+- FOUND commit: 2b2a6f7 (Task 2)
+
 ---
 *Phase: 04-courses*
 *Completed: 2026-03-26*
