@@ -4,8 +4,8 @@ import type { ApiKeyRow } from '@/lib/api/types'
 import OwnKeysTab from './OwnKeysTab'
 import SecretsTab from './SecretsTab'
 import EndpointsTab from './EndpointsTab'
-import { listSecrets, seedSecrets } from './secrets-actions'
-import type { SecretListItem } from './secrets-actions'
+import { listSecrets, seedSecrets, listAiProviderKeys } from './secrets-actions'
+import type { SecretListItem, AiProviderKeyItem } from './secrets-actions'
 
 export default async function ApiKeysPage({
   searchParams,
@@ -36,8 +36,12 @@ export default async function ApiKeysPage({
 
   // Seed placeholder entries on first visit (no-op if already seeded)
   await seedSecrets()
-  const secretsResult = await listSecrets()
+  const [secretsResult, aiKeysResult] = await Promise.all([
+    listSecrets(),
+    listAiProviderKeys(),
+  ])
   const initialSecrets: SecretListItem[] = secretsResult.success ? secretsResult.secrets : []
+  const initialAiKeys: AiProviderKeyItem[] = aiKeysResult.success ? aiKeysResult.keys : []
 
   return (
     <div className="p-6 lg:p-8">
@@ -89,7 +93,7 @@ export default async function ApiKeysPage({
 
       {/* Tab content */}
       {activeTab === 'keys' && <OwnKeysTab initialKeys={apiKeys} />}
-      {activeTab === 'secrets' && <SecretsTab initialSecrets={initialSecrets} />}
+      {activeTab === 'secrets' && <SecretsTab initialSecrets={initialSecrets} initialAiKeys={initialAiKeys} />}
       {activeTab === 'endpoints' && <EndpointsTab />}
     </div>
   )

@@ -1,12 +1,13 @@
 'use client'
 
-// Seed data (Google OAuth, GA4, Clarity, Meta Pixel, Anthropic) is expected to exist
+// Seed data (Google OAuth, GA4, Clarity, Meta Pixel) is expected to exist
 // on first load — seeded by seedSecrets() called from page.tsx server component.
 
 import { useState } from 'react'
-import type { SecretListItem, SecretCategory } from './secrets-actions'
+import type { SecretListItem, SecretCategory, AiProviderKeyItem } from './secrets-actions'
 import { listSecrets, deleteSecret } from './secrets-actions'
 import SecretModal from './SecretModal'
+import AiProvidersSection from './AiProvidersSection'
 
 const CATEGORIES: SecretCategory[] = ['Auth', 'Analytics', 'Payments', 'AI', 'Other']
 
@@ -38,7 +39,12 @@ type ModalState =
   | { mode: 'create' }
   | { mode: 'edit'; secret: SecretListItem }
 
-export default function SecretsTab({ initialSecrets }: { initialSecrets: SecretListItem[] }) {
+interface SecretsTabProps {
+  initialSecrets: SecretListItem[]
+  initialAiKeys: AiProviderKeyItem[]
+}
+
+export default function SecretsTab({ initialSecrets, initialAiKeys }: SecretsTabProps) {
   const [secrets, setSecrets] = useState<SecretListItem[]>(initialSecrets)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<SecretCategory | 'All'>('All')
@@ -71,6 +77,13 @@ export default function SecretsTab({ initialSecrets }: { initialSecrets: SecretL
 
   return (
     <div>
+      {/* AI Providers section */}
+      <AiProvidersSection initialKeys={initialAiKeys} />
+
+      {/* Section divider */}
+      <div className="mt-8 mb-4" />
+
+      {/* General Keys section */}
       {/* Toolbar: category filter + search + add button */}
       <div className="mb-4 flex flex-wrap items-center gap-3 justify-between">
         {/* Category filter pills */}
