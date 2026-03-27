@@ -18,14 +18,14 @@ See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 
 ## Current Position
 **Status:** In progress
-**Current Phase:** Phase 1 (in progress)
-**Current Plan:** 01-02 (next)
+**Current Phase:** Phase 1 (complete)
+**Current Plan:** 02-01 (next)
 **Last Activity:** 2026-03-27
-**Last Activity Description:** Completed Plan 01-01 — WordPress export plugin scaffold with admin page, core WP user export, chunking, and filters
+**Last Activity Description:** Completed Plan 01-02 — BuddyBoss xprofile, avatar URL, and WooCommerce subscription enrichment; active subscription filter activated
 
 ## Progress
-**Phases Complete:** 0
-**Plans Complete:** 1 (01-01)
+**Phases Complete:** 1 (Phase 1 — WP Export Plugin)
+**Plans Complete:** 2 (01-01, 01-02)
 
 ## Decisions Made
 
@@ -35,13 +35,17 @@ See: .planning/workstreams/wp-migration/PROJECT.md (updated 2026-03-27)
 | 2026-03-27 | WP_User_Query with offset/limit for pagination | Avoids WordPress timeout on 4000+ users |
 | 2026-03-27 | Defer active status filter to Plan 02 | Filter requires subscriptions[] enrichment not yet available |
 | 2026-03-27 | Placeholder arrays for profile/avatar/subscriptions in Plan 01-01 | Plan 02 adds BuddyBoss and WooCommerce enrichment |
+| 2026-03-27 | Direct SQL JOIN on bp_xprofile_data + bp_xprofile_fields | Avoids N+1 queries; single round trip for all xprofile field values |
+| 2026-03-27 | Skip (legacy) groups via stripos on group name | Preserves forward compatibility if new legacy groups are added |
+| 2026-03-27 | Post-enrichment array_filter for active subscription status | Subscription data must be populated before filtering |
 
 ## Performance Metrics
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 01 | 01 | 1m 32s | 1/1 | 1 |
+| 01 | 02 | 5m | 2/2 | 1 |
 
 ## Session Continuity
-**Stopped At:** Completed 01-01-PLAN.md (WP export plugin scaffold)
-**Resume File:** .planning/workstreams/wp-migration/phases/01-wp-export-plugin/01-01-SUMMARY.md
+**Stopped At:** Completed 01-02-PLAN.md (BuddyBoss + WooCommerce enrichment — Phase 1 complete)
+**Resume File:** .planning/workstreams/wp-migration/phases/01-wp-export-plugin/01-02-SUMMARY.md

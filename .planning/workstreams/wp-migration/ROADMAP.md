@@ -6,7 +6,7 @@ Build a complete WordPress-to-Supabase user migration pipeline. Phase 1 creates 
 
 ## Phases
 
-- [ ] **Phase 1: WP Export Plugin** - Self-contained WordPress plugin that exports user data as chunked JSON
+- [x] **Phase 1: WP Export Plugin** - Self-contained WordPress plugin that exports user data as chunked JSON
 - [ ] **Phase 2: Import Script & Test Data** - Node.js import script with skip/overwrite modes, dummy test data, and migration infrastructure
 - [ ] **Phase 3: Password Reset Flow** - Middleware interception and set-password page for migrated users
 - [ ] **Phase 4: Admin Migration Page** - Admin UI for uploading JSON files and running imports with live progress
@@ -25,7 +25,7 @@ Build a complete WordPress-to-Supabase user migration pipeline. Phase 1 creates 
 **Plans:** 2 plans
 Plans:
 - [x] 01-01-PLAN.md — Plugin scaffold, admin page, core WP user export with chunking and filters
-- [ ] 01-02-PLAN.md — BuddyBoss xprofile, avatar URL, and WooCommerce subscription enrichment
+- [x] 01-02-PLAN.md — BuddyBoss xprofile, avatar URL, and WooCommerce subscription enrichment
 
 ### Phase 2: Import Script & Test Data
 **Goal**: Admins can run the CLI import script against exported JSON files and see users created in Supabase with correct profiles, roles, MRNs, and subscription data
@@ -69,7 +69,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. WP Export Plugin | 1/2 | In progress | - |
+| 1. WP Export Plugin | 2/2 | Complete | 2026-03-27 |
 | 2. Import Script & Test Data | 0/? | Not started | - |
 | 3. Password Reset Flow | 0/? | Not started | - |
 | 4. Admin Migration Page | 0/? | Not started | - |

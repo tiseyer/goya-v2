@@ -12,9 +12,9 @@
 - [x] **WPEX-03**: Export Chunk button downloads JSON file named goya-export-chunk-{offset}-{limit}.json
 - [x] **WPEX-04**: Export All button exports everything with slow-operation warning for 4000+ users
 - [x] **WPEX-05**: Per-user JSON includes core WP fields (ID, email, display_name, first/last name, role, registered_at)
-- [ ] **WPEX-06**: Per-user JSON includes all BuddyBoss xprofile fields (General, About, Practice, Teaching, School, Socials, Languages, Location)
-- [ ] **WPEX-07**: Per-user JSON includes avatar URL via BuddyBoss avatar functions
-- [ ] **WPEX-08**: Per-user JSON includes WooCommerce subscriptions with stripe_customer_id and stripe_subscription_id
+- [x] **WPEX-06**: Per-user JSON includes all BuddyBoss xprofile fields (General, About, Practice, Teaching, School, Socials, Languages, Location)
+- [x] **WPEX-07**: Per-user JSON includes avatar URL via BuddyBoss avatar functions
+- [x] **WPEX-08**: Per-user JSON includes WooCommerce subscriptions with stripe_customer_id and stripe_subscription_id
 - [x] **WPEX-09**: Plugin is read-only — zero writes to the WordPress database
 - [x] **WPEX-10**: Filter options: export all / only active members / only specific roles
 
@@ -89,9 +89,9 @@
 | WPEX-03 | Phase 1 | Complete (01-01) |
 | WPEX-04 | Phase 1 | Complete (01-01) |
 | WPEX-05 | Phase 1 | Complete (01-01) |
-| WPEX-06 | Phase 1 | Pending (01-02) |
-| WPEX-07 | Phase 1 | Pending (01-02) |
-| WPEX-08 | Phase 1 | Pending (01-02) |
+| WPEX-06 | Phase 1 | Complete (01-02) |
+| WPEX-07 | Phase 1 | Complete (01-02) |
+| WPEX-08 | Phase 1 | Complete (01-02) |
 | WPEX-09 | Phase 1 | Complete (01-01) |
 | WPEX-10 | Phase 1 | Complete (01-01) |
 | IMPT-01 | Phase 2 | Pending |
@@ -134,4 +134,4 @@
 
 ---
 *Requirements defined: 2026-03-27*
-*Last updated: 2026-03-27 after initial definition*
+*Last updated: 2026-03-27 after 01-02 completion (WPEX-06, WPEX-07, WPEX-08 marked complete)*
