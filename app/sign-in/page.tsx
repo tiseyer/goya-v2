@@ -42,13 +42,11 @@ export default function SignInPage() {
     <div className="h-screen overflow-hidden flex items-center justify-center px-4 bg-[#f8f9fa]">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <Link href="/">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/GOYA Logo Blue.png" alt="GOYA" className="h-10 mx-auto mb-4" />
+            <img src="/images/GOYA Logo Blue.png" alt="GOYA" className="h-8 mx-auto" />
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
-          <p className="text-slate-500 text-sm mt-1">Sign in to your GOYA account</p>
         </div>
 
         <div className="bg-white rounded-2xl p-8 border border-[var(--goya-border)] shadow-sm">

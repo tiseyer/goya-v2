@@ -93,14 +93,15 @@ export async function middleware(request: NextRequest) {
 
   // Fast path: skip auth entirely for public paths when maintenance is off
   if (!maintenanceActive && !isProtectedPath && !isOnboardingPath) {
-    const res = NextResponse.next({ request: { headers: request.headers } })
-    res.headers.set('x-pathname', pathname)
-    return res
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-pathname', pathname)
+    return NextResponse.next({ request: { headers: requestHeaders } })
   }
 
   // ─── Set up Supabase client (needed for session refresh + auth) ──────────────
-  let response = NextResponse.next({ request: { headers: request.headers } })
-  response.headers.set('x-pathname', pathname)
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-pathname', pathname)
+  let response = NextResponse.next({ request: { headers: requestHeaders } })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -114,7 +115,7 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
-          response = NextResponse.next({ request })
+          response = NextResponse.next({ request: { headers: requestHeaders } })
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options)
           )

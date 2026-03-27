@@ -100,10 +100,12 @@ export default function RegisterPage() {
     <div className="h-screen overflow-hidden flex flex-col items-center justify-center px-4 bg-[#f8f9fa]">
 
       {/* Logo */}
-      <Link href="/" className="mb-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/GOYA Logo Blue.png" alt="GOYA" style={{ width: '96px', height: 'auto' }} />
-      </Link>
+      <div className="text-center mb-6">
+        <Link href="/">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/GOYA Logo Blue.png" alt="GOYA" className="h-8 mx-auto" />
+        </Link>
+      </div>
 
       {/* Card — same container for every step */}
       <div className="w-full max-w-[520px]">

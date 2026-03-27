@@ -36,18 +36,18 @@ export default function ForgotPasswordPage() {
     <div className="h-screen overflow-hidden flex items-center justify-center px-4 bg-[#f8f9fa]">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <Link href="/">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/GOYA Logo Blue.png" alt="GOYA" className="h-10 mx-auto mb-4" />
+            <img src="/images/GOYA Logo Blue.png" alt="GOYA" className="h-8 mx-auto" />
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Reset your password</h1>
-          <p className="text-slate-500 text-sm mt-1">
-            {sent ? 'Check your inbox' : "Enter your email and we'll send you a reset link"}
-          </p>
         </div>
 
         <div className="bg-white rounded-2xl p-8 border border-[var(--goya-border)] shadow-sm">
+          <h1 className="text-lg font-semibold text-slate-900 mb-1">Reset your password</h1>
+          <p className="text-slate-500 text-sm mb-6">
+            {sent ? 'Check your inbox' : "Enter your email and we'll send you a reset link"}
+          </p>
           {sent ? (
             <div className="text-center py-4">
               <div className="w-16 h-16 bg-[#345c83] rounded-full flex items-center justify-center mx-auto mb-5">
