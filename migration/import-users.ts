@@ -149,12 +149,6 @@ function mapRole(wpRole: string): 'student' | 'teacher' | 'wellness_practitioner
 function buildProfileUpdate(user: WPExportUser): Record<string, unknown> {
   const p = user.profile;
 
-  // Build location string from city + country
-  const locationParts: string[] = [];
-  if (p.location?.city) locationParts.push(p.location.city);
-  if (p.location?.country) locationParts.push(p.location.country);
-  const location = locationParts.length > 0 ? locationParts.join(', ') : null;
-
   // Determine first_name and last_name — prefer explicit fields, fallback to display_name split
   let firstName = user.first_name || '';
   let lastName = user.last_name || '';
@@ -167,8 +161,13 @@ function buildProfileUpdate(user: WPExportUser): Record<string, unknown> {
   // Determine subscription_status — 'member' if any active subscription
   const hasActiveSub = user.subscriptions.some((s) => s.status === 'active');
 
+  // Map teaching_styles (stored as jsonb array in teaching_styles column)
+  const teachingStyles = p.teaching?.teaching_styles || [];
+  const teachingFocusArr = p.teaching?.teaching_focus || [];
+  const influencesArr = (p.school?.lineage || []) as string[];
+
   return {
-    // Name fields (full_name auto-computed by sync_full_name trigger)
+    // Name fields
     first_name: firstName || null,
     last_name: lastName || null,
 
@@ -178,30 +177,23 @@ function buildProfileUpdate(user: WPExportUser): Record<string, unknown> {
     // Avatar
     avatar_url: user.avatar_url || null,
 
-    // About
-    introduction: p.about?.introduction || null,
-    biography: p.about?.personal_bio || null,
-
-    // Practice
-    practice_level: p.practice?.practice_level || null,
-    practice_styles: p.practice?.practice_styles || [],
-
-    // Teaching
-    years_teaching: p.teaching?.years_teaching || null,
-    teaching_styles_profile: p.teaching?.teaching_styles || [],
-    teaching_focus: p.teaching?.teaching_focus || [],
-    teaching_format: p.teaching?.teaching_format || null,
-
-    // School / Lineage
-    lineage: p.school?.lineage || [],
+    // Bio (maps from personal_bio; introduction not a column in current schema)
+    bio: p.about?.personal_bio || p.about?.introduction || null,
 
     // Socials
     website: p.socials?.website || null,
     instagram: p.socials?.instagram || null,
     youtube: p.socials?.youtube || null,
 
-    // Location
-    location: location,
+    // Location — stored as separate city/country columns in current schema
+    city: p.location?.city || null,
+    country: p.location?.country || null,
+    location: [p.location?.city, p.location?.country].filter(Boolean).join(', ') || null,
+
+    // Teaching data — mapped to current schema columns
+    teaching_styles: teachingStyles.length > 0 ? teachingStyles : null,
+    teaching_focus_arr: teachingFocusArr.length > 0 ? teachingFocusArr : null,
+    influences_arr: influencesArr.length > 0 ? influencesArr : null,
 
     // Subscription status
     subscription_status: hasActiveSub ? 'member' : 'guest',
@@ -453,7 +445,7 @@ async function importUsers(): Promise<void> {
     started_at: startedAt,
     completed_at: completedAt,
     mode,
-    files: filePaths.map(basename),
+    files: filePaths.map((f) => basename(f)),
     total: allUsers.length,
     created,
     skipped,
