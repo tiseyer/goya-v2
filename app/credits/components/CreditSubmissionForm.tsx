@@ -21,6 +21,150 @@ interface CategoryCard {
   icon: React.ReactNode;
 }
 
+// ─── Inline Calendar Component ──────────────────────────────────────────────
+
+function InlineCalendar({
+  value,
+  onChange,
+  minDate,
+  maxDate,
+}: {
+  value: string;
+  onChange: (date: string) => void;
+  minDate: string;
+  maxDate: string;
+}) {
+  const [viewDate, setViewDate] = useState(() => {
+    if (value) return new Date(value + 'T00:00:00');
+    return new Date();
+  });
+
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+
+  const MONTH_NAMES = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+  const DAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+  // First day of month and number of days
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // Build grid: pad with nulls for empty cells before first day
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  function toDateStr(d: number): string {
+    return `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  }
+
+  function isDisabled(d: number): boolean {
+    const ds = toDateStr(d);
+    return ds < minDate || ds > maxDate;
+  }
+
+  function prevMonth() {
+    setViewDate(new Date(year, month - 1, 1));
+  }
+
+  function nextMonth() {
+    setViewDate(new Date(year, month + 1, 1));
+  }
+
+  // Can navigate to prev/next month?
+  const canPrev = `${year}-${String(month + 1).padStart(2, '0')}-01` > minDate;
+  const canNext = (() => {
+    const nm = new Date(year, month + 1, 1);
+    return `${nm.getFullYear()}-${String(nm.getMonth() + 1).padStart(2, '0')}-01` <= maxDate;
+  })();
+
+  return (
+    <div className="max-w-xs mx-auto">
+      {/* Month navigation */}
+      <div className="flex items-center justify-between mb-3">
+        <button
+          type="button"
+          onClick={prevMonth}
+          disabled={!canPrev}
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <span className="text-sm font-semibold text-primary-dark">
+          {MONTH_NAMES[month]} {year}
+        </span>
+        <button
+          type="button"
+          onClick={nextMonth}
+          disabled={!canNext}
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Day headers */}
+      <div className="grid grid-cols-7 mb-1">
+        {DAY_LABELS.map(d => (
+          <div key={d} className="text-center text-xs font-medium text-slate-400 py-1">
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* Day grid */}
+      <div className="grid grid-cols-7 gap-0.5">
+        {cells.map((day, i) => {
+          if (day === null) {
+            return <div key={`empty-${i}`} className="h-9" />;
+          }
+          const ds = toDateStr(day);
+          const selected = ds === value;
+          const disabled = isDisabled(day);
+          const isToday = ds === maxDate;
+
+          return (
+            <button
+              key={ds}
+              type="button"
+              onClick={() => !disabled && onChange(ds)}
+              disabled={disabled}
+              className={cn(
+                'h-9 w-full rounded-lg text-sm font-medium transition-all duration-150',
+                selected
+                  ? 'bg-primary text-white shadow-sm'
+                  : disabled
+                    ? 'text-slate-300 cursor-not-allowed'
+                    : 'text-slate-700 hover:bg-primary-50 cursor-pointer',
+                isToday && !selected && 'ring-1 ring-primary/30',
+              )}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Selected date display */}
+      {value && (
+        <p className="text-sm text-primary font-medium text-center mt-3">
+          {new Date(value + 'T00:00:00').toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          })}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Form Component ────────────────────────────────────────────────────
+
 export default function CreditSubmissionForm({ isTeacher, teachingOnly = false, onSuccess }: Props) {
   const totalSteps = teachingOnly ? 4 : 5;
   const [step, setStep] = useState(1);
@@ -291,28 +435,24 @@ export default function CreditSubmissionForm({ isTeacher, teachingOnly = false, 
         </div>
       )}
 
-      {/* Step 4 — Activity Date */}
+      {/* Step 4 — Activity Date (Inline Calendar) */}
       {logicalStep === 4 && (
         <div className="animate-step-in">
           <h3 className="text-lg font-semibold text-primary-dark mb-1">When did this take place?</h3>
-          <p className="text-sm text-slate-500 mb-8">Select the date of the activity.</p>
+          <p className="text-sm text-slate-500 mb-6">Select the date of the activity.</p>
 
-          <div className="flex flex-col items-center mb-8">
-            <input
-              type="date"
-              value={activityDate}
-              onChange={e => setActivityDate(e.target.value)}
-              min={twoYearsAgo}
-              max={today}
-              className="w-full max-w-xs border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-primary-dark text-center focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/40"
-            />
-            <p className="text-xs text-slate-400 mt-3">Must be within the last 2 years.</p>
-            {activityDate && !isDateValid() && (
-              <p className="text-xs text-rose-500 mt-1">Please select a date within the last 2 years.</p>
-            )}
-          </div>
+          <InlineCalendar
+            value={activityDate}
+            onChange={setActivityDate}
+            minDate={twoYearsAgo}
+            maxDate={today}
+          />
+          <p className="text-xs text-slate-400 mt-3 text-center">Must be within the last 2 years.</p>
+          {activityDate && !isDateValid() && (
+            <p className="text-xs text-rose-500 mt-1 text-center">Please select a date within the last 2 years.</p>
+          )}
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 mt-6">
             <Button variant="secondary" onClick={handlePrev} icon={<ChevronLeft className="w-4 h-4" />}>
               Previous
             </Button>

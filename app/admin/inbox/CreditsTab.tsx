@@ -29,11 +29,11 @@ interface Props {
 }
 
 const CREDIT_TYPE_LABELS: Record<string, string> = {
-  ce_credit: 'CE Credits',
-  karma_hours: 'Karma Hours',
-  practice_hours: 'Practice Hours',
-  teaching_hours: 'Teaching Hours',
-  community_credits: 'Community Credits',
+  ce: 'CE Credits',
+  karma: 'Karma Hours',
+  practice: 'Practice Hours',
+  teaching: 'Teaching Hours',
+  community: 'Community Credits',
 }
 
 function formatCreditType(type: string): string {

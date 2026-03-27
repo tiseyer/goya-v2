@@ -59,25 +59,34 @@ export default async function InboxPage({
 
   const pendingUpgradeCount = upgradeRequests.filter((r: { status: string }) => r.status === 'pending').length
 
-  // Fetch credit entries
+  // Fetch credit entries (no join — credit_entries FK points to auth.users, not profiles)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: creditData } = await (supabaseService as any)
     .from('credit_entries')
-    .select(`
-      id, user_id, credit_type, amount, activity_date, description,
-      status, rejection_reason, source, created_at,
-      profile:user_id (id, full_name, email, avatar_url)
-    `)
+    .select('id, user_id, credit_type, amount, activity_date, description, status, rejection_reason, source, created_at')
     .order('created_at', { ascending: false })
 
+  // Fetch profiles separately for credit entry authors
+  const creditUserIds = [...new Set((creditData ?? []).map((c: { user_id: string }) => c.user_id))]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: creditProfiles } = creditUserIds.length > 0
+    ? await (supabaseService as any)
+        .from('profiles')
+        .select('id, full_name, email, avatar_url')
+        .in('id', creditUserIds)
+    : { data: [] }
+
+  const profileMap = new Map<string, { id: string; full_name: string | null; email: string | null; avatar_url: string | null }>()
+  for (const p of creditProfiles ?? []) profileMap.set(p.id, p)
+
   const creditEntries = (creditData ?? []).map((c: {
-    profile: unknown
+    user_id: string
     status: string
     [key: string]: unknown
   }) => ({
     ...c,
     status: c.status as 'pending' | 'approved' | 'rejected',
-    profile: Array.isArray(c.profile) ? c.profile[0] ?? null : c.profile,
+    profile: profileMap.get(c.user_id) ?? null,
   }))
 
   const pendingCreditCount = creditEntries.filter((c: { status: string }) => c.status === 'pending').length
