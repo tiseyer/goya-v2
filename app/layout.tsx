@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import { Analytics } from "@vercel/analytics/react";
-import dynamic from "next/dynamic";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -11,9 +10,8 @@ import ClientProviders from "./components/ClientProviders";
 import ImpersonationBanner from "./components/ImpersonationBanner";
 import ConsentGatedScripts from "./components/ConsentGatedScripts";
 import CookieConsent from "./components/CookieConsent";
+import ChatWidgetLoader from "./components/chat/ChatWidgetLoader";
 import { getImpersonationState } from "@/lib/impersonation";
-
-const ChatWidget = dynamic(() => import("./components/chat/ChatWidget"), { ssr: false })
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -101,7 +99,7 @@ export default async function RootLayout({
           {showSlimFooter && <SlimFooter />}
 
           {/* Chat widget — hidden on admin pages, lazy-loaded */}
-          {!isAdmin && <ChatWidget />}
+          {!isAdmin && <ChatWidgetLoader />}
 
           {/* Cookie consent banner + floating button */}
           <CookieConsent />
