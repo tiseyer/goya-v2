@@ -2,7 +2,7 @@ import 'server-only'
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
-import { importUsersFromData, type ImportMode, type WPExportUser } from '../../../../../migration/import-core'
+import { importUsersFromData, type ImportMode, type WPExportUser, type UserResult } from '../../../../../migration/import-core'
 
 export async function POST(request: Request) {
   // 1. Auth check — admin only
@@ -36,13 +36,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid mode — must be "skip" or "overwrite"' }, { status: 400 })
   }
 
-  // Collect all uploaded files
   const files = formData.getAll('file') as File[]
   if (files.length === 0) {
     return NextResponse.json({ error: 'No files uploaded' }, { status: 400 })
   }
 
-  // Parse JSON from all files and concatenate users
   const allUsers: WPExportUser[] = []
   for (const file of files) {
     try {
@@ -62,19 +60,64 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No users found in uploaded files' }, { status: 400 })
   }
 
-  // 3. Run import with service role client
-  try {
-    const supabaseService = getSupabaseService()
-    const log = await importUsersFromData(
-      supabaseService,
-      allUsers,
-      mode as ImportMode
-    )
+  // 3. Stream progress via SSE
+  const encoder = new TextEncoder()
+  const stream = new ReadableStream({
+    async start(controller) {
+      const counters = { created: 0, skipped: 0, updated: 0, failed: 0 }
 
-    // 4. Return full MigrationLog
-    return NextResponse.json(log)
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: `Import failed: ${message}` }, { status: 500 })
-  }
+      function sendEvent(data: Record<string, unknown>) {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`))
+      }
+
+      try {
+        const supabaseService = getSupabaseService()
+        const log = await importUsersFromData(
+          supabaseService,
+          allUsers,
+          mode as ImportMode,
+          (result: UserResult, index: number, total: number) => {
+            if (result.status === 'created') counters.created++
+            else if (result.status === 'skipped') counters.skipped++
+            else if (result.status === 'updated') counters.updated++
+            else if (result.status === 'error') counters.failed++
+
+            sendEvent({
+              total,
+              processed: index + 1,
+              created: counters.created,
+              skipped: counters.skipped,
+              updated: counters.updated,
+              failed: counters.failed,
+              status: 'running',
+            })
+          }
+        )
+
+        sendEvent({
+          total: log.total,
+          processed: log.total,
+          created: log.created,
+          skipped: log.skipped,
+          updated: log.updated,
+          failed: log.errors,
+          status: 'done',
+          log,
+        })
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error'
+        sendEvent({ status: 'error', error: message })
+      } finally {
+        controller.close()
+      }
+    },
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    },
+  })
 }

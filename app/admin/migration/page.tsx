@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 interface UserResult {
   email: string
@@ -21,37 +21,99 @@ interface MigrationLog {
   results: UserResult[]
 }
 
+interface Progress {
+  total: number
+  processed: number
+  created: number
+  skipped: number
+  updated: number
+  failed: number
+}
+
 export default function MigrationPage() {
   const [files, setFiles] = useState<File[]>([])
   const [mode, setMode] = useState<'skip' | 'overwrite'>('skip')
   const [importing, setImporting] = useState(false)
+  const [progress, setProgress] = useState<Progress | null>(null)
   const [log, setLog] = useState<MigrationLog | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   async function handleImport() {
     setImporting(true)
     setError(null)
     setLog(null)
+    setProgress(null)
 
     const formData = new FormData()
     files.forEach(f => formData.append('file', f))
     formData.append('mode', mode)
 
+    const abort = new AbortController()
+    abortRef.current = abort
+
     try {
       const res = await fetch('/api/admin/migration/import', {
         method: 'POST',
         body: formData,
+        signal: abort.signal,
       })
+
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.error || `Import failed (${res.status})`)
       }
-      const data: MigrationLog = await res.json()
-      setLog(data)
+
+      const contentType = res.headers.get('content-type') || ''
+
+      if (contentType.includes('text/event-stream')) {
+        // SSE streaming
+        const reader = res.body!.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n\n')
+          buffer = lines.pop() || ''
+
+          for (const chunk of lines) {
+            const dataLine = chunk.split('\n').find(l => l.startsWith('data: '))
+            if (!dataLine) continue
+            const data = JSON.parse(dataLine.slice(6))
+
+            if (data.status === 'running') {
+              setProgress({
+                total: data.total,
+                processed: data.processed,
+                created: data.created,
+                skipped: data.skipped,
+                updated: data.updated,
+                failed: data.failed,
+              })
+            } else if (data.status === 'done') {
+              setLog(data.log)
+              setProgress(null)
+            } else if (data.status === 'error') {
+              throw new Error(data.error)
+            }
+          }
+        }
+      } else {
+        // Fallback: JSON response
+        const data: MigrationLog = await res.json()
+        setLog(data)
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Import failed')
+      if ((err as Error).name !== 'AbortError') {
+        setError(err instanceof Error ? err.message : 'Import failed')
+      }
     } finally {
       setImporting(false)
+      abortRef.current = null
     }
   }
 
@@ -67,6 +129,7 @@ export default function MigrationPage() {
   }
 
   const errorResults = log?.results.filter(r => r.status === 'error') ?? []
+  const pct = progress ? Math.round((progress.processed / progress.total) * 100) : 0
 
   return (
     <div className="p-6 space-y-6">
@@ -79,11 +142,8 @@ export default function MigrationPage() {
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
         <h2 className="text-lg font-semibold text-[#1B3A5C]">Upload & Import</h2>
 
-        {/* File Input */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Export JSON File(s)
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Export JSON File(s)</label>
           <input
             type="file"
             accept=".json"
@@ -98,64 +158,70 @@ export default function MigrationPage() {
           )}
         </div>
 
-        {/* Mode Selector */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Import Mode
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Import Mode</label>
           <div className="flex gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="mode"
-                value="skip"
-                checked={mode === 'skip'}
-                onChange={() => setMode('skip')}
-                className="accent-[#1B3A5C]"
-              />
+              <input type="radio" name="mode" value="skip" checked={mode === 'skip'} onChange={() => setMode('skip')} className="accent-[#1B3A5C]" />
               <span className="text-sm text-slate-700">Skip existing</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="mode"
-                value="overwrite"
-                checked={mode === 'overwrite'}
-                onChange={() => setMode('overwrite')}
-                className="accent-[#1B3A5C]"
-              />
+              <input type="radio" name="mode" value="overwrite" checked={mode === 'overwrite'} onChange={() => setMode('overwrite')} className="accent-[#1B3A5C]" />
               <span className="text-sm text-slate-700">Overwrite existing</span>
             </label>
           </div>
         </div>
 
-        {/* Start Button */}
-        <button
-          onClick={handleImport}
-          disabled={files.length === 0 || importing}
-          className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#1B3A5C] hover:bg-[#15304d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-        >
-          {importing && (
+        {!importing && !progress && (
+          <button
+            onClick={handleImport}
+            disabled={files.length === 0}
+            className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#1B3A5C] hover:bg-[#15304d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Start Import
+          </button>
+        )}
+
+        {/* Progress Bar */}
+        {importing && progress && (
+          <div className="space-y-3">
+            <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+              <div
+                className="h-full bg-[#00B5A3] rounded-full transition-all duration-300"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <p className="text-sm font-medium text-[#1B3A5C]">
+              Importing... {progress.processed} / {progress.total}
+            </p>
+            <p className="text-xs text-slate-500">
+              Created: <span className="text-green-600 font-medium">{progress.created}</span>
+              {' | '}Skipped: <span className="text-amber-600 font-medium">{progress.skipped}</span>
+              {' | '}Updated: <span className="text-blue-600 font-medium">{progress.updated}</span>
+              {' | '}Failed: <span className="text-red-600 font-medium">{progress.failed}</span>
+            </p>
+          </div>
+        )}
+
+        {importing && !progress && (
+          <div className="flex items-center gap-2 text-sm text-slate-500">
             <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-          )}
-          {importing ? 'Importing...' : 'Start Import'}
-        </button>
+            Preparing import...
+          </div>
+        )}
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
           <p className="text-sm text-red-600 font-medium">{error}</p>
         </div>
       )}
 
-      {/* Results */}
       {log && (
         <div className="space-y-6">
-          {/* Summary Cards */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-4 text-center">
               <p className="text-2xl font-bold text-slate-800">{log.total}</p>
@@ -179,12 +245,9 @@ export default function MigrationPage() {
             </div>
           </div>
 
-          {/* Error List */}
           {errorResults.length > 0 && (
             <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-red-600 mb-4">
-                Errors ({errorResults.length})
-              </h3>
+              <h3 className="text-lg font-semibold text-red-600 mb-4">Errors ({errorResults.length})</h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -206,7 +269,6 @@ export default function MigrationPage() {
             </div>
           )}
 
-          {/* Download Button */}
           <button
             onClick={downloadLog}
             className="px-5 py-2.5 rounded-lg text-sm font-semibold text-[#1B3A5C] bg-white border border-[#E5E7EB] hover:bg-slate-50 transition-colors"
