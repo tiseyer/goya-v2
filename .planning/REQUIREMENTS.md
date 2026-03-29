@@ -72,10 +72,10 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 ### Infrastructure
 
 - [x] **INFRA-01**: Supabase migration: secrets table with admin-only RLS
-- [ ] **INFRA-02**: Supabase migration: chatbot_config single-row upsert table
-- [ ] **INFRA-03**: Supabase migration: faq_items table with admin write, public read for chatbot
-- [ ] **INFRA-04**: Supabase migration: chat_sessions and chat_messages tables with session-owner RLS
-- [ ] **INFRA-05**: Supabase migration: support_tickets table with admin-only RLS and session FK
+- [x] **INFRA-02**: Supabase migration: chatbot_config single-row upsert table
+- [x] **INFRA-03**: Supabase migration: faq_items table with admin write, public read for chatbot
+- [x] **INFRA-04**: Supabase migration: chat_sessions and chat_messages tables with session-owner RLS
+- [x] **INFRA-05**: Supabase migration: support_tickets table with admin-only RLS and session FK
 - [ ] **INFRA-06**: Guest chat cleanup cron endpoint for expired sessions
 - [ ] **INFRA-07**: Node.js runtime for chat route (not Edge — crypto module required)
 
@@ -154,10 +154,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AI-10 | Phase 14 | Pending |
 | AI-11 | Phase 14 | Pending |
 | INFRA-01 | Phase 12 | Complete |
-| INFRA-02 | Phase 13 | Pending |
-| INFRA-03 | Phase 13 | Pending |
-| INFRA-04 | Phase 13 | Pending |
-| INFRA-05 | Phase 13 | Pending |
+| INFRA-02 | Phase 13 | Complete |
+| INFRA-03 | Phase 13 | Complete |
+| INFRA-04 | Phase 13 | Complete |
+| INFRA-05 | Phase 13 | Complete |
 | INFRA-06 | Phase 15 | Pending |
 | INFRA-07 | Phase 14 | Pending |
 
