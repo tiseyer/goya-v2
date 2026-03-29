@@ -2,7 +2,7 @@ import 'server-only'
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
-import { importUsersFromData, type ImportMode, type WPExportUser } from '../../../../migration/import-core'
+import { importUsersFromData, type ImportMode, type WPExportUser } from '../../../../../migration/import-core'
 
 export async function POST(request: Request) {
   // 1. Auth check — admin only

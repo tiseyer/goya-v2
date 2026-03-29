@@ -14,61 +14,267 @@ export type Database = {
   }
   public: {
     Tables: {
-      audit_log: {
+      admin_secrets: {
         Row: {
-          id: string
           category: string
-          action: string
-          severity: string
-          actor_id: string | null
-          actor_name: string | null
-          actor_role: string | null
-          target_type: string | null
-          target_id: string | null
-          target_label: string | null
-          description: string | null
-          metadata: Json
-          ip_address: string | null
           created_at: string
+          created_by: string | null
+          description: string | null
+          encrypted_value: string
+          id: string
+          iv: string
+          key_name: string
+          model: string | null
+          provider: string | null
+          updated_at: string
         }
         Insert: {
-          id?: string
-          category: string
-          action: string
-          severity?: string
-          actor_id?: string | null
-          actor_name?: string | null
-          actor_role?: string | null
-          target_type?: string | null
-          target_id?: string | null
-          target_label?: string | null
-          description?: string | null
-          metadata?: Json
-          ip_address?: string | null
+          category?: string
           created_at?: string
+          created_by?: string | null
+          description?: string | null
+          encrypted_value: string
+          id?: string
+          iv: string
+          key_name: string
+          model?: string | null
+          provider?: string | null
+          updated_at?: string
         }
         Update: {
-          id?: string
           category?: string
-          action?: string
-          severity?: string
-          actor_id?: string | null
-          actor_name?: string | null
-          actor_role?: string | null
-          target_type?: string | null
-          target_id?: string | null
-          target_label?: string | null
-          description?: string | null
-          metadata?: Json
-          ip_address?: string | null
           created_at?: string
+          created_by?: string | null
+          description?: string | null
+          encrypted_value?: string
+          id?: string
+          iv?: string
+          key_name?: string
+          model?: string | null
+          provider?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "audit_log_actor_id_fkey"
-            columns: ["actor_id"]
+            foreignKeyName: "admin_secrets_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      api_keys: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          name: string
+          permissions: string[]
+          request_count: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          name: string
+          permissions?: string[]
+          request_count?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          name?: string
+          permissions?: string[]
+          request_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_name: string | null
+          actor_role: string | null
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          ip_address: unknown
+          metadata: Json | null
+          severity: string
+          target_id: string | null
+          target_label: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_name?: string | null
+          actor_role?: string | null
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          severity?: string
+          target_id?: string | null
+          target_label?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          actor_role?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          severity?: string
+          target_id?: string | null
+          target_label?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          anonymous_id: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_escalated: boolean
+          last_message_at: string
+          user_id: string | null
+        }
+        Insert: {
+          anonymous_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_escalated?: boolean
+          last_message_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          anonymous_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_escalated?: boolean
+          last_message_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chatbot_config: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          guest_retention_days: number
+          id: string
+          is_active: boolean
+          name: string
+          selected_key_id: string | null
+          system_prompt: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          guest_retention_days?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          selected_key_id?: string | null
+          system_prompt?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          guest_retention_days?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          selected_key_id?: string | null
+          system_prompt?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chatbot_config_selected_key_id_fkey"
+            columns: ["selected_key_id"]
+            isOneToOne: false
+            referencedRelation: "admin_secrets"
             referencedColumns: ["id"]
           },
         ]
@@ -196,11 +402,45 @@ export type Database = {
           },
         ]
       }
+      cookie_consents: {
+        Row: {
+          consented_at: string
+          id: string
+          marketing: boolean
+          preferences: boolean
+          statistics: boolean
+          updated_at: string
+          user_id: string
+          version: string
+        }
+        Insert: {
+          consented_at?: string
+          id?: string
+          marketing?: boolean
+          preferences?: boolean
+          statistics?: boolean
+          updated_at?: string
+          user_id: string
+          version: string
+        }
+        Update: {
+          consented_at?: string
+          id?: string
+          marketing?: boolean
+          preferences?: boolean
+          statistics?: boolean
+          updated_at?: string
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           access: string | null
           category: string
           created_at: string | null
+          deleted_at: string | null
           description: string | null
           duration: string | null
           gradient_from: string | null
@@ -219,6 +459,7 @@ export type Database = {
           access?: string | null
           category: string
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           duration?: string | null
           gradient_from?: string | null
@@ -237,6 +478,7 @@ export type Database = {
           access?: string | null
           category?: string
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           duration?: string | null
           gradient_from?: string | null
@@ -394,6 +636,41 @@ export type Database = {
         }
         Relationships: []
       }
+      event_registrations: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          registered_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          registered_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          registered_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           category: string
@@ -459,6 +736,44 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      faq_items: {
+        Row: {
+          answer: string
+          created_at: string
+          created_by: string | null
+          id: string
+          question: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          question: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          question?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faq_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       impersonation_log: {
         Row: {
@@ -528,6 +843,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      newsletter_subscribers: {
+        Row: {
+          email: string
+          id: string
+          source: string
+          subscribed_at: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          source?: string
+          subscribed_at?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          source?: string
+          subscribed_at?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -604,30 +940,6 @@ export type Database = {
           started_at?: string | null
           updated_at?: string | null
           user_id?: string
-        }
-        Relationships: []
-      }
-      onboarding_state: {
-        Row: {
-          user_id: string
-          current_step: number
-          max_step_reached: number
-          onboarding_complete: boolean
-          updated_at: string | null
-        }
-        Insert: {
-          user_id: string
-          current_step?: number
-          max_step_reached?: number
-          onboarding_complete?: boolean
-          updated_at?: string | null
-        }
-        Update: {
-          user_id?: string
-          current_step?: number
-          max_step_reached?: number
-          onboarding_complete?: boolean
-          updated_at?: string | null
         }
         Relationships: []
       }
@@ -974,12 +1286,14 @@ export type Database = {
           other_org_registration: string | null
           phone: string | null
           practice_format: string | null
+          requires_password_reset: boolean
           role: Database["public"]["Enums"]["user_role"]
           stripe_customer_id: string | null
           subscription_status: string
           teacher_status: string | null
           teaching_focus_arr: string[] | null
           teaching_styles: string[] | null
+          theme_preference: string
           tiktok: string | null
           updated_at: string | null
           username: string | null
@@ -1025,12 +1339,14 @@ export type Database = {
           other_org_registration?: string | null
           phone?: string | null
           practice_format?: string | null
+          requires_password_reset?: boolean
           role?: Database["public"]["Enums"]["user_role"]
           stripe_customer_id?: string | null
           subscription_status?: string
           teacher_status?: string | null
           teaching_focus_arr?: string[] | null
           teaching_styles?: string[] | null
+          theme_preference?: string
           tiktok?: string | null
           updated_at?: string | null
           username?: string | null
@@ -1076,12 +1392,14 @@ export type Database = {
           other_org_registration?: string | null
           phone?: string | null
           practice_format?: string | null
+          requires_password_reset?: boolean
           role?: Database["public"]["Enums"]["user_role"]
           stripe_customer_id?: string | null
           subscription_status?: string
           teacher_status?: string | null
           teaching_focus_arr?: string[] | null
           teaching_styles?: string[] | null
+          theme_preference?: string
           tiktok?: string | null
           updated_at?: string | null
           username?: string | null
@@ -1431,62 +1749,123 @@ export type Database = {
         }
         Relationships: []
       }
-      upgrade_requests: {
+      support_tickets: {
         Row: {
-          id: string
-          user_id: string
-          status: string
-          certificate_urls: string[]
-          stripe_payment_intent_id: string | null
-          stripe_subscription_id: string | null
-          rejection_reason: string | null
+          anonymous_id: string | null
           created_at: string
-          updated_at: string
-          reviewed_at: string | null
-          reviewed_by: string | null
+          id: string
+          question_summary: string
+          resolved_at: string | null
+          resolved_by: string | null
+          session_id: string | null
+          status: string
+          user_id: string | null
         }
         Insert: {
-          id?: string
-          user_id: string
-          status?: string
-          certificate_urls?: string[]
-          stripe_payment_intent_id?: string | null
-          stripe_subscription_id?: string | null
-          rejection_reason?: string | null
+          anonymous_id?: string | null
           created_at?: string
-          updated_at?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
+          id?: string
+          question_summary: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          session_id?: string | null
+          status?: string
+          user_id?: string | null
         }
         Update: {
-          id?: string
-          user_id?: string
-          status?: string
-          certificate_urls?: string[]
-          stripe_payment_intent_id?: string | null
-          stripe_subscription_id?: string | null
-          rejection_reason?: string | null
+          anonymous_id?: string | null
           created_at?: string
-          updated_at?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
+          id?: string
+          question_summary?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          session_id?: string | null
+          status?: string
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "upgrade_requests_user_id_fkey"
+            foreignKeyName: "support_tickets_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "upgrade_requests_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
+      }
+      upgrade_requests: {
+        Row: {
+          certificate_urls: string[]
+          created_at: string
+          id: string
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          certificate_urls?: string[]
+          created_at?: string
+          id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          certificate_urls?: string[]
+          created_at?: string
+          id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      used_mrns: {
+        Row: {
+          created_at: string
+          mrn: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          mrn: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          mrn?: string
+          status?: string
+        }
+        Relationships: []
       }
       user_course_progress: {
         Row: {
@@ -1525,48 +1904,33 @@ export type Database = {
       }
       user_designations: {
         Row: {
-          id: string
-          user_id: string
-          stripe_product_id: string
-          stripe_price_id: string
-          purchase_date: string
           deleted_at: string | null
           deleted_by: string | null
+          id: string
+          purchase_date: string
+          stripe_price_id: string
+          stripe_product_id: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          stripe_product_id: string
-          stripe_price_id: string
-          purchase_date?: string
           deleted_at?: string | null
           deleted_by?: string | null
+          id?: string
+          purchase_date?: string
+          stripe_price_id: string
+          stripe_product_id: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          stripe_product_id?: string
-          stripe_price_id?: string
-          purchase_date?: string
           deleted_at?: string | null
           deleted_by?: string | null
+          id?: string
+          purchase_date?: string
+          stripe_price_id?: string
+          stripe_product_id?: string
+          user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_designations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_designations_deleted_by_fkey"
-            columns: ["deleted_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       webhook_events: {
         Row: {
@@ -1606,8 +1970,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_distinct_countries: { Args: never; Returns: number }
       generate_mrn: { Args: never; Returns: string }
       is_admin: { Args: never; Returns: boolean }
+      sum_approved_hours: { Args: never; Returns: number }
     }
     Enums: {
       user_role:
