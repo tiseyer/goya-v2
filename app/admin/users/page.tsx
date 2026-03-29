@@ -21,7 +21,8 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
   const verified     = str(params.verified);
   const status       = str(params.status);
   const creditStatus = str(params.creditStatus) as CreditStatus | '';
-  const wpRole       = str(params.wpRole);
+  const wpRoles      = str(params.wpRoles).split(',').filter(Boolean);
+  const wpRoleMode   = str(params.wpRoleMode) || 'include';
   const dateFrom     = str(params.from);
   const dateTo       = str(params.to);
   const sort         = str(params.sort) || 'newest';
@@ -55,7 +56,13 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
   if (verified === 'true')  query = query.eq('is_verified', true);
   if (verified === 'false') query = query.eq('is_verified', false);
   if (status)   query = query.eq('subscription_status', status);
-  if (wpRole)   query = query.contains('wp_roles', [wpRole]);
+  if (wpRoles.length > 0) {
+    if (wpRoleMode === 'exclude') {
+      query = query.not('wp_roles', 'ov', `{${wpRoles.join(',')}}`);
+    } else {
+      query = query.overlaps('wp_roles', wpRoles);
+    }
+  }
   if (dateFrom) query = query.gte('created_at', dateFrom);
   if (dateTo)   query = query.lte('created_at', dateTo + 'T23:59:59Z');
 
@@ -133,7 +140,8 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
             initialVerified={verified}
             initialStatus={status}
             initialCreditStatus={creditStatus}
-            initialWpRole={wpRole}
+            initialWpRoles={wpRoles}
+            initialWpRoleMode={wpRoleMode}
             initialDateFrom={dateFrom}
             initialDateTo={dateTo}
             initialSort={sort}

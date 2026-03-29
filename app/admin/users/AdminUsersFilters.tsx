@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const WP_ROLES = [
@@ -19,7 +19,8 @@ interface Props {
   initialVerified: string;
   initialStatus: string;
   initialCreditStatus: string;
-  initialWpRole: string;
+  initialWpRoles: string[];
+  initialWpRoleMode: string;
   initialDateFrom: string;
   initialDateTo: string;
   initialSort: string;
@@ -31,7 +32,8 @@ export default function AdminUsersFilters({
   initialVerified,
   initialStatus,
   initialCreditStatus,
-  initialWpRole,
+  initialWpRoles,
+  initialWpRoleMode,
   initialDateFrom,
   initialDateTo,
   initialSort,
@@ -41,6 +43,21 @@ export default function AdminUsersFilters({
   const [, startTransition] = useTransition();
 
   const [search, setSearch] = useState(initialSearch);
+  const [wpRoles, setWpRoles] = useState<Set<string>>(new Set(initialWpRoles));
+  const [wpMode, setWpMode] = useState(initialWpRoleMode || 'include');
+  const [wpOpen, setWpOpen] = useState(false);
+  const wpRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (wpRef.current && !wpRef.current.contains(e.target as Node)) {
+        setWpOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -66,8 +83,45 @@ export default function AdminUsersFilters({
     });
   }
 
+  function updateWpRoles(roles: Set<string>, mode: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (roles.size > 0) {
+      params.set('wpRoles', Array.from(roles).join(','));
+      params.set('wpRoleMode', mode);
+    } else {
+      params.delete('wpRoles');
+      params.delete('wpRoleMode');
+    }
+    params.set('page', '1');
+    startTransition(() => {
+      router.replace(`/admin/users?${params.toString()}`);
+    });
+  }
+
+  function toggleWpRole(role: string) {
+    const next = new Set(wpRoles);
+    if (next.has(role)) next.delete(role);
+    else next.add(role);
+    setWpRoles(next);
+    updateWpRoles(next, wpMode);
+  }
+
+  function changeWpMode(mode: string) {
+    setWpMode(mode);
+    if (wpRoles.size > 0) {
+      updateWpRoles(wpRoles, mode);
+    }
+  }
+
+  function clearWpRoles() {
+    setWpRoles(new Set());
+    updateWpRoles(new Set(), 'include');
+  }
+
   function handleReset() {
     setSearch('');
+    setWpRoles(new Set());
+    setWpMode('include');
     startTransition(() => {
       router.replace('/admin/users');
     });
@@ -139,17 +193,65 @@ export default function AdminUsersFilters({
         <option value="red">Needs Attention</option>
       </select>
 
-      {/* Legacy WP Role */}
-      <select
-        defaultValue={initialWpRole}
-        onChange={e => updateParam('wpRole', e.target.value)}
-        className={selectClass}
-      >
-        <option value="">WP Roles</option>
-        {WP_ROLES.map(r => (
-          <option key={r} value={r}>{wpRoleLabel(r)}</option>
-        ))}
-      </select>
+      {/* WP Roles Multi-Select */}
+      <div className="relative" ref={wpRef}>
+        <button
+          onClick={() => setWpOpen(!wpOpen)}
+          className={`${selectClass} flex items-center gap-1.5 ${wpRoles.size > 0 ? 'border-[#00B5A3] text-[#00B5A3]' : ''}`}
+        >
+          WP Roles{wpRoles.size > 0 && ` (${wpRoles.size})`}
+          <svg className={`w-3.5 h-3.5 transition-transform ${wpOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {wpOpen && (
+          <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-[#E5E7EB] rounded-xl shadow-lg z-50 overflow-hidden">
+            {/* Mode toggle */}
+            <div className="flex border-b border-[#E5E7EB]">
+              <button
+                onClick={() => changeWpMode('include')}
+                className={`flex-1 py-2 text-xs font-semibold transition-colors ${wpMode === 'include' ? 'bg-[#00B5A3] text-white' : 'text-[#6B7280] hover:bg-slate-50'}`}
+              >
+                Include
+              </button>
+              <button
+                onClick={() => changeWpMode('exclude')}
+                className={`flex-1 py-2 text-xs font-semibold transition-colors ${wpMode === 'exclude' ? 'bg-red-500 text-white' : 'text-[#6B7280] hover:bg-slate-50'}`}
+              >
+                Exclude
+              </button>
+            </div>
+
+            {/* Checkbox list */}
+            <div className="max-h-56 overflow-y-auto p-2 space-y-0.5">
+              {WP_ROLES.map(r => (
+                <label key={r} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={wpRoles.has(r)}
+                    onChange={() => toggleWpRole(r)}
+                    className="accent-[#00B5A3] rounded"
+                  />
+                  <span className="text-sm text-[#374151]">{wpRoleLabel(r)}</span>
+                </label>
+              ))}
+            </div>
+
+            {/* Clear */}
+            {wpRoles.size > 0 && (
+              <div className="border-t border-[#E5E7EB] p-2">
+                <button
+                  onClick={clearWpRoles}
+                  className="w-full text-xs font-medium text-[#6B7280] hover:text-red-500 py-1.5"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Date from */}
       <input
