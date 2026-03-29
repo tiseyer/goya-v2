@@ -35,10 +35,10 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 
 ### Admin Chatbot
 
-- [ ] **ADMIN-01**: /admin/chatbot page with sidebar entry between Audit Log and API Keys
-- [ ] **ADMIN-02**: Four tabs styled like /admin/settings: Configuration, FAQ, Conversations, API Connections
-- [ ] **ADMIN-03**: Configuration: chatbot name, profile image upload, active toggle, AI key selector, system prompt, guest retention days
-- [ ] **ADMIN-04**: Default avatar downloaded from GOYA website and stored in Supabase storage
+- [x] **ADMIN-01**: /admin/chatbot page with sidebar entry between Audit Log and API Keys
+- [x] **ADMIN-02**: Four tabs styled like /admin/settings: Configuration, FAQ, Conversations, API Connections
+- [x] **ADMIN-03**: Configuration: chatbot name, profile image upload, active toggle, AI key selector, system prompt, guest retention days
+- [x] **ADMIN-04**: Default avatar downloaded from GOYA website and stored in Supabase storage
 - [ ] **ADMIN-05**: FAQ tab with search, Add FAQ button, table with Question/Answer/Status/Actions
 - [ ] **ADMIN-06**: FAQ inline editing with dropdown expand, Save/Cancel, Published/Draft toggle
 - [ ] **ADMIN-07**: Conversations tab listing all sessions with user/guest info, message count, escalation badge
@@ -126,10 +126,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHAT-10 | Phase 14 | Pending |
 | CHAT-11 | Phase 14 | Pending |
 | CHAT-12 | Phase 14 | Pending |
-| ADMIN-01 | Phase 13 | Pending |
-| ADMIN-02 | Phase 13 | Pending |
-| ADMIN-03 | Phase 13 | Pending |
-| ADMIN-04 | Phase 13 | Pending |
+| ADMIN-01 | Phase 13 | Complete |
+| ADMIN-02 | Phase 13 | Complete |
+| ADMIN-03 | Phase 13 | Complete |
+| ADMIN-04 | Phase 13 | Complete |
 | ADMIN-05 | Phase 13 | Pending |
 | ADMIN-06 | Phase 13 | Pending |
 | ADMIN-07 | Phase 15 | Pending |

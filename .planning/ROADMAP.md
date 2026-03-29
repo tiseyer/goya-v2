@@ -58,7 +58,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 13-01-PLAN.md — All 4 Supabase migrations + chatbot types + server actions
-- [ ] 13-02-PLAN.md — Chatbot page shell + sidebar entry + Configuration tab
+- [x] 13-02-PLAN.md — Chatbot page shell + sidebar entry + Configuration tab
 - [ ] 13-03-PLAN.md — FAQ tab with search, inline editing, add modal + human-verify
 **UI hint**: yes
 
@@ -98,6 +98,6 @@ Phases execute in numeric order: 12 → 13 → 14 → 15
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 12. Encrypted Secrets + Key Management | v1.8 | 2/2 | Complete    | 2026-03-27 |
-| 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 1/3 | In Progress|  |
+| 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 2/3 | In Progress|  |
 | 14. AI Backend + Streaming Chat Widget | v1.8 | 0/TBD | Not started | - |
 | 15. Escalation + Support Tickets + Conversations Admin | v1.8 | 0/TBD | Not started | - |
