@@ -20,18 +20,18 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 
 ### Chat Widget
 
-- [ ] **CHAT-01**: Floating chat button visible on all public pages, hidden on /admin/* routes
-- [ ] **CHAT-02**: Chat window opens as 380x560px panel on desktop, fullscreen on mobile
-- [ ] **CHAT-03**: Chat header with Mattea avatar, name, online indicator
-- [ ] **CHAT-04**: Message bubbles (user right, Mattea left with avatar) with text input and send button
-- [ ] **CHAT-05**: "New Chat" button starts fresh conversation, "Delete" button clears history
-- [ ] **CHAT-06**: Opening greeting: "Namaste! I'm Mattea, your GOYA guide. How can I help you today?"
+- [x] **CHAT-01**: Floating chat button visible on all public pages, hidden on /admin/* routes
+- [x] **CHAT-02**: Chat window opens as 380x560px panel on desktop, fullscreen on mobile
+- [x] **CHAT-03**: Chat header with Mattea avatar, name, online indicator
+- [x] **CHAT-04**: Message bubbles (user right, Mattea left with avatar) with text input and send button
+- [x] **CHAT-05**: "New Chat" button starts fresh conversation, "Delete" button clears history
+- [x] **CHAT-06**: Opening greeting: "Namaste! I'm Mattea, your GOYA guide. How can I help you today?"
 - [ ] **CHAT-07**: Logged-in users' chats persist by user ID in Supabase
 - [ ] **CHAT-08**: Guest users' chats persist via anonymous session ID with cookie
 - [ ] **CHAT-09**: Returning users see previous conversation, not blank chat
 - [ ] **CHAT-10**: Escalation triggers when: low confidence, explicit human request, or 2 failed attempts
 - [ ] **CHAT-11**: Escalation message shown to user with 48-hour response promise
-- [ ] **CHAT-12**: Widget only visible when chatbot is_active in config (checked via public endpoint)
+- [x] **CHAT-12**: Widget only visible when chatbot is_active in config (checked via public endpoint)
 
 ### Admin Chatbot
 
@@ -57,17 +57,17 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 
 ### AI Backend
 
-- [ ] **AI-01**: POST /api/chatbot/message endpoint accepting session_id, message, anonymous_id
-- [ ] **AI-02**: Reads chatbot config (active key, model, system prompt, enabled tools) from DB
-- [ ] **AI-03**: Decrypts selected AI provider key server-side using SECRETS_MASTER_KEY
-- [ ] **AI-04**: Calls OpenAI or Anthropic based on provider, with streaming response
-- [ ] **AI-05**: FAQ items injected as context in system prompt (XML-delimited)
-- [ ] **AI-06**: Full conversation history passed for session continuity
-- [ ] **AI-07**: Enabled tools registered as function definitions for AI provider
-- [ ] **AI-08**: User and assistant messages saved to chat_messages table
-- [ ] **AI-09**: Escalation detection creates support_ticket and returns escalation flag
-- [ ] **AI-10**: Rate limited: max 20 messages per session per hour (distributed)
-- [ ] **AI-11**: Public endpoint (no auth for guests) with session validation
+- [x] **AI-01**: POST /api/chatbot/message endpoint accepting session_id, message, anonymous_id
+- [x] **AI-02**: Reads chatbot config (active key, model, system prompt, enabled tools) from DB
+- [x] **AI-03**: Decrypts selected AI provider key server-side using SECRETS_MASTER_KEY
+- [x] **AI-04**: Calls OpenAI or Anthropic based on provider, with streaming response
+- [x] **AI-05**: FAQ items injected as context in system prompt (XML-delimited)
+- [x] **AI-06**: Full conversation history passed for session continuity
+- [x] **AI-07**: Enabled tools registered as function definitions for AI provider
+- [x] **AI-08**: User and assistant messages saved to chat_messages table
+- [x] **AI-09**: Escalation detection creates support_ticket and returns escalation flag
+- [x] **AI-10**: Rate limited: max 20 messages per session per hour (distributed)
+- [x] **AI-11**: Public endpoint (no auth for guests) with session validation
 
 ### Infrastructure
 
@@ -77,7 +77,7 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 - [x] **INFRA-04**: Supabase migration: chat_sessions and chat_messages tables with session-owner RLS
 - [x] **INFRA-05**: Supabase migration: support_tickets table with admin-only RLS and session FK
 - [ ] **INFRA-06**: Guest chat cleanup cron endpoint for expired sessions
-- [ ] **INFRA-07**: Node.js runtime for chat route (not Edge — crypto module required)
+- [x] **INFRA-07**: Node.js runtime for chat route (not Edge — crypto module required)
 
 ## Future Requirements
 
@@ -114,18 +114,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KEYS-06 | Phase 12 | Pending |
 | KEYS-07 | Phase 12 | Pending |
 | KEYS-08 | Phase 12 | Complete |
-| CHAT-01 | Phase 14 | Pending |
-| CHAT-02 | Phase 14 | Pending |
-| CHAT-03 | Phase 14 | Pending |
-| CHAT-04 | Phase 14 | Pending |
-| CHAT-05 | Phase 14 | Pending |
-| CHAT-06 | Phase 14 | Pending |
+| CHAT-01 | Phase 14 | Complete |
+| CHAT-02 | Phase 14 | Complete |
+| CHAT-03 | Phase 14 | Complete |
+| CHAT-04 | Phase 14 | Complete |
+| CHAT-05 | Phase 14 | Complete |
+| CHAT-06 | Phase 14 | Complete |
 | CHAT-07 | Phase 14 | Pending |
 | CHAT-08 | Phase 14 | Pending |
 | CHAT-09 | Phase 14 | Pending |
 | CHAT-10 | Phase 14 | Pending |
 | CHAT-11 | Phase 14 | Pending |
-| CHAT-12 | Phase 14 | Pending |
+| CHAT-12 | Phase 14 | Complete |
 | ADMIN-01 | Phase 13 | Complete |
 | ADMIN-02 | Phase 13 | Complete |
 | ADMIN-03 | Phase 13 | Complete |
@@ -142,24 +142,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUPP-03 | Phase 15 | Pending |
 | SUPP-04 | Phase 15 | Pending |
 | SUPP-05 | Phase 15 | Pending |
-| AI-01 | Phase 14 | Pending |
-| AI-02 | Phase 14 | Pending |
-| AI-03 | Phase 14 | Pending |
-| AI-04 | Phase 14 | Pending |
-| AI-05 | Phase 14 | Pending |
-| AI-06 | Phase 14 | Pending |
-| AI-07 | Phase 14 | Pending |
-| AI-08 | Phase 14 | Pending |
-| AI-09 | Phase 14 | Pending |
-| AI-10 | Phase 14 | Pending |
-| AI-11 | Phase 14 | Pending |
+| AI-01 | Phase 14 | Complete |
+| AI-02 | Phase 14 | Complete |
+| AI-03 | Phase 14 | Complete |
+| AI-04 | Phase 14 | Complete |
+| AI-05 | Phase 14 | Complete |
+| AI-06 | Phase 14 | Complete |
+| AI-07 | Phase 14 | Complete |
+| AI-08 | Phase 14 | Complete |
+| AI-09 | Phase 14 | Complete |
+| AI-10 | Phase 14 | Complete |
+| AI-11 | Phase 14 | Complete |
 | INFRA-01 | Phase 12 | Complete |
 | INFRA-02 | Phase 13 | Complete |
 | INFRA-03 | Phase 13 | Complete |
 | INFRA-04 | Phase 13 | Complete |
 | INFRA-05 | Phase 13 | Complete |
 | INFRA-06 | Phase 15 | Pending |
-| INFRA-07 | Phase 14 | Pending |
+| INFRA-07 | Phase 14 | Complete |
 
 **Coverage:**
 - v1.8 requirements: 54 total
