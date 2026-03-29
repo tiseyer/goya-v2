@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import EmailTemplatesList from './components/EmailTemplatesList';
+import HealthTab from './components/HealthTab';
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
 
@@ -706,12 +707,13 @@ function AnalyticsTab() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-type Tab = 'general' | 'analytics' | 'email-templates';
+type Tab = 'general' | 'analytics' | 'email-templates' | 'health';
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'general',         label: 'General'         },
   { key: 'analytics',       label: 'Analytics'       },
   { key: 'email-templates', label: 'Email Templates' },
+  { key: 'health',          label: 'Health'           },
 ];
 
 export default function SettingsPage() {
@@ -741,6 +743,7 @@ export default function SettingsPage() {
       {tab === 'general'         && <GeneralTab />}
       {tab === 'analytics'       && <AnalyticsTab />}
       {tab === 'email-templates' && <EmailTemplatesList />}
+      {tab === 'health'          && <HealthTab />}
     </div>
   );
 }

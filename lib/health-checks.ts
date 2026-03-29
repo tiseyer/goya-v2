@@ -99,12 +99,6 @@ export async function checkSupabase(): Promise<ServiceCheck[]> {
   // DB connectivity
   try {
     const sb = getSupabaseService()
-    const start = Date.now()
-    const { error } = await (sb.rpc as any)('', undefined).then(
-      () => ({ error: null }),
-      () => ({ error: null })
-    )
-    // Use a simple query instead
     const dbStart = Date.now()
     const { error: dbError } = await (sb as any).from('profiles').select('id', { count: 'exact', head: true }).limit(1)
     const latency = Date.now() - dbStart
