@@ -287,6 +287,7 @@ class GOYA_Exporter {
             'first_name'    => $user->first_name,
             'last_name'     => $user->last_name,
             'role'          => !empty($user->roles) ? $user->roles[0] : 'subscriber',
+            'roles'         => !empty($user->roles) ? array_values($user->roles) : array('subscriber'),
             'registered_at' => $user->user_registered,
             'profile'       => $this->get_xprofile_data($user->ID),
             'avatar_url'    => $this->get_avatar_url($user->ID),

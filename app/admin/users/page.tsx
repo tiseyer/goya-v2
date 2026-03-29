@@ -21,6 +21,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
   const verified     = str(params.verified);
   const status       = str(params.status);
   const creditStatus = str(params.creditStatus) as CreditStatus | '';
+  const wpRole       = str(params.wpRole);
   const dateFrom     = str(params.from);
   const dateTo       = str(params.to);
   const sort         = str(params.sort) || 'newest';
@@ -43,7 +44,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
 
   let query = supabase
     .from('profiles')
-    .select('id, email, full_name, username, role, subscription_status, is_verified, created_at, avatar_url, member_type', { count: 'exact' });
+    .select('id, email, full_name, username, role, subscription_status, is_verified, created_at, avatar_url, member_type, wp_roles', { count: 'exact' });
 
   if (search) {
     query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,username.ilike.%${search}%,mrn.ilike.%${search}%`);
@@ -54,6 +55,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
   if (verified === 'true')  query = query.eq('is_verified', true);
   if (verified === 'false') query = query.eq('is_verified', false);
   if (status)   query = query.eq('subscription_status', status);
+  if (wpRole)   query = query.contains('wp_roles', [wpRole]);
   if (dateFrom) query = query.gte('created_at', dateFrom);
   if (dateTo)   query = query.lte('created_at', dateTo + 'T23:59:59Z');
 
@@ -131,6 +133,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
             initialVerified={verified}
             initialStatus={status}
             initialCreditStatus={creditStatus}
+            initialWpRole={wpRole}
             initialDateFrom={dateFrom}
             initialDateTo={dateTo}
             initialSort={sort}

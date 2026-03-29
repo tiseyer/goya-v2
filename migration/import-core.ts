@@ -22,6 +22,7 @@ export interface WPExportUser {
   first_name: string;
   last_name: string;
   role: string; // 'subscriber' | 'teacher' | 'wellness' | 'administrator'
+  roles?: string[]; // All WP roles (for legacy tracking)
   registered_at: string;
   profile: {
     about?: { introduction?: string; personal_bio?: string };
@@ -147,6 +148,9 @@ export function buildProfileUpdate(user: WPExportUser): Record<string, unknown> 
 
     // Migration flag — user must reset password on first login
     requires_password_reset: true,
+
+    // Legacy WordPress roles (read-only reference)
+    wp_roles: user.roles ?? [],
   };
 }
 

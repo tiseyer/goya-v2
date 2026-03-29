@@ -11,6 +11,7 @@ export type UserRow = {
   is_verified: boolean;
   created_at: string;
   avatar_url: string | null;
+  wp_roles?: string[];
 };
 
 const ROLE_BADGE: Record<string, string> = {
@@ -93,9 +94,16 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
 
                 {/* Role */}
                 <td className="px-4 py-3">
-                  <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full capitalize ${ROLE_BADGE[user.role] ?? 'bg-slate-100 text-slate-600'}`}>
-                    {user.role?.replace(/_/g, ' ') ?? '—'}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-1">
+                    <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full capitalize ${ROLE_BADGE[user.role] ?? 'bg-slate-100 text-slate-600'}`}>
+                      {user.role?.replace(/_/g, ' ') ?? '—'}
+                    </span>
+                    {user.wp_roles && user.wp_roles.length > 0 && user.wp_roles.map((wr: string) => (
+                      <span key={wr} className="inline-block text-[9px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-400">
+                        {wr.replace(/_/g, ' ')}
+                      </span>
+                    ))}
+                  </div>
                 </td>
 
                 {/* Status */}

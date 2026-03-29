@@ -3,12 +3,23 @@
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+const WP_ROLES = [
+  'administrator', 'woo_sub', 'customer', 'student', 'wellness_practitioner',
+  'teacher', 'school', 'robot', 'subscription_editor', 'faux', 'keymaster',
+  'participant', '2fa_active', '2fa_inactive', 'pending', 'verification_requests',
+] as const;
+
+function wpRoleLabel(role: string): string {
+  return role.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 interface Props {
   initialSearch: string;
   initialRole: string;
   initialVerified: string;
   initialStatus: string;
   initialCreditStatus: string;
+  initialWpRole: string;
   initialDateFrom: string;
   initialDateTo: string;
   initialSort: string;
@@ -20,6 +31,7 @@ export default function AdminUsersFilters({
   initialVerified,
   initialStatus,
   initialCreditStatus,
+  initialWpRole,
   initialDateFrom,
   initialDateTo,
   initialSort,
@@ -125,6 +137,18 @@ export default function AdminUsersFilters({
         <option value="green">On Track</option>
         <option value="yellow">Expiring Soon</option>
         <option value="red">Needs Attention</option>
+      </select>
+
+      {/* Legacy WP Role */}
+      <select
+        defaultValue={initialWpRole}
+        onChange={e => updateParam('wpRole', e.target.value)}
+        className={selectClass}
+      >
+        <option value="">WP Roles</option>
+        {WP_ROLES.map(r => (
+          <option key={r} value={r}>{wpRoleLabel(r)}</option>
+        ))}
       </select>
 
       {/* Date from */}
