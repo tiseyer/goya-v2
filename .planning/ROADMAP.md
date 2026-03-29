@@ -73,7 +73,12 @@ Plans:
   4. After two failed attempts or an explicit "talk to a human" request, the widget shows the escalation message with a 48-hour response promise and creates a support ticket
   5. The chat widget is hidden when the chatbot is_active flag is false in the config, verified by checking the public config endpoint
   6. The AI route enforces a 20-message-per-session-per-hour distributed rate limit and runs on Node.js runtime (not Edge)
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 14-01-PLAN.md — AI SDKs, chat service layer, rate limiter, escalation detection, API routes
+- [ ] 14-02-PLAN.md — Chat widget UI components (8 files) + layout mount
+- [ ] 14-03-PLAN.md — Wire widget to streaming backend, session management, persistence
+- [ ] 14-04-PLAN.md — Human verification of complete chat flow
 **UI hint**: yes
 
 ### Phase 15: Escalation + Support Tickets + Conversations Admin
@@ -99,5 +104,5 @@ Phases execute in numeric order: 12 → 13 → 14 → 15
 |-------|-----------|----------------|--------|-----------|
 | 12. Encrypted Secrets + Key Management | v1.8 | 2/2 | Complete    | 2026-03-27 |
 | 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 3/3 | Complete    | 2026-03-29 |
-| 14. AI Backend + Streaming Chat Widget | v1.8 | 0/TBD | Not started | - |
+| 14. AI Backend + Streaming Chat Widget | v1.8 | 0/4 | Not started | - |
 | 15. Escalation + Support Tickets + Conversations Admin | v1.8 | 0/TBD | Not started | - |
