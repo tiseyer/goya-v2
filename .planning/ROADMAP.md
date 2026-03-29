@@ -23,7 +23,7 @@ Phases 1–11 covered User Settings, Connections & Inbox, Stripe Admin & Shop, S
 **Milestone Goal:** Add an AI-powered support chatbot ("Mattea") with encrypted third-party key management, admin configuration, FAQ knowledge base, tool-use capabilities, and escalation-to-human workflow.
 
 - [x] **Phase 12: Encrypted Secrets + Key Management** - Secrets infrastructure and Third Party Keys admin UI
-- [ ] **Phase 13: Chat Schema + Admin Chatbot Config + FAQ** - All database migrations, chatbot config page, and FAQ management
+- [x] **Phase 13: Chat Schema + Admin Chatbot Config + FAQ** - All database migrations, chatbot config page, and FAQ management (completed 2026-03-29)
 - [ ] **Phase 14: AI Backend + Streaming Chat Widget** - AI route, streaming, chat widget, rate limiting
 - [ ] **Phase 15: Escalation + Support Tickets + Conversations Admin** - Escalation flow, support tickets, conversations viewer, cron cleanup
 
@@ -59,7 +59,7 @@ Plans:
 Plans:
 - [x] 13-01-PLAN.md — All 4 Supabase migrations + chatbot types + server actions
 - [x] 13-02-PLAN.md — Chatbot page shell + sidebar entry + Configuration tab
-- [ ] 13-03-PLAN.md — FAQ tab with search, inline editing, add modal + human-verify
+- [x] 13-03-PLAN.md — FAQ tab with search, inline editing, add modal + human-verify
 **UI hint**: yes
 
 ### Phase 14: AI Backend + Streaming Chat Widget
@@ -98,6 +98,6 @@ Phases execute in numeric order: 12 → 13 → 14 → 15
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 12. Encrypted Secrets + Key Management | v1.8 | 2/2 | Complete    | 2026-03-27 |
-| 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 2/3 | In Progress|  |
+| 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 3/3 | Complete   | 2026-03-29 |
 | 14. AI Backend + Streaming Chat Widget | v1.8 | 0/TBD | Not started | - |
 | 15. Escalation + Support Tickets + Conversations Admin | v1.8 | 0/TBD | Not started | - |

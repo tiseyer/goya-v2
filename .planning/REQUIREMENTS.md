@@ -39,8 +39,8 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 - [x] **ADMIN-02**: Four tabs styled like /admin/settings: Configuration, FAQ, Conversations, API Connections
 - [x] **ADMIN-03**: Configuration: chatbot name, profile image upload, active toggle, AI key selector, system prompt, guest retention days
 - [x] **ADMIN-04**: Default avatar downloaded from GOYA website and stored in Supabase storage
-- [ ] **ADMIN-05**: FAQ tab with search, Add FAQ button, table with Question/Answer/Status/Actions
-- [ ] **ADMIN-06**: FAQ inline editing with dropdown expand, Save/Cancel, Published/Draft toggle
+- [x] **ADMIN-05**: FAQ tab with search, Add FAQ button, table with Question/Answer/Status/Actions
+- [x] **ADMIN-06**: FAQ inline editing with dropdown expand, Save/Cancel, Published/Draft toggle
 - [ ] **ADMIN-07**: Conversations tab listing all sessions with user/guest info, message count, escalation badge
 - [ ] **ADMIN-08**: Conversation viewer shows full read-only chat history
 - [ ] **ADMIN-09**: Conversations filterable by all/logged-in/guests/escalated, searchable by name/ID
@@ -130,8 +130,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADMIN-02 | Phase 13 | Complete |
 | ADMIN-03 | Phase 13 | Complete |
 | ADMIN-04 | Phase 13 | Complete |
-| ADMIN-05 | Phase 13 | Pending |
-| ADMIN-06 | Phase 13 | Pending |
+| ADMIN-05 | Phase 13 | Complete |
+| ADMIN-06 | Phase 13 | Complete |
 | ADMIN-07 | Phase 15 | Pending |
 | ADMIN-08 | Phase 15 | Pending |
 | ADMIN-09 | Phase 15 | Pending |
