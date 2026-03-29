@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import AdminOnboardingTest from './AdminOnboardingTest';
+import AnalyticsSection from './AnalyticsSection';
 
 // ─── Stat card ─────────────────────────────────────────────────────────────────
 
@@ -117,7 +118,12 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Row 2 — Platform info */}
+      {/* Row 2 — Web Analytics */}
+      <div className="mt-8">
+        <AnalyticsSection />
+      </div>
+
+      {/* Row 3 — Platform info */}
       <div className="mt-8">
         <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest mb-3">Platform</h2>
 
