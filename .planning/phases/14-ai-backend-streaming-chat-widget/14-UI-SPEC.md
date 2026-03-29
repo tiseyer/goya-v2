@@ -44,7 +44,7 @@ Declared values (must be multiples of 4):
 
 Exceptions:
 - Floating button: 56x56px (touch target minimum 44px met, 56px provides visual weight)
-- Mattea avatar in header: 36x36px
+- Mattea avatar in header: 36x36px (matches common chat UI convention; closest 4px-multiple above 32px for visual weight — 40px was too large for the 56px header)
 - Mattea avatar in message thread: 28x28px
 - Widget panel: exactly 380px wide, 560px tall on desktop (from CONTEXT.md CHAT-02)
 - Mobile fullscreen: 100dvh height, 100vw width
@@ -125,9 +125,9 @@ Source: globals.css token audit. Dark mode variants sourced from .dark {} block.
 - Background: `var(--background-secondary)`, border-radius: 16px 16px 0 0
 - Left: Mattea avatar 36x36px circle + name label (semibold 14px) + online indicator dot (8px, bg-primary)
 - Right: two icon buttons (ghost variant, 32x32px)
-  - RotateCcw icon (16px) — "New Chat" — aria-label: "Start new chat"
-  - Trash2 icon (16px) — "Delete chat history" — aria-label: "Delete chat history", accent-colored (destructive)
-- Close button: X icon (16px) — `ml-auto` — aria-label: "Close chat"
+  - RotateCcw icon (16px) — "New Chat" — aria-label: "Start new chat", title="New chat"
+  - Trash2 icon (16px) — "Delete chat history" — aria-label: "Delete chat history", title="Delete chat history", accent-colored (destructive)
+- Close button: X icon (16px) — `ml-auto` — aria-label: "Close chat", title="Close chat"
 
 ### MessageList
 - Flex-col, scrollable overflow-y-auto, padding: `px-4 py-4`
@@ -143,14 +143,14 @@ Source: globals.css token audit. Dark mode variants sourced from .dark {} block.
 ### MessageBubble (user)
 - Right-aligned: `ml-auto max-w-[75%]`
 - Background: `var(--background-secondary)`, border: 1px `var(--goya-border)`, border-radius: 12px 12px 2px 12px
-- Padding: `px-3.5 py-2.5` (14px / 10px)
+- Padding: `px-4 py-2` (16px / 8px)
 - Text: 14px regular, `var(--foreground)`
 
 ### MessageBubble (Mattea / assistant)
 - Left-aligned: `mr-auto max-w-[75%]`, flex row with avatar
 - Avatar: 28x28px circle, `shrink-0 mt-0.5`
 - Bubble: Background `var(--goya-surface)`, border: 1px `var(--goya-border)`, border-radius: 2px 12px 12px 12px
-- Padding: `px-3.5 py-2.5`
+- Padding: `px-4 py-2` (16px / 8px)
 - Text: 14px regular, `var(--foreground)`
 - Streaming state: append blinking cursor `|` in `text-primary` after last character while tokens are incoming
 
@@ -255,6 +255,7 @@ Destructive actions in this phase:
 | Scroll | MessageList uses `scrollbar-none` but remains keyboard-scrollable |
 | Touch target | FloatingButton 56x56px — exceeds 44px minimum |
 | Contrast | All body text on surface backgrounds passes WCAG AA at 4.5:1 minimum |
+| Icon-only buttons | All icon-only buttons in ChatHeader carry both `aria-label` and `title` attributes for pointer tooltip disclosure |
 
 ---
 
