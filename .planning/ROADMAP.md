@@ -24,7 +24,7 @@ Phases 1–11 covered User Settings, Connections & Inbox, Stripe Admin & Shop, S
 
 - [x] **Phase 12: Encrypted Secrets + Key Management** - Secrets infrastructure and Third Party Keys admin UI
 - [x] **Phase 13: Chat Schema + Admin Chatbot Config + FAQ** - All database migrations, chatbot config page, and FAQ management (completed 2026-03-29)
-- [ ] **Phase 14: AI Backend + Streaming Chat Widget** - AI route, streaming, chat widget, rate limiting
+- [x] **Phase 14: AI Backend + Streaming Chat Widget** - AI route, streaming, chat widget, rate limiting (completed 2026-03-29)
 - [ ] **Phase 15: Escalation + Support Tickets + Conversations Admin** - Escalation flow, support tickets, conversations viewer, cron cleanup
 
 ## Phase Details
@@ -78,7 +78,7 @@ Plans:
 - [x] 14-01-PLAN.md — AI SDKs, chat service layer, rate limiter, escalation detection, API routes
 - [x] 14-02-PLAN.md — Chat widget UI components (8 files) + layout mount
 - [x] 14-03-PLAN.md — Wire widget to streaming backend, session management, persistence
-- [ ] 14-04-PLAN.md — Human verification of complete chat flow
+- [x] 14-04-PLAN.md — Human verification of complete chat flow
 **UI hint**: yes
 
 ### Phase 15: Escalation + Support Tickets + Conversations Admin
@@ -104,5 +104,5 @@ Phases execute in numeric order: 12 → 13 → 14 → 15
 |-------|-----------|----------------|--------|-----------|
 | 12. Encrypted Secrets + Key Management | v1.8 | 2/2 | Complete    | 2026-03-27 |
 | 13. Chat Schema + Admin Chatbot Config + FAQ | v1.8 | 3/3 | Complete    | 2026-03-29 |
-| 14. AI Backend + Streaming Chat Widget | v1.8 | 3/4 | In Progress|  |
+| 14. AI Backend + Streaming Chat Widget | v1.8 | 3/4 | Complete    | 2026-03-29 |
 | 15. Escalation + Support Tickets + Conversations Admin | v1.8 | 0/TBD | Not started | - |
