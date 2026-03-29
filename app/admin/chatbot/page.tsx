@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { getChatbotConfig } from './chatbot-actions'
+import { getChatbotConfig, listFaqItems } from './chatbot-actions'
 import { listAiProviderKeys } from '../api-keys/secrets-actions'
 import type { AiProviderKeyItem } from '../api-keys/secrets-actions'
 import ConfigurationTab from './ConfigurationTab'
 import PlaceholderTab from './PlaceholderTab'
+import FaqTab from './FaqTab'
 
 export default async function ChatbotPage({
   searchParams,
@@ -20,13 +21,15 @@ export default async function ChatbotPage({
       ? 'api-connections'
       : 'config'
 
-  const [configResult, aiKeysResult] = await Promise.all([
+  const [configResult, aiKeysResult, faqResult] = await Promise.all([
     getChatbotConfig(),
     listAiProviderKeys(),
+    listFaqItems(),
   ])
 
   const config = configResult.success ? configResult.config : null
   const aiKeys: AiProviderKeyItem[] = aiKeysResult.success ? aiKeysResult.keys : []
+  const initialFaqItems = faqResult.success ? faqResult.items : []
 
   return (
     <div className="p-6 lg:p-8">
@@ -88,9 +91,7 @@ export default async function ChatbotPage({
 
       {/* Tab content */}
       {activeTab === 'config' && <ConfigurationTab config={config} aiKeys={aiKeys} />}
-      {activeTab === 'faq' && (
-        <PlaceholderTab title="FAQ tab loading..." body="FAQ management will be available here." />
-      )}
+      {activeTab === 'faq' && <FaqTab initialItems={initialFaqItems} />}
       {activeTab === 'conversations' && (
         <PlaceholderTab
           title="Coming in Phase 15"
