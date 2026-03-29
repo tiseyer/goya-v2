@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: AI-Support-System
-status: verifying
-stopped_at: "Checkpoint: human-verify Task 3 — verify /admin/chatbot FAQ tab"
-last_updated: "2026-03-29T13:52:09.407Z"
+status: executing
+stopped_at: Completed 14-02-PLAN.md
+last_updated: "2026-03-29T14:21:01.886Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 9
+  completed_plans: 7
   percent: 100
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 13 — chat-schema-admin-chatbot-config-faq
+**Current focus:** Phase 14 — ai-backend-streaming-chat-widget
 
 ## Current Position
 
-Phase: 14
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 14 (ai-backend-streaming-chat-widget) — EXECUTING
+Plan: 3 of 4
+Status: Ready to execute
 Last activity: 2026-03-29
 
 Progress: [██████████] 100%
@@ -51,6 +51,8 @@ Progress: [██████████] 100%
 | Phase 13 P01 | 11 | 2 tasks | 6 files |
 | Phase 13 P02 | 6 | 2 tasks | 4 files |
 | Phase 13 P03 | 5 | 2 tasks | 4 files |
+| Phase 14 P01 | 10 | 2 tasks | 7 files |
+| Phase 14-ai-backend-streaming-chat-widget P02 | 215 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -72,6 +74,9 @@ Recent decisions affecting current work:
 - [Phase 13]: Auto-fetch Mattea avatar from GOYA CDN on first config save when avatar_url is null (ADMIN-04 one-time operation)
 - [Phase 13]: FAQ tab renders PlaceholderTab until Plan 03 wires FaqTab — avoids import cycle without stub complexity
 - [Phase 13]: FaqTab manages expandedId centrally, passing isExpanded/onExpand to FaqRow for single-row constraint enforcement at parent level
+- [Phase 14]: In-memory sliding window for chat rate limit (20/session/hr) — same pattern as REST API, no external deps
+- [Phase 14]: JSON-line streaming format — each line is JSON (type: token|done|error|escalation) terminated by newline
+- [Phase 14]: ChatWidget uses ssr:false dynamic import — client-side only, avoids SSR bundle cost
 
 ### Blockers/Concerns
 
@@ -96,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T13:29:27.154Z
-Stopped at: Checkpoint: human-verify Task 3 — verify /admin/chatbot FAQ tab
+Last session: 2026-03-29T14:21:01.883Z
+Stopped at: Completed 14-02-PLAN.md
 Resume file: None
