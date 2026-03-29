@@ -15,17 +15,25 @@ CREATE TABLE IF NOT EXISTS public.webhook_events (
 
 ALTER TABLE public.webhook_events ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Admins can manage webhook events"
-  ON public.webhook_events
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id = auth.uid() AND role IN ('admin', 'moderator')
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id = auth.uid() AND role IN ('admin', 'moderator')
-    )
-  );
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'webhook_events' AND policyname = 'Admins can manage webhook events'
+  ) THEN
+    CREATE POLICY "Admins can manage webhook events"
+      ON public.webhook_events
+      USING (
+        EXISTS (
+          SELECT 1 FROM public.profiles
+          WHERE id = auth.uid() AND role IN ('admin', 'moderator')
+        )
+      )
+      WITH CHECK (
+        EXISTS (
+          SELECT 1 FROM public.profiles
+          WHERE id = auth.uid() AND role IN ('admin', 'moderator')
+        )
+      );
+  END IF;
+END $$;

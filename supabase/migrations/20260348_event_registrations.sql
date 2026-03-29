@@ -12,9 +12,17 @@ CREATE TABLE IF NOT EXISTS public.event_registrations (
   UNIQUE(event_id, user_id)
 );
 
-CREATE TRIGGER update_event_registrations_updated_at
-  BEFORE UPDATE ON public.event_registrations
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger
+    WHERE tgname = 'update_event_registrations_updated_at'
+  ) THEN
+    CREATE TRIGGER update_event_registrations_updated_at
+      BEFORE UPDATE ON public.event_registrations
+      FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+  END IF;
+END $$;
 
 -- RLS: enabled with no policies (service-role-only access, same as api_keys)
 ALTER TABLE public.event_registrations ENABLE ROW LEVEL SECURITY;
