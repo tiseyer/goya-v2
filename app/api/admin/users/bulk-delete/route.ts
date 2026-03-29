@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
   const adminIds = new Set(
     (profiles ?? []).filter(p => p.role === 'admin').map(p => {
-      skippedAdmins.push(p.email)
+      skippedAdmins.push(p.email ?? 'unknown')
       return p.id
     })
   )
