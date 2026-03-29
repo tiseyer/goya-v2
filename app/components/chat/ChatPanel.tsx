@@ -4,6 +4,10 @@ import { useState, useEffect, useRef } from 'react'
 import ChatHeader from './ChatHeader'
 import MessageList from './MessageList'
 import ChatInput from './ChatInput'
+import {
+  getOrCreateSession,
+  deleteSession,
+} from '@/lib/chatbot/chat-actions'
 
 interface Message {
   id: string
@@ -16,28 +20,81 @@ interface ChatPanelProps {
   avatarUrl: string | null
   name: string
   onClose: () => void
+  userId: string | null
+  anonymousId: string | null
+  initialSessionId: string | null
 }
 
-export default function ChatPanel({ isOpen, avatarUrl, name, onClose }: ChatPanelProps) {
+const LS_KEY = 'goya_chat_session_id'
+
+export default function ChatPanel({
+  isOpen,
+  avatarUrl,
+  name,
+  onClose,
+  userId,
+  anonymousId,
+  initialSessionId,
+}: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const [isStreaming, setIsStreaming] = useState(false)
   const [isEscalated, setIsEscalated] = useState(false)
   const [isRateLimited, setIsRateLimited] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
-  const inputRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
-  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
-  // Initialize session ID on mount
+  // Restore or create session when panel opens
   useEffect(() => {
-    setSessionId(crypto.randomUUID())
-  }, [])
+    if (!isOpen) return
+
+    let cancelled = false
+
+    async function initSession() {
+      try {
+        const storedSessionId =
+          initialSessionId ?? (typeof window !== 'undefined' ? localStorage.getItem(LS_KEY) : null)
+
+        const result = await getOrCreateSession({
+          userId: userId ?? undefined,
+          anonymousId: anonymousId ?? undefined,
+          existingSessionId: storedSessionId ?? undefined,
+        })
+
+        if (cancelled) return
+
+        setSessionId(result.session_id)
+
+        // Persist session ID to localStorage for cross-navigation restore
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(LS_KEY, result.session_id)
+        }
+
+        // Restore conversation history
+        if (result.messages.length > 0) {
+          const restored: Message[] = result.messages
+            .filter(m => m.role === 'user' || m.role === 'assistant')
+            .map(m => ({
+              id: m.id,
+              role: m.role as 'user' | 'assistant',
+              content: m.content,
+            }))
+          setMessages(restored)
+        }
+      } catch {
+        // Non-fatal — widget still works without session restore
+      }
+    }
+
+    initSession()
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
   // Focus input when panel opens
   useEffect(() => {
     if (!isOpen) return
-    // Focus the textarea inside the input area
     const textarea = panelRef.current?.querySelector('textarea')
     if (textarea) {
       setTimeout(() => textarea.focus(), 50)
@@ -54,17 +111,17 @@ export default function ChatPanel({ isOpen, avatarUrl, name, onClose }: ChatPane
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
-  // Cleanup typing timer on unmount
+  // Abort in-flight request on unmount
   useEffect(() => {
     return () => {
-      if (typingTimerRef.current) clearTimeout(typingTimerRef.current)
+      abortControllerRef.current?.abort()
     }
   }, [])
 
-  function handleSend(text: string) {
+  async function handleSend(text: string) {
     if (isEscalated || isRateLimited) return
 
-    // Add user message
+    // Optimistic: add user message immediately
     const userMsg: Message = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -73,26 +130,195 @@ export default function ChatPanel({ isOpen, avatarUrl, name, onClose }: ChatPane
     setMessages(prev => [...prev, userMsg])
     setIsTyping(true)
 
-    // Mock assistant response after 1 second
-    typingTimerRef.current = setTimeout(() => {
-      setIsTyping(false)
-      const assistantMsg: Message = {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: "I'm Mattea! This is a placeholder response. The real AI backend will be connected soon.",
+    abortControllerRef.current?.abort()
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
+    try {
+      const res = await fetch('/api/chatbot/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: text,
+          anonymous_id: anonymousId,
+        }),
+        signal: controller.signal,
+      })
+
+      if (res.status === 429) {
+        setIsRateLimited(true)
+        setIsTyping(false)
+        setMessages(prev => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            role: 'rate-limit',
+            content:
+              "You've reached the message limit for this hour. Please check back soon.",
+          },
+        ])
+        return
       }
-      setMessages(prev => [...prev, assistantMsg])
-    }, 1000)
+
+      if (!res.ok) {
+        setIsTyping(false)
+        setMessages(prev => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            role: 'assistant',
+            content: 'Something went wrong. Please try again.',
+          },
+        ])
+        return
+      }
+
+      if (!res.body) {
+        setIsTyping(false)
+        return
+      }
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      let assistantMsgId: string | null = null
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() ?? ''
+
+        for (const line of lines) {
+          if (!line.trim()) continue
+
+          let data: { type: string; content?: string; message?: string; session_id?: string }
+          try {
+            data = JSON.parse(line)
+          } catch {
+            continue
+          }
+
+          if (data.type === 'token') {
+            if (!assistantMsgId) {
+              // First token: switch from typing indicator to streaming
+              setIsTyping(false)
+              setIsStreaming(true)
+              assistantMsgId = crypto.randomUUID()
+              setMessages(prev => [
+                ...prev,
+                { id: assistantMsgId!, role: 'assistant', content: data.content ?? '' },
+              ])
+            } else {
+              // Subsequent tokens: append to existing assistant message
+              const targetId = assistantMsgId
+              setMessages(prev =>
+                prev.map(m =>
+                  m.id === targetId
+                    ? { ...m, content: m.content + (data.content ?? '') }
+                    : m,
+                ),
+              )
+            }
+          } else if (data.type === 'done') {
+            setIsStreaming(false)
+            if (data.session_id && data.session_id !== sessionId) {
+              setSessionId(data.session_id)
+              if (typeof window !== 'undefined') {
+                localStorage.setItem(LS_KEY, data.session_id)
+              }
+            }
+          } else if (data.type === 'escalation') {
+            setIsEscalated(true)
+            setIsTyping(false)
+            setIsStreaming(false)
+            if (data.session_id) {
+              setSessionId(data.session_id)
+              if (typeof window !== 'undefined') {
+                localStorage.setItem(LS_KEY, data.session_id)
+              }
+            }
+            setMessages(prev => [
+              ...prev,
+              {
+                id: crypto.randomUUID(),
+                role: 'escalation',
+                content: data.message ?? "I'll connect you with a human team member shortly.",
+              },
+            ])
+          } else if (data.type === 'error') {
+            setIsTyping(false)
+            setIsStreaming(false)
+            setMessages(prev => [
+              ...prev,
+              {
+                id: crypto.randomUUID(),
+                role: 'assistant',
+                content: data.message ?? 'Something went wrong. Please try again.',
+              },
+            ])
+          }
+        }
+      }
+    } catch (err) {
+      // Ignore AbortError (user navigated away or started new chat)
+      if (err instanceof Error && err.name === 'AbortError') return
+      setMessages(prev => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: 'Something went wrong. Please try again.',
+        },
+      ])
+    } finally {
+      setIsTyping(false)
+      setIsStreaming(false)
+    }
   }
 
-  function handleNewChat() {
-    if (typingTimerRef.current) clearTimeout(typingTimerRef.current)
+  async function handleNewChat() {
+    // Abort any in-flight request
+    abortControllerRef.current?.abort()
+
+    // Delete existing session from DB
+    if (sessionId) {
+      try {
+        await deleteSession(sessionId)
+      } catch {
+        // Non-fatal
+      }
+    }
+
+    // Clear localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(LS_KEY)
+    }
+
+    // Reset state
     setMessages([])
-    setSessionId(crypto.randomUUID())
     setIsEscalated(false)
     setIsRateLimited(false)
     setIsTyping(false)
     setIsStreaming(false)
+
+    // Create a fresh session
+    try {
+      const result = await getOrCreateSession({
+        userId: userId ?? undefined,
+        anonymousId: anonymousId ?? undefined,
+      })
+      setSessionId(result.session_id)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LS_KEY, result.session_id)
+      }
+    } catch {
+      setSessionId(null)
+    }
   }
 
   function handleDeleteHistory() {
