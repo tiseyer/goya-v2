@@ -26,11 +26,11 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 - [x] **CHAT-04**: Message bubbles (user right, Mattea left with avatar) with text input and send button
 - [x] **CHAT-05**: "New Chat" button starts fresh conversation, "Delete" button clears history
 - [x] **CHAT-06**: Opening greeting: "Namaste! I'm Mattea, your GOYA guide. How can I help you today?"
-- [ ] **CHAT-07**: Logged-in users' chats persist by user ID in Supabase
-- [ ] **CHAT-08**: Guest users' chats persist via anonymous session ID with cookie
-- [ ] **CHAT-09**: Returning users see previous conversation, not blank chat
-- [ ] **CHAT-10**: Escalation triggers when: low confidence, explicit human request, or 2 failed attempts
-- [ ] **CHAT-11**: Escalation message shown to user with 48-hour response promise
+- [x] **CHAT-07**: Logged-in users' chats persist by user ID in Supabase
+- [x] **CHAT-08**: Guest users' chats persist via anonymous session ID with cookie
+- [x] **CHAT-09**: Returning users see previous conversation, not blank chat
+- [x] **CHAT-10**: Escalation triggers when: low confidence, explicit human request, or 2 failed attempts
+- [x] **CHAT-11**: Escalation message shown to user with 48-hour response promise
 - [x] **CHAT-12**: Widget only visible when chatbot is_active in config (checked via public endpoint)
 
 ### Admin Chatbot
@@ -120,11 +120,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHAT-04 | Phase 14 | Complete |
 | CHAT-05 | Phase 14 | Complete |
 | CHAT-06 | Phase 14 | Complete |
-| CHAT-07 | Phase 14 | Pending |
-| CHAT-08 | Phase 14 | Pending |
-| CHAT-09 | Phase 14 | Pending |
-| CHAT-10 | Phase 14 | Pending |
-| CHAT-11 | Phase 14 | Pending |
+| CHAT-07 | Phase 14 | Complete |
+| CHAT-08 | Phase 14 | Complete |
+| CHAT-09 | Phase 14 | Complete |
+| CHAT-10 | Phase 14 | Complete |
+| CHAT-11 | Phase 14 | Complete |
 | CHAT-12 | Phase 14 | Complete |
 | ADMIN-01 | Phase 13 | Complete |
 | ADMIN-02 | Phase 13 | Complete |

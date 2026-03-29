@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: AI-Support-System
 status: executing
-stopped_at: Completed 14-02-PLAN.md
-last_updated: "2026-03-29T14:21:01.886Z"
+stopped_at: Completed 14-03-PLAN.md
+last_updated: "2026-03-29T14:27:52.723Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 100
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 ## Current Position
 
 Phase: 14 (ai-backend-streaming-chat-widget) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-03-29
 
@@ -53,6 +53,7 @@ Progress: [██████████] 100%
 | Phase 13 P03 | 5 | 2 tasks | 4 files |
 | Phase 14 P01 | 10 | 2 tasks | 7 files |
 | Phase 14-ai-backend-streaming-chat-widget P02 | 215 | 2 tasks | 9 files |
+| Phase 14 P03 | 162 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ Recent decisions affecting current work:
 - [Phase 14]: In-memory sliding window for chat rate limit (20/session/hr) — same pattern as REST API, no external deps
 - [Phase 14]: JSON-line streaming format — each line is JSON (type: token|done|error|escalation) terminated by newline
 - [Phase 14]: ChatWidget uses ssr:false dynamic import — client-side only, avoids SSR bundle cost
+- [Phase 14]: Session restore uses both localStorage (session ID) and cookie (anonymous ID) — localStorage for cross-navigation restore, cookie for server-side anonymous identity
+- [Phase 14]: AbortController used for in-flight stream cancellation on new chat/unmount — prevents state updates after panel teardown
 
 ### Blockers/Concerns
 
@@ -101,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T14:21:01.883Z
-Stopped at: Completed 14-02-PLAN.md
+Last session: 2026-03-29T14:27:52.720Z
+Stopped at: Completed 14-03-PLAN.md
 Resume file: None
