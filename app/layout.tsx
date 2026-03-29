@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import { Analytics } from "@vercel/analytics/react";
+import dynamic from "next/dynamic";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -11,6 +12,8 @@ import ImpersonationBanner from "./components/ImpersonationBanner";
 import ConsentGatedScripts from "./components/ConsentGatedScripts";
 import CookieConsent from "./components/CookieConsent";
 import { getImpersonationState } from "@/lib/impersonation";
+
+const ChatWidget = dynamic(() => import("./components/chat/ChatWidget"), { ssr: false })
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,6 +69,7 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "";
+  const isAdmin = pathname.startsWith('/admin')
   const hideNav = pathname.startsWith("/onboarding") || pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/sign-in") || pathname.startsWith("/forgot-password") || pathname.startsWith("/maintenance");
   const hideFooter = pathname.startsWith("/maintenance") || pathname.startsWith("/members") || pathname.startsWith("/sign-in") || pathname.startsWith("/forgot-password") || pathname.startsWith("/register") || pathname.startsWith("/login") || pathname.startsWith("/onboarding");
   const fullFooterPaths = ["/", "/privacy", "/terms", "/code-of-conduct", "/code-of-ethics"];
@@ -95,6 +99,9 @@ export default async function RootLayout({
           </main>
           {showFullFooter && <Footer />}
           {showSlimFooter && <SlimFooter />}
+
+          {/* Chat widget — hidden on admin pages, lazy-loaded */}
+          {!isAdmin && <ChatWidget />}
 
           {/* Cookie consent banner + floating button */}
           <CookieConsent />
