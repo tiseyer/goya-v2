@@ -151,6 +151,9 @@ export function buildProfileUpdate(user: WPExportUser): Record<string, unknown> 
 
     // Legacy WordPress roles (read-only reference)
     wp_roles: user.roles ?? [],
+
+    // Original WP registration date
+    wp_registered_at: user.registered_at ? new Date(user.registered_at.replace(' ', 'T') + 'Z').toISOString() : null,
   };
 }
 

@@ -45,7 +45,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
 
   let query = supabase
     .from('profiles')
-    .select('id, email, full_name, username, role, subscription_status, is_verified, created_at, avatar_url, member_type, wp_roles', { count: 'exact' });
+    .select('id, email, full_name, username, role, subscription_status, is_verified, created_at, avatar_url, member_type, wp_roles, wp_registered_at', { count: 'exact' });
 
   if (search) {
     query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,username.ilike.%${search}%,mrn.ilike.%${search}%`);

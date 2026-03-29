@@ -16,6 +16,7 @@ export type UserRow = {
   created_at: string
   avatar_url: string | null
   wp_roles?: string[]
+  wp_registered_at?: string | null
 }
 
 const ROLE_BADGE: Record<string, string> = {
@@ -195,7 +196,12 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-[#6B7280]">{formatDate(user.created_at)}</span>
+                    <span className="text-sm text-[#6B7280] flex items-center gap-1.5">
+                      {formatDate(user.wp_registered_at || user.created_at)}
+                      {user.wp_registered_at && (
+                        <span className="text-[9px] font-semibold px-1 py-0.5 rounded bg-slate-100 text-slate-400">WP</span>
+                      )}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
