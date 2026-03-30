@@ -4,7 +4,6 @@ import { getSupabaseService } from '@/lib/supabase/service';
 import ConnectButton from '@/app/components/ConnectButton';
 import ConnectionsSection from '@/app/components/ConnectionsSection';
 
-
 export const dynamic = 'force-dynamic';
 
 const ROLE_HERO: Record<string, { badge: string }> = {
@@ -44,7 +43,7 @@ export default async function MemberProfilePage({
     'Wellness Practitioner': 'wellness_practitioner',
   };
 
-  const staticMember = !profileData ? staticMembers.find(m => m.id === id) : null;
+  const staticMember = null;
   if (!profileData && !staticMember) notFound();
 
   const profile = profileData ?? (() => {
