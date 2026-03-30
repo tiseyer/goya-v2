@@ -41,19 +41,19 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 - [x] **ADMIN-04**: Default avatar downloaded from GOYA website and stored in Supabase storage
 - [x] **ADMIN-05**: FAQ tab with search, Add FAQ button, table with Question/Answer/Status/Actions
 - [x] **ADMIN-06**: FAQ inline editing with dropdown expand, Save/Cancel, Published/Draft toggle
-- [ ] **ADMIN-07**: Conversations tab listing all sessions with user/guest info, message count, escalation badge
-- [ ] **ADMIN-08**: Conversation viewer shows full read-only chat history
-- [ ] **ADMIN-09**: Conversations filterable by all/logged-in/guests/escalated, searchable by name/ID
-- [ ] **ADMIN-10**: API Connections tab with toggleable tools (Events, Teachers, Courses, FAQ)
-- [ ] **ADMIN-11**: Each tool shows description and enable/disable toggle
+- [x] **ADMIN-07**: Conversations tab listing all sessions with user/guest info, message count, escalation badge
+- [x] **ADMIN-08**: Conversation viewer shows full read-only chat history
+- [x] **ADMIN-09**: Conversations filterable by all/logged-in/guests/escalated, searchable by name/ID
+- [x] **ADMIN-10**: API Connections tab with toggleable tools (Events, Teachers, Courses, FAQ)
+- [x] **ADMIN-11**: Each tool shows description and enable/disable toggle
 
 ### Support Tickets
 
-- [ ] **SUPP-01**: Support Tickets tab added to /admin/inbox (third tab)
-- [ ] **SUPP-02**: Table with User, Question, Created, Status (Open/In Progress/Resolved), Actions
-- [ ] **SUPP-03**: View action opens escalated conversation with reply field
-- [ ] **SUPP-04**: Admin reply stored and delivered to user (in-app or in widget for guests)
-- [ ] **SUPP-05**: Status toggle between Open, In Progress, Resolved
+- [x] **SUPP-01**: Support Tickets tab added to /admin/inbox (third tab)
+- [x] **SUPP-02**: Table with User, Question, Created, Status (Open/In Progress/Resolved), Actions
+- [x] **SUPP-03**: View action opens escalated conversation with reply field
+- [x] **SUPP-04**: Admin reply stored and delivered to user (in-app or in widget for guests)
+- [x] **SUPP-05**: Status toggle between Open, In Progress, Resolved
 
 ### AI Backend
 
@@ -76,7 +76,7 @@ Requirements for v1.8 AI-Support-System milestone. Each maps to roadmap phases.
 - [x] **INFRA-03**: Supabase migration: faq_items table with admin write, public read for chatbot
 - [x] **INFRA-04**: Supabase migration: chat_sessions and chat_messages tables with session-owner RLS
 - [x] **INFRA-05**: Supabase migration: support_tickets table with admin-only RLS and session FK
-- [ ] **INFRA-06**: Guest chat cleanup cron endpoint for expired sessions
+- [x] **INFRA-06**: Guest chat cleanup cron endpoint for expired sessions
 - [x] **INFRA-07**: Node.js runtime for chat route (not Edge — crypto module required)
 
 ## Future Requirements
@@ -132,16 +132,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADMIN-04 | Phase 13 | Complete |
 | ADMIN-05 | Phase 13 | Complete |
 | ADMIN-06 | Phase 13 | Complete |
-| ADMIN-07 | Phase 15 | Pending |
-| ADMIN-08 | Phase 15 | Pending |
-| ADMIN-09 | Phase 15 | Pending |
-| ADMIN-10 | Phase 15 | Pending |
-| ADMIN-11 | Phase 15 | Pending |
-| SUPP-01 | Phase 15 | Pending |
-| SUPP-02 | Phase 15 | Pending |
-| SUPP-03 | Phase 15 | Pending |
-| SUPP-04 | Phase 15 | Pending |
-| SUPP-05 | Phase 15 | Pending |
+| ADMIN-07 | Phase 15 | Complete |
+| ADMIN-08 | Phase 15 | Complete |
+| ADMIN-09 | Phase 15 | Complete |
+| ADMIN-10 | Phase 15 | Complete |
+| ADMIN-11 | Phase 15 | Complete |
+| SUPP-01 | Phase 15 | Complete |
+| SUPP-02 | Phase 15 | Complete |
+| SUPP-03 | Phase 15 | Complete |
+| SUPP-04 | Phase 15 | Complete |
+| SUPP-05 | Phase 15 | Complete |
 | AI-01 | Phase 14 | Complete |
 | AI-02 | Phase 14 | Complete |
 | AI-03 | Phase 14 | Complete |
@@ -158,7 +158,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-03 | Phase 13 | Complete |
 | INFRA-04 | Phase 13 | Complete |
 | INFRA-05 | Phase 13 | Complete |
-| INFRA-06 | Phase 15 | Pending |
+| INFRA-06 | Phase 15 | Complete |
 | INFRA-07 | Phase 14 | Complete |
 
 **Coverage:**

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: AI-Support-System
 status: executing
-stopped_at: Completed 14-03-PLAN.md
-last_updated: "2026-03-30T02:18:18.763Z"
-last_activity: 2026-03-30 -- Completed quick task 260330-cwt: Fix overwrite mode migration import
+stopped_at: Completed 15-01-PLAN.md
+last_updated: "2026-03-30T02:26:26.434Z"
+last_activity: 2026-03-30
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 12
-  completed_plans: 9
+  completed_plans: 10
   percent: 100
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 ## Current Position
 
 Phase: 15 (escalation-support-tickets-conversations-admin) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 15
-Last activity: 2026-03-30 -- Phase 15 execution started
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-03-30
 
 Progress: [██████████] 100%
 
@@ -54,6 +54,7 @@ Progress: [██████████] 100%
 | Phase 14 P01 | 10 | 2 tasks | 7 files |
 | Phase 14-ai-backend-streaming-chat-widget P02 | 215 | 2 tasks | 9 files |
 | Phase 14 P03 | 162 | 2 tasks | 3 files |
+| Phase 15-escalation-support-tickets-conversations-admin P01 | 12 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,9 @@ Recent decisions affecting current work:
 - [Phase 14]: ChatWidget uses ssr:false dynamic import — client-side only, avoids SSR bundle cost
 - [Phase 14]: Session restore uses both localStorage (session ID) and cookie (anonymous ID) — localStorage for cross-navigation restore, cookie for server-side anonymous identity
 - [Phase 14]: AbortController used for in-flight stream cancellation on new chat/unmount — prevents state updates after panel teardown
+- [Phase 15]: Used 20260361 migration filename — 20260360 was already taken by health_monitor_log
+- [Phase 15]: replyToTicket only advances open→in_progress, never re-opens resolved tickets
+- [Phase 15]: updateEnabledTools always forces faq into tools array regardless of caller input
 
 ### Blockers/Concerns
 
@@ -105,6 +109,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T02:17:46.214Z
-Stopped at: Completed quick task 260330-cwt
+Last session: 2026-03-30T02:26:26.430Z
+Stopped at: Completed 15-01-PLAN.md
 Resume file: None
