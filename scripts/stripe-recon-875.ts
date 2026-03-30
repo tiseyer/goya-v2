@@ -14,7 +14,7 @@ const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY!;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://snddprncgilpctgvjukr.supabase.co';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-type Bucket = 'active_in_stripe' | 'cancelled_in_stripe' | 'no_stripe_customer' | 'manual_renewal' | 'failed_payment';
+type Bucket = 'active_in_stripe' | 'cancelled_in_stripe' | 'no_stripe_customer' | 'customer_no_subs' | 'manual_renewal' | 'failed_payment';
 
 interface WCSubscription {
   sub_id: number;
@@ -249,8 +249,8 @@ function categorizeBucket(stripeCustomers: StripeCustomer[]): Bucket {
   const allSubs = stripeCustomers.flatMap(c => c.subscriptions);
 
   if (allSubs.length === 0) {
-    // Has customer but no subs — treat as no_stripe_customer for practical purposes
-    return 'no_stripe_customer';
+    // Has Stripe customer but no subscriptions — distinct from no customer at all
+    return 'customer_no_subs';
   }
 
   // Check for active subscriptions
@@ -348,6 +348,7 @@ function generateSummary(records: ReconRecord[], isTestKey: boolean = false): st
     active_in_stripe: 0,
     cancelled_in_stripe: 0,
     no_stripe_customer: 0,
+    customer_no_subs: 0,
     manual_renewal: 0,
     failed_payment: 0,
   };
@@ -384,7 +385,8 @@ function generateSummary(records: ReconRecord[], isTestKey: boolean = false): st
   lines.push('|--------|-------|-------|---|--------------------|');
   lines.push(`| A | active_in_stripe | ${buckets.active_in_stripe} | ${pct(buckets.active_in_stripe)} | Link existing Stripe sub ID to WC/Supabase profile — no re-onboarding needed |`);
   lines.push(`| B | cancelled_in_stripe | ${buckets.cancelled_in_stripe} | ${pct(buckets.cancelled_in_stripe)} | Re-onboard or send re-subscribe email — subscription lapsed |`);
-  lines.push(`| C | no_stripe_customer | ${buckets.no_stripe_customer} | ${pct(buckets.no_stripe_customer)} | These users never had Stripe — investigate if faux/test or need new payment setup |`);
+  lines.push(`| C | no_stripe_customer | ${buckets.no_stripe_customer} | ${pct(buckets.no_stripe_customer)} | No Stripe presence at all — need new payment setup at re-onboarding |`);
+  lines.push(`| C2 | customer_no_subs | ${buckets.customer_no_subs} | ${pct(buckets.customer_no_subs)} | Stripe customer exists but has no subscriptions — link customer, create new sub |`);
   lines.push(`| D | manual_renewal | ${buckets.manual_renewal} | ${pct(buckets.manual_renewal)} | Stripe customer exists with $0 plan — manual or comp'd member, migrate as-is |`);
   lines.push(`| E | failed_payment | ${buckets.failed_payment} | ${pct(buckets.failed_payment)} | Stripe sub in past_due/incomplete state — needs payment retry or dunning |`);
 
@@ -412,13 +414,17 @@ function generateSummary(records: ReconRecord[], isTestKey: boolean = false): st
   lines.push('  2. Admin manually creates new subscription if member should still be active');
   lines.push('- Estimated effort: **Semi-manual** — email campaign + admin review');
   lines.push('');
-  lines.push('### C — no_stripe_customer (Investigate)');
-  lines.push('- These users have no Stripe presence at all. Likely scenarios:');
-  lines.push('  - Faux/test users (should be excluded from migration)');
-  lines.push('  - Early WooCommerce-only members who paid via PayPal or check');
-  lines.push('  - WP-migrated users without payment history');
-  lines.push('- Action: Cross-check wp_roles for faux/robit. Those with real roles need new Stripe setup.');
-  lines.push('- Estimated effort: **Manual review** — run wp_roles filter, then batch invite real users');
+  lines.push('### C — no_stripe_customer (New setup needed)');
+  lines.push('- No Stripe customer record exists for this email');
+  lines.push('- These members need a Stripe customer + subscription created at re-onboarding');
+  lines.push('- Action: At next login, prompt to set up payment method and create Stripe subscription');
+  lines.push('- Estimated effort: **Automated** — handled by re-onboarding flow');
+  lines.push('');
+  lines.push('### C2 — customer_no_subs (Stripe customer exists, no subscription)');
+  lines.push('- Stripe customer record exists (often with payment method) but no subscription');
+  lines.push('- These were likely created during WooCommerce checkout but subscription was handled by WC');
+  lines.push('- Action: Link existing Stripe customer ID to Supabase profile, create new subscription at re-onboarding');
+  lines.push('- Estimated effort: **Semi-automated** — batch link customer IDs, subscription created at login');
   lines.push('');
   lines.push('### D — manual_renewal (Migrate as-is)');
   lines.push('- Comp\'d or manually managed members with $0 Stripe subscriptions');
@@ -484,6 +490,22 @@ function generateSummary(records: ReconRecord[], isTestKey: boolean = false): st
     }
   }
 
+  // C2 bucket detail: how many have payment methods
+  const c2Records = records.filter(r => r.bucket === 'customer_no_subs');
+  if (c2Records.length > 0) {
+    const c2WithPM = c2Records.filter(r =>
+      r.stripe_data && r.stripe_data.some((c: any) => c.has_payment_method)
+    ).length;
+    lines.push('\n## C2 Bucket Detail — Customer No Subs\n');
+    lines.push(`| Metric | Count | % of C2 |`);
+    lines.push(`|--------|-------|---------|`);
+    lines.push(`| Total C2 (Stripe customer, no sub) | ${c2Records.length} | 100% |`);
+    lines.push(`| With payment method on file | ${c2WithPM} | ${((c2WithPM / c2Records.length) * 100).toFixed(1)}% |`);
+    lines.push(`| Without payment method | ${c2Records.length - c2WithPM} | ${(((c2Records.length - c2WithPM) / c2Records.length) * 100).toFixed(1)}% |`);
+    lines.push(`\n> These ${c2WithPM} users with payment methods can have subscriptions created automatically.`);
+    lines.push(`> The remaining ${c2Records.length - c2WithPM} need payment method collection at re-onboarding.`);
+  }
+
   return lines.join('\n');
 }
 
@@ -533,20 +555,32 @@ async function main() {
     console.log('  All records will be bucketed as no_stripe_customer');
     console.log('  Re-run with live key (rk_live_51... or sk_live_...) for real bucket data');
   } else {
+    // Parallel Stripe lookups in batches of 10 for ~10x speedup
+    const STRIPE_CONCURRENCY = 10;
     let stripeLookupsComplete = 0;
-    for (const email of uniqueEmails) {
-      try {
-        const customers = await lookupStripeCustomerByEmail(email);
-        stripeCache.set(email, customers);
-      } catch (err: any) {
-        console.error(`  Error looking up Stripe for ${email}:`, err.message);
-        stripeCache.set(email, []);
+    for (let i = 0; i < uniqueEmails.length; i += STRIPE_CONCURRENCY) {
+      const batch = uniqueEmails.slice(i, i + STRIPE_CONCURRENCY);
+      const results = await Promise.allSettled(
+        batch.map(async (email) => {
+          try {
+            const customers = await lookupStripeCustomerByEmail(email);
+            return { email, customers };
+          } catch (err: any) {
+            console.error(`  Error looking up Stripe for ${email}:`, err.message);
+            return { email, customers: [] as any[] };
+          }
+        })
+      );
+      for (const r of results) {
+        if (r.status === 'fulfilled') {
+          stripeCache.set(r.value.email, r.value.customers);
+        }
       }
-      stripeLookupsComplete++;
-      if (stripeLookupsComplete % 25 === 0) {
+      stripeLookupsComplete += batch.length;
+      if (stripeLookupsComplete % 50 === 0 || stripeLookupsComplete === uniqueEmails.length) {
         console.log(`  Stripe lookups: ${stripeLookupsComplete}/${uniqueEmails.length}`);
       }
-      await sleep(100); // 100ms delay to avoid rate limits
+      await sleep(50); // Small delay between batches
     }
   }
 
