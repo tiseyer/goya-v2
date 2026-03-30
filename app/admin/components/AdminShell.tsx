@@ -112,6 +112,17 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     type: 'link',
+    href: '/admin/flows',
+    label: 'Flows',
+    paths: [
+      'M6 3v12',
+      'M18 9a3 3 0 100-6 3 3 0 000 6z',
+      'M6 21a3 3 0 100-6 3 3 0 000 6z',
+      'M15 6a9 9 0 00-9 9',
+    ],
+  },
+  {
+    type: 'link',
     href: '/admin/api-keys',
     label: 'API Keys',
     paths: [
