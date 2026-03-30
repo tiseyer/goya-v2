@@ -55,7 +55,7 @@ export default function ConsentGatedScripts({
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', '${ga4Id}');
+gtag('config', '${ga4Id}', { send_page_view: false });
           `}</Script>
         </>
       )}

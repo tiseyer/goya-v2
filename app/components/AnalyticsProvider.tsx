@@ -41,10 +41,11 @@ function AnalyticsTracker() {
         const designation = designations.filter(Boolean).join(', ') || 'none';
 
         const { count } = await supabase
-          .from('stripe_subscriptions')
+          .from('stripe_orders')
           .select('id', { count: 'exact', head: true })
-          .eq('customer_profile_id', user.id)
-          .eq('status', 'active');
+          .eq('user_id', user.id)
+          .eq('type', 'recurring')
+          .eq('subscription_status', 'active');
 
         const hasSubscription = (count ?? 0) > 0;
 
