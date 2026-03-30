@@ -118,7 +118,7 @@ None yet.
 | 260330-mlx | Add live deployments branch switcher to admin dashboard | 2026-03-30 | b024d68 | [260330-mlx](./quick/260330-mlx-add-live-deployments-branch-switcher-to-/) |
 | 260330-nij | Fix member directory 1000-user hardcap and restore designation/style filter UI | 2026-03-30 | f406537 | [260330-nij](./quick/260330-nij-fix-member-directory-1000-user-hardcap-a/) |
 | 260330-ngh | Fix broken profile links across app — dropdown nav, messages, member directory all 404 | 2026-03-30 | ceddbd1 | [260330-ngh](./quick/260330-ngh-fix-broken-profile-links-across-app-drop/) |
-| 260330-naz | Fix impersonation — all data queries must respect impersonated user ID | 2026-03-30 | — | [260330-naz](./quick/260330-naz-fix-impersonation-all-data-queries-must-/) |
+| 260330-naz | Fix impersonation — all data queries must respect impersonated user ID | 2026-03-30 | e847943 | [260330-naz](./quick/260330-naz-fix-impersonation-all-data-queries-must-/) |
 
 ## Session Continuity
 
