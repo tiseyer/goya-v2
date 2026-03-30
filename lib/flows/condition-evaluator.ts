@@ -5,6 +5,7 @@ import type { FlowCondition } from './types';
 // Engine-internal type — not exported to types.ts
 interface UserProfileForConditions {
   role: string;
+  member_type: string | null;
   onboarding_complete: boolean;
   avatar_url: string | null;
   subscription_status: string | null;
@@ -38,11 +39,17 @@ function evaluateSingleCondition(
 ): boolean {
   switch (condition.type) {
     case 'role': {
+      const MEMBER_TYPES = ['student', 'teacher', 'wellness_practitioner'];
       if (condition.operator === 'equals') {
-        return userProfile.role === condition.value;
+        const v = condition.value as string;
+        if (MEMBER_TYPES.includes(v)) {
+          return userProfile.member_type === v;
+        }
+        return userProfile.role === v;
       }
       if (condition.operator === 'in') {
-        return (condition.value as string[]).includes(userProfile.role);
+        const values = condition.value as string[];
+        return values.includes(userProfile.role) || (userProfile.member_type !== null && values.includes(userProfile.member_type));
       }
       return false;
     }

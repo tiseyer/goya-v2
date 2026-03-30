@@ -42,7 +42,7 @@ export async function getActiveFlowForUser(
   // 2. Fetch user profile
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('role, onboarding_complete, avatar_url, subscription_status, birthday')
+    .select('role, onboarding_complete, avatar_url, subscription_status, birthday, member_type')
     .eq('id', userId)
     .single();
 
@@ -75,6 +75,7 @@ export async function getActiveFlowForUser(
   // 5. Evaluate each flow — first match wins
   const userProfileForConditions = {
     role: profile.role ?? '',
+    member_type: profile.member_type ?? null,
     onboarding_complete: profile.onboarding_complete ?? false,
     avatar_url: profile.avatar_url ?? null,
     subscription_status: profile.subscription_status ?? null,
