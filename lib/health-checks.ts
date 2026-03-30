@@ -178,7 +178,7 @@ export async function checkStripe(): Promise<ServiceCheck> {
       name: 'Stripe',
       status: latency > 500 ? 'degraded' : 'ok',
       latencyMs: latency,
-      notes: `Connected (${stripe.VERSION})`,
+      notes: `Connected (${(stripe as any).VERSION || 'unknown'})`,
     }
   } catch (err: any) {
     const msg = err?.message ?? 'Connection failed'
