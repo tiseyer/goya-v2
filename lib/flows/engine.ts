@@ -7,9 +7,13 @@ import type {
   Flow,
   FlowTriggerType,
   FlowResponse,
+  FlowStepAction,
   ActiveFlowResponse,
   StepResponseInput,
 } from './types';
+
+// Imported lazily to break circular: actions.ts -> engine.ts (completeFlow)
+type ActionResult = Awaited<ReturnType<typeof import('./actions').executeStepActions>>[number];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = () => getSupabaseService() as any;
@@ -153,12 +157,14 @@ export async function getActiveFlowForUser(
 /**
  * Record the user's answer(s) for a step and advance last_step_id.
  * Merges new answers into existing responses JSONB.
+ * Optionally executes step actions (with idempotency) when options.actions is provided.
  */
 export async function recordStepResponse(
   userId: string,
   flowId: string,
-  input: StepResponseInput
-): Promise<{ data: FlowResponse | null; error: unknown }> {
+  input: StepResponseInput,
+  options?: { actions?: FlowStepAction[]; userEmail?: string }
+): Promise<{ data: FlowResponse | null; actionResults?: ActionResult[]; error: unknown }> {
   const supabase = db();
 
   // 1. Fetch existing flow_response
@@ -191,7 +197,25 @@ export async function recordStepResponse(
     .select()
     .single();
 
-  return { data: updated ?? null, error: updateError ?? null };
+  if (updateError) {
+    return { data: null, error: updateError };
+  }
+
+  // 4. Execute step actions if provided (lazy import breaks circular with actions.ts)
+  let actionResults: ActionResult[] | undefined;
+  if (options?.actions && options.actions.length > 0) {
+    const { executeStepActions } = await import('./actions');
+    actionResults = await executeStepActions({
+      flowId,
+      userId,
+      stepId: input.step_id,
+      actions: options.actions,
+      answers: input.answers,
+      userEmail: options.userEmail ?? '',
+    });
+  }
+
+  return { data: updated ?? null, actionResults, error: null };
 }
 
 /**

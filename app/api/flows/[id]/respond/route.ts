@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { recordStepResponse } from '@/lib/flows/engine';
+import type { FlowStepAction } from '@/lib/flows/types';
 
 export async function POST(
   request: Request,
@@ -17,7 +18,7 @@ export async function POST(
   const { id } = await params;
 
   // Parse body
-  let body: { step_id?: string; answers?: Record<string, unknown> };
+  let body: { step_id?: string; answers?: Record<string, unknown>; actions?: FlowStepAction[] };
   try {
     body = await request.json();
   } catch {
@@ -28,16 +29,24 @@ export async function POST(
     return NextResponse.json({ error: 'Missing required field: step_id' }, { status: 400 });
   }
 
-  const { data, error } = await recordStepResponse(user.id, id, {
-    step_id: body.step_id,
-    answers: body.answers ?? {},
-  });
+  const result = await recordStepResponse(
+    user.id,
+    id,
+    { step_id: body.step_id, answers: body.answers ?? {} },
+    { actions: body.actions, userEmail: user.email ?? '' }
+  );
 
-  if (error || !data) {
-    const message = error instanceof Error ? error.message : 'Flow response not found';
+  if (result.error || !result.data) {
+    const message = result.error instanceof Error ? result.error.message : 'Flow response not found';
     const status = message.includes('not found') ? 404 : 500;
     return NextResponse.json({ error: message }, { status });
   }
 
-  return NextResponse.json(data, { status: 200 });
+  return NextResponse.json(
+    {
+      response: result.data,
+      ...(result.actionResults && { actionResults: result.actionResults }),
+    },
+    { status: 200 }
+  );
 }
