@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 Phase: 15
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-03-30 - Completed quick task 260330-jew: Verify Google + Apple OAuth config
+Last activity: 2026-03-30 - Completed quick task 260330-mlx: Add live deployments branch switcher to admin dashboard
 
 Progress: [██████████] 100%
 
@@ -115,6 +115,7 @@ None yet.
 | 260330-gu2 | Add FAQ category field + seed 33 FAQs for Mattea chatbot | 2026-03-30 | ca59dc7 | [260330-gu2](./quick/260330-gu2-add-faq-category-field-and-seed-33-faqs-/) |
 | 260330-hva | Add category filter tabs to FAQ admin UI | 2026-03-30 | 7057ec5 | [260330-hva](./quick/260330-hva-add-category-filter-tabs-to-faq-admin-ui/) |
 | 260330-jew | Verify Google + Apple OAuth — no code changes, dashboard config needed | 2026-03-30 | — | [260330-jew](./quick/260330-jew-verify-and-fix-google-apple-oauth-redire/) |
+| 260330-mlx | Add live deployments branch switcher to admin dashboard | 2026-03-30 | b024d68 | [260330-mlx](./quick/260330-mlx-add-live-deployments-branch-switcher-to-/) |
 
 ## Session Continuity
 
