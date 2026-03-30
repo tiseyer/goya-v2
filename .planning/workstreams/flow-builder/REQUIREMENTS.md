@@ -33,13 +33,13 @@
 
 ## Flow Player
 
-- [ ] **PLAYER-01**: User sees active flows rendered in the correct display type (modal, fullscreen, top banner, bottom banner, notification)
-- [ ] **PLAYER-02**: Modal and fullscreen flows show progress bar, back/next navigation, and validate required fields
-- [ ] **PLAYER-03**: Modal flows respect dismissible setting (X button, backdrop click behavior)
+- [x] **PLAYER-01**: User sees active flows rendered in the correct display type (modal, fullscreen, top banner, bottom banner, notification)
+- [x] **PLAYER-02**: Modal and fullscreen flows show progress bar, back/next navigation, and validate required fields
+- [x] **PLAYER-03**: Modal flows respect dismissible setting (X button, backdrop click behavior)
 - [ ] **PLAYER-04**: Banner flows show as fixed bars with text, optional CTA, and close button
 - [ ] **PLAYER-05**: Notification flows slide in from top-right with icon, title, body, and action button
-- [ ] **PLAYER-06**: Choice elements render as Typeform-style pill/card buttons (not native radio/checkbox)
-- [ ] **PLAYER-07**: All element types have styled renderers (text inputs, dropdowns, image upload, info text, images, video embeds)
+- [x] **PLAYER-06**: Choice elements render as Typeform-style pill/card buttons (not native radio/checkbox)
+- [x] **PLAYER-07**: All element types have styled renderers (text inputs, dropdowns, image upload, info text, images, video embeds)
 - [ ] **PLAYER-08**: Flow player persists progress on each step completion and resumes from last step on reload
 - [x] **PLAYER-09**: Flow engine evaluates conditions server-side and returns the highest-priority matching flow per trigger
 
@@ -110,13 +110,13 @@
 | ADMIN-13 | Phase 3 | Pending |
 | ADMIN-14 | Phase 3 | Pending |
 | ADMIN-15 | Phase 3 | Pending |
-| PLAYER-01 | Phase 5 | Pending |
-| PLAYER-02 | Phase 5 | Pending |
-| PLAYER-03 | Phase 5 | Pending |
+| PLAYER-01 | Phase 5 | Complete — 05-01 |
+| PLAYER-02 | Phase 5 | Complete — 05-01 |
+| PLAYER-03 | Phase 5 | Complete — 05-01 |
 | PLAYER-04 | Phase 5 | Pending |
 | PLAYER-05 | Phase 5 | Pending |
-| PLAYER-06 | Phase 5 | Pending |
-| PLAYER-07 | Phase 5 | Pending |
+| PLAYER-06 | Phase 5 | Complete — 05-01 |
+| PLAYER-07 | Phase 5 | Complete — 05-01 |
 | PLAYER-08 | Phase 5 | Pending |
 | PLAYER-09 | Phase 4 | Complete — 04-01 |
 | ACTION-01 | Phase 4 | Complete |

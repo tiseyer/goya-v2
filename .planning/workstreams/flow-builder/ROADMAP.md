@@ -91,7 +91,7 @@ Plans:
   5. Closing the browser and reopening resumes the flow from the last completed step — progress is not lost on refresh
 **Plans:** 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Element renderers (all 9 types with Typeform-style choices) + FlowPlayer core with modal/fullscreen display (PLAYER-01, PLAYER-02, PLAYER-03, PLAYER-06, PLAYER-07)
+- [x] 05-01-PLAN.md — Element renderers (all 9 types with Typeform-style choices) + FlowPlayer core with modal/fullscreen display (PLAYER-01, PLAYER-02, PLAYER-03, PLAYER-06, PLAYER-07)
 - [ ] 05-02-PLAN.md — Banner/notification display types, global mount in ClientProviders, persistence verification (PLAYER-04, PLAYER-05, PLAYER-08)
 **UI hint**: yes
 
@@ -128,6 +128,6 @@ Plans:
 | 2. Service Layer + Admin API Routes | 2/2 | Complete | 2026-03-30 |
 | 3. Admin Flow Builder UI | 4/4 | Complete | 2026-03-30 |
 | 4. Flow Engine + Actions Engine | 2/2 | Complete | 2026-03-27 |
-| 5. Flow Player UI | 0/2 | Not started | - |
+| 5. Flow Player UI | 1/2 | In progress | - |
 | 6. Analytics + User Management | 0/? | Not started | - |
 | 7. Onboarding Migration | 0/? | Not started | - |
