@@ -305,13 +305,54 @@ export async function importUsersFromData(
         },
       });
 
-      if (authError) throw new Error(`Auth creation failed: ${authError.message}`);
-      if (!authData.user) throw new Error('Auth creation returned no user');
+      // Resolve userId — either from fresh creation or from fallback lookup for existing auth users
+      let userId: string;
+      let isExistingAuthUser = false;
 
-      const userId = authData.user.id;
+      if (authError) {
+        const errMsg = authError.message || '';
+        const isKnownConflict =
+          /already registered/i.test(errMsg) || /database error/i.test(errMsg);
 
-      // Small delay to ensure handle_new_user trigger has created the profile row
-      await new Promise((r) => setTimeout(r, 150));
+        if (!isKnownConflict) {
+          // Unknown auth error — surface immediately
+          throw new Error(`Auth creation failed: ${errMsg}`);
+        }
+
+        // Known conflict in overwrite mode — look up the existing auth user by email
+        const { data: listData, error: listError } = await supabase.auth.admin.listUsers({
+          page: 1,
+          perPage: 1000,
+        });
+
+        if (listError) {
+          throw new Error(`Auth creation failed and fallback lookup errored: ${listError.message}`);
+        }
+
+        const existingAuthUser = (listData?.users ?? []).find(
+          (u: { email?: string }) => u.email?.toLowerCase() === user.email.toLowerCase()
+        );
+
+        if (!existingAuthUser) {
+          // Cannot create AND cannot find — real error
+          throw new Error(`Auth creation failed and user not found by email: ${errMsg}`);
+        }
+
+        console.warn(
+          `Auth user already exists for ${user.email}, using existing ID ${existingAuthUser.id} (overwrite mode)`
+        );
+        userId = existingAuthUser.id;
+        isExistingAuthUser = true;
+      } else {
+        if (!authData.user) throw new Error('Auth creation returned no user');
+        userId = authData.user.id;
+      }
+
+      // Small delay to ensure handle_new_user trigger has created the profile row.
+      // Skip when reusing an existing auth user — profile row already exists.
+      if (!isExistingAuthUser) {
+        await new Promise((r) => setTimeout(r, 150));
+      }
 
       // Update the auto-created profile row with all mapped fields
       const profileData = buildProfileUpdate(user);
@@ -325,14 +366,21 @@ export async function importUsersFromData(
       // Upsert Stripe subscription records into stripe_orders
       await upsertSubscriptions(supabase, userId, user);
 
+      // Existing auth users that had no profile entry yet count as "updated" not "created"
+      const resultStatus: UserResult['status'] = isExistingAuthUser ? 'updated' : 'created';
+
       const result: UserResult = {
         email: user.email,
         wp_id: user.wp_id,
-        status: 'created',
+        status: resultStatus,
         supabase_id: userId,
       };
       results.push(result);
-      created++;
+      if (isExistingAuthUser) {
+        updated++;
+      } else {
+        created++;
+      }
       onProgress?.(result, i, users.length);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
