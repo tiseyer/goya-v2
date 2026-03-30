@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 Phase: 15
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-03-30 - Completed quick task 260330-nij: Fix member directory 1000-user hardcap and restore designation/style filter UI
+Last activity: 2026-03-30 - Completed quick task 260330-naz: Fix impersonation — all data queries respect impersonated user ID
 
 Progress: [██████████] 100%
 
@@ -116,7 +116,9 @@ None yet.
 | 260330-hva | Add category filter tabs to FAQ admin UI | 2026-03-30 | 7057ec5 | [260330-hva](./quick/260330-hva-add-category-filter-tabs-to-faq-admin-ui/) |
 | 260330-jew | Verify Google + Apple OAuth — no code changes, dashboard config needed | 2026-03-30 | — | [260330-jew](./quick/260330-jew-verify-and-fix-google-apple-oauth-redire/) |
 | 260330-mlx | Add live deployments branch switcher to admin dashboard | 2026-03-30 | b024d68 | [260330-mlx](./quick/260330-mlx-add-live-deployments-branch-switcher-to-/) |
-| 260330-nij | Fix member directory 1000-user hardcap and restore designation/style filter UI | 2026-03-30 | — | [260330-nij](./quick/260330-nij-fix-member-directory-1000-user-hardcap-a/) |
+| 260330-nij | Fix member directory 1000-user hardcap and restore designation/style filter UI | 2026-03-30 | f406537 | [260330-nij](./quick/260330-nij-fix-member-directory-1000-user-hardcap-a/) |
+| 260330-ngh | Fix broken profile links across app — dropdown nav, messages, member directory all 404 | 2026-03-30 | ceddbd1 | [260330-ngh](./quick/260330-ngh-fix-broken-profile-links-across-app-drop/) |
+| 260330-naz | Fix impersonation — all data queries must respect impersonated user ID | 2026-03-30 | — | [260330-naz](./quick/260330-naz-fix-impersonation-all-data-queries-must-/) |
 
 ## Session Continuity
 

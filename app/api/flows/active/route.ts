@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import { getEffectiveUserId } from '@/lib/supabase/getEffectiveUserId';
 import { getActiveFlowForUser } from '@/lib/flows/engine';
 import type { FlowTriggerType } from '@/lib/flows/types';
 
 export async function GET(request: Request) {
-  // Auth: require authenticated user
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
+  let userId: string;
+  try {
+    userId = await getEffectiveUserId();
+  } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -16,7 +15,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const trigger = (searchParams.get('trigger') ?? 'login') as FlowTriggerType;
 
-  const result = await getActiveFlowForUser(user.id, trigger);
+  const result = await getActiveFlowForUser(userId, trigger);
 
   if (!result) {
     return NextResponse.json({ flow: null }, { status: 200 });
