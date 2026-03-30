@@ -76,7 +76,7 @@ Plans:
   5. `stripe_checkout` creates a Stripe checkout session; `kit_tag` posts to Kit.com with graceful fallback; `trigger_flow` queues the next flow for the user
 **Plans:** 2 plans
 Plans:
-- [ ] 04-01-PLAN.md — Migration, condition evaluator, flow engine, user API routes (PLAYER-09)
+- [x] 04-01-PLAN.md — Migration, condition evaluator, flow engine, user API routes (PLAYER-09)
 - [ ] 04-02-PLAN.md — Actions engine with all 8 handlers, idempotency, wired into respond route (ACTION-01 through ACTION-05)
 
 ### Phase 5: Flow Player UI

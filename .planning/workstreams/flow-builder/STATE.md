@@ -2,28 +2,28 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 03-04-PLAN.md — Phase 03 Admin Flow Builder UI complete (all 15 ADMIN requirements satisfied)
-last_updated: "2026-03-30T07:03:32.109Z"
-last_activity: 2026-03-30
+status: executing
+stopped_at: Completed 04-01-PLAN.md — Flow engine core (migration, condition evaluator, engine service, 3 API routes)
+last_updated: "2026-03-30T07:18:25Z"
+last_activity: 2026-03-30 -- Phase 04 Plan 01 complete
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
-  percent: 57
+  total_plans: 10
+  completed_plans: 9
+  percent: 64
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
-Status: Phase 03 complete — ready for Phase 4
-Last activity: 2026-03-30
+Phase: 04 (flow-engine-actions-engine) — EXECUTING
+Plan: 2 of 2 (Plan 01 complete)
+Status: Executing Phase 04
+Last activity: 2026-03-30 -- Phase 04 Plan 01 complete
 
-Progress: [######----] 57%
+Progress: [#######---] 64%
 
 ## Performance Metrics
 
@@ -38,6 +38,7 @@ Progress: [######----] 57%
 | 01-database-schema | 2/2 | 12min | 6min |
 | 02-service-layer-admin-api-routes | 2/2 | 11min | 5.5min |
 | 03-admin-flow-builder-ui | 4/4 | 46min | 11.5min |
+| 04-flow-engine-actions-engine | 1/2 | 3min | 3min |
 
 *Updated after each plan completion*
 
@@ -95,9 +96,17 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - Conditions builder uses AddConditionForm inline below chips — no popover/portal needed for the panel context
 - FlowSettingsPanel collapsed by default — settingsPanelOpen: false in store initial state
 
+**Plan 04-01 decisions:**
+
+- conditions field is stripped via Omit<Flow, 'conditions'> in engine.ts before returning ActiveFlowResponse — client never receives condition rules
+- frequency=custom treated as once for v1 — avoids undefined behavior until scheduling is built
+- completeFlow analytics failure is non-fatal — console.error logged but 200 returned — flow is already marked complete
+- getActiveFlowForUser creates new flow_response on first match, reuses existing in_progress response on re-trigger
+
 ### Blockers/Concerns
 
-- **Phase 4 research flag**: Actions idempotency table design and condition evaluator type safety are non-trivial — consider a design spike on `flow_action_executions` schema before starting Phase 4 planning
+- **RESOLVED — Phase 4 research flag**: Actions idempotency table design implemented — flow_action_executions with UNIQUE(flow_id, user_id, step_id, action_type) constraint
+- **Phase 4 research flag**: Kit.com idempotency behavior still needs verification during Plan 04-02 implementation
 - **Phase 7 pre-deploy check**: Must query `SELECT count(*) FROM users WHERE onboarding_status = 'in_progress'` before removing old routes; old routes stay behind a flag until all in-progress users finish
 - **RESOLVED — Research gap — `flow_runs` table**: flow_responses.last_step_id provides resume-on-refresh capability; no separate table needed
 - **Research gap — Kit.com idempotency**: Kit's tag endpoint behavior on duplicate requests needs verification during Phase 4 implementation
