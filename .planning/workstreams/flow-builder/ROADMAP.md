@@ -119,7 +119,10 @@ Plans:
   1. Three flow templates exist in the database (Student, Teacher, Wellness Practitioner) with all existing onboarding questions mapped to flow elements, correct profile field mappings, role conditions, login trigger, once frequency, and non-dismissible modal display
   2. New users who register are shown the correct onboarding flow via the flow player — the hardcoded `app/onboarding/` route is not triggered for new accounts
   3. The hardcoded onboarding routes (`app/onboarding/`), middleware redirects, and role-branched wizard pages are fully removed from the codebase with no 404s or broken references
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 07-01-PLAN.md — Condition evaluator member_type fix + migration seeding 3 onboarding flow templates (MIGRATE-01, MIGRATE-02)
+- [ ] 07-02-PLAN.md — Remove middleware onboarding redirects + delete app/onboarding/ directory and clean references (MIGRATE-03)
 
 ## Progress
 
@@ -133,4 +136,4 @@ Plans:
 | 4. Flow Engine + Actions Engine | 2/2 | Complete | 2026-03-27 |
 | 5. Flow Player UI | 2/2 | Complete | 2026-03-30 |
 | 6. Analytics + User Management | 1/2 | In progress | - |
-| 7. Onboarding Migration | 0/? | Not started | - |
+| 7. Onboarding Migration | 0/2 | Not started | - |
