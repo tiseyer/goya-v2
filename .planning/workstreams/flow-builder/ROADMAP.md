@@ -8,7 +8,7 @@ Build the complete flow builder system from database schema through admin editor
 
 - [x] **Phase 1: Database Schema** — 5 tables, RLS policies, GIN index, JSONB versioning, birthday column
 - [x] **Phase 2: Service Layer + Admin API Routes** — Admin CRUD services, condition evaluator stub, cycle detection, Kit.com integration wrapper
-- [ ] **Phase 3: Admin Flow Builder UI** — Flow list page, three-panel editor, drag-drop, conditions builder, preview mode
+- [x] **Phase 3: Admin Flow Builder UI** — Flow list page, three-panel editor, drag-drop, conditions builder, preview mode
 - [ ] **Phase 4: Flow Engine + Actions Engine** — Server-side condition evaluation, all 5 action types, idempotency table, user API routes
 - [ ] **Phase 5: Flow Player UI** — All 5 display types, element renderers, Typeform-style choices, progress persistence, global mount
 - [ ] **Phase 6: Analytics + User Management** — Event recording, analytics dashboard, per-user flow admin on user edit page
@@ -61,7 +61,7 @@ Plans:
 - [x] 03-01-PLAN.md — Flow list page with tabs, drag-reorder, CRUD actions, completion stats (ADMIN-01 through ADMIN-04)
 - [x] 03-02-PLAN.md — Three-panel editor shell, Zustand store, step sidebar, element canvas with type picker (ADMIN-05 through ADMIN-08)
 - [x] 03-03-PLAN.md — Element properties panel, profile field mapping, branch configurator (ADMIN-09 through ADMIN-11)
-- [ ] 03-04-PLAN.md — Step actions, flow settings, conditions builder, preview mode (ADMIN-12 through ADMIN-15)
+- [x] 03-04-PLAN.md — Step actions, flow settings, conditions builder, preview mode (ADMIN-12 through ADMIN-15)
 **UI hint**: yes
 
 ### Phase 4: Flow Engine + Actions Engine
@@ -120,7 +120,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Database Schema | 2/2 | Complete | 2026-03-30 |
 | 2. Service Layer + Admin API Routes | 2/2 | Complete | 2026-03-30 |
-| 3. Admin Flow Builder UI | 3/4 | In progress | - |
+| 3. Admin Flow Builder UI | 4/4 | Complete | 2026-03-30 |
 | 4. Flow Engine + Actions Engine | 0/? | Not started | - |
 | 5. Flow Player UI | 0/? | Not started | - |
 | 6. Analytics + User Management | 0/? | Not started | - |
