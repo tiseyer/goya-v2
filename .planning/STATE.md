@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 Phase: 15
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-03-30 - Completed quick task 260330-o30: GA4 and Clarity full tracking implementation
+Last activity: 2026-03-30 - Completed quick task 260330-oyn: Remove staticMembers lookup fallback in members detail page
 
 Progress: [██████████] 100%
 
@@ -120,6 +120,7 @@ None yet.
 | 260330-ngh | Fix broken profile links across app — dropdown nav, messages, member directory all 404 | 2026-03-30 | ceddbd1 | [260330-ngh](./quick/260330-ngh-fix-broken-profile-links-across-app-drop/) |
 | 260330-naz | Fix impersonation — all data queries must respect impersonated user ID | 2026-03-30 | e847943 | [260330-naz](./quick/260330-naz-fix-impersonation-all-data-queries-must-/) |
 | 260330-o30 | GA4 and Clarity full tracking implementation | 2026-03-30 | d84dcb9 | [260330-o30](./quick/260330-o30-ga4-and-clarity-full-tracking-implementa/) |
+| 260330-oyn | Remove staticMembers lookup fallback in members detail page | 2026-03-30 | 0d2d87c | [260330-oyn](./quick/260330-oyn-remove-staticmembers-lookup-fallback-in-/) |
 
 ## Session Continuity
 
