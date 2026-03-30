@@ -59,9 +59,9 @@
 
 ## User Management
 
-- [ ] **USERMGMT-01**: Admin can view a user's flow interactions (status, started_at, completed_at) on the user edit page
-- [ ] **USERMGMT-02**: Admin can reset a user's flow response to force re-display
-- [ ] **USERMGMT-03**: Admin can force-assign a flow to a user or mark it complete without the user going through it
+- [x] **USERMGMT-01**: Admin can view a user's flow interactions (status, started_at, completed_at) on the user edit page
+- [x] **USERMGMT-02**: Admin can reset a user's flow response to force re-display
+- [x] **USERMGMT-03**: Admin can force-assign a flow to a user or mark it complete without the user going through it
 
 ## Onboarding Migration
 
@@ -127,9 +127,9 @@
 | ANALYTICS-01 | Phase 6 | Pending |
 | ANALYTICS-02 | Phase 6 | Pending |
 | ANALYTICS-03 | Phase 6 | Pending |
-| USERMGMT-01 | Phase 6 | Pending |
-| USERMGMT-02 | Phase 6 | Pending |
-| USERMGMT-03 | Phase 6 | Pending |
+| USERMGMT-01 | Phase 6 | Complete |
+| USERMGMT-02 | Phase 6 | Complete |
+| USERMGMT-03 | Phase 6 | Complete |
 | MIGRATE-01 | Phase 7 | Pending |
 | MIGRATE-02 | Phase 7 | Pending |
 | MIGRATE-03 | Phase 7 | Pending |

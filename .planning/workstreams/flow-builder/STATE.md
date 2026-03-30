@@ -3,33 +3,33 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-01-PLAN.md — Per-flow analytics dashboard tab in editor
-last_updated: "2026-03-30T09:05:37Z"
-last_activity: 2026-03-30 -- Phase 06 Plan 01 complete
+stopped_at: Completed 06-02-PLAN.md — Per-user flow management in admin user edit page
+last_updated: "2026-03-30T09:06:00Z"
+last_activity: 2026-03-30 -- Phase 06 Plan 02 complete
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 14
-  completed_plans: 13
-  percent: 89
+  completed_plans: 14
+  percent: 100
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 06 (analytics-user-management) — EXECUTING
-Plan: 2 of 2
-Status: Executing Phase 06
-Last activity: 2026-03-30 -- Phase 06 Plan 01 complete
+Phase: 06 (analytics-user-management) — COMPLETE
+Plan: 2 of 2 (all complete)
+Status: Phase 06 complete — ready for Phase 07
+Last activity: 2026-03-30 -- Phase 06 Plan 02 complete
 
-Progress: [###########-] 89%
+Progress: [############] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12 (this milestone)
+- Total plans completed: 14 (this milestone)
 
 **By Phase:**
 
@@ -40,7 +40,7 @@ Progress: [###########-] 89%
 | 03-admin-flow-builder-ui | 4/4 | 46min | 11.5min |
 | 04-flow-engine-actions-engine | 2/2 | 11min | 5.5min |
 | 05-flow-player-ui | 2/2 | 22min | 11min |
-| 06-analytics-user-management | 1/2 | 3min | 3min |
+| 06-analytics-user-management | 2/2 | 6min | 3min |
 
 *Updated after each plan completion*
 
@@ -134,6 +134,13 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - First step drop-off uses 'started' event count (not step_completed) — users who started the flow are by definition at step 1
 - completionRate formula is completed/shown (not completed/started) per ANALYTICS-01 requirement
 - Step user counts use distinct user_id sets per step_id to avoid double-counting repeated completions
+
+**Plan 06-02 decisions:**
+
+- getSupabaseService cast as any in all user-flows routes — flow tables not in generated Supabase types; consistent with engine.ts/flow-service.ts pattern
+- DELETE flow response also deletes flow_action_executions for same flow_id+user_id — ensures actions re-fire on re-display after reset
+- PATCH only accepts status=completed — admin mark-complete is the only supported mutation
+- assign route validates both userId and flowId exist before upsert — returns 404 not 500 on bad input
 
 ### Blockers/Concerns
 
