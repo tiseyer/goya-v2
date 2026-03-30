@@ -32,7 +32,7 @@ export default async function MemberProfilePage({
 
   const { data: profileData } = await serviceClient
     .from('profiles')
-    .select('id, full_name, first_name, last_name, avatar_url, bio, city, country, member_type, role, verification_status, instagram, youtube, website, facebook, tiktok, practice_format, teacher_status, practice_level, practice_styles, teaching_styles, years_teaching, languages, mrn, created_at')
+    .select('id, full_name, first_name, last_name, avatar_url, bio, city, country, role, instagram, youtube, website, facebook, created_at')
     .eq('id', id)
     .single();
 
@@ -46,7 +46,7 @@ export default async function MemberProfilePage({
     'Unknown Member';
 
   const firstName = profile.first_name ?? displayName.split(' ')[0] ?? '';
-  const role = profile.member_type ?? profile.role ?? 'student';
+  const role = profile.role ?? 'student';
   const heroStyle = ROLE_HERO[role] ?? ROLE_HERO['student'];
   const roleLabel = ROLE_LABEL[role] ?? role;
   const memberSince = profile.created_at
@@ -98,23 +98,11 @@ export default async function MemberProfilePage({
                 <span className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full ${heroStyle.badge}`}>
                   {roleLabel}
                 </span>
-                {profile.verification_status === 'verified' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-500/20 text-blue-200 rounded-full text-xs font-semibold border border-blue-400/30">
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    Verified
-                  </span>
-                )}
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight">
                 {displayName}
               </h1>
-
-              {profile.introduction && (
-                <p className="text-slate-300 text-sm mt-1 italic">{profile.introduction}</p>
-              )}
 
               {(profile.city || profile.country) && (
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 text-slate-400 text-sm mt-2">
@@ -143,26 +131,6 @@ export default async function MemberProfilePage({
                   About
                 </h2>
                 <p className="text-slate-600 leading-relaxed text-[15px] whitespace-pre-line">{profile.bio}</p>
-              </div>
-            )}
-
-            {/* Teaching / Practice styles */}
-            {((profile.teaching_styles?.length ?? 0) > 0 || (profile.practice_styles?.length ?? 0) > 0) && (
-              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
-                <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <span className="w-1 h-4 bg-[#4E87A0] rounded-full" />
-                  {role === 'teacher' ? 'Teaching Styles' : 'Practice Styles'}
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  {(role === 'teacher' ? profile.teaching_styles : profile.practice_styles)?.map((style: string) => (
-                    <span
-                      key={style}
-                      className="bg-[#4E87A0]/10 text-[#3A7190] border border-[#4E87A0]/20 text-sm font-medium px-4 py-1.5 rounded-full"
-                    >
-                      {style}
-                    </span>
-                  ))}
-                </div>
               </div>
             )}
 
