@@ -74,7 +74,10 @@ Plans:
   3. Navigating back and forward through steps does not re-fire actions (idempotency table prevents duplicate emails, Stripe charges, and Kit.com tags)
   4. `save_to_profile` correctly upserts mapped element values to the profiles table
   5. `stripe_checkout` creates a Stripe checkout session; `kit_tag` posts to Kit.com with graceful fallback; `trigger_flow` queues the next flow for the user
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — Migration, condition evaluator, flow engine, user API routes (PLAYER-09)
+- [ ] 04-02-PLAN.md — Actions engine with all 8 handlers, idempotency, wired into respond route (ACTION-01 through ACTION-05)
 
 ### Phase 5: Flow Player UI
 **Goal**: Users see the correct flow on authenticated pages, rendered in the right display type with full navigation and persistence
@@ -121,7 +124,7 @@ Plans:
 | 1. Database Schema | 2/2 | Complete | 2026-03-30 |
 | 2. Service Layer + Admin API Routes | 2/2 | Complete | 2026-03-30 |
 | 3. Admin Flow Builder UI | 4/4 | Complete | 2026-03-30 |
-| 4. Flow Engine + Actions Engine | 0/? | Not started | - |
+| 4. Flow Engine + Actions Engine | 0/2 | Not started | - |
 | 5. Flow Player UI | 0/? | Not started | - |
 | 6. Analytics + User Management | 0/? | Not started | - |
 | 7. Onboarding Migration | 0/? | Not started | - |
