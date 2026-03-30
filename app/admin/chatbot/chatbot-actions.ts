@@ -3,7 +3,7 @@ import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
-import type { ChatbotConfig, FaqItem, FaqStatus } from '@/lib/chatbot/types'
+import type { ChatbotConfig, ChatMessage, ConversationListItem, FaqItem, FaqStatus } from '@/lib/chatbot/types'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -413,6 +413,202 @@ export async function toggleFaqStatus(
       .from('faq_items')
       .update({ status: newStatus, updated_at: new Date().toISOString() })
       .eq('id', id)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath('/admin/chatbot')
+    return { success: true }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
+}
+
+// --- Phase 15 additions: Conversations + Tools ---
+
+const VALID_TOOL_SLUGS = ['events', 'teachers', 'courses', 'faq']
+
+/**
+ * List all chat sessions with user/guest info, message count, and escalation status.
+ */
+export async function listConversations(
+  filter?: 'all' | 'users' | 'guests' | 'escalated',
+  search?: string,
+): Promise<{ success: true; conversations: ConversationListItem[] } | { success: false; error: string }> {
+  try {
+    const supabase = getSupabaseService() as any // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    // Fetch all sessions ordered by last_message_at DESC
+    let query = supabase
+      .from('chat_sessions')
+      .select('id, user_id, anonymous_id, is_escalated, created_at, last_message_at')
+      .order('last_message_at', { ascending: false })
+
+    // Apply filter
+    if (filter === 'users') {
+      query = query.not('user_id', 'is', null)
+    } else if (filter === 'guests') {
+      query = query.not('anonymous_id', 'is', null).is('user_id', null)
+    } else if (filter === 'escalated') {
+      query = query.eq('is_escalated', true)
+    }
+
+    const { data: sessions, error: sessErr } = await query
+
+    if (sessErr) {
+      return { success: false, error: sessErr.message }
+    }
+
+    if (!sessions || sessions.length === 0) {
+      return { success: true, conversations: [] }
+    }
+
+    // Batch-fetch profiles for user sessions
+    const userIds = [...new Set((sessions as any[]).filter((s) => s.user_id).map((s) => s.user_id as string))]
+    const profileMap: Record<string, { full_name: string | null; email: string | null }> = {}
+
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIds)
+
+      for (const p of profiles ?? []) {
+        profileMap[p.id] = { full_name: p.full_name, email: p.email }
+      }
+    }
+
+    // Batch-count messages per session
+    const sessionIds = (sessions as any[]).map((s) => s.id as string)
+    const { data: messageCounts } = await supabase
+      .from('chat_messages')
+      .select('session_id')
+      .in('session_id', sessionIds)
+
+    const countMap: Record<string, number> = {}
+    for (const row of messageCounts ?? []) {
+      countMap[row.session_id] = (countMap[row.session_id] ?? 0) + 1
+    }
+
+    // Build result
+    let conversations: ConversationListItem[] = (sessions as any[]).map((s) => {
+      const profile = s.user_id ? (profileMap[s.user_id] ?? null) : null
+      return {
+        id: s.id,
+        user_id: s.user_id,
+        anonymous_id: s.anonymous_id,
+        user_name: profile?.full_name ?? null,
+        user_email: profile?.email ?? null,
+        is_escalated: s.is_escalated,
+        created_at: s.created_at,
+        last_message_at: s.last_message_at,
+        message_count: countMap[s.id] ?? 0,
+      }
+    })
+
+    // Apply search filter (on user_name or anonymous_id)
+    if (search && search.trim()) {
+      const term = search.trim().toLowerCase()
+      conversations = conversations.filter(
+        (c) =>
+          (c.user_name ?? '').toLowerCase().includes(term) ||
+          (c.user_email ?? '').toLowerCase().includes(term) ||
+          (c.anonymous_id ?? '').toLowerCase().includes(term),
+      )
+    }
+
+    return { success: true, conversations }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Fetch full message history for a single session.
+ */
+export async function getConversationMessages(
+  sessionId: string,
+): Promise<{ success: true; messages: ChatMessage[] } | { success: false; error: string }> {
+  try {
+    if (!UUID_REGEX.test(sessionId)) {
+      return { success: false, error: 'Invalid session ID format' }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (getSupabaseService() as any)
+      .from('chat_messages')
+      .select('id, session_id, role, content, created_at')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: true })
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, messages: (data ?? []) as ChatMessage[] }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Get enabled_tools array from chatbot_config.
+ */
+export async function getEnabledTools(): Promise<
+  { success: true; tools: string[] } | { success: false; error: string }
+> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (getSupabaseService() as any)
+      .from('chatbot_config')
+      .select('enabled_tools')
+      .single()
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, tools: (data?.enabled_tools ?? ['faq']) as string[] }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Update enabled_tools in chatbot_config. Always ensures 'faq' is included.
+ */
+export async function updateEnabledTools(
+  tools: string[],
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    // Validate all slugs
+    for (const slug of tools) {
+      if (!VALID_TOOL_SLUGS.includes(slug)) {
+        return { success: false, error: `Invalid tool slug: "${slug}"` }
+      }
+    }
+
+    // Ensure 'faq' is always included
+    const finalTools = tools.includes('faq') ? tools : [...tools, 'faq']
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (getSupabaseService() as any)
+      .from('chatbot_config')
+      .update({ enabled_tools: finalTools, updated_at: new Date().toISOString() })
+      .not('id', 'is', null)
 
     if (error) {
       return { success: false, error: error.message }

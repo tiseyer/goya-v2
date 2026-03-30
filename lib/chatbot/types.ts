@@ -8,6 +8,7 @@ export interface ChatbotConfig {
   system_prompt: string
   selected_key_id: string | null
   guest_retention_days: number
+  enabled_tools: string[]
   created_at: string
   updated_at: string
 }
@@ -53,4 +54,45 @@ export interface ChatStreamResult {
   stream: ReadableStream<Uint8Array>
   session_id: string
   escalated?: boolean
+}
+
+// --- Admin types (added in Phase 15) ---
+
+export type TicketStatus = 'open' | 'in_progress' | 'resolved'
+
+export interface ConversationListItem {
+  id: string
+  user_id: string | null
+  anonymous_id: string | null
+  user_name: string | null
+  user_email: string | null
+  is_escalated: boolean
+  created_at: string
+  last_message_at: string
+  message_count: number
+}
+
+export interface SupportTicket {
+  id: string
+  session_id: string | null
+  user_id: string | null
+  anonymous_id: string | null
+  question_summary: string
+  status: TicketStatus
+  created_at: string
+  resolved_at: string | null
+  resolved_by: string | null
+  // Joined fields
+  user_name: string | null
+  user_email: string | null
+}
+
+export type ToolSlug = 'events' | 'teachers' | 'courses' | 'faq'
+
+export interface ToolConnection {
+  slug: ToolSlug
+  name: string
+  description: string
+  enabled: boolean
+  locked: boolean // faq is always locked-on
 }

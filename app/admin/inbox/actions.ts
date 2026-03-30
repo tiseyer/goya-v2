@@ -1,8 +1,12 @@
 'use server'
+import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
 import { getStripe } from '@/lib/stripe/client'
 import { getSupabaseService } from '@/lib/supabase/service'
+import type { SupportTicket, TicketStatus } from '@/lib/chatbot/types'
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export async function approveUpgradeRequest(
   requestId: string,
@@ -253,4 +257,181 @@ export async function rejectCreditEntry(
 
   revalidatePath('/admin/inbox')
   return { success: true }
+}
+
+// --- Phase 15 additions: Support Tickets ---
+
+/**
+ * List all support tickets with optional status filter, joined with user profiles.
+ */
+export async function listSupportTickets(
+  statusFilter?: TicketStatus | 'all',
+): Promise<{ success: true; tickets: SupportTicket[] } | { success: false; error: string }> {
+  try {
+    const supabase = getSupabaseService() as any // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    let query = supabase
+      .from('support_tickets')
+      .select('id, session_id, user_id, anonymous_id, question_summary, status, created_at, resolved_at, resolved_by')
+      .order('created_at', { ascending: false })
+
+    if (statusFilter && statusFilter !== 'all') {
+      query = query.eq('status', statusFilter)
+    }
+
+    const { data: rows, error } = await query
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    if (!rows || rows.length === 0) {
+      return { success: true, tickets: [] }
+    }
+
+    // Batch-fetch profiles for user tickets
+    const userIds = [...new Set((rows as any[]).filter((r) => r.user_id).map((r) => r.user_id as string))]
+    const profileMap: Record<string, { full_name: string | null; email: string | null }> = {}
+
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIds)
+
+      for (const p of profiles ?? []) {
+        profileMap[p.id] = { full_name: p.full_name, email: p.email }
+      }
+    }
+
+    const tickets: SupportTicket[] = (rows as any[]).map((r) => {
+      const profile = r.user_id ? (profileMap[r.user_id] ?? null) : null
+      return {
+        id: r.id,
+        session_id: r.session_id,
+        user_id: r.user_id,
+        anonymous_id: r.anonymous_id,
+        question_summary: r.question_summary,
+        status: r.status as TicketStatus,
+        created_at: r.created_at,
+        resolved_at: r.resolved_at,
+        resolved_by: r.resolved_by,
+        user_name: profile?.full_name ?? null,
+        user_email: profile?.email ?? null,
+      }
+    })
+
+    return { success: true, tickets }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Update the status of a support ticket. Sets resolved_at/resolved_by if resolved.
+ */
+export async function updateTicketStatus(
+  ticketId: string,
+  status: TicketStatus,
+  adminUserId: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    if (!UUID_REGEX.test(ticketId)) {
+      return { success: false, error: 'Invalid ticket ID format' }
+    }
+
+    const updatePayload: Record<string, unknown> = { status }
+
+    if (status === 'resolved') {
+      updatePayload.resolved_at = new Date().toISOString()
+      updatePayload.resolved_by = adminUserId
+    } else {
+      updatePayload.resolved_at = null
+      updatePayload.resolved_by = null
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (getSupabaseService() as any)
+      .from('support_tickets')
+      .update(updatePayload)
+      .eq('id', ticketId)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath('/admin/inbox')
+    return { success: true }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Reply to a support ticket by inserting an assistant message and updating ticket/session state.
+ */
+export async function replyToTicket(
+  ticketId: string,
+  sessionId: string,
+  replyContent: string,
+  adminUserId: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    if (!UUID_REGEX.test(ticketId)) {
+      return { success: false, error: 'Invalid ticket ID format' }
+    }
+    if (!UUID_REGEX.test(sessionId)) {
+      return { success: false, error: 'Invalid session ID format' }
+    }
+    if (!replyContent || !replyContent.trim()) {
+      return { success: false, error: 'Reply content is required' }
+    }
+
+    void adminUserId // used for audit purposes — could attach to message metadata in future
+
+    const supabase = getSupabaseService() as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    const now = new Date().toISOString()
+
+    // Insert assistant message into chat_messages
+    const { error: msgErr } = await supabase
+      .from('chat_messages')
+      .insert({
+        session_id: sessionId,
+        role: 'assistant',
+        content: replyContent.trim(),
+        created_at: now,
+      })
+
+    if (msgErr) {
+      return { success: false, error: msgErr.message }
+    }
+
+    // Update session last_message_at
+    await supabase
+      .from('chat_sessions')
+      .update({ last_message_at: now })
+      .eq('id', sessionId)
+
+    // Update ticket status to 'in_progress' if currently 'open'
+    await supabase
+      .from('support_tickets')
+      .update({ status: 'in_progress' })
+      .eq('id', ticketId)
+      .eq('status', 'open')
+
+    revalidatePath('/admin/inbox')
+    revalidatePath('/admin/chatbot')
+    return { success: true }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
 }
