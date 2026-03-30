@@ -211,6 +211,9 @@ export default async function MemberProfilePage({
                     memberName={displayName}
                     memberPhoto={profile.avatar_url ?? ''}
                     firstName={firstName}
+                    viewerRole={null}
+                    profileRole={profile.role ?? null}
+                    isOwnProfile={false}
                   />
                 </div>
               </div>
