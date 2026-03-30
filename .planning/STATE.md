@@ -109,6 +109,7 @@ None yet.
 | 260327-nep | Admin MRN display and search fixes | 2026-03-27 | — | [260327-nep](./quick/260327-nep-admin-mrn-display-and-search-fixes/) |
 | 260329-rwg | Add live Vercel Analytics section to admin dashboard | 2026-03-29 | 2fd0a7b | [260329-rwg](./quick/260329-rwg-add-live-vercel-analytics-section-to-adm/) |
 | 260330-cwt | Fix overwrite mode — handle already-registered users gracefully in migration import | 2026-03-30 | 65e09ba | [260330-cwt](./quick/260330-cwt-fix-overwrite-mode-handle-already-regist/) |
+| 260330-ey9 | Fix chat widget visibility and add Maintenance tab to /admin/settings | 2026-03-30 | 4f80c10 | [260330-ey9](./quick/260330-ey9-fix-chat-widget-visibility-and-add-maint/) |
 
 ## Session Continuity
 
