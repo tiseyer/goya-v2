@@ -1,10 +1,11 @@
 import Link from 'next/link'
-import { getChatbotConfig, listFaqItems } from './chatbot-actions'
+import { getChatbotConfig, listFaqItems, listConversations, getEnabledTools } from './chatbot-actions'
 import { listAiProviderKeys } from '../api-keys/secrets-actions'
 import type { AiProviderKeyItem } from '../api-keys/secrets-actions'
 import ConfigurationTab from './ConfigurationTab'
-import PlaceholderTab from './PlaceholderTab'
 import FaqTab from './FaqTab'
+import ConversationsTab from './ConversationsTab'
+import ApiConnectionsTab from './ApiConnectionsTab'
 
 export default async function ChatbotPage({
   searchParams,
@@ -21,15 +22,19 @@ export default async function ChatbotPage({
       ? 'api-connections'
       : 'config'
 
-  const [configResult, aiKeysResult, faqResult] = await Promise.all([
+  const [configResult, aiKeysResult, faqResult, conversationsResult, toolsResult] = await Promise.all([
     getChatbotConfig(),
     listAiProviderKeys(),
     listFaqItems(),
+    listConversations(),
+    getEnabledTools(),
   ])
 
   const config = configResult.success ? configResult.config : null
   const aiKeys: AiProviderKeyItem[] = aiKeysResult.success ? aiKeysResult.keys : []
   const initialFaqItems = faqResult.success ? faqResult.items : []
+  const initialConversations = conversationsResult.success ? conversationsResult.conversations : []
+  const enabledTools = toolsResult.success ? toolsResult.tools : ['faq']
 
   return (
     <div className="p-6 lg:p-8">
@@ -92,18 +97,8 @@ export default async function ChatbotPage({
       {/* Tab content */}
       {activeTab === 'config' && <ConfigurationTab config={config} aiKeys={aiKeys} />}
       {activeTab === 'faq' && <FaqTab initialItems={initialFaqItems} />}
-      {activeTab === 'conversations' && (
-        <PlaceholderTab
-          title="Coming in Phase 15"
-          body="Conversation history viewer will be available here."
-        />
-      )}
-      {activeTab === 'api-connections' && (
-        <PlaceholderTab
-          title="Coming in Phase 15"
-          body="Tool connection toggles will be available here."
-        />
-      )}
+      {activeTab === 'conversations' && <ConversationsTab initialConversations={initialConversations} />}
+      {activeTab === 'api-connections' && <ApiConnectionsTab initialTools={enabledTools} />}
     </div>
   )
 }
