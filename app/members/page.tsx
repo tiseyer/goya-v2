@@ -4,13 +4,8 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ROLE_BADGE } from '@/app/components/ui/Badge';
-import {
-  members,
-  allDesignations,
-  allTeachingStyles,
-  type MemberRole,
-  type Member,
-} from '@/lib/members-data';
+import { type MemberRole, type Member } from '@/lib/members-data';
+import { fetchMembers } from '@/lib/members-actions';
 
 const MapPanel = dynamic(() => import('./MapPanel'), { ssr: false });
 
@@ -360,6 +355,11 @@ function ResizeDivider({ onDrag }: { onDrag: (deltaX: number) => void }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function MembersPage() {
+  const [allMembers, setAllMembers] = useState<Member[]>([]);
+  const [allDesignations, setAllDesignations] = useState<string[]>([]);
+  const [allTeachingStyles, setAllTeachingStyles] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [roleFilter, setRoleFilter] = useState<'All' | MemberRole>('All');
   const [countryFilter, setCountryFilter] = useState<string[]>([]);
   const [designationFilter, setDesignationFilter] = useState<string[]>([]);
@@ -371,30 +371,39 @@ export default function MembersPage() {
   const [mobileMapOpen, setMobileMapOpen] = useState(false);
   const [mobileProfileMember, setMobileProfileMember] = useState<Member | null>(null);
 
+  useEffect(() => {
+    fetchMembers().then(({ members, allDesignations, allTeachingStyles }) => {
+      setAllMembers(members);
+      setAllDesignations(allDesignations);
+      setAllTeachingStyles(allTeachingStyles);
+      setLoading(false);
+    });
+  }, []);
+
   const clearFilters = () => { setRoleFilter('All'); setCountryFilter([]); setDesignationFilter([]); setStyleFilter([]); setSearch(''); };
   const hasFilters = roleFilter !== 'All' || countryFilter.length > 0 || designationFilter.length > 0 || styleFilter.length > 0 || search !== '';
 
-  const filtered = useMemo(() => members.filter(m => {
+  const filtered = useMemo(() => allMembers.filter(m => {
     if (roleFilter !== 'All' && m.role !== roleFilter) return false;
     if (countryFilter.length > 0 && !countryFilter.includes(m.country)) return false;
     if (designationFilter.length > 0 && !designationFilter.some(d => m.designations.includes(d))) return false;
     if (styleFilter.length > 0 && !styleFilter.some(s => m.teachingStyles.includes(s))) return false;
     if (search) { const q = search.toLowerCase(); if (!m.name.toLowerCase().includes(q) && !m.city.toLowerCase().includes(q) && !m.country.toLowerCase().includes(q) && !m.bio.toLowerCase().includes(q)) return false; }
     return true;
-  }), [roleFilter, countryFilter, designationFilter, styleFilter, search]);
+  }), [allMembers, roleFilter, countryFilter, designationFilter, styleFilter, search]);
 
-  const availableCountries = useMemo(() => Array.from(new Set(members.map(m => m.country))).sort(), []);
+  const availableCountries = useMemo(() => Array.from(new Set(allMembers.map(m => m.country))).sort(), [allMembers]);
 
   const handleSelect = useCallback((id: string) => {
     setHighlightedId(prev => prev === id ? null : id);
-    const member = members.find(m => m.id === id);
+    const member = allMembers.find(m => m.id === id);
     if (member) setSelectedMember(prev => prev?.id === id ? null : member);
-  }, []);
+  }, [allMembers]);
 
-  const handleMobileSelect = useCallback((id: string) => { const member = members.find(m => m.id === id); if (member) setMobileProfileMember(member); }, []);
+  const handleMobileSelect = useCallback((id: string) => { const member = allMembers.find(m => m.id === id); if (member) setMobileProfileMember(member); }, [allMembers]);
   const handleBack = useCallback(() => { setSelectedMember(null); setHighlightedId(null); }, []);
   const handleResize = useCallback((delta: number) => { setListWidth(prev => Math.max(280, Math.min(700, prev + delta))); }, []);
-  const handleMapMemberClick = useCallback((id: string) => { setHighlightedId(id); const member = members.find(m => m.id === id); if (member) setSelectedMember(member); }, []);
+  const handleMapMemberClick = useCallback((id: string) => { setHighlightedId(id); const member = allMembers.find(m => m.id === id); if (member) setSelectedMember(member); }, [allMembers]);
 
   // ── Filters panel ───────────────────────────────────────────────────────────
   const filtersContent = (
@@ -411,7 +420,7 @@ export default function MembersPage() {
           </button>
         )}
       </div>
-      <div className="text-xs text-foreground-tertiary font-medium tabular-nums">{filtered.length} of {members.length} members</div>
+      <div className="text-xs text-foreground-tertiary font-medium tabular-nums">{filtered.length} of {allMembers.length} members</div>
       <div>
         <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground-tertiary mb-2">Role</div>
         <div className="flex flex-wrap gap-1.5">
@@ -445,14 +454,14 @@ export default function MembersPage() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-            <MapPanel allMembers={members} filteredMembers={filtered} highlightedId={highlightedId}
-              onMemberClick={(id) => { const m = members.find(x => x.id === id); if (m) { setMobileMapOpen(false); setMobileProfileMember(m); } }} isVisible={mobileMapOpen} />
+            <MapPanel allMembers={allMembers} filteredMembers={filtered} highlightedId={highlightedId}
+              onMemberClick={(id) => { const m = allMembers.find(x => x.id === id); if (m) { setMobileMapOpen(false); setMobileProfileMember(m); } }} isVisible={mobileMapOpen} />
           </div>
         )}
         <div className="px-4 pt-4 pb-3 border-b border-goya-border bg-surface shrink-0">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-lg font-bold text-foreground">Members</h1>
-            <span className="text-xs text-foreground-tertiary font-medium">{filtered.length} of {members.length}</span>
+            <span className="text-xs text-foreground-tertiary font-medium">{filtered.length} of {allMembers.length}</span>
           </div>
           <div className="relative mb-3">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -466,9 +475,13 @@ export default function MembersPage() {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto divide-y divide-goya-border">
-          {filtered.length === 0 ? (
+          {loading ? (
             <div className="py-16 text-center text-foreground-tertiary">
-              <p className="text-sm font-medium">No members found</p>
+              <p className="text-sm font-medium animate-pulse">Loading members...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-16 text-center text-foreground-tertiary">
+              <p className="text-sm font-medium">{allMembers.length === 0 ? 'No members found' : 'No members match your filters'}</p>
               {hasFilters && <button onClick={clearFilters} className="mt-2 text-xs text-primary hover:underline">Clear filters</button>}
             </div>
           ) : filtered.map(m => <MemberCard key={m.id} member={m} highlighted={false} onSelect={handleMobileSelect} />)}
@@ -495,13 +508,17 @@ export default function MembersPage() {
               <InlineProfile member={selectedMember} onBack={handleBack} />
             ) : (
               <div className="flex-1 overflow-y-auto divide-y divide-goya-border-muted">
-                {filtered.length === 0 ? (
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center h-full text-foreground-tertiary py-16">
+                    <p className="font-medium text-sm animate-pulse">Loading members...</p>
+                  </div>
+                ) : filtered.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-foreground-tertiary py-16">
                     <svg className="w-10 h-10 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <p className="font-medium text-sm">No members found</p>
-                    <button onClick={clearFilters} className="mt-2 text-xs text-primary hover:underline">Clear filters</button>
+                    <p className="font-medium text-sm">{allMembers.length === 0 ? 'No members found' : 'No members match your filters'}</p>
+                    {hasFilters && <button onClick={clearFilters} className="mt-2 text-xs text-primary hover:underline">Clear filters</button>}
                   </div>
                 ) : filtered.map(m => <MemberCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />)}
               </div>
@@ -510,7 +527,7 @@ export default function MembersPage() {
           <ResizeDivider onDrag={handleResize} />
           {/* Right: Map */}
           <div className="flex-1 min-w-0">
-            <MapPanel allMembers={members} filteredMembers={filtered} highlightedId={highlightedId} onMemberClick={handleMapMemberClick} isVisible={true} />
+            <MapPanel allMembers={allMembers} filteredMembers={filtered} highlightedId={highlightedId} onMemberClick={handleMapMemberClick} isVisible={true} />
           </div>
         </div>
       </div>

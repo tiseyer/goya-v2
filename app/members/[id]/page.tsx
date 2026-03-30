@@ -4,7 +4,6 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import ConnectButton from '@/app/components/ConnectButton';
 import ConnectionsSection from '@/app/components/ConnectionsSection';
 import MessageButton from '@/app/components/MessageButton';
-import { members as staticMembers } from '@/lib/members-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,48 +50,9 @@ export default async function MemberProfilePage({
     .eq('id', id)
     .single();
 
-  const STATIC_ROLE_MAP: Record<string, string> = {
-    Teacher: 'teacher',
-    Student: 'student',
-    School: 'school',
-    'Wellness Practitioner': 'wellness_practitioner',
-  };
+  if (!profileData) notFound();
 
-  const staticMember = !profileData ? staticMembers.find(m => m.id === id) : null;
-  if (!profileData && !staticMember) notFound();
-
-  const profile = profileData ?? (() => {
-    const m = staticMember!;
-    const nameParts = m.name.split(' ');
-    return {
-      id: m.id,
-      full_name: m.name,
-      first_name: nameParts[0] ?? null,
-      last_name: nameParts.slice(1).join(' ') || null,
-      avatar_url: m.photo ?? null,
-      bio: m.bio ?? null,
-      introduction: m.introduction ?? null,
-      city: m.city ?? null,
-      country: m.country ?? null,
-      member_type: STATIC_ROLE_MAP[m.role] ?? 'student',
-      role: STATIC_ROLE_MAP[m.role] ?? 'student',
-      verification_status: m.is_verified ? 'verified' : null,
-      instagram: m.social.instagram ?? null,
-      youtube: m.social.youtube ?? null,
-      website: m.social.website ?? null,
-      facebook: null as string | null,
-      tiktok: null as string | null,
-      practice_format: null as string | null,
-      teacher_status: null as string | null,
-      practice_level: null as string | null,
-      practice_styles: null as string[] | null,
-      teaching_styles: m.teachingStyles as string[] | null,
-      years_teaching: null as number | null,
-      languages: null as string[] | null,
-      mrn: null as string | null,
-      created_at: m.memberSince ? `${m.memberSince}-01-01` : null,
-    };
-  })();
+  const profile = profileData;
 
   const displayName =
     [profile.first_name, profile.last_name].filter(Boolean).join(' ') ||
