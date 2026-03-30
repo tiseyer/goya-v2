@@ -499,8 +499,14 @@ export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>('general');
 
   return (
-    <div className="p-6 lg:p-8 max-w-3xl">
-      <h1 className="text-2xl font-bold text-[#1B3A5C] mb-6">Settings</h1>
+    <div className="p-6 lg:p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B3A5C]">Settings</h1>
+          <p className="text-sm text-[#6B7280] mt-0.5">Manage platform configuration</p>
+        </div>
+      </div>
 
       {/* Tab bar */}
       <div className="flex gap-1 bg-slate-100 rounded-lg p-1 mb-8 w-fit">

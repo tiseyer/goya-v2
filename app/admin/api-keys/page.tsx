@@ -24,7 +24,7 @@ export default async function ApiKeysPage({
   if (error) {
     return (
       <div className="p-6 lg:p-8">
-        <h1 className="text-2xl font-bold text-[#1B3A5C] mb-4">API Settings</h1>
+        <h1 className="text-2xl font-bold text-[#1B3A5C] mb-4">API Keys</h1>
         <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
           <p className="text-sm text-red-600">Failed to load API keys: {error.message}</p>
         </div>
@@ -46,11 +46,11 @@ export default async function ApiKeysPage({
   return (
     <div className="p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-[#1B3A5C]">API Settings</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Manage API keys, secrets, and endpoint documentation
-        </p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B3A5C]">API Keys</h1>
+          <p className="text-sm text-[#6B7280] mt-0.5">Manage API keys and third-party integrations</p>
+        </div>
       </div>
 
       {/* Tab bar */}

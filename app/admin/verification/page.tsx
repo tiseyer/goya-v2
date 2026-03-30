@@ -15,9 +15,9 @@ export default async function VerificationPage() {
   const users = pending ?? [];
 
   return (
-    <div className="p-6 sm:p-8 max-w-5xl mx-auto">
+    <div className="p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-[#1B3A5C]">Verification Queue</h1>
         <p className="text-sm text-slate-500 mt-1">
           Review teacher and wellness practitioner applications

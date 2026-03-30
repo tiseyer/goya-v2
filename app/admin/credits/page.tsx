@@ -135,16 +135,18 @@ export default async function AdminCreditsPage() {
   }
 
   return (
-    <div className="min-h-full">
+    <div className="p-6 lg:p-8">
         {/* Page header */}
-        <div className="p-6 sm:p-8 border-b border-slate-200 bg-white">
-          <h1 className="text-2xl font-bold text-[#1B3A5C]">Credits & Hours</h1>
-          <p className="text-sm text-[#6B7280] mt-1">
-            Configure the credit requirements members must meet to maintain their membership status.
-          </p>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-[#1B3A5C]">Credits & Hours</h1>
+            <p className="text-sm text-[#6B7280] mt-0.5">
+              Configure the credit requirements members must meet to maintain their membership status.
+            </p>
+          </div>
         </div>
 
-        <div className="p-6 sm:p-8 space-y-8">
+        <div className="space-y-8">
           {/* Membership Requirements */}
           <section>
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">

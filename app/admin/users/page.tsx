@@ -6,6 +6,7 @@ import type { CreditStatus } from '@/lib/credits';
 import AdminUsersTable from './AdminUsersTable';
 import AdminUsersFilters from './AdminUsersFilters';
 import AdminUsersPagination from './AdminUsersPagination';
+import CreateUserButton from './CreateUserButton';
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -122,13 +123,16 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
     <div className="p-6 lg:p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#1B3A5C]">Users</h1>
-        <p className="text-sm text-[#6B7280]">
-          <span className="font-medium text-[#374151]">{displayedCount}</span>
-          {' / '}
-          <span className="font-medium text-[#374151]">{totalCount.toLocaleString()}</span>
-          {' users'}
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B3A5C]">Users</h1>
+          <p className="text-sm text-[#6B7280] mt-0.5">
+            <span className="font-medium text-[#374151]">{displayedCount}</span>
+            {' / '}
+            <span className="font-medium text-[#374151]">{totalCount.toLocaleString()}</span>
+            {' users'}
+          </p>
+        </div>
+        <CreateUserButton />
       </div>
 
       {/* Filter bar */}
