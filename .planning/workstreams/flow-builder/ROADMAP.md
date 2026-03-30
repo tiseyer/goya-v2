@@ -42,7 +42,7 @@ Plans:
   4. All admin routes reject unauthenticated requests and non-admin/moderator sessions
 **Plans:** 2 plans
 Plans:
-- [ ] 02-01-PLAN.md — TypeScript types, flow/step CRUD services, cycle detection, Kit.com wrapper
+- [x] 02-01-PLAN.md — TypeScript types, flow/step CRUD services, cycle detection, Kit.com wrapper
 - [ ] 02-02-PLAN.md — Admin API route handlers with auth guard and cycle detection on branch save
 
 ### Phase 3: Admin Flow Builder UI
@@ -114,7 +114,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Database Schema | 2/2 | Complete | 2026-03-30 |
-| 2. Service Layer + Admin API Routes | 0/2 | Planned | - |
+| 2. Service Layer + Admin API Routes | 1/2 | Executing | - |
 | 3. Admin Flow Builder UI | 0/? | Not started | - |
 | 4. Flow Engine + Actions Engine | 0/? | Not started | - |
 | 5. Flow Player UI | 0/? | Not started | - |
