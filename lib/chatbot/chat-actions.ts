@@ -137,3 +137,26 @@ export async function getCurrentUserId(): Promise<string | null> {
     return null
   }
 }
+
+/**
+ * Get the current authenticated user's role from the profiles table, or null for guests.
+ */
+export async function getCurrentUserRole(): Promise<string | null> {
+  try {
+    const supabase = await createSupabaseServerClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user?.id) return null
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    return (profile as { role: string } | null)?.role ?? null
+  } catch {
+    return null
+  }
+}

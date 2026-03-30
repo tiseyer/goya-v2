@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import FloatingButton from './FloatingButton'
 import ChatPanel from './ChatPanel'
-import { getCurrentUserId, getAnonymousId } from '@/lib/chatbot/chat-actions'
+import { getCurrentUserId, getAnonymousId, getCurrentUserRole } from '@/lib/chatbot/chat-actions'
 
 interface ChatbotConfig {
   is_active: boolean
   name: string
   avatar_url: string | null
+  chatbot_maintenance_mode: boolean
 }
 
 const LS_KEY = 'goya_chat_session_id'
@@ -20,8 +21,7 @@ export default function ChatWidget() {
   const [userId, setUserId] = useState<string | null>(null)
   const [anonymousId, setAnonymousId] = useState<string | null>(null)
   const [initialSessionId, setInitialSessionId] = useState<string | null>(null)
-  const floatingButtonRef = useRef<HTMLButtonElement>(null)
-
+  const [userRole, setUserRole] = useState<string | null>(null)
   // Fetch chatbot config on mount
   useEffect(() => {
     async function fetchConfig() {
@@ -42,25 +42,25 @@ export default function ChatWidget() {
     fetchConfig()
   }, [])
 
-  // Resolve user identity on mount (after config confirms widget is active)
+  // Resolve user identity and role on mount
   useEffect(() => {
-    if (!config?.is_active) return
-
     async function resolveIdentity() {
       try {
-        const [uid, anonId] = await Promise.all([
+        const [uid, anonId, role] = await Promise.all([
           getCurrentUserId(),
           getAnonymousId(),
+          getCurrentUserRole(),
         ])
         setUserId(uid)
         setAnonymousId(anonId)
+        setUserRole(role)
       } catch {
         // Non-fatal — widget still works without identity
       }
     }
 
     resolveIdentity()
-  }, [config?.is_active])
+  }, [])
 
   // Read stored session ID from localStorage for restore on panel open
   useEffect(() => {
@@ -76,17 +76,46 @@ export default function ChatWidget() {
 
   function handleClose() {
     setIsOpen(false)
-    // Return focus to floating button
-    setTimeout(() => floatingButtonRef.current?.focus(), 50)
   }
 
-  // Don't render while loading or if chatbot is inactive
-  if (loading || !config || !config.is_active) return null
+  // Don't render while loading config
+  if (loading || !config) return null
+
+  const isAdmin = userRole === 'admin' || userRole === 'moderator'
+  const maintenanceMode = config.chatbot_maintenance_mode
+
+  // Determine visibility and badge
+  let badge: 'preview' | 'maintenance' | null = null
+
+  if (config.is_active && !maintenanceMode) {
+    // Normal mode — show for everyone, no badge
+    badge = null
+  } else if (config.is_active && maintenanceMode) {
+    // Chatbot maintenance — show for admins only with amber badge
+    if (!isAdmin) return null
+    badge = 'maintenance'
+  } else {
+    // is_active=false — admin preview mode only
+    if (!isAdmin) return null
+    badge = 'preview'
+  }
 
   return (
     <>
       {!isOpen && (
-        <FloatingButton onClick={handleOpen} />
+        <>
+          <FloatingButton onClick={handleOpen} />
+          {badge === 'preview' && (
+            <span className="fixed bottom-16 right-4 z-50 text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full font-medium leading-none pointer-events-none">
+              Preview
+            </span>
+          )}
+          {badge === 'maintenance' && (
+            <span className="fixed bottom-16 right-4 z-50 text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-medium leading-none pointer-events-none">
+              Maintenance
+            </span>
+          )}
+        </>
       )}
       <ChatPanel
         isOpen={isOpen}
