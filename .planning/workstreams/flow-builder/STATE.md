@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-03-PLAN.md — Element properties panel, profile field mapper, branch configurator
-last_updated: "2026-03-30T06:50:00Z"
-last_activity: 2026-03-30 -- Phase 03 Plan 03 completed
+stopped_at: Completed 03-04-PLAN.md tasks 1-2 — awaiting checkpoint:human-verify for Task 3
+last_updated: "2026-03-30T06:57:00Z"
+last_activity: 2026-03-30 -- Phase 03 Plan 04 tasks 1-2 complete, checkpoint reached
 progress:
   total_phases: 7
   completed_phases: 2
@@ -19,9 +19,9 @@ progress:
 ## Current Position
 
 Phase: 03 (admin-flow-builder-ui) — EXECUTING
-Plan: 4 of 4
-Status: Executing Phase 03 (plans 01, 02, and 03 complete)
-Last activity: 2026-03-30 -- Phase 03 Plan 03 completed
+Plan: 4 of 4 (Tasks 1-2 complete, awaiting human-verify checkpoint for Task 3)
+Status: Checkpoint reached — awaiting admin UI visual verification
+Last activity: 2026-03-30 -- Phase 03 Plan 04 tasks 1-2 committed, human verification pending
 
 Progress: [######----] 50%
 
@@ -38,6 +38,7 @@ Progress: [######----] 50%
 | 01-database-schema | 2/2 | 12min | 6min |
 | 02-service-layer-admin-api-routes | 2/2 | 11min | 5.5min |
 | 03-admin-flow-builder-ui | 3/4 | 39min | 13min |
+| 03-admin-flow-builder-ui plan 04 | tasks 1-2/3 | 6min | — |
 
 *Updated after each plan completion*
 
@@ -88,6 +89,13 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - Profile mappings stored in editor store (profileMappings: Record<string, string>) — not yet persisted to DB; Plan 04 will wire to save_to_profile step actions
 - updateElement uses spread merge over FlowElement discriminated union — TypeScript satisfied via cast, keeping action generic across all 9 element types
 
+**Plan 03-04 decisions:**
+
+- AlignTop/AlignBottom icons don't exist in lucide-react — used PanelTop/PanelBottom instead
+- Step actions stored in editor store stepActions[stepId] map — UI scaffold only, not persisted until flow_steps gets actions column (future schema migration)
+- Conditions builder uses AddConditionForm inline below chips — no popover/portal needed for the panel context
+- FlowSettingsPanel collapsed by default — settingsPanelOpen: false in store initial state
+
 ### Blockers/Concerns
 
 - **Phase 4 research flag**: Actions idempotency table design and condition evaluator type safety are non-trivial — consider a design spike on `flow_action_executions` schema before starting Phase 4 planning
@@ -108,5 +116,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-30
-Stopped at: Completed 03-03-PLAN.md — Element properties panel, profile field mapper, branch configurator
+Stopped at: Completed 03-04-PLAN.md tasks 1-2 — checkpoint:human-verify reached for Task 3 (full UI verification)
 Resume file: None
