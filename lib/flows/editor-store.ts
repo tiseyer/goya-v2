@@ -3,6 +3,21 @@ import type { Flow, FlowStep, FlowBranch, FlowElement, FlowWithSteps } from './t
 
 type StepWithBranches = FlowStep & { branches: FlowBranch[] };
 
+export type StepActionType =
+  | 'save_to_profile'
+  | 'send_email'
+  | 'kit_tag'
+  | 'stripe_checkout'
+  | 'redirect'
+  | 'trigger_flow'
+  | 'success_popup'
+  | 'mark_complete';
+
+export interface StepAction {
+  type: StepActionType;
+  config: Record<string, unknown>;
+}
+
 interface EditorState {
   // Data
   flow: Flow | null;
@@ -14,6 +29,13 @@ interface EditorState {
   isSaving: boolean;
   // Profile mappings: elementKey -> profile column name
   profileMappings: Record<string, string>;
+  // Step actions: stepId -> StepAction[] (UI scaffold — not yet persisted to DB)
+  stepActions: Record<string, StepAction[]>;
+  // Flow settings panel
+  settingsPanelOpen: boolean;
+  // Preview state
+  isPreviewOpen: boolean;
+  previewStepIndex: number;
   // Actions
   initializeFlow: (flowWithSteps: FlowWithSteps) => void;
   selectStep: (stepId: string | null) => void;
@@ -29,6 +51,18 @@ interface EditorState {
   setDirty: (dirty: boolean) => void;
   setSaving: (saving: boolean) => void;
   setProfileMapping: (elementKey: string, field: string | null) => void;
+  // Step actions
+  setStepAction: (stepId: string, actions: StepAction[]) => void;
+  addStepAction: (stepId: string, action: StepAction) => void;
+  removeStepAction: (stepId: string, index: number) => void;
+  updateStepAction: (stepId: string, index: number, updates: Partial<StepAction>) => void;
+  // Flow settings panel
+  toggleSettingsPanel: () => void;
+  // Preview
+  openPreview: () => void;
+  closePreview: () => void;
+  previewNext: () => void;
+  previewBack: () => void;
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -39,6 +73,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   isDirty: false,
   isSaving: false,
   profileMappings: {},
+  stepActions: {},
+  settingsPanelOpen: false,
+  isPreviewOpen: false,
+  previewStepIndex: 0,
 
   initializeFlow: (flowWithSteps) => {
     set({
@@ -181,5 +219,69 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       }
       return { profileMappings: next };
     });
+  },
+
+  setStepAction: (stepId, actions) => {
+    set((state) => ({
+      stepActions: { ...state.stepActions, [stepId]: actions },
+    }));
+  },
+
+  addStepAction: (stepId, action) => {
+    set((state) => {
+      const current = state.stepActions[stepId] ?? [];
+      return { stepActions: { ...state.stepActions, [stepId]: [...current, action] } };
+    });
+  },
+
+  removeStepAction: (stepId, index) => {
+    set((state) => {
+      const current = state.stepActions[stepId] ?? [];
+      return {
+        stepActions: {
+          ...state.stepActions,
+          [stepId]: current.filter((_, i) => i !== index),
+        },
+      };
+    });
+  },
+
+  updateStepAction: (stepId, index, updates) => {
+    set((state) => {
+      const current = state.stepActions[stepId] ?? [];
+      return {
+        stepActions: {
+          ...state.stepActions,
+          [stepId]: current.map((a, i) =>
+            i === index ? { ...a, ...updates, config: { ...a.config, ...(updates.config ?? {}) } } : a
+          ),
+        },
+      };
+    });
+  },
+
+  toggleSettingsPanel: () => {
+    set((state) => ({ settingsPanelOpen: !state.settingsPanelOpen }));
+  },
+
+  openPreview: () => {
+    set({ isPreviewOpen: true, previewStepIndex: 0 });
+  },
+
+  closePreview: () => {
+    set({ isPreviewOpen: false });
+  },
+
+  previewNext: () => {
+    set((state) => {
+      const maxIndex = Math.max(0, state.steps.length - 1);
+      return { previewStepIndex: Math.min(state.previewStepIndex + 1, maxIndex) };
+    });
+  },
+
+  previewBack: () => {
+    set((state) => ({
+      previewStepIndex: Math.max(0, state.previewStepIndex - 1),
+    }));
   },
 }));

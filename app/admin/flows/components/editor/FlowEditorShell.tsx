@@ -2,19 +2,22 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Eye } from 'lucide-react';
 import { useEditorStore } from '@/lib/flows/editor-store';
 import type { FlowWithSteps } from '@/lib/flows/types';
 import StepListSidebar from './StepListSidebar';
 import StepCanvas from './StepCanvas';
 import ElementPropertiesPanel from './ElementPropertiesPanel';
+import FlowSettingsPanel from './FlowSettingsPanel';
+import StepActionsEditor from './StepActionsEditor';
+import FlowPreviewModal from './FlowPreviewModal';
 
 interface FlowEditorShellProps {
   initialFlow: FlowWithSteps;
 }
 
 export default function FlowEditorShell({ initialFlow }: FlowEditorShellProps) {
-  const { initializeFlow, flow, isDirty, isSaving, selectedElementKey } = useEditorStore();
+  const { initializeFlow, flow, isDirty, isSaving, selectedElementKey, openPreview } = useEditorStore();
   const initializedRef = useRef(false);
 
   useEffect(() => {
@@ -66,10 +69,23 @@ export default function FlowEditorShell({ initialFlow }: FlowEditorShellProps) {
             {flow?.name ?? initialFlow.name}
           </span>
         </div>
-        <div className={`text-xs font-medium ${saveStatusColor}`}>
-          {saveStatus}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={openPreview}
+            className="flex items-center gap-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-md px-3 py-1.5 hover:bg-slate-50 transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            Preview
+          </button>
+          <div className={`text-xs font-medium ${saveStatusColor}`}>
+            {saveStatus}
+          </div>
         </div>
       </div>
+
+      {/* Flow settings panel — collapsible, above the three-panel grid */}
+      <FlowSettingsPanel flowId={initialFlow.id} />
 
       {/* Three-panel grid */}
       <div
@@ -89,7 +105,7 @@ export default function FlowEditorShell({ initialFlow }: FlowEditorShellProps) {
           <StepCanvas flowId={initialFlow.id} />
         </div>
 
-        {/* Right panel: Element properties */}
+        {/* Right panel: Element properties + step actions */}
         <div className="border-l border-slate-200 bg-slate-50 overflow-y-auto">
           {selectedElementKey ? (
             <div>
@@ -104,8 +120,15 @@ export default function FlowEditorShell({ initialFlow }: FlowEditorShellProps) {
               <p className="text-xs text-slate-400">Select an element to edit its properties</p>
             </div>
           )}
+          {/* Step Actions always shown below element properties */}
+          <div className="border-t border-slate-200">
+            <StepActionsEditor />
+          </div>
         </div>
       </div>
+
+      {/* Preview modal — renders on top of everything */}
+      <FlowPreviewModal />
     </div>
   );
 }
