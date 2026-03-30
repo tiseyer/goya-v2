@@ -28,7 +28,7 @@ Build the complete flow builder system from database schema through admin editor
   5. RLS policies block non-admin users from writing flow or step records, and users can only read/write their own flow_responses
 **Plans:** 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — Core tables, indexes, birthday column, and triggers (SCHEMA-01 through SCHEMA-06)
+- [x] 01-01-PLAN.md — Core tables, indexes, birthday column, and triggers (SCHEMA-01 through SCHEMA-06)
 - [ ] 01-02-PLAN.md — RLS policies for all 5 flow tables (SCHEMA-07)
 
 ### Phase 2: Service Layer + Admin API Routes
@@ -110,7 +110,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Database Schema | 0/2 | Planning complete | - |
+| 1. Database Schema | 1/2 | In progress | - |
 | 2. Service Layer + Admin API Routes | 0/? | Not started | - |
 | 3. Admin Flow Builder UI | 0/? | Not started | - |
 | 4. Flow Engine + Actions Engine | 0/? | Not started | - |
