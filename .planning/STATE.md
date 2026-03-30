@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 Phase: 15
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-03-30 - Completed quick task 260330-ey9: Fix chat widget visibility and add Maintenance tab
+Last activity: 2026-03-30 - Completed quick task 260330-f5s: Fix Member Directory Search — real Supabase data
 
 Progress: [██████████] 100%
 
@@ -110,6 +110,7 @@ None yet.
 | 260329-rwg | Add live Vercel Analytics section to admin dashboard | 2026-03-29 | 2fd0a7b | [260329-rwg](./quick/260329-rwg-add-live-vercel-analytics-section-to-adm/) |
 | 260330-cwt | Fix overwrite mode — handle already-registered users gracefully in migration import | 2026-03-30 | 65e09ba | [260330-cwt](./quick/260330-cwt-fix-overwrite-mode-handle-already-regist/) |
 | 260330-ey9 | Fix chat widget visibility and add Maintenance tab to /admin/settings | 2026-03-30 | 4f80c10 | [260330-ey9](./quick/260330-ey9-fix-chat-widget-visibility-and-add-maint/) |
+| 260330-f5s | Fix Member Directory Search — replace mock data with real Supabase queries | 2026-03-30 | 144aeb0 | [260330-f5s](./quick/260330-f5s-fix-member-directory-search-showing-wron/) |
 | 260330-f5s | Fix member directory — replace 330 mock entries with real Supabase profiles | 2026-03-30 | 144aeb0 | [260330-f5s](./quick/260330-f5s-fix-member-directory-search-showing-wron/) |
 
 ## Session Continuity
