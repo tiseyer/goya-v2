@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 07-01-PLAN.md — Seed 3 onboarding flow templates + fix condition evaluator
-last_updated: "2026-03-30T10:00:00.000Z"
-last_activity: 2026-03-30 -- Phase 07 Plan 01 completed
+status: complete
+stopped_at: Completed 07-02-PLAN.md — Remove hardcoded onboarding system, delete app/onboarding/
+last_updated: "2026-03-27T00:00:00.000Z"
+last_activity: 2026-03-27 -- Phase 07 Plan 02 completed — milestone v1.0 DONE
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 16
-  completed_plans: 15
+  completed_plans: 16
   percent: 100
 ---
 
@@ -18,10 +18,10 @@ progress:
 
 ## Current Position
 
-Phase: 07 (onboarding-migration) — EXECUTING
-Plan: 2 of 2
-Status: Executing Phase 07
-Last activity: 2026-03-30 -- Phase 07 Plan 01 completed
+Phase: 07 (onboarding-migration) — COMPLETE
+Plan: 2 of 2 — COMPLETE
+Status: Milestone v1.0 Flow Builder COMPLETE
+Last activity: 2026-03-27 -- Phase 07 Plan 02 completed
 
 Progress: [############] 100%
 
@@ -41,7 +41,7 @@ Progress: [############] 100%
 | 04-flow-engine-actions-engine | 2/2 | 11min | 5.5min |
 | 05-flow-player-ui | 2/2 | 22min | 11min |
 | 06-analytics-user-management | 2/2 | 6min | 3min |
-| 07-onboarding-migration | 1/2 | 8min | 8min |
+| 07-onboarding-migration | 2/2 | 20min | 10min |
 
 *Updated after each plan completion*
 
@@ -151,6 +151,14 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - Teacher step 12B (blocked) placed at position 13 — branches route to it; sequential player never reaches it normally
 - In-progress users marked completed with onboarding_step=999 as sentinel value
 
+**Plan 07-02 decisions:**
+
+- onboarding_state table references removed from auth/callback and auth/actions — legacy table not used in new flow system
+- ResetOnboardingButton.tsx preserved — resets profile.onboarding_completed field which is still a valid flow condition
+- app/api/email/onboarding-complete/route.ts preserved — useful for future send_email flow actions
+- app/schools/create/onboarding/ not deleted — school registration wizard, unrelated to user onboarding
+- onboarding_completed column references in analytics/members queries preserved — DB column still valid as flow condition
+
 ### Blockers/Concerns
 
 - **RESOLVED — Phase 4 research flag**: Actions idempotency table design implemented — flow_action_executions with UNIQUE(flow_id, user_id, step_id, action_type) constraint
@@ -171,6 +179,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-30
-Stopped at: Completed 07-01-PLAN.md — Seed 3 onboarding flow templates + fix condition evaluator
-Resume file: None
+Last session: 2026-03-27
+Stopped at: Completed 07-02-PLAN.md — Remove hardcoded onboarding system, delete app/onboarding/
+Resume file: None — Milestone v1.0 COMPLETE

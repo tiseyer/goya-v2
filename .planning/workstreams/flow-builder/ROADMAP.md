@@ -11,8 +11,8 @@ Build the complete flow builder system from database schema through admin editor
 - [x] **Phase 3: Admin Flow Builder UI** — Flow list page, three-panel editor, drag-drop, conditions builder, preview mode
 - [x] **Phase 4: Flow Engine + Actions Engine** — Server-side condition evaluation, all 5 action types, idempotency table, user API routes
 - [x] **Phase 5: Flow Player UI** — All 5 display types, element renderers, Typeform-style choices, progress persistence, global mount
-- [ ] **Phase 6: Analytics + User Management** — Event recording, analytics dashboard, per-user flow admin on user edit page
-- [ ] **Phase 7: Onboarding Migration** — 3 seed templates, phased cutover, hardcoded onboarding removal
+- [x] **Phase 6: Analytics + User Management** — Event recording, analytics dashboard, per-user flow admin on user edit page
+- [x] **Phase 7: Onboarding Migration** — 3 seed templates, phased cutover, hardcoded onboarding removal
 
 ## Phase Details
 
@@ -108,7 +108,7 @@ Plans:
 **Plans:** 2 plans
 Plans:
 - [x] 06-01-PLAN.md — Analytics API route + analytics tab in flow editor with metrics, drop-off chart, time filters (ANALYTICS-01, ANALYTICS-02, ANALYTICS-03)
-- [ ] 06-02-PLAN.md — User flow management API routes + Flows tab on user edit page with reset, assign, mark-complete (USERMGMT-01, USERMGMT-02, USERMGMT-03)
+- [x] 06-02-PLAN.md — User flow management API routes + Flows tab on user edit page with reset, assign, mark-complete (USERMGMT-01, USERMGMT-02, USERMGMT-03)
 **UI hint**: yes
 
 ### Phase 7: Onboarding Migration
@@ -121,8 +121,8 @@ Plans:
   3. The hardcoded onboarding routes (`app/onboarding/`), middleware redirects, and role-branched wizard pages are fully removed from the codebase with no 404s or broken references
 **Plans:** 2 plans
 Plans:
-- [ ] 07-01-PLAN.md — Condition evaluator member_type fix + migration seeding 3 onboarding flow templates (MIGRATE-01, MIGRATE-02)
-- [ ] 07-02-PLAN.md — Remove middleware onboarding redirects + delete app/onboarding/ directory and clean references (MIGRATE-03)
+- [x] 07-01-PLAN.md — Condition evaluator member_type fix + migration seeding 3 onboarding flow templates (MIGRATE-01, MIGRATE-02)
+- [x] 07-02-PLAN.md — Remove middleware onboarding redirects + delete app/onboarding/ directory and clean references (MIGRATE-03)
 
 ## Progress
 
@@ -135,5 +135,5 @@ Plans:
 | 3. Admin Flow Builder UI | 4/4 | Complete | 2026-03-30 |
 | 4. Flow Engine + Actions Engine | 2/2 | Complete | 2026-03-27 |
 | 5. Flow Player UI | 2/2 | Complete | 2026-03-30 |
-| 6. Analytics + User Management | 1/2 | In progress | - |
-| 7. Onboarding Migration | 0/2 | Not started | - |
+| 6. Analytics + User Management | 2/2 | Complete | 2026-03-30 |
+| 7. Onboarding Migration | 2/2 | Complete | 2026-03-27 |
