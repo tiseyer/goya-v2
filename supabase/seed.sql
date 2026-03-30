@@ -1,3 +1,0 @@
--- Set your account as admin after first signup
--- Replace the email below with your real email, then run in Supabase SQL editor
--- UPDATE public.profiles SET role = 'admin', is_verified = true WHERE email = 'your-email@example.com';
