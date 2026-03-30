@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 06-01-PLAN.md — Per-flow analytics dashboard tab in editor
-last_updated: "2026-03-30T09:12:39.411Z"
-last_activity: 2026-03-30
+status: executing
+stopped_at: Completed 07-01-PLAN.md — Seed 3 onboarding flow templates + fix condition evaluator
+last_updated: "2026-03-30T10:00:00.000Z"
+last_activity: 2026-03-30 -- Phase 07 Plan 01 completed
 progress:
   total_phases: 7
   completed_phases: 6
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 16
+  completed_plans: 15
   percent: 100
 ---
 
@@ -18,10 +18,10 @@ progress:
 
 ## Current Position
 
-Phase: 7
-Plan: Not started
-Status: Phase 06 complete — ready for Phase 07
-Last activity: 2026-03-30
+Phase: 07 (onboarding-migration) — EXECUTING
+Plan: 2 of 2
+Status: Executing Phase 07
+Last activity: 2026-03-30 -- Phase 07 Plan 01 completed
 
 Progress: [############] 100%
 
@@ -41,6 +41,7 @@ Progress: [############] 100%
 | 04-flow-engine-actions-engine | 2/2 | 11min | 5.5min |
 | 05-flow-player-ui | 2/2 | 22min | 11min |
 | 06-analytics-user-management | 2/2 | 6min | 3min |
+| 07-onboarding-migration | 1/2 | 8min | 8min |
 
 *Updated after each plan completion*
 
@@ -142,11 +143,19 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - PATCH only accepts status=completed — admin mark-complete is the only supported mutation
 - assign route validates both userId and flowId exist before upsert — returns 404 not 500 on bad input
 
+**Plan 07-01 decisions:**
+
+- Migration applied via supabase db query --linked due to _skip_* file conflict in migration history
+- flow_steps actions column added in 20260369 migration (was deferred from Plan 03-04)
+- Boolean profile columns (other_org_member, certificate_is_official, wellness_regulatory_body) use string 'true'/'false' options — save_to_profile writes raw answer strings
+- Teacher step 12B (blocked) placed at position 13 — branches route to it; sequential player never reaches it normally
+- In-progress users marked completed with onboarding_step=999 as sentinel value
+
 ### Blockers/Concerns
 
 - **RESOLVED — Phase 4 research flag**: Actions idempotency table design implemented — flow_action_executions with UNIQUE(flow_id, user_id, step_id, action_type) constraint
 - **RESOLVED — Phase 4 research flag**: Kit.com idempotency — kit_tag action uses flow_action_executions idempotency table to prevent double-firing; Kit.com's own behavior on duplicate tags is irrelevant since we guard before calling
-- **Phase 7 pre-deploy check**: Must query `SELECT count(*) FROM users WHERE onboarding_status = 'in_progress'` before removing old routes; old routes stay behind a flag until all in-progress users finish
+- **RESOLVED — Phase 7 pre-deploy check**: In-progress users marked onboarding_completed=true in migration 20260369 — safe to proceed with route removal in Plan 07-02
 - **RESOLVED — Research gap — `flow_runs` table**: flow_responses.last_step_id provides resume-on-refresh capability; no separate table needed
 - **RESOLVED — Research gap — Kit.com idempotency**: Resolved — our flow_action_executions guard prevents duplicate calls regardless of Kit.com's server behavior
 - **Infrastructure note**: Migration 20260366_add_faq_category.sql fails on remote (column already exists) — needs `supabase migration repair` before next push. Unrelated to flow builder.
@@ -163,5 +172,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-30
-Stopped at: Completed 06-01-PLAN.md — Per-flow analytics dashboard tab in editor
+Stopped at: Completed 07-01-PLAN.md — Seed 3 onboarding flow templates + fix condition evaluator
 Resume file: None
