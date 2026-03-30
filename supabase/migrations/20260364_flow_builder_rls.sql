@@ -1,12 +1,10 @@
 -- =============================================================================
 -- Flow Builder RLS Policies
 -- Migration: 20260364_flow_builder_rls
--- Enables Row Level Security on all 5 flow builder tables
--- Admin/moderator: full CRUD on content tables (flows, flow_steps, flow_branches)
--- Authenticated users: read-only on active content, own-data CRUD on responses
--- flow_analytics: authenticated insert own events, admin read all
+-- Enables row-level security on all 5 flow tables.
+-- Pattern: inline EXISTS subquery checking role IN ('admin', 'moderator')
+-- Consistent with supabase/migrations/20260324_add_courses_tables.sql
 -- =============================================================================
-
 
 -- =============================================================================
 -- flows
@@ -34,7 +32,6 @@ CREATE POLICY "Admins and moderators can manage flows"
       WHERE id = auth.uid() AND role IN ('admin', 'moderator')
     )
   );
-
 
 -- =============================================================================
 -- flow_steps
@@ -68,7 +65,6 @@ CREATE POLICY "Admins and moderators can manage flow steps"
     )
   );
 
-
 -- =============================================================================
 -- flow_branches
 -- =============================================================================
@@ -101,7 +97,6 @@ CREATE POLICY "Admins and moderators can manage flow branches"
       WHERE id = auth.uid() AND role IN ('admin', 'moderator')
     )
   );
-
 
 -- =============================================================================
 -- flow_responses
@@ -166,7 +161,6 @@ CREATE POLICY "Admins can delete flow responses"
       WHERE id = auth.uid() AND role IN ('admin', 'moderator')
     )
   );
-
 
 -- =============================================================================
 -- flow_analytics
