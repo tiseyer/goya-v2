@@ -26,7 +26,10 @@ Build the complete flow builder system from database schema through admin editor
   3. User responses and per-element answers can be stored and retrieved with start/complete timestamps and last-step resumability
   4. Analytics events (shown, started, step_completed, completed, skipped, dismissed) can be recorded against user and step references
   5. RLS policies block non-admin users from writing flow or step records, and users can only read/write their own flow_responses
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Core tables, indexes, birthday column, and triggers (SCHEMA-01 through SCHEMA-06)
+- [ ] 01-02-PLAN.md — RLS policies for all 5 flow tables (SCHEMA-07)
 
 ### Phase 2: Service Layer + Admin API Routes
 **Goal**: All admin flow operations are available as tested API endpoints — the UI can be built against stable, validated contracts
@@ -107,7 +110,7 @@ Build the complete flow builder system from database schema through admin editor
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Database Schema | 0/? | Not started | - |
+| 1. Database Schema | 0/2 | Planning complete | - |
 | 2. Service Layer + Admin API Routes | 0/? | Not started | - |
 | 3. Admin Flow Builder UI | 0/? | Not started | - |
 | 4. Flow Engine + Actions Engine | 0/? | Not started | - |
