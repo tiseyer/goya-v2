@@ -3,33 +3,33 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-01-PLAN.md — FlowPlayer core + 9 element renderers + Modal/Fullscreen display types
-last_updated: "2026-03-30T08:17:45Z"
-last_activity: 2026-03-30 -- Phase 05 Plan 01 complete
+stopped_at: Completed 05-02-PLAN.md — Banner + Notification display types + global FlowPlayerLoader mount
+last_updated: "2026-03-30T08:24:00Z"
+last_activity: 2026-03-30 -- Phase 05 Plan 02 complete
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 12
-  completed_plans: 11
-  percent: 76
+  completed_plans: 12
+  percent: 83
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 05 (flow-player-ui) — EXECUTING
+Phase: 05 (flow-player-ui) — COMPLETE
 Plan: 2 of 2
-Status: Executing Phase 05 — Plan 01 complete
-Last activity: 2026-03-30 -- 05-01 complete (FlowPlayer core + element renderers)
+Status: Phase 05 complete — advancing to Phase 06
+Last activity: 2026-03-30 -- 05-02 complete (Banner + Notification + global mount)
 
-Progress: [#########-] 76%
+Progress: [##########-] 83%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 10 (this milestone)
+- Total plans completed: 12 (this milestone)
 
 **By Phase:**
 
@@ -39,7 +39,7 @@ Progress: [#########-] 76%
 | 02-service-layer-admin-api-routes | 2/2 | 11min | 5.5min |
 | 03-admin-flow-builder-ui | 4/4 | 46min | 11.5min |
 | 04-flow-engine-actions-engine | 2/2 | 11min | 5.5min |
-| 05-flow-player-ui | 1/2 | 20min | 20min |
+| 05-flow-player-ui | 2/2 | 22min | 11min |
 
 *Updated after each plan completion*
 
@@ -120,6 +120,14 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - Branch resolution checks branches array before sequential fallback — multi-choice supported via Array.includes
 - ImageUploadRenderer uses URL.createObjectURL for preview — File object passed as value upstream
 
+**Plan 05-02 decisions:**
+
+- overrideDisplay state allows banner/notification CTA to upgrade display to modal without remounting FlowPlayer
+- handleOverrideDismiss resets overrideDisplay to null and clears activeFlow — clean teardown after CTA-opened modal is dismissed
+- bannerText and notificationBody extracted inline via loop over all steps — avoids prop drilling, consistent fallback to flow.name/description
+- FlowPlayerLoader placed after {children} inside ConnectionsProvider — portals render above page content without blocking layout
+- Persistence confirmed wired in 05-01 — no additional changes needed for PLAYER-08
+
 ### Blockers/Concerns
 
 - **RESOLVED — Phase 4 research flag**: Actions idempotency table design implemented — flow_action_executions with UNIQUE(flow_id, user_id, step_id, action_type) constraint
@@ -141,5 +149,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-30
-Stopped at: Completed 05-01-PLAN.md — FlowPlayer core + element renderers + Modal/Fullscreen display types
+Stopped at: Completed 05-02-PLAN.md — Banner + Notification display types + global FlowPlayerLoader mount
 Resume file: None
