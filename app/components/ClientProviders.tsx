@@ -8,6 +8,7 @@ import { CookieConsentProvider } from '@/app/context/CookieConsentContext';
 import type { ImpersonationState } from '@/lib/impersonation';
 import { ReactNode } from 'react';
 import FlowPlayerLoader from '@/app/components/flow-player/FlowPlayerLoader';
+import AnalyticsProvider from '@/app/components/AnalyticsProvider';
 
 export default function ClientProviders({
   children,
@@ -24,6 +25,7 @@ export default function ClientProviders({
             <ConnectionsProvider>
               {children}
               <FlowPlayerLoader />
+              <AnalyticsProvider />
             </ConnectionsProvider>
           </CartProvider>
         </CookieConsentProvider>

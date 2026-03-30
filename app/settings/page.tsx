@@ -179,8 +179,15 @@ export default function SettingsGeneralPage() {
       practice_format: deliveryFormat || null,
     });
     setSaving(false);
-    if (error) showToast(error, 'error');
-    else showToast('Profile updated');
+    if (error) {
+      showToast(error, 'error');
+    } else {
+      showToast('Profile updated');
+      try {
+        const { trackProfileUpdated } = await import('@/lib/analytics/tracking');
+        trackProfileUpdated();
+      } catch { /* analytics non-critical */ }
+    }
   }
 
   async function handleEmailUpdate() {

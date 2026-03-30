@@ -366,6 +366,11 @@ function MessagesPageInner() {
     setSending(true);
     try {
       await sendMessage(activeConvId, userId, content, userName);
+      // Track message_sent engagement event
+      try {
+        const { trackMessageSent } = await import('@/lib/analytics/tracking');
+        trackMessageSent();
+      } catch { /* analytics non-critical */ }
     } catch {
       setOptimisticMsgs(prev => prev.filter(m => m.id !== optimistic.id));
       setInput(content);
