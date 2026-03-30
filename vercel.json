@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/stripe-events",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/chatbot-cleanup",
+      "schedule": "0 3 * * *"
     }
   ]
 }
