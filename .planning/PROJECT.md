@@ -2,7 +2,7 @@
 
 ## What This Is
 
-GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions through a unified settings section. Admins manage the community through a full-featured admin panel with a comprehensive Shop section for products, orders, coupons, and analytics powered by bidirectional Stripe integration. External services can programmatically access and manage all entities through a secure, documented REST API.
+GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions through a unified settings section. Members and visitors can chat with Mattea, an AI-powered support chatbot that answers questions using FAQ knowledge and platform data, with automatic escalation to human support. Admins manage the community through a full-featured admin panel with a comprehensive Shop section, chatbot configuration, FAQ management, conversation review, and support ticket handling. External services can programmatically access and manage all entities through a secure, documented REST API.
 
 ## Core Value
 
@@ -10,9 +10,9 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 ## Current State
 
-**As of v1.6 (2026-03-27):** Open Gates REST API milestone shipped. Complete REST API at `/api/v1/` with 49 endpoints across 10 resource categories (users, events, courses, credits, verifications, analytics, add-ons, admin settings, webhooks, health). API key authentication with SHA-256 hashing, sliding-window rate limiting (100/min), and three permission levels (read/write/admin). Admin API key management page at `/admin/api-keys`. Comprehensive API_DOCS.md (1,958 lines).
+**As of v1.8 (2026-03-30):** AI-Support-System milestone shipped. Mattea AI chatbot with streaming responses (OpenAI/Anthropic), encrypted third-party key management (AES-256-GCM), FAQ knowledge base with admin CRUD, floating chat widget on all public pages (380x560px desktop, fullscreen mobile), guest and authenticated session persistence, escalation-to-human workflow with support tickets in admin inbox, conversations viewer, and toggleable API tool connections. Admin chatbot configuration at `/admin/chatbot` with 4 tabs. Guest session cleanup via daily cron.
 
-Previous: v1.3 Subscriptions & Teacher Upgrade, v1.2 Stripe Admin & Shop, v1.1 Connections & Inbox, v1.0 User Settings.
+Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 Stripe Admin & Shop, v1.1 Connections & Inbox, v1.0 User Settings.
 
 ## Requirements
 
@@ -91,34 +91,20 @@ Previous: v1.3 Subscriptions & Teacher Upgrade, v1.2 Stripe Admin & Shop, v1.1 C
 - ✓ Admin API key management page with create/revoke UI — v1.6
 - ✓ API_DOCS.md documenting all 49 endpoints — v1.6
 
-## Current Milestone: v1.8 AI-Support-System
-
-**Goal:** Add an AI-powered support chatbot ("Mattea") with encrypted third-party key management, admin configuration, FAQ knowledge base, tool-use capabilities, and escalation-to-human workflow.
-
-**Target features:**
-- Encrypted third-party key manager with dedicated AI Providers section (AES-256, Supabase-stored)
-- Floating chat widget ("Mattea") on all public pages with guest and logged-in persistence
-- Admin chatbot page with Configuration, FAQ, Conversations, and API Connections tabs
-- Support ticket escalation flow integrated into admin inbox
-- AI backend with provider-agnostic calls, FAQ context, and toggleable tool use
-
-### Active
-
-- [ ] Encrypted secrets table with AES-256 encryption and admin-only RLS
-- [ ] Server-side encryption/decryption service using SECRETS_MASTER_KEY
-- [ ] AI Providers CRUD UI with provider/model selection (OpenAI, Anthropic)
-- [ ] General third-party keys CRUD with categories (Auth, Analytics, Payments, Other)
-- [ ] Floating chat widget on public pages (desktop panel + mobile fullscreen)
-- [ ] Chat persistence for logged-in users (user_id) and guests (anonymous cookie ID)
-- [ ] Guest chat expiry with configurable retention and cleanup cron
-- [ ] Admin chatbot config page: name, avatar, active toggle, AI key selector, system prompt
-- [ ] FAQ management with CRUD, published/draft status, inline editing
-- [ ] Conversations viewer with filters (all/logged-in/guests/escalated)
-- [ ] API Connections tab with toggleable tools (Events, Teachers, Courses, FAQ)
-- [ ] Support tickets tab in admin inbox with escalation from chatbot
-- [ ] AI backend route: provider-agnostic calls, FAQ context injection, tool calling
-- [ ] Escalation detection (low confidence, explicit request, repeated failures)
-- [ ] Rate limiting for chatbot API (20 messages/session/hour)
+<!-- v1.8 AI-Support-System milestone -->
+- ✓ Encrypted secrets with AES-256-GCM, AI Providers CRUD with provider/model selection — v1.8
+- ✓ General third-party keys CRUD with category filter (Auth, Analytics, Payments, Other) — v1.8
+- ✓ Floating chat widget on public pages (380x560px desktop, fullscreen mobile) — v1.8
+- ✓ Chat persistence for logged-in users (user_id) and guests (anonymous cookie ID) — v1.8
+- ✓ Guest chat expiry with configurable retention and daily cleanup cron — v1.8
+- ✓ Admin chatbot config at /admin/chatbot: name, avatar, active toggle, AI key selector, system prompt — v1.8
+- ✓ FAQ knowledge base with CRUD, published/draft status, inline editing — v1.8
+- ✓ Conversations viewer with filters (all/logged-in/guests/escalated) — v1.8
+- ✓ API Connections tab with toggleable tools (Events, Teachers, Courses, FAQ) — v1.8
+- ✓ Support tickets tab in admin inbox with escalation from chatbot — v1.8
+- ✓ AI backend route with OpenAI/Anthropic streaming, FAQ context injection — v1.8
+- ✓ Escalation detection (keyword, repeated failures) with support ticket creation — v1.8
+- ✓ Rate limiting for chatbot API (20 messages/session/hour) — v1.8
 
 ### Out of Scope
 
@@ -165,6 +151,12 @@ Previous: v1.3 Subscriptions & Teacher Upgrade, v1.2 Stripe Admin & Shop, v1.1 C
 | Service layer in lib/api/services/ | Business logic separated from route handlers | ✓ 8 service files — v1.6 |
 | Soft-delete for events and courses | Preserve data integrity — deleted_at timestamp pattern | ✓ Events + courses — v1.6 |
 | as any cast on Supabase client for API | Tables not in generated types — consistent with existing patterns | ✓ All service files — v1.6 |
+| AES-256-GCM for third-party key encryption | Industry-standard authenticated encryption, Node.js crypto built-in | ✓ lib/secrets/encryption.ts — v1.8 |
+| Direct OpenAI/Anthropic SDKs (not AI Gateway) | Admin controls own keys, no gateway dependency | ✓ chat-service.ts — v1.8 |
+| UUID cookie for guest chat sessions | Simple, no Supabase anon auth needed | ✓ goya_chat_session cookie — v1.8 |
+| FAQ as XML block in system prompt (not pgvector RAG) | Simple concatenation sufficient for <100 items | ✓ FAQ injection — v1.8 |
+| In-memory rate limiter for chatbot | Matches REST API pattern, sufficient for single-instance | ✓ 20/session/hour — v1.8 |
+| Single-row chatbot_config table | Upsert pattern, all config in one place | ✓ chatbot_config — v1.8 |
 
 ## Evolution
 
@@ -177,4 +169,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-27 after v1.8 AI-Support-System milestone started*
+*Last updated: 2026-03-30 after v1.8 AI-Support-System milestone completed*

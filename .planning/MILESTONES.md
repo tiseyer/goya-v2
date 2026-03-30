@@ -1,5 +1,26 @@
 # Milestones
 
+## v1.8 AI-Support-System (Shipped: 2026-03-30)
+
+**Phases completed:** 4 phases, 12 plans, 4 tasks
+
+**Key accomplishments:**
+
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- Status:
+- 6 server actions + enabled_tools migration + daily cron cleanup for AI chatbot admin backend
+- 5 new admin UI components completing Conversations, API Connections, and Support Tickets tabs
+- Status:
+
+---
+
 ## v1.7 API Settings Page (Shipped: 2026-03-27)
 
 **Phases completed:** 3 phases (9-11), 4 plans, 19 requirements
