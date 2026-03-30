@@ -121,9 +121,10 @@ None yet.
 | 260330-naz | Fix impersonation — all data queries must respect impersonated user ID | 2026-03-30 | e847943 | [260330-naz](./quick/260330-naz-fix-impersonation-all-data-queries-must-/) |
 | 260330-o30 | GA4 and Clarity full tracking implementation | 2026-03-30 | d84dcb9 | [260330-o30](./quick/260330-o30-ga4-and-clarity-full-tracking-implementa/) |
 | 260330-oyn | Remove staticMembers lookup fallback in members detail page | 2026-03-30 | 0d2d87c | [260330-oyn](./quick/260330-oyn-remove-staticmembers-lookup-fallback-in-/) |
+| 260330-o9t | Stripe reconciliation analysis for WC users without Stripe sub IDs — script + WC data | 2026-03-30 | 3ab4391 | [260330-o9t](./quick/260330-o9t-stripe-reconciliation-analysis-for-875-w/) |
 
 ## Session Continuity
 
-Last session: 2026-03-30T02:33:30.428Z
-Stopped at: Completed 15-02-PLAN.md
+Last session: 2026-03-30T11:05:00.000Z
+Stopped at: Completed quick-260330-o9t: Stripe reconciliation analysis for WC users without Stripe sub IDs
 Resume file: None
