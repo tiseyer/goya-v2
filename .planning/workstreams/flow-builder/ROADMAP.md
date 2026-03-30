@@ -58,9 +58,9 @@ Plans:
   6. Admin can enter preview mode and see the flow rendered as a user would, with all display types, navigation, and no data saved
 **Plans:** 4 plans
 Plans:
-- [ ] 03-01-PLAN.md — Flow list page with tabs, drag-reorder, CRUD actions, completion stats (ADMIN-01 through ADMIN-04)
-- [ ] 03-02-PLAN.md — Three-panel editor shell, Zustand store, step sidebar, element canvas with type picker (ADMIN-05 through ADMIN-08)
-- [ ] 03-03-PLAN.md — Element properties panel, profile field mapping, branch configurator (ADMIN-09 through ADMIN-11)
+- [x] 03-01-PLAN.md — Flow list page with tabs, drag-reorder, CRUD actions, completion stats (ADMIN-01 through ADMIN-04)
+- [x] 03-02-PLAN.md — Three-panel editor shell, Zustand store, step sidebar, element canvas with type picker (ADMIN-05 through ADMIN-08)
+- [x] 03-03-PLAN.md — Element properties panel, profile field mapping, branch configurator (ADMIN-09 through ADMIN-11)
 - [ ] 03-04-PLAN.md — Step actions, flow settings, conditions builder, preview mode (ADMIN-12 through ADMIN-15)
 **UI hint**: yes
 
@@ -120,7 +120,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Database Schema | 2/2 | Complete | 2026-03-30 |
 | 2. Service Layer + Admin API Routes | 2/2 | Complete | 2026-03-30 |
-| 3. Admin Flow Builder UI | 0/4 | Not started | - |
+| 3. Admin Flow Builder UI | 3/4 | In progress | - |
 | 4. Flow Engine + Actions Engine | 0/? | Not started | - |
 | 5. Flow Player UI | 0/? | Not started | - |
 | 6. Analytics + User Management | 0/? | Not started | - |
