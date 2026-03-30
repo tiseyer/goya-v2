@@ -45,11 +45,11 @@
 
 ## Actions Engine
 
-- [ ] **ACTION-01**: Step completion triggers configured actions (save_to_profile, send_email, kit_tag, stripe_checkout, redirect, trigger_flow, success_popup, mark_complete)
-- [ ] **ACTION-02**: save_to_profile upserts mapped element values to the profiles table
-- [ ] **ACTION-03**: kit_tag POSTs to Kit.com API with graceful fallback when KITCOM_API_KEY is missing
-- [ ] **ACTION-04**: stripe_checkout creates a Stripe checkout session using existing Stripe integration
-- [ ] **ACTION-05**: trigger_flow queues the next flow for the user after current flow completes
+- [x] **ACTION-01**: Step completion triggers configured actions (save_to_profile, send_email, kit_tag, stripe_checkout, redirect, trigger_flow, success_popup, mark_complete)
+- [x] **ACTION-02**: save_to_profile upserts mapped element values to the profiles table
+- [x] **ACTION-03**: kit_tag POSTs to Kit.com API with graceful fallback when KITCOM_API_KEY is missing
+- [x] **ACTION-04**: stripe_checkout creates a Stripe checkout session using existing Stripe integration
+- [x] **ACTION-05**: trigger_flow queues the next flow for the user after current flow completes
 
 ## Analytics
 
@@ -119,11 +119,11 @@
 | PLAYER-07 | Phase 5 | Pending |
 | PLAYER-08 | Phase 5 | Pending |
 | PLAYER-09 | Phase 4 | Complete — 04-01 |
-| ACTION-01 | Phase 4 | Pending |
-| ACTION-02 | Phase 4 | Pending |
-| ACTION-03 | Phase 4 | Pending |
-| ACTION-04 | Phase 4 | Pending |
-| ACTION-05 | Phase 4 | Pending |
+| ACTION-01 | Phase 4 | Complete |
+| ACTION-02 | Phase 4 | Complete |
+| ACTION-03 | Phase 4 | Complete |
+| ACTION-04 | Phase 4 | Complete |
+| ACTION-05 | Phase 4 | Complete |
 | ANALYTICS-01 | Phase 6 | Pending |
 | ANALYTICS-02 | Phase 6 | Pending |
 | ANALYTICS-03 | Phase 6 | Pending |

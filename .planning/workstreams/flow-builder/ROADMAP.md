@@ -9,7 +9,7 @@ Build the complete flow builder system from database schema through admin editor
 - [x] **Phase 1: Database Schema** — 5 tables, RLS policies, GIN index, JSONB versioning, birthday column
 - [x] **Phase 2: Service Layer + Admin API Routes** — Admin CRUD services, condition evaluator stub, cycle detection, Kit.com integration wrapper
 - [x] **Phase 3: Admin Flow Builder UI** — Flow list page, three-panel editor, drag-drop, conditions builder, preview mode
-- [ ] **Phase 4: Flow Engine + Actions Engine** — Server-side condition evaluation, all 5 action types, idempotency table, user API routes
+- [x] **Phase 4: Flow Engine + Actions Engine** — Server-side condition evaluation, all 5 action types, idempotency table, user API routes
 - [ ] **Phase 5: Flow Player UI** — All 5 display types, element renderers, Typeform-style choices, progress persistence, global mount
 - [ ] **Phase 6: Analytics + User Management** — Event recording, analytics dashboard, per-user flow admin on user edit page
 - [ ] **Phase 7: Onboarding Migration** — 3 seed templates, phased cutover, hardcoded onboarding removal
@@ -77,7 +77,7 @@ Plans:
 **Plans:** 2 plans
 Plans:
 - [x] 04-01-PLAN.md — Migration, condition evaluator, flow engine, user API routes (PLAYER-09)
-- [ ] 04-02-PLAN.md — Actions engine with all 8 handlers, idempotency, wired into respond route (ACTION-01 through ACTION-05)
+- [x] 04-02-PLAN.md — Actions engine with all 8 handlers, idempotency, wired into respond route (ACTION-01 through ACTION-05)
 
 ### Phase 5: Flow Player UI
 **Goal**: Users see the correct flow on authenticated pages, rendered in the right display type with full navigation and persistence
@@ -124,7 +124,7 @@ Plans:
 | 1. Database Schema | 2/2 | Complete | 2026-03-30 |
 | 2. Service Layer + Admin API Routes | 2/2 | Complete | 2026-03-30 |
 | 3. Admin Flow Builder UI | 4/4 | Complete | 2026-03-30 |
-| 4. Flow Engine + Actions Engine | 0/2 | Not started | - |
+| 4. Flow Engine + Actions Engine | 2/2 | Complete | 2026-03-27 |
 | 5. Flow Player UI | 0/? | Not started | - |
 | 6. Analytics + User Management | 0/? | Not started | - |
 | 7. Onboarding Migration | 0/? | Not started | - |

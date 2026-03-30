@@ -3,33 +3,33 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md — Flow engine core (migration, condition evaluator, engine service, 3 API routes)
-last_updated: "2026-03-30T07:18:25Z"
-last_activity: 2026-03-30 -- Phase 04 Plan 01 complete
+stopped_at: Completed 04-02-PLAN.md — Actions engine (all 8 handlers, idempotency, wired into respond route)
+last_updated: "2026-03-27T00:00:00Z"
+last_activity: 2026-03-27 -- Phase 04 Plan 02 complete — Phase 04 DONE
 progress:
   total_phases: 7
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 10
-  completed_plans: 9
-  percent: 64
+  completed_plans: 10
+  percent: 71
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 04 (flow-engine-actions-engine) — EXECUTING
-Plan: 2 of 2 (Plan 01 complete)
-Status: Executing Phase 04
-Last activity: 2026-03-30 -- Phase 04 Plan 01 complete
+Phase: 04 (flow-engine-actions-engine) — COMPLETE
+Plan: 2 of 2 (both plans complete)
+Status: Phase 04 complete — ready to begin Phase 05
+Last activity: 2026-03-27 -- Phase 04 Plan 02 complete
 
-Progress: [#######---] 64%
+Progress: [########--] 71%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8 (this milestone)
+- Total plans completed: 10 (this milestone)
 
 **By Phase:**
 
@@ -38,7 +38,7 @@ Progress: [#######---] 64%
 | 01-database-schema | 2/2 | 12min | 6min |
 | 02-service-layer-admin-api-routes | 2/2 | 11min | 5.5min |
 | 03-admin-flow-builder-ui | 4/4 | 46min | 11.5min |
-| 04-flow-engine-actions-engine | 1/2 | 3min | 3min |
+| 04-flow-engine-actions-engine | 2/2 | 11min | 5.5min |
 
 *Updated after each plan completion*
 
@@ -103,13 +103,21 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - completeFlow analytics failure is non-fatal — console.error logged but 200 returned — flow is already marked complete
 - getActiveFlowForUser creates new flow_response on first match, reuses existing in_progress response on re-trigger
 
+**Plan 04-02 decisions:**
+
+- Dynamic import used in both actions.ts and engine.ts to break the circular dependency (actions imports completeFlow from engine; engine imports executeStepActions from actions)
+- redirect and success_popup are intentionally client-only pass-throughs — no DB record written, no idempotency needed
+- send_email is a deliberate no-op stub — console.warn logged, success returned, real integration deferred
+- Sequential execution with continue-on-failure — partial failures reported in ActionResult[] rather than aborting
+- trigger_flow skips (returns skipped:true) if user already has any flow_response for target flow — prevents re-triggering completed flows
+
 ### Blockers/Concerns
 
 - **RESOLVED — Phase 4 research flag**: Actions idempotency table design implemented — flow_action_executions with UNIQUE(flow_id, user_id, step_id, action_type) constraint
-- **Phase 4 research flag**: Kit.com idempotency behavior still needs verification during Plan 04-02 implementation
+- **RESOLVED — Phase 4 research flag**: Kit.com idempotency — kit_tag action uses flow_action_executions idempotency table to prevent double-firing; Kit.com's own behavior on duplicate tags is irrelevant since we guard before calling
 - **Phase 7 pre-deploy check**: Must query `SELECT count(*) FROM users WHERE onboarding_status = 'in_progress'` before removing old routes; old routes stay behind a flag until all in-progress users finish
 - **RESOLVED — Research gap — `flow_runs` table**: flow_responses.last_step_id provides resume-on-refresh capability; no separate table needed
-- **Research gap — Kit.com idempotency**: Kit's tag endpoint behavior on duplicate requests needs verification during Phase 4 implementation
+- **RESOLVED — Research gap — Kit.com idempotency**: Resolved — our flow_action_executions guard prevents duplicate calls regardless of Kit.com's server behavior
 - **Infrastructure note**: Migration 20260366_add_faq_category.sql fails on remote (column already exists) — needs `supabase migration repair` before next push. Unrelated to flow builder.
 
 ### Pending Todos
@@ -123,6 +131,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-30
-Stopped at: Completed 03-04-PLAN.md — Phase 03 Admin Flow Builder UI complete (all 15 ADMIN requirements satisfied)
+Last session: 2026-03-27
+Stopped at: Completed 04-02-PLAN.md — Phase 04 Actions Engine complete (all 5 ACTION requirements satisfied)
 Resume file: None
