@@ -32,7 +32,7 @@ export default async function MemberProfilePage({
 
   const { data: profileData } = await serviceClient
     .from('profiles')
-    .select('id, full_name, first_name, last_name, avatar_url, bio, introduction, city, country, member_type, role, verification_status, instagram, youtube, website, facebook, tiktok, practice_format, teacher_status, practice_level, practice_styles, teaching_styles, years_teaching, languages, mrn, created_at')
+    .select('id, full_name, first_name, last_name, avatar_url, bio, city, country, member_type, role, verification_status, instagram, youtube, website, facebook, tiktok, practice_format, teacher_status, practice_level, practice_styles, teaching_styles, years_teaching, languages, mrn, created_at')
     .eq('id', id)
     .single();
 
