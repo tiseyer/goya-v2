@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getSupabaseService } from '@/lib/supabase/service';
 import ConnectButton from '@/app/components/ConnectButton';
 import ConnectionsSection from '@/app/components/ConnectionsSection';
-import { members as staticMembers } from '@/lib/members-data';
+
 
 export const dynamic = 'force-dynamic';
 
