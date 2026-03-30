@@ -17,6 +17,62 @@ function getSupabaseAdmin() {
   return _supabaseAdmin
 }
 
+// ─── Email Sandbox ────────────────────────────────────────────────────────────
+
+interface SandboxCache {
+  enabled: boolean
+  recipient: string
+  fetchedAt: number
+}
+
+let _sandboxCache: SandboxCache | null = null
+const SANDBOX_CACHE_TTL_MS = 30_000 // 30 seconds
+
+async function applySandbox(
+  to: string | string[],
+  subject: string
+): Promise<{ to: string | string[]; subject: string }> {
+  const now = Date.now()
+
+  // Use cached result if fresh
+  if (!_sandboxCache || now - _sandboxCache.fetchedAt > SANDBOX_CACHE_TTL_MS) {
+    const { data } = await getSupabaseAdmin()
+      .from('site_settings')
+      .select('key, value')
+      .in('key', ['email_sandbox_enabled', 'email_sandbox_recipient'])
+
+    const map: Record<string, string> = {}
+    if (data) {
+      ;(data as Array<{ key: string; value: string }>).forEach(r => {
+        map[r.key] = r.value ?? ''
+      })
+    }
+
+    _sandboxCache = {
+      enabled: map.email_sandbox_enabled === 'true',
+      recipient: map.email_sandbox_recipient ?? '',
+      fetchedAt: now,
+    }
+  }
+
+  if (!_sandboxCache.enabled || !_sandboxCache.recipient) {
+    return { to, subject }
+  }
+
+  const originalTo = Array.isArray(to) ? to.join(', ') : to
+  console.log(`[email] SANDBOX: redirecting email for ${originalTo} to ${_sandboxCache.recipient}`)
+
+  return {
+    to: _sandboxCache.recipient,
+    subject: `[SANDBOX → ${originalTo}] ${subject}`,
+  }
+}
+
+/**
+ * Export applySandbox so other send sites (e.g. email-templates action) can use it.
+ */
+export { applySandbox }
+
 /**
  * @deprecated Use sendEmailFromTemplate() instead.
  */
@@ -44,11 +100,12 @@ export async function sendEmail({
   const recipient = Array.isArray(to) ? to.join(', ') : to
 
   try {
+    const sandboxed = await applySandbox(to, subject)
     const result = await resend.emails.send({
       from: FROM_ADDRESS,
-      to,
+      to: sandboxed.to,
       replyTo: replyTo ?? REPLY_TO,
-      subject,
+      subject: sandboxed.subject,
       html,
     })
 
@@ -125,11 +182,12 @@ export async function sendEmailFromTemplate({
 
   // 6. Send via Resend directly
   try {
+    const sandboxed = await applySandbox(to, subject)
     const result = await resend.emails.send({
       from: FROM_ADDRESS,
-      to,
+      to: sandboxed.to,
       replyTo: REPLY_TO,
-      subject,
+      subject: sandboxed.subject,
       html,
     })
 

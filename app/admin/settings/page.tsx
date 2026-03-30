@@ -264,13 +264,23 @@ function GeneralTab() {
   const [toast,       setToast]       = useState<{ type: ToastType; message: string } | null>(null);
   const dismissToast = useCallback(() => setToast(null), []);
 
+  // ── Email Sandbox state ──────────────────────────────────────────────────
+  const [sbEnabled,   setSbEnabled]   = useState(false);
+  const [sbRecipient, setSbRecipient] = useState('');
+  const [sbLoading,   setSbLoading]   = useState(true);
+  const [sbSaving,    setSbSaving]    = useState(false);
+
   useEffect(() => {
     async function load() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data } = await supabase
         .from('site_settings')
         .select('key, value')
-        .in('key', ['maintenance_mode_enabled', 'maintenance_mode_scheduled', 'maintenance_start_utc', 'maintenance_end_utc', 'maintenance_message']);
+        .in('key', [
+          'maintenance_mode_enabled', 'maintenance_mode_scheduled',
+          'maintenance_start_utc', 'maintenance_end_utc', 'maintenance_message',
+          'email_sandbox_enabled', 'email_sandbox_recipient',
+        ]);
       if (data) {
         const map: Record<string, string> = {};
         (data as Array<{ key: string; value: string }>).forEach(r => { map[r.key] = r.value ?? ''; });
@@ -279,8 +289,11 @@ function GeneralTab() {
         setMmStart(utcToDatetimeLocal(map.maintenance_start_utc ?? ''));
         setMmEnd(utcToDatetimeLocal(map.maintenance_end_utc ?? ''));
         setMmMessage(map.maintenance_message ?? '');
+        setSbEnabled(map.email_sandbox_enabled === 'true');
+        setSbRecipient(map.email_sandbox_recipient ?? '');
       }
       setMmLoading(false);
+      setSbLoading(false);
     }
     load();
   }, []);
@@ -329,6 +342,29 @@ function GeneralTab() {
       setShowConfirm(true); // require confirmation before enabling
     } else {
       saveMmSettings(false); // disable immediately
+    }
+  }
+
+  async function saveSbSettings() {
+    setSbSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const rows = [
+      { key: 'email_sandbox_enabled',   value: String(sbEnabled) },
+      { key: 'email_sandbox_recipient', value: sbRecipient },
+    ];
+    for (const row of rows) {
+      await supabase
+        .from('site_settings')
+        .upsert(
+          { ...row, updated_at: new Date().toISOString(), updated_by: user?.id ?? null },
+          { onConflict: 'key' }
+        );
+    }
+    setSbSaving(false);
+    if (sbEnabled) {
+      setToast({ type: 'info', message: `Email sandbox active — all emails redirected to ${sbRecipient || '(no address set)'}` });
+    } else {
+      setToast({ type: 'success', message: 'Email sandbox disabled. Emails sending normally.' });
     }
   }
 
@@ -439,6 +475,90 @@ function GeneralTab() {
                     </svg>
                   )}
                   {mmSaving ? 'Saving…' : 'Save Settings'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Email Sandbox section */}
+      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
+          <h2 className="text-base font-semibold text-[#1B3A5C]">Email Sandbox</h2>
+          {!sbLoading && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+              {sbEnabled ? (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-yellow-400" />
+                  <span className="text-yellow-700">Sandbox active — all emails → {sbRecipient || '(no address)'}</span>
+                </>
+              ) : (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="text-emerald-700">Emails sending normally</span>
+                </>
+              )}
+            </span>
+          )}
+        </div>
+
+        {sbLoading ? (
+          <div className="px-6 py-10 flex justify-center">
+            <div className="w-6 h-6 border-2 border-[#00B5A3] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <div className="px-6 py-5 space-y-5">
+            {/* Enable toggle */}
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-[#374151]">Enable Email Sandbox</p>
+                <p className="text-xs text-[#6B7280] mt-1">
+                  Redirect all outgoing emails to a single address instead of the real recipients.
+                </p>
+              </div>
+              <Toggle checked={sbEnabled} onChange={setSbEnabled} />
+            </div>
+
+            {sbEnabled && (
+              <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
+                <svg className="w-4 h-4 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <p className="text-xs font-medium text-yellow-800">Sandbox is active. No real users will receive emails until this is disabled.</p>
+              </div>
+            )}
+
+            <div className="border-t border-[#E5E7EB] pt-5 space-y-5">
+              {sbEnabled && (
+                <div>
+                  <label className="block text-sm font-medium text-[#374151] mb-1.5">Redirect all emails to</label>
+                  <input
+                    type="email"
+                    value={sbRecipient}
+                    onChange={e => setSbRecipient(e.target.value)}
+                    placeholder="till@seyer-marketing.de"
+                    className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] font-mono transition-colors"
+                  />
+                  <p className="mt-1.5 text-xs text-[#6B7280]">All outgoing emails will be delivered to this address instead.</p>
+                </div>
+              )}
+
+              {/* Save button */}
+              <div className="flex justify-end pt-1">
+                <button
+                  onClick={saveSbSettings}
+                  disabled={sbSaving}
+                  className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1B3A5C] text-white text-sm font-semibold hover:bg-[#162f4d] transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                >
+                  {sbSaving ? (
+                    <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                  )}
+                  {sbSaving ? 'Saving…' : 'Save Settings'}
                 </button>
               </div>
             </div>

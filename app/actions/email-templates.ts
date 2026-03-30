@@ -5,6 +5,7 @@ import { resend, FROM_ADDRESS, REPLY_TO } from '@/lib/email/client'
 import { wrapInEmailLayout } from '@/lib/email/wrapper'
 import { TEMPLATE_VARIABLES } from '@/lib/email/variables'
 import { DEFAULT_TEMPLATES } from '@/lib/email/defaults'
+import { applySandbox } from '@/lib/email/send'
 
 async function requireAdminOrModerator() {
   const supabase = await createSupabaseServerClient()
@@ -119,11 +120,12 @@ export async function sendTestEmail(
 
     const html = wrapInEmailLayout(content)
 
+    const sandboxed = await applySandbox(toAddress, `[TEST] ${subject}`)
     const { error } = await resend.emails.send({
       from: FROM_ADDRESS,
       replyTo: REPLY_TO,
-      to: toAddress,
-      subject: `[TEST] ${subject}`,
+      to: sandboxed.to,
+      subject: sandboxed.subject,
       html,
     })
 
