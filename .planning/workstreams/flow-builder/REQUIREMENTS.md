@@ -88,48 +88,48 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| SCHEMA-01 | — | Pending |
-| SCHEMA-02 | — | Pending |
-| SCHEMA-03 | — | Pending |
-| SCHEMA-04 | — | Pending |
-| SCHEMA-05 | — | Pending |
-| SCHEMA-06 | — | Pending |
-| SCHEMA-07 | — | Pending |
-| ADMIN-01 | — | Pending |
-| ADMIN-02 | — | Pending |
-| ADMIN-03 | — | Pending |
-| ADMIN-04 | — | Pending |
-| ADMIN-05 | — | Pending |
-| ADMIN-06 | — | Pending |
-| ADMIN-07 | — | Pending |
-| ADMIN-08 | — | Pending |
-| ADMIN-09 | — | Pending |
-| ADMIN-10 | — | Pending |
-| ADMIN-11 | — | Pending |
-| ADMIN-12 | — | Pending |
-| ADMIN-13 | — | Pending |
-| ADMIN-14 | — | Pending |
-| ADMIN-15 | — | Pending |
-| PLAYER-01 | — | Pending |
-| PLAYER-02 | — | Pending |
-| PLAYER-03 | — | Pending |
-| PLAYER-04 | — | Pending |
-| PLAYER-05 | — | Pending |
-| PLAYER-06 | — | Pending |
-| PLAYER-07 | — | Pending |
-| PLAYER-08 | — | Pending |
-| PLAYER-09 | — | Pending |
-| ACTION-01 | — | Pending |
-| ACTION-02 | — | Pending |
-| ACTION-03 | — | Pending |
-| ACTION-04 | — | Pending |
-| ACTION-05 | — | Pending |
-| ANALYTICS-01 | — | Pending |
-| ANALYTICS-02 | — | Pending |
-| ANALYTICS-03 | — | Pending |
-| USERMGMT-01 | — | Pending |
-| USERMGMT-02 | — | Pending |
-| USERMGMT-03 | — | Pending |
-| MIGRATE-01 | — | Pending |
-| MIGRATE-02 | — | Pending |
-| MIGRATE-03 | — | Pending |
+| SCHEMA-01 | Phase 1 | Pending |
+| SCHEMA-02 | Phase 1 | Pending |
+| SCHEMA-03 | Phase 1 | Pending |
+| SCHEMA-04 | Phase 1 | Pending |
+| SCHEMA-05 | Phase 1 | Pending |
+| SCHEMA-06 | Phase 1 | Pending |
+| SCHEMA-07 | Phase 1 | Pending |
+| ADMIN-01 | Phase 3 | Pending |
+| ADMIN-02 | Phase 3 | Pending |
+| ADMIN-03 | Phase 3 | Pending |
+| ADMIN-04 | Phase 3 | Pending |
+| ADMIN-05 | Phase 3 | Pending |
+| ADMIN-06 | Phase 3 | Pending |
+| ADMIN-07 | Phase 3 | Pending |
+| ADMIN-08 | Phase 3 | Pending |
+| ADMIN-09 | Phase 3 | Pending |
+| ADMIN-10 | Phase 3 | Pending |
+| ADMIN-11 | Phase 3 | Pending |
+| ADMIN-12 | Phase 3 | Pending |
+| ADMIN-13 | Phase 3 | Pending |
+| ADMIN-14 | Phase 3 | Pending |
+| ADMIN-15 | Phase 3 | Pending |
+| PLAYER-01 | Phase 5 | Pending |
+| PLAYER-02 | Phase 5 | Pending |
+| PLAYER-03 | Phase 5 | Pending |
+| PLAYER-04 | Phase 5 | Pending |
+| PLAYER-05 | Phase 5 | Pending |
+| PLAYER-06 | Phase 5 | Pending |
+| PLAYER-07 | Phase 5 | Pending |
+| PLAYER-08 | Phase 5 | Pending |
+| PLAYER-09 | Phase 4 | Pending |
+| ACTION-01 | Phase 4 | Pending |
+| ACTION-02 | Phase 4 | Pending |
+| ACTION-03 | Phase 4 | Pending |
+| ACTION-04 | Phase 4 | Pending |
+| ACTION-05 | Phase 4 | Pending |
+| ANALYTICS-01 | Phase 6 | Pending |
+| ANALYTICS-02 | Phase 6 | Pending |
+| ANALYTICS-03 | Phase 6 | Pending |
+| USERMGMT-01 | Phase 6 | Pending |
+| USERMGMT-02 | Phase 6 | Pending |
+| USERMGMT-03 | Phase 6 | Pending |
+| MIGRATE-01 | Phase 7 | Pending |
+| MIGRATE-02 | Phase 7 | Pending |
+| MIGRATE-03 | Phase 7 | Pending |
