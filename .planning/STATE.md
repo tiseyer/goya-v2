@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: AI-Support-System
 status: executing
-stopped_at: Completed 15-01-PLAN.md
-last_updated: "2026-03-30T02:26:26.434Z"
+stopped_at: Completed 15-02-PLAN.md
+last_updated: "2026-03-30T02:33:30.432Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 12
-  completed_plans: 10
+  completed_plans: 11
   percent: 100
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 ## Current Position
 
 Phase: 15 (escalation-support-tickets-conversations-admin) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-03-30
 
@@ -55,6 +55,7 @@ Progress: [██████████] 100%
 | Phase 14-ai-backend-streaming-chat-widget P02 | 215 | 2 tasks | 9 files |
 | Phase 14 P03 | 162 | 2 tasks | 3 files |
 | Phase 15-escalation-support-tickets-conversations-admin P01 | 12 | 2 tasks | 6 files |
+| Phase 15-escalation-support-tickets-conversations-admin P02 | 15 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase 15]: Used 20260361 migration filename — 20260360 was already taken by health_monitor_log
 - [Phase 15]: replyToTicket only advances open→in_progress, never re-opens resolved tickets
 - [Phase 15]: updateEnabledTools always forces faq into tools array regardless of caller input
+- [Phase 15]: relativeDate helper copied per-file — consistent with SchoolRegistrationsTab pattern, no shared util
+- [Phase 15]: SupportTicketsTab fetches messages on-demand — avoids N+1 on initial inbox page load
 
 ### Blockers/Concerns
 
@@ -109,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T02:26:26.430Z
-Stopped at: Completed 15-01-PLAN.md
+Last session: 2026-03-30T02:33:30.428Z
+Stopped at: Completed 15-02-PLAN.md
 Resume file: None
