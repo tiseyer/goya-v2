@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 Phase: 15
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-03-30 - Completed quick task 260330-f5s: Fix Member Directory Search — real Supabase data
+Last activity: 2026-03-30 - Completed quick task 260330-hva: Add category filter tabs to FAQ admin UI
 
 Progress: [██████████] 100%
 
@@ -111,7 +111,9 @@ None yet.
 | 260330-cwt | Fix overwrite mode — handle already-registered users gracefully in migration import | 2026-03-30 | 65e09ba | [260330-cwt](./quick/260330-cwt-fix-overwrite-mode-handle-already-regist/) |
 | 260330-ey9 | Fix chat widget visibility and add Maintenance tab to /admin/settings | 2026-03-30 | 4f80c10 | [260330-ey9](./quick/260330-ey9-fix-chat-widget-visibility-and-add-maint/) |
 | 260330-f5s | Fix Member Directory Search — replace mock data with real Supabase queries | 2026-03-30 | 144aeb0 | [260330-f5s](./quick/260330-f5s-fix-member-directory-search-showing-wron/) |
-| 260330-f5s | Fix member directory — replace 330 mock entries with real Supabase profiles | 2026-03-30 | 144aeb0 | [260330-f5s](./quick/260330-f5s-fix-member-directory-search-showing-wron/) |
+| 260330-hch | Migration upload via Supabase Storage to bypass Vercel 4.5MB body limit | 2026-03-30 | 06cf491 | [260330-hch](./quick/260330-hch-migration-upload-via-supabase-storage-to/) |
+| 260330-gu2 | Add FAQ category field + seed 33 FAQs for Mattea chatbot | 2026-03-30 | ca59dc7 | [260330-gu2](./quick/260330-gu2-add-faq-category-field-and-seed-33-faqs-/) |
+| 260330-hva | Add category filter tabs to FAQ admin UI | 2026-03-30 | 7057ec5 | [260330-hva](./quick/260330-hva-add-category-filter-tabs-to-faq-admin-ui/) |
 
 ## Session Continuity
 
