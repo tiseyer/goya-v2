@@ -107,7 +107,7 @@ Plans:
   5. Admin can reset a user's flow response to force re-display, or force-assign a flow to a user as complete
 **Plans:** 2 plans
 Plans:
-- [ ] 06-01-PLAN.md — Analytics API route + analytics tab in flow editor with metrics, drop-off chart, time filters (ANALYTICS-01, ANALYTICS-02, ANALYTICS-03)
+- [x] 06-01-PLAN.md — Analytics API route + analytics tab in flow editor with metrics, drop-off chart, time filters (ANALYTICS-01, ANALYTICS-02, ANALYTICS-03)
 - [ ] 06-02-PLAN.md — User flow management API routes + Flows tab on user edit page with reset, assign, mark-complete (USERMGMT-01, USERMGMT-02, USERMGMT-03)
 **UI hint**: yes
 
@@ -132,5 +132,5 @@ Plans:
 | 3. Admin Flow Builder UI | 4/4 | Complete | 2026-03-30 |
 | 4. Flow Engine + Actions Engine | 2/2 | Complete | 2026-03-27 |
 | 5. Flow Player UI | 2/2 | Complete | 2026-03-30 |
-| 6. Analytics + User Management | 0/2 | In progress | - |
+| 6. Analytics + User Management | 1/2 | In progress | - |
 | 7. Onboarding Migration | 0/? | Not started | - |

@@ -2,28 +2,28 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 05-02-PLAN.md — Banner + Notification display types + global FlowPlayerLoader mount
-last_updated: "2026-03-30T08:31:37.156Z"
-last_activity: 2026-03-30
+status: executing
+stopped_at: Completed 06-01-PLAN.md — Per-flow analytics dashboard tab in editor
+last_updated: "2026-03-30T09:05:37Z"
+last_activity: 2026-03-30 -- Phase 06 Plan 01 complete
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
-  percent: 83
+  total_plans: 14
+  completed_plans: 13
+  percent: 89
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 6
-Plan: Not started
-Status: Phase 05 complete — advancing to Phase 06
-Last activity: 2026-03-30
+Phase: 06 (analytics-user-management) — EXECUTING
+Plan: 2 of 2
+Status: Executing Phase 06
+Last activity: 2026-03-30 -- Phase 06 Plan 01 complete
 
-Progress: [##########-] 83%
+Progress: [###########-] 89%
 
 ## Performance Metrics
 
@@ -40,6 +40,7 @@ Progress: [##########-] 83%
 | 03-admin-flow-builder-ui | 4/4 | 46min | 11.5min |
 | 04-flow-engine-actions-engine | 2/2 | 11min | 5.5min |
 | 05-flow-player-ui | 2/2 | 22min | 11min |
+| 06-analytics-user-management | 1/2 | 3min | 3min |
 
 *Updated after each plan completion*
 
@@ -128,6 +129,12 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - FlowPlayerLoader placed after {children} inside ConnectionsProvider — portals render above page content without blocking layout
 - Persistence confirmed wired in 05-01 — no additional changes needed for PLAYER-08
 
+**Plan 06-01 decisions:**
+
+- First step drop-off uses 'started' event count (not step_completed) — users who started the flow are by definition at step 1
+- completionRate formula is completed/shown (not completed/started) per ANALYTICS-01 requirement
+- Step user counts use distinct user_id sets per step_id to avoid double-counting repeated completions
+
 ### Blockers/Concerns
 
 - **RESOLVED — Phase 4 research flag**: Actions idempotency table design implemented — flow_action_executions with UNIQUE(flow_id, user_id, step_id, action_type) constraint
@@ -149,5 +156,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-30
-Stopped at: Completed 05-02-PLAN.md — Banner + Notification display types + global FlowPlayerLoader mount
+Stopped at: Completed 06-01-PLAN.md — Per-flow analytics dashboard tab in editor
 Resume file: None
