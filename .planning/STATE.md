@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 Phase: 15
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-03-30 - Completed quick task 260330-hch: Migration upload via Supabase Storage
+Last activity: 2026-03-30 - Completed quick task 260330-gu2: Add FAQ category field + seed 33 FAQs for Mattea
 
 Progress: [██████████] 100%
 
@@ -112,6 +112,7 @@ None yet.
 | 260330-ey9 | Fix chat widget visibility and add Maintenance tab to /admin/settings | 2026-03-30 | 4f80c10 | [260330-ey9](./quick/260330-ey9-fix-chat-widget-visibility-and-add-maint/) |
 | 260330-f5s | Fix Member Directory Search — replace mock data with real Supabase queries | 2026-03-30 | 144aeb0 | [260330-f5s](./quick/260330-f5s-fix-member-directory-search-showing-wron/) |
 | 260330-hch | Migration upload via Supabase Storage to bypass Vercel 4.5MB body limit | 2026-03-30 | 06cf491 | [260330-hch](./quick/260330-hch-migration-upload-via-supabase-storage-to/) |
+| 260330-gu2 | Add FAQ category field + seed 33 FAQs for Mattea chatbot | 2026-03-30 | ca59dc7 | [260330-gu2](./quick/260330-gu2-add-faq-category-field-and-seed-33-faqs-/) |
 
 ## Session Continuity
 
