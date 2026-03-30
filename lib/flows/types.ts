@@ -212,3 +212,40 @@ export type UpsertBranchInput = {
   answer_value: string;
   target_step_id: string;
 };
+
+// ─── Action Types ─────────────────────────────────────────────────────────
+export type FlowActionType =
+  | 'save_to_profile'
+  | 'send_email'
+  | 'kit_tag'
+  | 'stripe_checkout'
+  | 'redirect'
+  | 'trigger_flow'
+  | 'success_popup'
+  | 'mark_complete';
+
+export interface FlowStepAction {
+  type: FlowActionType;
+  config: Record<string, unknown>;
+}
+
+export interface FlowActionExecution {
+  id: string;
+  flow_id: string;
+  user_id: string;
+  step_id: string;
+  action_type: string;
+  executed_at: string;
+}
+
+// ─── Engine Types ─────────────────────────────────────────────────────────
+export interface ActiveFlowResponse {
+  flow: Omit<Flow, 'conditions'>;
+  steps: (FlowStep & { branches: FlowBranch[] })[];
+  response: FlowResponse | null;
+}
+
+export interface StepResponseInput {
+  step_id: string;
+  answers: Record<string, unknown>;
+}
