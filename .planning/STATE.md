@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 Phase: 15
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-03-30 - Completed quick task 260330-oyn: Remove staticMembers lookup fallback in members detail page
+Last activity: 2026-03-30 - Completed quick task 260330-pwe: Change stripe-events cron schedule back to every 5 minutes
 
 Progress: [██████████] 100%
 
@@ -122,6 +122,7 @@ None yet.
 | 260330-o30 | GA4 and Clarity full tracking implementation | 2026-03-30 | d84dcb9 | [260330-o30](./quick/260330-o30-ga4-and-clarity-full-tracking-implementa/) |
 | 260330-oyn | Remove staticMembers lookup fallback in members detail page | 2026-03-30 | 0d2d87c | [260330-oyn](./quick/260330-oyn-remove-staticmembers-lookup-fallback-in-/) |
 | 260330-o9t | Stripe reconciliation analysis for WC users without Stripe sub IDs — script + WC data | 2026-03-30 | 3ab4391 | [260330-o9t](./quick/260330-o9t-stripe-reconciliation-analysis-for-875-w/) |
+| 260330-pwe | Change stripe-events cron schedule back to every 5 minutes | 2026-03-30 | 74cf79c | [260330-pwe](./quick/260330-pwe-change-stripe-events-cron-schedule-back-/) |
 
 ## Session Continuity
 
