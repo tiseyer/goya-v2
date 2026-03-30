@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import { getSupabaseService } from '@/lib/supabase/service';
 import ConnectButton from '@/app/components/ConnectButton';
 import ConnectionsSection from '@/app/components/ConnectionsSection';
 import { members as staticMembers } from '@/lib/members-data';
@@ -27,9 +27,11 @@ export default async function MemberProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createSupabaseServerClient();
+  // Use service role client for profile reads — bypasses RLS so JWT expiry
+  // doesn't cause a false 404. Middleware already enforces authentication.
+  const serviceClient = getSupabaseService();
 
-  const { data: profileData } = await supabase
+  const { data: profileData } = await serviceClient
     .from('profiles')
     .select('id, full_name, first_name, last_name, avatar_url, bio, introduction, city, country, member_type, role, verification_status, instagram, youtube, website, facebook, tiktok, practice_format, teacher_status, practice_level, practice_styles, teaching_styles, years_teaching, languages, mrn, created_at')
     .eq('id', id)
@@ -185,7 +187,7 @@ export default async function MemberProfilePage({
             )}
 
             {/* Teaching / Practice styles */}
-            {(profile.teaching_styles?.length > 0 || profile.practice_styles?.length > 0) && (
+            {((profile.teaching_styles?.length ?? 0) > 0 || (profile.practice_styles?.length ?? 0) > 0) && (
               <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
                 <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
                   <span className="w-1 h-4 bg-[#4E87A0] rounded-full" />
