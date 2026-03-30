@@ -305,6 +305,7 @@ export async function createFaqItem(
         id: data.id,
         question: data.question,
         answer: data.answer,
+        category: data.category ?? null,
         status: data.status as FaqStatus,
         created_by: data.created_by,
         created_at: data.created_at,
