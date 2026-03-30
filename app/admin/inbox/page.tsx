@@ -4,6 +4,8 @@ import { getSupabaseService } from '@/lib/supabase/service'
 import SchoolRegistrationsTab from './SchoolRegistrationsTab'
 import TeacherUpgradesTab from './TeacherUpgradesTab'
 import CreditsTab from './CreditsTab'
+import SupportTicketsTab from './SupportTicketsTab'
+import { listSupportTickets } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,9 +15,20 @@ export default async function InboxPage({
   searchParams: Promise<{ tab?: string }>
 }) {
   const { tab } = await searchParams
-  const activeTab = tab === 'upgrades' ? 'upgrades' : tab === 'credits' ? 'credits' : 'schools'
+  const activeTab =
+    tab === 'upgrades'
+      ? 'upgrades'
+      : tab === 'credits'
+      ? 'credits'
+      : tab === 'tickets'
+      ? 'tickets'
+      : 'schools'
 
   const supabase = await createSupabaseServerClient()
+
+  // Get admin user ID for support ticket operations
+  const { data: { user: adminUser } } = await supabase.auth.getUser()
+  const adminUserId = adminUser?.id ?? ''
 
   // Fetch all schools with owner profile info
   const { data: schoolsData } = await supabase
@@ -91,13 +104,18 @@ export default async function InboxPage({
 
   const pendingCreditCount = creditEntries.filter((c: { status: string }) => c.status === 'pending').length
 
+  // Fetch support tickets
+  const supportTicketsResult = await listSupportTickets()
+  const supportTickets = supportTicketsResult.success ? supportTicketsResult.tickets : []
+  const openTicketCount = supportTickets.filter((t) => t.status === 'open').length
+
   return (
     <div className="p-6 sm:p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#1B3A5C]">Inbox</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Review school registrations, teacher upgrade requests, and credit submissions
+          Review school registrations, teacher upgrade requests, credit submissions, and support tickets
         </p>
       </div>
 
@@ -151,6 +169,21 @@ export default async function InboxPage({
                 </span>
               )}
             </Link>
+            <Link
+              href="/admin/inbox?tab=tickets"
+              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
+                activeTab === 'tickets'
+                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
+                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
+              }`}
+            >
+              Support Tickets
+              {openTicketCount > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+                  {openTicketCount}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
       </div>
@@ -159,6 +192,7 @@ export default async function InboxPage({
       {activeTab === 'schools' && <SchoolRegistrationsTab initialSchools={schools} />}
       {activeTab === 'upgrades' && <TeacherUpgradesTab initialRequests={upgradeRequests} />}
       {activeTab === 'credits' && <CreditsTab initialEntries={creditEntries} />}
+      {activeTab === 'tickets' && <SupportTicketsTab initialTickets={supportTickets} adminUserId={adminUserId} />}
     </div>
   )
 }
