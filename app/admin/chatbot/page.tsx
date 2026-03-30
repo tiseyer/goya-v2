@@ -47,51 +47,47 @@ export default async function ChatbotPage({
       </div>
 
       {/* Tab bar */}
-      <div className="mb-6">
-        <div className="border-b border-slate-200">
-          <div className="flex items-center gap-0">
-            <Link
-              href="/admin/chatbot?tab=config"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'config'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              Configuration
-            </Link>
-            <Link
-              href="/admin/chatbot?tab=faq"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'faq'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              FAQ
-            </Link>
-            <Link
-              href="/admin/chatbot?tab=conversations"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'conversations'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              Conversations
-            </Link>
-            <Link
-              href="/admin/chatbot?tab=api-connections"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'api-connections'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              API Connections
-            </Link>
-          </div>
-        </div>
+      <div className="flex gap-1 bg-slate-100 rounded-lg p-1 mb-8 w-fit overflow-x-auto">
+        <Link
+          href="/admin/chatbot?tab=config"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+            activeTab === 'config'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Configuration
+        </Link>
+        <Link
+          href="/admin/chatbot?tab=faq"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+            activeTab === 'faq'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          FAQ
+        </Link>
+        <Link
+          href="/admin/chatbot?tab=conversations"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+            activeTab === 'conversations'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Conversations
+        </Link>
+        <Link
+          href="/admin/chatbot?tab=api-connections"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+            activeTab === 'api-connections'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          API Connections
+        </Link>
       </div>
 
       {/* Tab content */}

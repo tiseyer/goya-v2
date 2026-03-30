@@ -6,21 +6,21 @@ import AdminCourseActions from './AdminCourseActions';
 import AdminCoursesFilters from './AdminCoursesFilters';
 
 const CATEGORY_BADGE: Record<string, string> = {
-  Workshop:         'bg-teal-50 text-teal-700',
-  'Yoga Sequence':  'bg-green-50 text-green-700',
+  Workshop:         'bg-blue-50 text-blue-700',
+  'Yoga Sequence':  'bg-blue-50 text-blue-700',
   'Dharma Talk':    'bg-blue-50 text-blue-700',
-  'Music Playlist': 'bg-pink-50 text-pink-700',
-  Research:         'bg-slate-100 text-slate-600',
+  'Music Playlist': 'bg-blue-50 text-blue-700',
+  Research:         'bg-blue-50 text-blue-700',
 };
 
 const ACCESS_BADGE: Record<string, string> = {
   free:         'bg-emerald-50 text-emerald-700',
-  members_only: 'bg-[#4E87A0]/10 text-[#4E87A0]',
+  members_only: 'bg-blue-50 text-blue-700',
 };
 
 const STATUS_BADGE: Record<string, string> = {
   published: 'bg-emerald-50 text-emerald-700',
-  draft:     'bg-yellow-50 text-yellow-700',
+  draft:     'bg-amber-50 text-amber-700',
 };
 
 const LEVEL_BADGE: Record<string, string> = {
@@ -77,7 +77,7 @@ export default async function AdminCoursesPage({
         </div>
         <Link
           href="/admin/courses/new"
-          className="flex items-center gap-2 px-4 py-2 bg-[#4E87A0] text-white text-sm font-semibold rounded-lg hover:bg-[#3A7190] transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-dark transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

@@ -52,21 +52,22 @@ export default function SettingsConnectionsPage() {
       <h1 className="text-xl font-semibold text-[#1B3A5C] mb-6">Connections</h1>
 
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm">
-        <div className="flex border-b border-[#E5E7EB] overflow-x-auto">
-          {tabs.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={[
-                'px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors',
-                activeTab === tab.key
-                  ? 'border-b-2 border-primary text-primary'
-                  : 'text-slate-500 hover:text-primary-dark',
-              ].join(' ')}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="p-3 border-b border-[#E5E7EB]">
+          <div className="flex gap-1 bg-slate-100 rounded-lg p-1 w-fit overflow-x-auto">
+            {tabs.map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+                  activeTab === tab.key
+                    ? 'bg-white text-[#1B3A5C] shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {filtered.length === 0 ? (

@@ -31,7 +31,7 @@ const SEVERITY_STYLES: Record<string, string> = {
 };
 
 const CATEGORY_STYLES: Record<string, string> = {
-  admin: 'bg-purple-50 text-purple-700',
+  admin: 'bg-blue-50 text-blue-700',
   user: 'bg-emerald-50 text-emerald-700',
   system: 'bg-slate-100 text-slate-600',
 };

@@ -223,7 +223,7 @@ export default function ProfileSettingsPage() {
         </div>
 
         {/* SECTION 1: Profile Information */}
-        <form onSubmit={handleSave} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+        <form onSubmit={handleSave} className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
           <h2 className="text-lg font-bold text-[#1a2744]">Profile Information</h2>
 
           {/* Avatar */}
@@ -299,7 +299,7 @@ export default function ProfileSettingsPage() {
 
         {/* STUDENT: Practice Profile */}
         {profile?.role === 'student' && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+          <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
             <h2 className="text-lg font-bold text-[#1a2744]">Practice Profile</h2>
 
             {/* Practice Level */}
@@ -321,7 +321,7 @@ export default function ProfileSettingsPage() {
 
         {/* TEACHER: Teaching Profile */}
         {profile?.role === 'teacher' && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+          <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
             <h2 className="text-lg font-bold text-[#1a2744]">Teaching Profile</h2>
 
             {/* Years Teaching */}
@@ -355,7 +355,7 @@ export default function ProfileSettingsPage() {
 
         {/* SCHOOL: School Profile */}
         {profile?.role === 'school' && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+          <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
             <h2 className="text-lg font-bold text-[#1a2744]">School Profile</h2>
 
             <CheckboxGroup label="Programs Offered" options={PROGRAMS_LIST} value={programsOffered} onChange={setProgramsOffered} />
@@ -382,7 +382,7 @@ export default function ProfileSettingsPage() {
         )}
 
         {/* SECTION 2: Account Information */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
           <h2 className="text-lg font-bold text-[#1a2744]">Account Information</h2>
 
           {/* Email */}
@@ -416,7 +416,7 @@ export default function ProfileSettingsPage() {
         </div>
 
         {/* SECTION 3: Danger Zone */}
-        <div className="rounded-2xl border-2 border-red-100 bg-red-50/20 p-6">
+        <div className="rounded-xl border-2 border-red-100 bg-red-50/20 p-6">
           <h2 className="text-lg font-bold text-red-700 mb-1">Danger Zone</h2>
           <p className="text-sm text-red-500/80 mb-5">These actions are permanent or hard to reverse.</p>
           <div className="flex flex-wrap gap-3">

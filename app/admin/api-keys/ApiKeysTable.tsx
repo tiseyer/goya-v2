@@ -320,10 +320,19 @@ export default function ApiKeysTable({ initialKeys }: { initialKeys: ApiKeyRow[]
                         <button
                           onClick={() => handleRevoke(key.id)}
                           disabled={revoking === key.id}
-                          className="px-3 py-1 rounded-lg text-xs font-medium text-red-600 border border-red-200 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="text-slate-400 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Revoke this API key"
                         >
-                          {revoking === key.id ? 'Revoking...' : 'Revoke'}
+                          {revoking === key.id ? (
+                            <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <circle cx="12" cy="12" r="10" strokeWidth={2} className="opacity-25" />
+                              <path strokeLinecap="round" strokeWidth={2} d="M4 12a8 8 0 018-8" className="opacity-75" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                            </svg>
+                          )}
                         </button>
                       )}
                     </td>

@@ -42,11 +42,60 @@ Defined in `app/globals.css` and exposed as Tailwind utilities via `@theme inlin
 
 ---
 
-## 2. Badge System
+## 2. Tabs
+
+**Standard: Pill/Capsule Style** — used across ALL admin and settings pages.
+
+```html
+<!-- Container -->
+<div class="flex bg-slate-100 rounded-lg p-1 overflow-x-auto">
+  <!-- Active tab -->
+  <button class="px-4 py-2 text-sm font-medium rounded-md bg-white text-[#1B3A5C] shadow-sm">
+    Active Tab
+  </button>
+  <!-- Inactive tab -->
+  <button class="px-4 py-2 text-sm font-medium rounded-md text-slate-500 hover:text-slate-700">
+    Inactive Tab
+  </button>
+</div>
+```
+
+Count badges on tabs (e.g. Inbox): `bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full px-1.5 min-w-[18px]`
+
+> **Rule:** Never use underline-style tabs. All tab navigation uses pill/capsule style.
+
+---
+
+## 3. Badge System — Semantic Colors
+
+### Status Badges (semantic meaning)
+
+| Status | Classes | Used for |
+|--------|---------|----------|
+| **Green** | `bg-emerald-50 text-emerald-700` | Active, Published, Approved, Connected, On Track, Free |
+| **Amber** | `bg-amber-50 text-amber-700` | Pending, Draft, Warning, Expiring Soon |
+| **Red** | `bg-red-50 text-red-700` | Rejected, Cancelled, Error, Needs Attention, Deleted |
+| **Gray** | `bg-slate-100 text-slate-600` | Inactive, Guest, System, No Requirements, Default |
+| **Blue** | `bg-blue-50 text-blue-700` | Informational only (categories, types, labels) |
+
+### Category Badges
+
+ALL category labels (event categories, course categories, member types in verification, audit log categories) use **blue** (`bg-blue-50 text-blue-700`). Categories are informational, not status.
+
+### Role Badges
+
+| Role | Classes | Rationale |
+|------|---------|-----------|
+| Teacher | `bg-teal-100 text-teal-700` | Primary elevated role |
+| Student | `bg-slate-100 text-slate-600` | Default/base role |
+| Wellness Practitioner | `bg-blue-100 text-blue-700` | Informational |
+| School | `bg-blue-100 text-blue-700` | Informational |
+| Admin | `bg-red-100 text-red-700` | Elevated/dangerous |
+| Moderator | `bg-amber-100 text-amber-700` | Elevated |
+
+### Badge Component
 
 All badges live in `app/components/ui/Badge.tsx`. Import the record maps — never re-define colour maps inline.
-
-### Available Exports
 
 ```ts
 import Badge, {
@@ -57,28 +106,105 @@ import Badge, {
 } from '@/app/components/ui/Badge';
 ```
 
-### ROLE_BADGE keys
-`Teacher` · `School` · `Student` · `Wellness` · `Moderator` · `Admin`
+> **Rule:** Never define per-file `CATEGORY_STYLES`, `CATEGORY_COLORS`, `ROLE_STYLES` maps with rainbow colours.
 
-> **Note:** member role `'Wellness Practitioner'` maps to the `'Wellness'` key.
-> Use a helper: `ROLE_BADGE[role] ?? ROLE_BADGE['Wellness']`
+---
 
-### CATEGORY_BADGE keys
-`Workshop` · `Teacher Training` · `Dharma Talk` · `Conference` · `Yoga Sequence` · `Music Playlist` · `Research`
+## 4. Primary Action Buttons (CTAs)
 
-### FORMAT_BADGE keys
-`Online` · `In Person` · `Hybrid`
+### Top-right create/add button (admin list pages)
 
-### Badge Component Props
-```ts
-<Badge variant="default|solid|subtle|outline|muted" size="sm|md">
-  Label
-</Badge>
+```html
+<button class="flex items-center gap-2 bg-primary text-white hover:bg-primary-dark px-4 py-2 text-sm font-semibold rounded-lg transition-colors">
+  <PlusIcon /> Create Item
+</button>
+```
+
+Every admin list page where creation is possible MUST have this button.
+
+### CTA button (secondary)
+
+```html
+<button class="border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl px-4 py-2 text-sm font-semibold">
+```
+
+### Link / text action
+
+```
+text-primary-light hover:text-primary-dark font-semibold transition-colors
 ```
 
 ---
 
-## 3. Typography
+## 5. Cards
+
+### Standard card
+
+```html
+<div class="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+```
+
+Used for: all admin tables, settings sections, content cards.
+
+### Danger zone card
+
+```html
+<div class="rounded-xl border-2 border-red-100 bg-red-50/20 p-6">
+```
+
+> **Rule:** `rounded-xl` for ALL cards. Never `rounded-2xl` or `rounded-lg` for page-level cards.
+> Modals may use `rounded-2xl`.
+
+---
+
+## 6. Destructive Actions
+
+### In table rows: Icon-only trash
+
+```html
+<button class="p-1 text-slate-400 hover:text-red-500 transition-colors">
+  <TrashIcon class="w-4 h-4" />
+</button>
+```
+
+### In modals/forms: Outlined red button
+
+```html
+<button class="border border-red-200 text-red-600 hover:bg-red-50 rounded-lg px-3 py-1.5 text-sm font-medium">
+  Delete
+</button>
+```
+
+### In bulk action bars: Solid red button
+
+```html
+<button class="bg-red-500 hover:bg-red-600 text-white rounded-lg px-3 py-1.5 text-sm font-medium">
+  Delete Selected
+</button>
+```
+
+### Confirmation dialogs
+
+Keep existing modal/inline confirmation patterns — only standardize the trigger buttons.
+
+> **Rule:** Never use standalone red text "Delete" links in table rows.
+> **Rule:** Revoke actions use a slash/ban icon, same gray→red hover pattern.
+
+---
+
+## 7. Empty States
+
+```html
+<div class="bg-white rounded-xl border border-[#E5E7EB] p-12 text-center">
+  <svg class="w-10 h-10 mx-auto text-slate-300 mb-3"><!-- contextual icon --></svg>
+  <p class="text-sm font-medium text-[#374151]">No items found</p>
+  <p class="text-xs text-[#6B7280] mt-1">Try adjusting your filters.</p>
+</div>
+```
+
+---
+
+## 8. Typography
 
 Font family set in `globals.css` via `--font-sans` (Geist Sans) and `--font-mono` (Geist Mono).
 
@@ -94,18 +220,18 @@ Font family set in `globals.css` via `--font-sans` (Geist Sans) and `--font-mono
 
 ---
 
-## 4. Spacing & Layout
+## 9. Spacing & Layout
 
 - **Max content width:** `max-w-7xl` (pages), `max-w-5xl` (detail pages), `max-w-3xl` (legal/prose)
 - **Page padding:** `px-4 sm:px-6 lg:px-8`
 - **Page top spacing:** `py-10` (list), `py-14 pb-24` (prose)
-- **Card radius:** `rounded-2xl`
-- **Button radius:** `rounded-xl` (primary), `rounded-full` (pill/badge)
+- **Card radius:** `rounded-xl`
+- **Button radius:** `rounded-xl` (primary), `rounded-lg` (admin CTA), `rounded-full` (pill/badge)
 - **Spacing scale:** 4/8/12/16/20/24/32/40/48 (multiples of 4)
 
 ---
 
-## 5. Shadows
+## 10. Shadows
 
 Defined in `globals.css` as custom shadow tokens:
 
@@ -119,41 +245,7 @@ Use Tailwind's `shadow-sm`, `shadow-md`, `shadow-lg` for standard utility shadow
 
 ---
 
-## 6. Component Patterns
-
-### Cards
-```html
-<div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
-```
-
-### Hero sections
-Use `<PageHero pill="..." title="..." subtitle="..." />` — never inline hero divs.
-The component handles the `bg-primary-dark` background, dot texture, and glow.
-
-### Active filter / selected state
-```
-bg-primary-dark text-white   ← selected pill/button
-bg-primary-light/8 border-primary-light  ← highlighted row
-```
-
-### CTA button (primary)
-```
-bg-primary-light hover:bg-primary active:bg-primary-dark text-white font-bold rounded-xl
-```
-
-### CTA button (secondary)
-```
-border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl
-```
-
-### Link / text action
-```
-text-primary-light hover:text-primary-dark font-semibold transition-colors
-```
-
----
-
-## 7. Semantic Level Colors (Exception)
+## 11. Semantic Level Colors (Exception)
 
 These are **not** part of the GOYA blue family but are semantically meaningful and permitted:
 
@@ -169,10 +261,14 @@ These are **not** part of the GOYA blue family but are semantically meaningful a
 
 ---
 
-## 8. Anti-Patterns
+## 12. Anti-Patterns
 
 - **Never** define per-file `CATEGORY_STYLES`, `CATEGORY_COLORS`, `ROLE_STYLES` maps with rainbow colours.
-- **Never** use raw hex in `className` strings (e.g. `text-[#1B3A5C]`).
-- **Never** use `bg-teal-*`, `bg-purple-*`, `bg-orange-*`, `bg-pink-*`, `bg-indigo-*` for role/category UI.
+- **Never** use raw hex in `className` strings (e.g. `text-[#1B3A5C]`) for new components.
+- **Never** use `bg-teal-*`, `bg-purple-*`, `bg-orange-*`, `bg-pink-*`, `bg-indigo-*` for category badges.
+- **Never** use underline-style tabs — always pill/capsule.
+- **Never** use `rounded-2xl` for page-level cards — always `rounded-xl`.
+- **Never** use text "Delete" links in table rows — always icon-only trash.
 - **Always** import badge maps from `@/app/components/ui/Badge`.
 - **Always** use `PageHero` for page-level hero sections.
+- **Always** use `bg-primary text-white hover:bg-primary-dark` for admin CTA buttons.

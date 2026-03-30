@@ -120,72 +120,67 @@ export default async function InboxPage({
       </div>
 
       {/* Tabs */}
-      <div className="mb-6">
-        {/* Tab bar */}
-        <div className="border-b border-slate-200">
-          <div className="flex items-center gap-0">
-            <Link
-              href="/admin/inbox?tab=schools"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'schools'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              School Registrations
-              {pendingSchoolCount > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
-                  {pendingSchoolCount}
-                </span>
-              )}
-            </Link>
-            <Link
-              href="/admin/inbox?tab=upgrades"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'upgrades'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              Teacher Upgrades
-              {pendingUpgradeCount > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
-                  {pendingUpgradeCount}
-                </span>
-              )}
-            </Link>
-            <Link
-              href="/admin/inbox?tab=credits"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'credits'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              Credits & Hours
-              {pendingCreditCount > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
-                  {pendingCreditCount}
-                </span>
-              )}
-            </Link>
-            <Link
-              href="/admin/inbox?tab=tickets"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'tickets'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              Support Tickets
-              {openTicketCount > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
-                  {openTicketCount}
-                </span>
-              )}
-            </Link>
-          </div>
-        </div>
+      <div className="flex gap-1 bg-slate-100 rounded-lg p-1 mb-8 w-fit overflow-x-auto">
+        <Link
+          href="/admin/inbox?tab=schools"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap inline-flex items-center gap-1.5 ${
+            activeTab === 'schools'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          School Registrations
+          {pendingSchoolCount > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+              {pendingSchoolCount}
+            </span>
+          )}
+        </Link>
+        <Link
+          href="/admin/inbox?tab=upgrades"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap inline-flex items-center gap-1.5 ${
+            activeTab === 'upgrades'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Teacher Upgrades
+          {pendingUpgradeCount > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+              {pendingUpgradeCount}
+            </span>
+          )}
+        </Link>
+        <Link
+          href="/admin/inbox?tab=credits"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap inline-flex items-center gap-1.5 ${
+            activeTab === 'credits'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Credits & Hours
+          {pendingCreditCount > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+              {pendingCreditCount}
+            </span>
+          )}
+        </Link>
+        <Link
+          href="/admin/inbox?tab=tickets"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap inline-flex items-center gap-1.5 ${
+            activeTab === 'tickets'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Support Tickets
+          {openTicketCount > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+              {openTicketCount}
+            </span>
+          )}
+        </Link>
       </div>
 
       {/* Tab content */}

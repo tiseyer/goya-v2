@@ -54,41 +54,37 @@ export default async function ApiKeysPage({
       </div>
 
       {/* Tab bar */}
-      <div className="mb-6">
-        <div className="border-b border-slate-200">
-          <div className="flex items-center gap-0">
-            <Link
-              href="/admin/api-keys?tab=keys"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'keys'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              Own Keys
-            </Link>
-            <Link
-              href="/admin/api-keys?tab=secrets"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'secrets'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              Third Party Keys
-            </Link>
-            <Link
-              href="/admin/api-keys?tab=endpoints"
-              className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                activeTab === 'endpoints'
-                  ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                  : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-              }`}
-            >
-              Endpoints
-            </Link>
-          </div>
-        </div>
+      <div className="flex gap-1 bg-slate-100 rounded-lg p-1 mb-8 w-fit overflow-x-auto">
+        <Link
+          href="/admin/api-keys?tab=keys"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+            activeTab === 'keys'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Own Keys
+        </Link>
+        <Link
+          href="/admin/api-keys?tab=secrets"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+            activeTab === 'secrets'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Third Party Keys
+        </Link>
+        <Link
+          href="/admin/api-keys?tab=endpoints"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+            activeTab === 'endpoints'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Endpoints
+        </Link>
       </div>
 
       {/* Tab content */}

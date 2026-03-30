@@ -224,28 +224,26 @@ export default function FlowListTabs({
       )}
 
       {/* Tabs + Create button */}
-      <div className="mb-6 flex items-end justify-between gap-4">
-        <div className="border-b border-slate-200 flex-1">
-          <div className="flex items-center gap-0">
-            {TABS.map(tab => (
-              <Link
-                key={tab.key}
-                href={`/admin/flows?tab=${tab.key}`}
-                className={`relative px-5 py-3 text-sm font-semibold -mb-px transition-colors ${
-                  activeTab === tab.key
-                    ? 'text-[#00B5A3] border-b-2 border-[#00B5A3]'
-                    : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
-                }`}
-              >
-                {tab.label}
-              </Link>
-            ))}
-          </div>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="flex gap-1 bg-slate-100 rounded-lg p-1 overflow-x-auto">
+          {TABS.map(tab => (
+            <Link
+              key={tab.key}
+              href={`/admin/flows?tab=${tab.key}`}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+                activeTab === tab.key
+                  ? 'bg-white text-[#1B3A5C] shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
         </div>
 
         <button
           onClick={() => setCreateModalOpen(true)}
-          className="shrink-0 mb-1 inline-flex items-center gap-2 px-4 py-2 bg-[#00B5A3] text-white text-sm font-semibold rounded-lg hover:bg-[#009e8e] transition-colors"
+          className="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-dark transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -260,7 +258,7 @@ export default function FlowListTabs({
           <p className="text-slate-500 text-sm">No {statusLabel} flows yet</p>
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="mt-3 px-4 py-2 bg-[#00B5A3] text-white text-sm font-semibold rounded-lg hover:bg-[#009e8e] transition-colors"
+            className="mt-3 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-dark transition-colors"
           >
             Create your first flow
           </button>

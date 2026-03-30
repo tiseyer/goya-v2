@@ -11,12 +11,12 @@ const INPUT = 'w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide';
 
 const ROLE_BADGE: Record<string, string> = {
-  student: 'bg-blue-100 text-blue-700',
+  student: 'bg-slate-100 text-slate-600',
   teacher: 'bg-teal-100 text-teal-700',
-  wellness_practitioner: 'bg-emerald-100 text-emerald-700',
-  school: 'bg-purple-100 text-purple-700',
+  wellness_practitioner: 'bg-blue-100 text-blue-700',
+  school: 'bg-blue-100 text-blue-700',
   admin: 'bg-red-100 text-red-700',
-  moderator: 'bg-orange-100 text-orange-700',
+  moderator: 'bg-amber-100 text-amber-700',
 };
 
 const TEACHING_STYLES_LIST = ['Hatha Yoga','Vinyasa Yoga','Yin Yoga','Restorative Yoga','Ashtanga Yoga','Prenatal Yoga','Postnatal Yoga',"Children's Yoga",'Power Yoga','Kundalini Yoga','Hot Yoga','Gentle Yoga','Modern Contemporaries','Traditional Lineage-based','Trauma-informed Yoga','Iyengar Yoga','Somatic Yoga','Chair Yoga','Aerial Yoga','Karma Yoga'];
@@ -224,7 +224,7 @@ export default function SettingsGeneralPage() {
         </div>
 
         {/* SECTION 1: Profile Information */}
-        <form onSubmit={handleSave} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+        <form onSubmit={handleSave} className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
           <h2 className="text-lg font-bold text-[#1a2744]">Profile Information</h2>
 
           {/* Avatar */}
@@ -300,7 +300,7 @@ export default function SettingsGeneralPage() {
 
         {/* STUDENT: Practice Profile */}
         {profile?.role === 'student' && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+          <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
             <h2 className="text-lg font-bold text-[#1a2744]">Practice Profile</h2>
 
             {/* Practice Level */}
@@ -322,7 +322,7 @@ export default function SettingsGeneralPage() {
 
         {/* TEACHER: Teaching Profile */}
         {profile?.role === 'teacher' && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+          <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
             <h2 className="text-lg font-bold text-[#1a2744]">Teaching Profile</h2>
 
             {/* Years Teaching */}
@@ -356,7 +356,7 @@ export default function SettingsGeneralPage() {
 
         {/* SCHOOL: School Profile */}
         {profile?.role === 'school' && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+          <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
             <h2 className="text-lg font-bold text-[#1a2744]">School Profile</h2>
 
             <CheckboxGroup label="Programs Offered" options={PROGRAMS_LIST} value={programsOffered} onChange={setProgramsOffered} />
@@ -383,7 +383,7 @@ export default function SettingsGeneralPage() {
         )}
 
         {/* SECTION 2: Account Information */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-5">
           <h2 className="text-lg font-bold text-[#1a2744]">Account Information</h2>
 
           {/* Email */}
@@ -417,7 +417,7 @@ export default function SettingsGeneralPage() {
         </div>
 
         {/* SECTION 3: Appearance */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 space-y-4">
           <div>
             <h2 className="text-lg font-bold text-[#1a2744]">Appearance</h2>
             <p className="text-sm text-slate-400 mt-0.5">Choose your preferred theme</p>
@@ -426,7 +426,7 @@ export default function SettingsGeneralPage() {
         </div>
 
         {/* SECTION 4: Danger Zone */}
-        <div className="rounded-2xl border-2 border-red-100 bg-red-50/20 p-6">
+        <div className="rounded-xl border-2 border-red-100 bg-red-50/20 p-6">
           <h2 className="text-lg font-bold text-red-700 mb-1">Danger Zone</h2>
           <p className="text-sm text-red-500/80 mb-5">These actions are permanent or hard to reverse.</p>
           <div className="flex flex-wrap gap-3">

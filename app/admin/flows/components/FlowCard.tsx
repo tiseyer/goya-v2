@@ -117,7 +117,7 @@ export default function FlowCard({ flow, stats, statsLoading, onAction }: FlowCa
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition-colors group relative"
+      className="flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 rounded-xl hover:border-slate-300 transition-colors group relative"
     >
       {/* Drag handle */}
       <button

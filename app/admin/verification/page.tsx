@@ -61,11 +61,7 @@ export default async function VerificationPage() {
                     {user.full_name ?? '—'}
                   </p>
                   <p className="text-xs text-slate-400 truncate">{user.email}</p>
-                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-1 ${
-                    user.member_type === 'teacher'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'bg-teal-50 text-teal-700'
-                  }`}>
+                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-1 bg-blue-50 text-blue-700`}>
                     {user.member_type === 'teacher' ? 'Yoga Teacher' : 'Wellness Practitioner'}
                   </span>
                 </div>
