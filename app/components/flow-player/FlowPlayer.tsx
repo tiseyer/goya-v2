@@ -11,6 +11,8 @@ import FlowProgress from './FlowProgress';
 import FlowNavigation from './FlowNavigation';
 import FlowPlayerModal from './FlowPlayerModal';
 import FlowPlayerFullscreen from './FlowPlayerFullscreen';
+import FlowPlayerBanner from './FlowPlayerBanner';
+import FlowPlayerNotification from './FlowPlayerNotification';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -123,6 +125,8 @@ export default function FlowPlayer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Allows banner/notification CTA to upgrade to modal display
+  const [overrideDisplay, setOverrideDisplay] = useState<'modal' | null>(null);
 
   // ── Fetch active flow on mount ──────────────────────────────────────────
   useEffect(() => {
@@ -337,26 +341,88 @@ export default function FlowPlayer() {
 
   const { display_type, modal_dismissible, modal_backdrop } = activeFlow.flow;
 
-  if (display_type === 'modal') {
-    return (
-      <FlowPlayerModal
-        dismissible={modal_dismissible ?? false}
-        backdrop={modal_backdrop}
-        onDismiss={handleDismiss}
-      >
-        {stepContent}
-      </FlowPlayerModal>
-    );
-  }
+  // Effective display: banner/notification CTA can upgrade to modal
+  const effectiveDisplay = overrideDisplay ?? display_type;
 
-  if (display_type === 'fullscreen') {
-    return (
-      <FlowPlayerFullscreen>
-        {stepContent}
-      </FlowPlayerFullscreen>
-    );
-  }
+  // Helper: extract banner text from first info_text element or fall back to flow name
+  const bannerText = (() => {
+    for (const step of activeFlow.steps) {
+      for (const el of step.elements) {
+        if (el.type === 'info_text' && el.content) return el.content;
+      }
+    }
+    return activeFlow.flow.name;
+  })();
 
-  // Banners and notification handled in Plan 02
-  return null;
+  // Helper: notification body from first info_text element, or flow description, or ''
+  const notificationBody = (() => {
+    for (const step of activeFlow.steps) {
+      for (const el of step.elements) {
+        if (el.type === 'info_text' && el.content) return el.content;
+      }
+    }
+    return activeFlow.flow.description ?? '';
+  })();
+
+  // When user dismisses an overridden modal, reset override and clear flow
+  const handleOverrideDismiss = () => {
+    setOverrideDisplay(null);
+    setActiveFlow(null);
+  };
+
+  switch (effectiveDisplay) {
+    case 'modal':
+      return (
+        <FlowPlayerModal
+          dismissible={overrideDisplay === 'modal' ? true : (modal_dismissible ?? false)}
+          backdrop={modal_backdrop}
+          onDismiss={overrideDisplay === 'modal' ? handleOverrideDismiss : handleDismiss}
+        >
+          {stepContent}
+        </FlowPlayerModal>
+      );
+
+    case 'fullscreen':
+      return (
+        <FlowPlayerFullscreen>
+          {stepContent}
+        </FlowPlayerFullscreen>
+      );
+
+    case 'top_banner':
+      return (
+        <FlowPlayerBanner
+          position="top"
+          text={bannerText}
+          ctaLabel="Start"
+          onCtaClick={() => setOverrideDisplay('modal')}
+          onClose={handleDismiss}
+        />
+      );
+
+    case 'bottom_banner':
+      return (
+        <FlowPlayerBanner
+          position="bottom"
+          text={bannerText}
+          ctaLabel="Start"
+          onCtaClick={() => setOverrideDisplay('modal')}
+          onClose={handleDismiss}
+        />
+      );
+
+    case 'notification':
+      return (
+        <FlowPlayerNotification
+          title={activeFlow.flow.name}
+          body={notificationBody}
+          actionLabel="Start"
+          onAction={() => setOverrideDisplay('modal')}
+          onClose={handleDismiss}
+        />
+      );
+
+    default:
+      return null;
+  }
 }
