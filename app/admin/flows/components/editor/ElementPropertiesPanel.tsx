@@ -3,6 +3,7 @@
 import { useEditorStore } from '@/lib/flows/editor-store';
 import type { FlowElement, FlowElementChoiceOption } from '@/lib/flows/types';
 import ProfileFieldMapper from './ProfileFieldMapper';
+import BranchConfigurator from './BranchConfigurator';
 
 // Element types where "required" toggle is shown
 const SUPPORTS_REQUIRED: FlowElement['type'][] = [
@@ -143,7 +144,7 @@ function OptionsEditor({ options, onChange }: OptionsEditorProps) {
                 className="text-slate-300 hover:text-slate-500 disabled:opacity-20 disabled:cursor-not-allowed leading-none text-xs"
                 title="Move up"
               >
-                ▲
+                &#9650;
               </button>
               <button
                 onClick={() => handleMoveDown(index)}
@@ -151,7 +152,7 @@ function OptionsEditor({ options, onChange }: OptionsEditorProps) {
                 className="text-slate-300 hover:text-slate-500 disabled:opacity-20 disabled:cursor-not-allowed leading-none text-xs"
                 title="Move down"
               >
-                ▼
+                &#9660;
               </button>
             </div>
             <input
@@ -173,7 +174,7 @@ function OptionsEditor({ options, onChange }: OptionsEditorProps) {
               className="shrink-0 text-slate-300 hover:text-red-500 transition-colors p-0.5"
               title="Remove option"
             >
-              <span className="text-xs">✕</span>
+              <span className="text-xs">&#x2715;</span>
             </button>
           </div>
         ))}
@@ -193,6 +194,7 @@ export default function ElementPropertiesPanel() {
     selectedStepId,
     selectedElementKey,
     steps,
+    flow,
     updateElement,
     profileMappings,
     setProfileMapping,
@@ -224,6 +226,14 @@ export default function ElementPropertiesPanel() {
   };
 
   const currentMapping = profileMappings[selectedElementKey] ?? null;
+
+  const stepInfoList = steps.map((s) => ({
+    id: s.id,
+    title: s.title,
+    position: s.position,
+  }));
+
+  const currentBranches = step?.branches ?? [];
 
   return (
     <div className="p-4 space-y-4 overflow-y-auto">
@@ -334,6 +344,21 @@ export default function ElementPropertiesPanel() {
             elementKey={selectedElementKey}
             currentMapping={currentMapping}
             onChange={(field) => setProfileMapping(selectedElementKey, field)}
+          />
+        </>
+      )}
+
+      {/* Branch configurator — only for single_choice */}
+      {element.type === 'single_choice' && flow && (
+        <>
+          <hr className="border-slate-200" />
+          <BranchConfigurator
+            flowId={flow.id}
+            stepId={selectedStepId}
+            elementKey={selectedElementKey}
+            options={element.options}
+            currentBranches={currentBranches}
+            allSteps={stepInfoList}
           />
         </>
       )}
