@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import ConnectButton from '@/app/components/ConnectButton';
 import ConnectionsSection from '@/app/components/ConnectionsSection';
-import { members as staticMembers } from '@/lib/members-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +41,7 @@ export default async function MemberProfilePage({
     'Wellness Practitioner': 'wellness_practitioner',
   };
 
-  const staticMember = !profileData ? staticMembers.find(m => m.id === id) : null;
+  const staticMember = null;
   if (!profileData && !staticMember) notFound();
 
   const profile = profileData ?? (() => {
