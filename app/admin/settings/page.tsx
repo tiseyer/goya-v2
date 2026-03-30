@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import EmailTemplatesList from './components/EmailTemplatesList';
 import HealthTab from './components/HealthTab';
+import MaintenanceTab from './components/MaintenanceTab';
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
 
@@ -252,122 +253,6 @@ function datetimeLocalToUtc(local: string): string {
 function GeneralTab() {
   const environment = process.env.NODE_ENV === 'production' ? 'Production' : 'Development';
 
-  // ── Maintenance state ────────────────────────────────────────────────────
-  const [mmEnabled,   setMmEnabled]   = useState(false);
-  const [mmScheduled, setMmScheduled] = useState(false);
-  const [mmStart,     setMmStart]     = useState(''); // datetime-local (local time)
-  const [mmEnd,       setMmEnd]       = useState(''); // datetime-local (local time)
-  const [mmMessage,   setMmMessage]   = useState('');
-  const [mmLoading,   setMmLoading]   = useState(true);
-  const [mmSaving,    setMmSaving]    = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [toast,       setToast]       = useState<{ type: ToastType; message: string } | null>(null);
-  const dismissToast = useCallback(() => setToast(null), []);
-
-  // ── Email Sandbox state ──────────────────────────────────────────────────
-  const [sbEnabled,   setSbEnabled]   = useState(false);
-  const [sbRecipient, setSbRecipient] = useState('');
-  const [sbLoading,   setSbLoading]   = useState(true);
-  const [sbSaving,    setSbSaving]    = useState(false);
-
-  useEffect(() => {
-    async function load() {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await supabase
-        .from('site_settings')
-        .select('key, value')
-        .in('key', [
-          'maintenance_mode_enabled', 'maintenance_mode_scheduled',
-          'maintenance_start_utc', 'maintenance_end_utc', 'maintenance_message',
-          'email_sandbox_enabled', 'email_sandbox_recipient',
-        ]);
-      if (data) {
-        const map: Record<string, string> = {};
-        (data as Array<{ key: string; value: string }>).forEach(r => { map[r.key] = r.value ?? ''; });
-        setMmEnabled(map.maintenance_mode_enabled === 'true');
-        setMmScheduled(map.maintenance_mode_scheduled === 'true');
-        setMmStart(utcToDatetimeLocal(map.maintenance_start_utc ?? ''));
-        setMmEnd(utcToDatetimeLocal(map.maintenance_end_utc ?? ''));
-        setMmMessage(map.maintenance_message ?? '');
-        setSbEnabled(map.email_sandbox_enabled === 'true');
-        setSbRecipient(map.email_sandbox_recipient ?? '');
-      }
-      setMmLoading(false);
-      setSbLoading(false);
-    }
-    load();
-  }, []);
-
-  // Status derived from current DB state
-  const statusInfo = mmEnabled
-    ? { dot: 'bg-red-500 animate-pulse', label: 'Maintenance is live', labelCls: 'text-red-600' }
-    : (mmScheduled && mmStart && mmEnd)
-      ? { dot: 'bg-yellow-400', label: 'Scheduled window set', labelCls: 'text-yellow-700' }
-      : { dot: 'bg-emerald-500', label: 'Site is online', labelCls: 'text-emerald-700' };
-
-  async function saveMmSettings(enabledOverride?: boolean) {
-    setMmSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    const enabled = enabledOverride !== undefined ? enabledOverride : mmEnabled;
-    const rows = [
-      { key: 'maintenance_mode_enabled',   value: String(enabled) },
-      { key: 'maintenance_mode_scheduled', value: String(mmScheduled) },
-      { key: 'maintenance_start_utc',      value: datetimeLocalToUtc(mmStart) },
-      { key: 'maintenance_end_utc',        value: datetimeLocalToUtc(mmEnd) },
-      { key: 'maintenance_message',        value: mmMessage },
-    ];
-    for (const row of rows) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await supabase
-        .from('site_settings')
-        .upsert(
-          { ...row, updated_at: new Date().toISOString(), updated_by: user?.id ?? null },
-          { onConflict: 'key' }
-        );
-    }
-    if (enabledOverride !== undefined) setMmEnabled(enabledOverride);
-    setMmSaving(false);
-
-    if (enabledOverride === true) {
-      setToast({ type: 'info', message: 'Maintenance mode is now active. Non-admin users will see the maintenance page.' });
-    } else if (enabledOverride === false) {
-      setToast({ type: 'success', message: 'Maintenance mode disabled. The site is back online.' });
-    } else {
-      setToast({ type: 'success', message: 'Maintenance settings saved.' });
-    }
-  }
-
-  function handleEnableToggle(val: boolean) {
-    if (val) {
-      setShowConfirm(true); // require confirmation before enabling
-    } else {
-      saveMmSettings(false); // disable immediately
-    }
-  }
-
-  async function saveSbSettings() {
-    setSbSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    const rows = [
-      { key: 'email_sandbox_enabled',   value: String(sbEnabled) },
-      { key: 'email_sandbox_recipient', value: sbRecipient },
-    ];
-    for (const row of rows) {
-      await supabase
-        .from('site_settings')
-        .upsert(
-          { ...row, updated_at: new Date().toISOString(), updated_by: user?.id ?? null },
-          { onConflict: 'key' }
-        );
-    }
-    setSbSaving(false);
-    if (sbEnabled) {
-      setToast({ type: 'info', message: `Email sandbox active — all emails redirected to ${sbRecipient || '(no address set)'}` });
-    } else {
-      setToast({ type: 'success', message: 'Email sandbox disabled. Emails sending normally.' });
-    }
-  }
-
   return (
     <div className="space-y-6">
       <Section title="General" description="Basic platform information.">
@@ -375,196 +260,6 @@ function GeneralTab() {
         <ReadOnlyField label="Version"     value="v2.0.0-alpha" />
         <ReadOnlyField label="Environment" value={environment} />
       </Section>
-
-      {/* Maintenance section */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-          <h2 className="text-base font-semibold text-[#1B3A5C]">Maintenance Mode</h2>
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium">
-            <span className={`w-2 h-2 rounded-full ${statusInfo.dot}`} />
-            <span className={statusInfo.labelCls}>{statusInfo.label}</span>
-          </span>
-        </div>
-
-        {mmLoading ? (
-          <div className="px-6 py-10 flex justify-center">
-            <div className="w-6 h-6 border-2 border-[#00B5A3] border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <div className="px-6 py-5 space-y-5">
-            {/* Enable toggle */}
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-[#374151]">Enable Maintenance Mode</p>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  Immediately redirect all non-admin users to the maintenance page.
-                </p>
-              </div>
-              <Toggle checked={mmEnabled} onChange={handleEnableToggle} />
-            </div>
-
-            {mmEnabled && (
-              <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-                <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                <p className="text-xs font-medium text-red-700">Maintenance mode is active. Non-admin users cannot access the site.</p>
-              </div>
-            )}
-
-            <div className="border-t border-[#E5E7EB] pt-5 space-y-5">
-              {/* Custom message */}
-              <div>
-                <label className="block text-sm font-medium text-[#374151] mb-1.5">Maintenance Message</label>
-                <textarea
-                  value={mmMessage}
-                  onChange={e => setMmMessage(e.target.value)}
-                  rows={3}
-                  placeholder="We are currently performing scheduled maintenance. We will be back online shortly."
-                  className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] resize-none transition-colors"
-                />
-                <p className="mt-1.5 text-xs text-[#6B7280]">Shown to visitors on the maintenance page.</p>
-              </div>
-
-              {/* Scheduled window toggle */}
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-[#374151]">Scheduled Window</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">
-                    Automatically activate maintenance during a specific time range.
-                  </p>
-                </div>
-                <Toggle checked={mmScheduled} onChange={setMmScheduled} />
-              </div>
-
-              {mmScheduled && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-[#374151] mb-1.5">Start (local time)</label>
-                    <input
-                      type="datetime-local"
-                      value={mmStart}
-                      onChange={e => setMmStart(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#374151] mb-1.5">End (local time)</label>
-                    <input
-                      type="datetime-local"
-                      value={mmEnd}
-                      onChange={e => setMmEnd(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] transition-colors"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Save button */}
-              <div className="flex justify-end pt-1">
-                <button
-                  onClick={() => saveMmSettings()}
-                  disabled={mmSaving}
-                  className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1B3A5C] text-white text-sm font-semibold hover:bg-[#162f4d] transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
-                >
-                  {mmSaving ? (
-                    <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                  )}
-                  {mmSaving ? 'Saving…' : 'Save Settings'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Email Sandbox section */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-          <h2 className="text-base font-semibold text-[#1B3A5C]">Email Sandbox</h2>
-          {!sbLoading && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium">
-              {sbEnabled ? (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-yellow-400" />
-                  <span className="text-yellow-700">Sandbox active — all emails → {sbRecipient || '(no address)'}</span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-emerald-700">Emails sending normally</span>
-                </>
-              )}
-            </span>
-          )}
-        </div>
-
-        {sbLoading ? (
-          <div className="px-6 py-10 flex justify-center">
-            <div className="w-6 h-6 border-2 border-[#00B5A3] border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <div className="px-6 py-5 space-y-5">
-            {/* Enable toggle */}
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-[#374151]">Enable Email Sandbox</p>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  Redirect all outgoing emails to a single address instead of the real recipients.
-                </p>
-              </div>
-              <Toggle checked={sbEnabled} onChange={setSbEnabled} />
-            </div>
-
-            {sbEnabled && (
-              <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
-                <svg className="w-4 h-4 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                <p className="text-xs font-medium text-yellow-800">Sandbox is active. No real users will receive emails until this is disabled.</p>
-              </div>
-            )}
-
-            <div className="border-t border-[#E5E7EB] pt-5 space-y-5">
-              {sbEnabled && (
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-1.5">Redirect all emails to</label>
-                  <input
-                    type="email"
-                    value={sbRecipient}
-                    onChange={e => setSbRecipient(e.target.value)}
-                    placeholder="till@seyer-marketing.de"
-                    className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] font-mono transition-colors"
-                  />
-                  <p className="mt-1.5 text-xs text-[#6B7280]">All outgoing emails will be delivered to this address instead.</p>
-                </div>
-              )}
-
-              {/* Save button */}
-              <div className="flex justify-end pt-1">
-                <button
-                  onClick={saveSbSettings}
-                  disabled={sbSaving}
-                  className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1B3A5C] text-white text-sm font-semibold hover:bg-[#162f4d] transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
-                >
-                  {sbSaving ? (
-                    <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                  )}
-                  {sbSaving ? 'Saving…' : 'Save Settings'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
 
       <DeployEnvironmentCard />
 
@@ -578,43 +273,6 @@ function GeneralTab() {
           </p>
         </div>
       </div>
-
-      {/* Confirmation dialog */}
-      {showConfirm && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
-            <div className="flex items-start gap-4 mb-5">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
-                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-[#1B3A5C]">Enable Maintenance Mode?</h3>
-                <p className="text-sm text-[#6B7280] mt-1.5 leading-relaxed">
-                  All non-admin users will be immediately redirected to the maintenance page. Admin users can still access the site normally.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="px-4 py-2 text-sm text-[#6B7280] border border-[#E5E7EB] rounded-lg hover:bg-slate-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => { setShowConfirm(false); saveMmSettings(true); }}
-                className="px-4 py-2 text-sm font-semibold bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
-              >
-                Enable Maintenance
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {toast && <Toast type={toast.type} message={toast.message} onDismiss={dismissToast} />}
     </div>
   );
 }
@@ -827,13 +485,14 @@ function AnalyticsTab() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-type Tab = 'general' | 'analytics' | 'email-templates' | 'health';
+type Tab = 'general' | 'analytics' | 'email-templates' | 'health' | 'maintenance';
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'general',         label: 'General'         },
   { key: 'analytics',       label: 'Analytics'       },
   { key: 'email-templates', label: 'Email Templates' },
   { key: 'health',          label: 'Health'           },
+  { key: 'maintenance',     label: 'Maintenance'      },
 ];
 
 export default function SettingsPage() {
@@ -864,6 +523,7 @@ export default function SettingsPage() {
       {tab === 'analytics'       && <AnalyticsTab />}
       {tab === 'email-templates' && <EmailTemplatesList />}
       {tab === 'health'          && <HealthTab />}
+      {tab === 'maintenance'     && <MaintenanceTab />}
     </div>
   );
 }
