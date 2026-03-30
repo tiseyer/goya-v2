@@ -1,5 +1,4 @@
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
-import AdminOnboardingTest from './AdminOnboardingTest';
 import AnalyticsSection from './AnalyticsSection';
 import DeploymentsSection from './DeploymentsSection';
 
@@ -146,12 +145,6 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* System */}
-      <div className="mt-8">
-        <h2 className="text-lg font-bold text-[#1B3A5C] mb-4">System</h2>
-        <AdminOnboardingTest />
       </div>
 
       {/* Row 5 — Deployments */}
