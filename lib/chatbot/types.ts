@@ -17,6 +17,7 @@ export interface FaqItem {
   id: string
   question: string
   answer: string
+  category: string | null
   status: FaqStatus
   created_by: string | null
   created_at: string

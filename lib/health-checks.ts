@@ -172,20 +172,24 @@ export async function checkStripe(): Promise<ServiceCheck> {
     const { getStripe } = await import('@/lib/stripe/client')
     const stripe = getStripe()
     const start = Date.now()
-    await stripe.balance.retrieve()
+    await stripe.balance.retrieve({ timeout: 8000 })
     const latency = Date.now() - start
     return {
       name: 'Stripe',
       status: latency > 500 ? 'degraded' : 'ok',
       latencyMs: latency,
-      notes: 'Connected',
+      notes: `Connected (${stripe.VERSION})`,
     }
   } catch (err: any) {
+    const msg = err?.message ?? 'Connection failed'
+    const isConnectionError = msg.includes('connection') || msg.includes('retried') || err?.type === 'StripeConnectionError'
     return {
       name: 'Stripe',
       status: 'down',
       latencyMs: 0,
-      notes: err?.message ?? 'Connection failed',
+      notes: isConnectionError
+        ? `Connection timeout — retry or check network (${msg})`
+        : msg,
     }
   }
 }
@@ -227,9 +231,10 @@ export async function checkTraffic(): Promise<TrafficSnapshot> {
         .select('id', { count: 'exact', head: true })
         .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
       (sb as any)
-        .from('stripe_subscriptions')
+        .from('stripe_orders')
         .select('id', { count: 'exact', head: true })
-        .eq('status', 'active'),
+        .eq('type', 'recurring')
+        .eq('subscription_status', 'active'),
     ])
 
     return {

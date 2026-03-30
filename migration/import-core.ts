@@ -17,6 +17,8 @@ import { randomBytes } from 'crypto';
 
 export interface WPExportUser {
   wp_id: number;
+  wp_user_id?: number; // v2 exporter: explicit WordPress user ID
+  username?: string; // v2 exporter: WordPress user_login
   email: string;
   display_name: string;
   first_name: string;
@@ -154,6 +156,9 @@ export function buildProfileUpdate(user: WPExportUser): Record<string, unknown> 
 
     // Original WP registration date
     wp_registered_at: user.registered_at ? new Date(user.registered_at.replace(' ', 'T') + 'Z').toISOString() : null,
+
+    // WordPress user ID (v2 exporter field, falls back to wp_id)
+    wp_user_id: user.wp_user_id ?? user.wp_id ?? null,
   };
 }
 

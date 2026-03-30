@@ -3,40 +3,40 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md — Flow builder service layer (types, flow-service, step-service, cycle-detection, kitcom)
-last_updated: "2026-03-30T05:51:00Z"
-last_activity: 2026-03-30 -- Phase 02 Plan 01 complete
+stopped_at: Completed 02-02-PLAN.md — Admin API routes for flow/step CRUD with auth guard and cycle detection
+last_updated: "2026-03-30T05:56:00Z"
+last_activity: 2026-03-30 -- Phase 02 Plan 02 complete (phase complete)
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
-  percent: 21
+  completed_plans: 4
+  percent: 29
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 02 (service-layer-admin-api-routes) — EXECUTING
-Plan: 2 of 2
-Status: Executing Phase 02 — Plan 01 complete
-Last activity: 2026-03-30 -- Phase 02 Plan 01 complete
+Phase: 02 (service-layer-admin-api-routes) — COMPLETE
+Plan: 2 of 2 (all plans done)
+Status: Phase 02 complete — ready for Phase 03 (admin UI)
+Last activity: 2026-03-30 -- Phase 02 Plan 02 complete
 
-Progress: [###-------] 21%
+Progress: [####------] 29%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 2 (this milestone)
+- Total plans completed: 4 (this milestone)
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-database-schema | 2/2 | 12min | 6min |
-| 02-service-layer-admin-api-routes | 1/2 (ongoing) | 8min | 8min |
+| 02-service-layer-admin-api-routes | 2/2 | 11min | 5.5min |
 
 *Updated after each plan completion*
 
@@ -67,6 +67,12 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - flow_responses uses per-operation policies (SELECT/INSERT/UPDATE) not a catch-all — consistent with user_course_progress pattern
 - flow_analytics admins can only SELECT (not DELETE) — preserve audit trail
 
+**Plan 02-02 decisions:**
+
+- requireFlowAdmin() returns { user, error } union — routes early-return the error response, keeping handler body clean
+- Cycle detection uses merged branch list (existing minus stepId's branches + incoming) — prevents false positives from stale data
+- Branches PUT returns 422 (Unprocessable Entity) not 400 — request is well-formed but semantically invalid due to cycle
+
 ### Blockers/Concerns
 
 - **Phase 4 research flag**: Actions idempotency table design and condition evaluator type safety are non-trivial — consider a design spike on `flow_action_executions` schema before starting Phase 4 planning
@@ -87,5 +93,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-30
-Stopped at: Completed 02-01-PLAN.md — Flow builder service layer (types, flow-service, step-service, cycle-detection, kitcom)
+Stopped at: Completed 02-02-PLAN.md — Admin API routes for flow/step CRUD with auth guard and cycle detection
 Resume file: None

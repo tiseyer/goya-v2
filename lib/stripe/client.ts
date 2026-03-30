@@ -8,7 +8,10 @@ export function getStripe(): Stripe {
     if (!process.env.STRIPE_SECRET_KEY) {
       throw new Error('STRIPE_SECRET_KEY is not set')
     }
-    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      maxNetworkRetries: 3,
+      timeout: 10000,
+    })
   }
   return _stripe
 }

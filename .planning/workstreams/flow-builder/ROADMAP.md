@@ -7,7 +7,7 @@ Build the complete flow builder system from database schema through admin editor
 ## Phases
 
 - [x] **Phase 1: Database Schema** — 5 tables, RLS policies, GIN index, JSONB versioning, birthday column
-- [ ] **Phase 2: Service Layer + Admin API Routes** — Admin CRUD services, condition evaluator stub, cycle detection, Kit.com integration wrapper
+- [x] **Phase 2: Service Layer + Admin API Routes** — Admin CRUD services, condition evaluator stub, cycle detection, Kit.com integration wrapper
 - [ ] **Phase 3: Admin Flow Builder UI** — Flow list page, three-panel editor, drag-drop, conditions builder, preview mode
 - [ ] **Phase 4: Flow Engine + Actions Engine** — Server-side condition evaluation, all 5 action types, idempotency table, user API routes
 - [ ] **Phase 5: Flow Player UI** — All 5 display types, element renderers, Typeform-style choices, progress persistence, global mount
@@ -43,7 +43,7 @@ Plans:
 **Plans:** 2 plans
 Plans:
 - [x] 02-01-PLAN.md — TypeScript types, flow/step CRUD services, cycle detection, Kit.com wrapper
-- [ ] 02-02-PLAN.md — Admin API route handlers with auth guard and cycle detection on branch save
+- [x] 02-02-PLAN.md — Admin API route handlers with auth guard and cycle detection on branch save
 
 ### Phase 3: Admin Flow Builder UI
 **Goal**: Admins can create, configure, and preview any flow entirely from the admin panel without writing code
@@ -114,7 +114,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Database Schema | 2/2 | Complete | 2026-03-30 |
-| 2. Service Layer + Admin API Routes | 1/2 | Executing | - |
+| 2. Service Layer + Admin API Routes | 2/2 | Complete | 2026-03-30 |
 | 3. Admin Flow Builder UI | 0/? | Not started | - |
 | 4. Flow Engine + Actions Engine | 0/? | Not started | - |
 | 5. Flow Player UI | 0/? | Not started | - |

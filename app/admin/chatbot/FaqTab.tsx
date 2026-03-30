@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Search, ClipboardList } from 'lucide-react'
 import type { FaqItem } from '@/lib/chatbot/types'
 import FaqRow from './FaqRow'
@@ -15,15 +15,34 @@ export default function FaqTab({ initialItems }: FaqTabProps) {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [categoryFilter, setCategoryFilter] = useState('All')
 
-  const filteredItems =
-    search.trim().length > 0
-      ? items.filter(
-          (i) =>
-            i.question.toLowerCase().includes(search.toLowerCase()) ||
-            i.answer.toLowerCase().includes(search.toLowerCase()),
-        )
-      : items
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(items.map((i) => i.category).filter(Boolean))).sort() as string[]
+    return ['All', ...cats]
+  }, [items])
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: items.length }
+    for (const item of items) {
+      if (item.category) {
+        counts[item.category] = (counts[item.category] || 0) + 1
+      }
+    }
+    return counts
+  }, [items])
+
+  const filteredItems = useMemo(() => {
+    return items.filter((i) => {
+      const matchesCategory = categoryFilter === 'All' || i.category === categoryFilter
+      const matchesSearch =
+        search.trim().length === 0 ||
+        i.question.toLowerCase().includes(search.toLowerCase()) ||
+        i.answer.toLowerCase().includes(search.toLowerCase()) ||
+        i.category?.toLowerCase().includes(search.toLowerCase())
+      return matchesCategory && matchesSearch
+    })
+  }, [items, search, categoryFilter])
 
   function handleExpand(id: string | null) {
     setExpandedId(id)
@@ -68,6 +87,32 @@ export default function FaqTab({ initialItems }: FaqTabProps) {
         </button>
       </div>
 
+      {/* Category filter tabs */}
+      {items.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setCategoryFilter(cat)}
+              className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                categoryFilter === cat
+                  ? 'bg-[#4e87a0] text-white'
+                  : 'bg-slate-100 text-[#374151] hover:bg-slate-200'
+              }`}
+            >
+              {cat}
+              <span
+                className={`ml-1.5 text-xs ${
+                  categoryFilter === cat ? 'text-white/70' : 'text-[#9CA3AF]'
+                }`}
+              >
+                {categoryCounts[cat] || 0}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Empty state */}
       {items.length === 0 && search.trim().length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -100,7 +145,7 @@ export default function FaqTab({ initialItems }: FaqTabProps) {
               </tr>
             </thead>
             <tbody>
-              {filteredItems.length === 0 && search.trim().length > 0 ? (
+              {filteredItems.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="text-center text-sm text-[#6B7280] py-12">
                     No FAQ entries match your search.
