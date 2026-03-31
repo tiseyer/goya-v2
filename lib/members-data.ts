@@ -28,6 +28,9 @@ export interface Member {
   is_verified?: boolean;
   introduction?: string;
   videoIntroUrl?: string;
+  // School-specific fields (only set when role === 'School')
+  slug?: string;
+  schoolDesignations?: string[];
 }
 
 export const members: Member[] = [
