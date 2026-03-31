@@ -79,9 +79,10 @@ None yet.
 | 260331-kdt | Chatbot UI improvements — toggle icon swap, bottom border radius, admin hiding, Help page with inline chat | 2026-03-31 | 8426ea3 | [260331-kdt](./quick/260331-kdt-chatbot-ui-improvements-toggle-icon-bord/) |
 | 260331-kil | Apply GOYA primary blue (#345c83) dark hero background to Dashboard, Events, Academy, Add-Ons pages | 2026-03-31 | 35bb518 | [260331-kil](./quick/260331-kil-apply-goya-primary-blue-background-to-he/) |
 | 260331-kp2 | Fix TypeScript build error: unknown not assignable to ReactNode in events edit page | 2026-03-31 | 822068f | [260331-kp2](./quick/260331-kp2-fix-typescript-build-error-unknown-not-a/) |
+| 260331-kny | Hero consistency — GOYA blue, shared height, vertical centering on event/course/member detail pages | 2026-03-31 | 0c6126f | [260331-kny](./quick/260331-kny-hero-consistency-goya-blue-shared-height/) |
 
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Completed quick task 260331-kil — GOYA primary blue hero background applied to 4 pages
+Stopped at: Completed quick task 260331-kny — hero consistency applied to event/course/member detail pages
 Resume file: None
