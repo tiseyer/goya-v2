@@ -420,8 +420,8 @@ function MemberEventForm({
   const isResubmit = event?.status === 'rejected';
 
   const [title, setTitle] = useState(event?.title ?? '');
-  const [category, setCategory] = useState(event?.category ?? 'Workshop');
-  const [format, setFormat] = useState(event?.format ?? 'Online');
+  const [category, setCategory] = useState<EventCategory>(event?.category ?? 'Workshop');
+  const [format, setFormat] = useState<EventFormat>(event?.format ?? 'Online');
   const [date, setDate] = useState(event?.date ?? '');
   const [timeStart, setTimeStart] = useState(event?.time_start?.slice(0, 5) ?? '');
   const [timeEnd, setTimeEnd] = useState(event?.time_end?.slice(0, 5) ?? '');
@@ -493,13 +493,13 @@ function MemberEventForm({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={LABEL}>Category *</label>
-            <select value={category} onChange={e => setCategory(e.target.value)} className={SELECT}>
+            <select value={category} onChange={e => setCategory(e.target.value as EventCategory)} className={SELECT}>
               {CATEGORIES.map(c => <option key={c}>{c}</option>)}
             </select>
           </div>
           <div>
             <label className={LABEL}>Format *</label>
-            <select value={format} onChange={e => setFormat(e.target.value)} className={SELECT}>
+            <select value={format} onChange={e => setFormat(e.target.value as EventFormat)} className={SELECT}>
               {FORMATS.map(f => <option key={f}>{f}</option>)}
             </select>
           </div>

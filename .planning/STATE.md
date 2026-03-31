@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-03-31 - Completed quick task 260331-kp2: Fix TypeScript unknown→ReactNode error
+Last activity: 2026-03-31 - Completed quick task 260331-lcm: Fix TypeScript string→union type errors
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -81,9 +81,10 @@ None yet.
 | 260331-kp2 | Fix TypeScript build error: unknown not assignable to ReactNode in events edit page | 2026-03-31 | 822068f | [260331-kp2](./quick/260331-kp2-fix-typescript-build-error-unknown-not-a/) |
 | 260331-kny | Hero consistency — GOYA blue, shared height, vertical centering on event/course/member detail pages | 2026-03-31 | 0c6126f | [260331-kny](./quick/260331-kny-hero-consistency-goya-blue-shared-height/) |
 | 260331-l3g | Fix unknown→ReactNode type error in admin event edit page (proper String extraction) | 2026-03-31 | 5f677eb | [260331-l3g](./quick/260331-l3g-fix-unknown-to-reactnode-type-error-in-a/) |
+| 260331-lcm | Fix TypeScript string→union type errors in MyEventsClient setCategory/setFormat | 2026-03-31 | c37fe16 | [260331-lcm](./quick/260331-lcm-fix-typescript-build-error-in-myeventscl/) |
 
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Completed quick task 260331-l3g — fix unknown→ReactNode type error with proper String extraction
+Stopped at: Completed quick task 260331-lcm — fix string→union type errors in MyEventsClient
 Resume file: None
