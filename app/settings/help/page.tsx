@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { getUserTickets, getUserRole, getAudiencesForRole } from './actions'
+import { getUserTickets, getUserRole } from './actions'
+import { getAudiencesForRole } from '@/lib/docs/audiences'
 import { getAllDocs } from '@/lib/docs'
 import InlineChat from './InlineChat'
 

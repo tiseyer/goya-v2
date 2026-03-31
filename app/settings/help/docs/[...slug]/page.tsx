@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getAllDocs, getDocBySlug, getNavTree } from '@/lib/docs'
-import { getUserRole, getAudiencesForRole } from '../../actions'
+import { getUserRole } from '../../actions'
+import { getAudiencesForRole } from '@/lib/docs/audiences'
 import HelpDocViewer from './HelpDocViewer'
 
 export default async function HelpDocPage({ params }: { params: Promise<{ slug: string[] }> }) {
