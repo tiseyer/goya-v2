@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-03-31 — Completed quick task 260331-oyj: Admin sidebar docs link + media library header alignment
+Last activity: 2026-03-31 — Completed quick task 260331-oyv: Backfill existing Storage files into media_items table
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -73,9 +73,10 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 1 | Admin sidebar docs icon + media library header alignment | 2026-03-31 | b1b6efa, 21437bd | 260331-oyj-admin-sidebar-docs-link-media-library-he |
+| 260331-oyv | Backfill existing Storage files into media_items table | 2026-03-31 | be4b692 | [260331-oyv-backfill-existing-storage-files-into-med](./quick/260331-oyv-backfill-existing-storage-files-into-med/) |
 
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Milestone v1.14 School Owner System started — defining requirements
+Stopped at: Completed quick task 260331-oyv — backfill existing Storage files into media_items
 Resume file: None
