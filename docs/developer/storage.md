@@ -125,7 +125,25 @@ Temporary staging area for the WordPress member import tool. The admin uploads a
 
 The media library (`/admin/media`) is a centralised file manager that provides a UI for browsing and organising files across multiple buckets. The `media_items` table stores metadata for every catalogued file.
 
-Buckets managed through the media library include `post-images`, `post-videos`, `post-audio`, `event-images`, `chatbot-avatars`, and `school-logos`.
+Buckets managed through the media library (defined in `app/admin/media/constants.ts`):
+
+| Bucket | Label in UI |
+|---|---|
+| `avatars` | Avatars |
+| `event-images` | Events |
+| `school-logos` | Courses |
+| `upgrade-certificates` | Certificates |
+| `uploads` | Uploads |
+
+### Backfill Script
+
+Because `media_items` was added after files already existed in storage, a one-time backfill script is provided:
+
+```bash
+npm run media:backfill
+```
+
+Source: `scripts/backfill-media-items.ts`. The script is **idempotent** — safe to re-run; it skips files already registered in `media_items`. New file uploads after the initial backfill are registered automatically via `lib/media/register.ts`.
 
 See [database-schema.md](./database-schema.md) for the `media_items` and `media_folders` table schemas.
 
