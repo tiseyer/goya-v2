@@ -199,6 +199,21 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 
 **Artifacts:** `.planning/workstreams/media-library/`
 
+## Parallel Workstream: v1.12 Documentation System
+
+**Workstream:** `documentation-system`
+**Goal:** Comprehensive documentation system with Markdown files as single source of truth, admin 3-column viewer, role-filtered user help viewer, full-text search, Mattea chatbot integration with role-scoped doc access, and automatic update rules in CLAUDE.md.
+
+**Target features:**
+- Markdown documentation files covering all features by audience (admin, moderator, teacher, student, developer)
+- Admin documentation viewer at `/admin/docs` — 3-column layout (filtered nav, content, on-page TOC)
+- User-facing help viewer at `/settings/help` with role-filtered content
+- Full-text client-side search with JSON index and Cmd+K modal
+- Mattea chatbot enhanced with role-scoped documentation context injection
+- CLAUDE.md automation rules for keeping docs current after every task
+
+**Artifacts:** `.planning/workstreams/documentation-system/`
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -210,4 +225,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-31 after v1.11 Media Library workstream started*
+*Last updated: 2026-03-31 after v1.12 Documentation System workstream started*
