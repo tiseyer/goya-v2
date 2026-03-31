@@ -80,9 +80,10 @@ None yet.
 | 260331-kil | Apply GOYA primary blue (#345c83) dark hero background to Dashboard, Events, Academy, Add-Ons pages | 2026-03-31 | 35bb518 | [260331-kil](./quick/260331-kil-apply-goya-primary-blue-background-to-he/) |
 | 260331-kp2 | Fix TypeScript build error: unknown not assignable to ReactNode in events edit page | 2026-03-31 | 822068f | [260331-kp2](./quick/260331-kp2-fix-typescript-build-error-unknown-not-a/) |
 | 260331-kny | Hero consistency — GOYA blue, shared height, vertical centering on event/course/member detail pages | 2026-03-31 | 0c6126f | [260331-kny](./quick/260331-kny-hero-consistency-goya-blue-shared-height/) |
+| 260331-l3g | Fix unknown→ReactNode type error in admin event edit page (proper String extraction) | 2026-03-31 | 5f677eb | [260331-l3g](./quick/260331-l3g-fix-unknown-to-reactnode-type-error-in-a/) |
 
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Completed quick task 260331-kny — hero consistency applied to event/course/member detail pages
+Stopped at: Completed quick task 260331-l3g — fix unknown→ReactNode type error with proper String extraction
 Resume file: None

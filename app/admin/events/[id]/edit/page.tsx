@@ -137,23 +137,29 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
                         )}
 
                         {/* Show status change details */}
-                        {entry.action === 'status_changed' && entry.changes && (
-                          <div className="mt-2 text-xs text-[#6B7280]">
-                            {(entry.changes as Record<string, unknown>).old_status && (
-                              <p>
-                                Status changed from{' '}
-                                <span className="font-medium capitalize">{String((entry.changes as Record<string, unknown>).old_status)}</span>
-                                {' to '}
-                                <span className="font-medium capitalize">{String((entry.changes as Record<string, unknown>).new_status)}</span>
-                              </p>
-                            )}
-                            {(entry.changes as Record<string, unknown>).rejection_reason && (
-                              <p className="mt-1 text-red-600">
-                                Reason: {String((entry.changes as Record<string, unknown>).rejection_reason)}
-                              </p>
-                            )}
-                          </div>
-                        )}
+                        {entry.action === 'status_changed' && entry.changes && (() => {
+                          const changes = entry.changes as Record<string, unknown>;
+                          const oldStatus = changes.old_status ? String(changes.old_status) : null;
+                          const newStatus = changes.new_status ? String(changes.new_status) : null;
+                          const rejectionReason = changes.rejection_reason ? String(changes.rejection_reason) : null;
+                          return (
+                            <div className="mt-2 text-xs text-[#6B7280]">
+                              {oldStatus && (
+                                <p>
+                                  Status changed from{' '}
+                                  <span className="font-medium capitalize">{oldStatus}</span>
+                                  {' to '}
+                                  <span className="font-medium capitalize">{newStatus}</span>
+                                </p>
+                              )}
+                              {rejectionReason && (
+                                <p className="mt-1 text-red-600">
+                                  Reason: {rejectionReason}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
