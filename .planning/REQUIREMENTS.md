@@ -39,10 +39,10 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 - [x] **ONB-03**: Online presence step: website + social links with at-least-one validation
 - [x] **ONB-04**: Video introduction step: YouTube/Vimeo toggle + URL (optional)
 - [x] **ONB-05**: Teaching info step: practice styles, programs, delivery format, lineage, languages
-- [ ] **ONB-06**: Location step with Google Places autocomplete (conditional on in-person/hybrid)
-- [ ] **ONB-07**: Document upload step per designation: business registration, qualification cert, insurance
-- [ ] **ONB-08**: Faculty step: search GOYA members, invite non-members by email, assign positions
-- [ ] **ONB-09**: Review & submit: summary, set onboarding_completed=true, status='pending_review', admin notification
+- [x] **ONB-06**: Location step with Google Places autocomplete (conditional on in-person/hybrid)
+- [x] **ONB-07**: Document upload step per designation: business registration, qualification cert, insurance
+- [x] **ONB-08**: Faculty step: search GOYA members, invite non-members by email, assign positions
+- [x] **ONB-09**: Review & submit: summary, set onboarding_completed=true, status='pending_review', admin notification
 
 ### School Settings
 
@@ -123,10 +123,10 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 | ONB-03 | Phase 31 | Complete |
 | ONB-04 | Phase 31 | Complete |
 | ONB-05 | Phase 31 | Complete |
-| ONB-06 | Phase 31 | Pending |
-| ONB-07 | Phase 31 | Pending |
-| ONB-08 | Phase 31 | Pending |
-| ONB-09 | Phase 31 | Pending |
+| ONB-06 | Phase 31 | Complete |
+| ONB-07 | Phase 31 | Complete |
+| ONB-08 | Phase 31 | Complete |
+| ONB-09 | Phase 31 | Complete |
 | SET-01 | Phase 32 | Pending |
 | SET-02 | Phase 32 | Pending |
 | SET-03 | Phase 32 | Pending |
