@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import EmailTemplatesList from './components/EmailTemplatesList';
 import HealthTab from './components/HealthTab';
 import MaintenanceTab from './components/MaintenanceTab';
 
@@ -142,13 +141,12 @@ function GeneralTab() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-type Tab = 'general' | 'email-templates' | 'health' | 'maintenance';
+type Tab = 'general' | 'health' | 'maintenance';
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'general',         label: 'General'         },
-  { key: 'email-templates', label: 'Email Templates' },
-  { key: 'health',          label: 'Health'           },
-  { key: 'maintenance',     label: 'Maintenance'      },
+  { key: 'general',     label: 'General'     },
+  { key: 'health',      label: 'Health'      },
+  { key: 'maintenance', label: 'Maintenance' },
 ];
 
 function isValidTab(value: string | null): value is Tab {
@@ -194,10 +192,9 @@ export default function SettingsPage() {
         ))}
       </div>
 
-      {tab === 'general'         && <GeneralTab />}
-      {tab === 'email-templates' && <EmailTemplatesList />}
-      {tab === 'health'          && <HealthTab />}
-      {tab === 'maintenance'     && <MaintenanceTab />}
+      {tab === 'general'     && <GeneralTab />}
+      {tab === 'health'      && <HealthTab />}
+      {tab === 'maintenance' && <MaintenanceTab />}
     </div>
   );
 }
