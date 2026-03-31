@@ -13,6 +13,7 @@ import {
   deleteMemberEvent,
 } from './actions';
 import { registerMediaItemAction } from '@/app/actions/media';
+import OrganizerPicker from '@/app/components/OrganizerPicker';
 
 const GooglePlacesAutocomplete = dynamic(() => import('@/app/components/GooglePlacesAutocomplete'), { ssr: false });
 
@@ -39,9 +40,13 @@ const STATUS_LABEL: Record<string, string> = {
 
 interface Props {
   initialEvents: Event[];
+  currentUserId: string;
+  currentUserName: string;
+  currentUserAvatar: string | null;
+  currentUserRole: string;
 }
 
-export default function MyEventsClient({ initialEvents }: Props) {
+export default function MyEventsClient({ initialEvents, currentUserId, currentUserName, currentUserAvatar, currentUserRole }: Props) {
   const router = useRouter();
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list');
@@ -155,6 +160,7 @@ export default function MyEventsClient({ initialEvents }: Props) {
         spots_remaining: formData.spots_remaining,
         website_url: formData.website_url,
         featured_image_url: imageUrl,
+        organizer_ids: formData.organizer_ids,
         status,
       };
 
@@ -220,6 +226,10 @@ export default function MyEventsClient({ initialEvents }: Props) {
           busy={busy}
           onSubmit={handleFormSubmit}
           onCancel={handleCancel}
+          currentUserId={currentUserId}
+          currentUserName={currentUserName}
+          currentUserAvatar={currentUserAvatar}
+          currentUserRole={currentUserRole}
         />
       </div>
     );
@@ -442,6 +452,7 @@ interface FormValues {
   spots_remaining: number | null;
   website_url: string | null;
   featured_image_url: string | null;
+  organizer_ids?: string[];
   _imageFile?: File;
   _removeImage?: boolean;
 }
@@ -451,11 +462,19 @@ function MemberEventForm({
   busy,
   onSubmit,
   onCancel,
+  currentUserId,
+  currentUserName,
+  currentUserAvatar,
+  currentUserRole,
 }: {
   event?: Event;
   busy: boolean;
   onSubmit: (data: FormValues, status: 'draft' | 'pending_review') => void;
   onCancel: () => void;
+  currentUserId: string;
+  currentUserName: string;
+  currentUserAvatar: string | null;
+  currentUserRole: string;
 }) {
   const isEdit = !!event;
   const isResubmit = event?.status === 'rejected';
@@ -481,6 +500,11 @@ function MemberEventForm({
   const [spotsRem, setSpotsRem] = useState(String(event?.spots_remaining ?? ''));
   const [registrationRequired, setRegistrationRequired] = useState(event?.registration_required ?? false);
   const [websiteUrl, setWebsiteUrl] = useState(event?.website_url ?? '');
+
+  // Organizer state — exclude current user from the managed list
+  const [organizerIds, setOrganizerIds] = useState<string[]>(
+    () => ((event as Event & { organizer_ids?: string[] | null })?.organizer_ids ?? []).filter(id => id !== currentUserId)
+  );
 
   const [currentImageUrl, setCurrentImageUrl] = useState(event?.featured_image_url ?? null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -535,6 +559,7 @@ function MemberEventForm({
       spots_remaining: spotsRem ? parseInt(spotsRem, 10) : null,
       website_url: websiteUrl.trim() || null,
       featured_image_url: removeImage ? null : (imageFile ? null : currentImageUrl),
+      organizer_ids: [currentUserId, ...organizerIds].filter(Boolean),
       _imageFile: imageFile ?? undefined,
       _removeImage: removeImage,
     };
@@ -727,6 +752,20 @@ function MemberEventForm({
             </div>
           </div>
         )}
+
+        {/* Organizers */}
+        <div>
+          <label className={LABEL}>Organizers</label>
+          <p className="text-xs text-[#6B7280] mb-2">Add up to 5 co-organizers for this event.</p>
+          <OrganizerPicker
+            currentUserId={currentUserId}
+            currentUserName={currentUserName}
+            currentUserAvatar={currentUserAvatar}
+            currentUserRole={currentUserRole}
+            value={organizerIds}
+            onChange={setOrganizerIds}
+          />
+        </div>
 
         {/* Event Website — always visible */}
         <div>

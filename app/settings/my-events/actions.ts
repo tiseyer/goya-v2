@@ -44,6 +44,7 @@ export interface MemberEventFormData {
   spots_remaining?: number | null;
   website_url?: string | null;
   featured_image_url?: string | null;
+  organizer_ids?: string[];
   status: 'draft' | 'pending_review';
 }
 
@@ -66,6 +67,7 @@ export async function createMemberEvent(formData: MemberEventFormData) {
     spots_total: formData.spots_total ?? null,
     spots_remaining: formData.spots_remaining ?? null,
     featured_image_url: formData.featured_image_url ?? null,
+    organizer_ids: formData.organizer_ids ?? [user.id],
     status: formData.status,
     event_type: 'member',
     created_by: user.id,
@@ -117,6 +119,7 @@ export async function updateMemberEvent(eventId: string, formData: MemberEventFo
     spots_total: formData.spots_total ?? null,
     spots_remaining: formData.spots_remaining ?? null,
     featured_image_url: formData.featured_image_url ?? null,
+    organizer_ids: formData.organizer_ids ?? [user.id],
     status: formData.status,
   };
 

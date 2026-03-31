@@ -17,7 +17,7 @@ export default async function MyEventsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, full_name, avatar_url')
     .eq('id', user.id)
     .single();
 
@@ -33,5 +33,13 @@ export default async function MyEventsPage() {
     .neq('status', 'deleted')
     .order('created_at', { ascending: false });
 
-  return <MyEventsClient initialEvents={(events ?? []) as Event[]} />;
+  return (
+    <MyEventsClient
+      initialEvents={(events ?? []) as Event[]}
+      currentUserId={user.id}
+      currentUserName={profile.full_name ?? user.email ?? 'You'}
+      currentUserAvatar={(profile as Record<string, unknown>).avatar_url as string | null}
+      currentUserRole={profile.role}
+    />
+  );
 }
