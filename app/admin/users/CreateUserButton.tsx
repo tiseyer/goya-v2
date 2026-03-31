@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createUser } from './actions'
 import type { Database } from '@/types/supabase'
 
@@ -15,7 +16,9 @@ const ROLE_OPTIONS: { value: UserRole; label: string }[] = [
 type ModalState = 'closed' | 'form' | 'success'
 
 export default function CreateUserButton() {
+  const router = useRouter()
   const [modal, setModal] = useState<ModalState>('closed')
+  const [createdUserId, setCreatedUserId] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -51,6 +54,7 @@ export default function CreateUserButton() {
         return
       }
       setCreatedEmail(result.email)
+      setCreatedUserId(result.userId)
       setModal('success')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred.')
@@ -104,12 +108,23 @@ export default function CreateUserButton() {
                   User created:{' '}
                   <span className="font-medium text-[#1B3A5C]">{createdEmail}</span>
                 </p>
-                <button
-                  onClick={closeModal}
-                  className="w-full px-4 py-2 rounded-lg bg-[#1B3A5C] hover:bg-[#142d47] text-white text-sm font-medium transition-colors"
-                >
-                  Close
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      closeModal()
+                      router.push(`/admin/users/${createdUserId}`)
+                    }}
+                    className="flex-1 px-4 py-2 rounded-lg bg-[#1B3A5C] hover:bg-[#142d47] text-white text-sm font-medium transition-colors"
+                  >
+                    View User
+                  </button>
+                  <button
+                    onClick={closeModal}
+                    className="px-4 py-2 rounded-lg border border-[#E5E7EB] text-sm text-[#374151] hover:bg-slate-50 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">

@@ -19,7 +19,7 @@ export async function createUser(formData: {
   email: string
   role: UserRole
   password?: string
-}): Promise<{ success: true; email: string } | { success: false; error: string }> {
+}): Promise<{ success: true; email: string; userId: string } | { success: false; error: string }> {
   const supabase = getSupabaseService()
 
   const password = formData.password?.trim() || generatePassword()
@@ -45,14 +45,14 @@ export async function createUser(formData: {
     return { success: false, error: 'User creation failed — no user returned.' }
   }
 
-  const { error: profileError } = await supabase.from('profiles').insert({
+  const { error: profileError } = await supabase.from('profiles').upsert({
     id: authData.user.id,
     email: formData.email.trim(),
     first_name: formData.firstName.trim(),
     last_name: formData.lastName.trim(),
     full_name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
     role: formData.role,
-  })
+  }, { onConflict: 'id' })
 
   if (profileError) {
     // Auth user was created — attempt cleanup so we don't leave orphaned auth records
@@ -60,7 +60,7 @@ export async function createUser(formData: {
     return { success: false, error: `Profile creation failed: ${profileError.message}` }
   }
 
-  return { success: true, email: formData.email.trim() }
+  return { success: true, email: formData.email.trim(), userId: authData.user.id }
 }
 
 export async function updateUserProfile(userId: string, updates: Record<string, unknown>) {
