@@ -9,11 +9,11 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 
 ### Database Foundation
 
-- [ ] **DB-01**: Schools table extended with bio, video, practice_styles, programs, delivery format, lineage, languages, insurance, onboarding fields
-- [ ] **DB-02**: school_designations table with designation type, Stripe subscription/payment tracking, status workflow
-- [ ] **DB-03**: school_faculty table with position, principal_trainer flag, invited_email for non-members
-- [ ] **DB-04**: school_verification_documents table with document type, designation link, file storage
-- [ ] **DB-05**: Profiles table extended with principal_trainer_school_id and faculty_school_ids
+- [x] **DB-01**: Schools table extended with bio, video, practice_styles, programs, delivery format, lineage, languages, insurance, onboarding fields
+- [x] **DB-02**: school_designations table with designation type, Stripe subscription/payment tracking, status workflow
+- [x] **DB-03**: school_faculty table with position, principal_trainer flag, invited_email for non-members
+- [x] **DB-04**: school_verification_documents table with document type, designation link, file storage
+- [x] **DB-05**: Profiles table extended with principal_trainer_school_id and faculty_school_ids
 - [ ] **DB-06**: RLS policies: owner CRUD own school, public SELECT approved, admin/mod full access
 - [ ] **DB-07**: TypeScript types regenerated and tsc --noEmit passes
 
@@ -102,11 +102,11 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | Phase 28 | Pending |
-| DB-02 | Phase 28 | Pending |
-| DB-03 | Phase 28 | Pending |
-| DB-04 | Phase 28 | Pending |
-| DB-05 | Phase 28 | Pending |
+| DB-01 | Phase 28 | Complete |
+| DB-02 | Phase 28 | Complete |
+| DB-03 | Phase 28 | Complete |
+| DB-04 | Phase 28 | Complete |
+| DB-05 | Phase 28 | Complete |
 | DB-06 | Phase 28 | Pending |
 | DB-07 | Phase 28 | Pending |
 | INT-01 | Phase 29 | Pending |

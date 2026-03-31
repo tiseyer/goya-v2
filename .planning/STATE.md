@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.14
-milestone_name: School-Owner-System
-status: roadmapped
-stopped_at: Roadmap created — ready to plan Phase 28
-last_updated: "2026-03-31"
+milestone_name: School Owner System
+status: executing
+stopped_at: Completed 28-01-PLAN.md
+last_updated: "2026-03-31T11:52:18.786Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 8
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** v1.14 School Owner System — Phase 28 next
+**Current focus:** Phase 28 — database-foundation
 
 ## Current Position
 
-Phase: 28 (Database Foundation) — not started
-Plan: —
-Status: Roadmap created, ready to begin Phase 28
-Last activity: 2026-03-31 — Completed quick task 260331-pe2: Migrate WordPress avatar URLs and GOYA logos to Supabase Storage
+Phase: 28 (database-foundation) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-03-31
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 | 35. Faculty Invitations | TBD | — | — |
 
 *Updated after each plan completion*
+| Phase 28 P01 | 18 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,9 @@ Recent decisions affecting current work:
 - v1.9: event_type column distinguishes 'goya' vs 'member' — school_designations follow same status workflow pattern
 - v1.8: Chat route must run Node.js runtime — crypto required for AES-256-GCM decryption
 - v1.6: Per-route auth composition — /api/ excluded from middleware; each handler validates explicitly
+- [Phase 28]: Migration timestamp changed 20260370→20260376 to avoid collision with existing member_events_schema.sql
+- [Phase 28]: Used Supabase Management API with SUPABASE_ACCESS_TOKEN for direct SQL execution when CLI migration history was out of sync
+- [Phase 28]: schools status CHECK extended to 5 values: pending, pending_review, approved, rejected, suspended
 
 ### Blockers/Concerns
 
@@ -87,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31
-Stopped at: Completed quick task 260331-pe2 — WP avatar migration script (dry-run verified)
+Last session: 2026-03-31T11:52:18.783Z
+Stopped at: Completed 28-01-PLAN.md
 Resume file: None
