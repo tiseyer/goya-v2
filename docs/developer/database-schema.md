@@ -575,8 +575,8 @@ Documents uploaded for school or designation verification.
 | `email_templates` | No access | No access | Full CRUD |
 | `site_settings` | No access | Read (some keys) | Full CRUD |
 | `schools` | Read approved | Owner read/update own | Full CRUD |
-| `school_designations` | No access | Owner read own | Full CRUD (admin) |
-| `school_faculty` | No access | School owner read own | Full CRUD (admin) |
+| `school_designations` | Read (approved schools only) | Owner CRUD own | Full CRUD (admin) |
+| `school_faculty` | Read (approved schools only) | Owner CRUD own | Full CRUD (admin) |
 | `school_verification_documents` | No access | Owner read/upload own | Full CRUD (admin) |
 
 ---
