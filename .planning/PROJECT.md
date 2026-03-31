@@ -8,6 +8,18 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
+## Current Milestone: v1.9 Member Events
+
+**Goal:** Enable teachers, wellness practitioners, and school owners to submit events for admin/moderator review before publication on the public calendar.
+
+**Target features:**
+- Database schema: event_type, created_by, status workflow, event_audit_log, RLS policies per role
+- Admin events list: type column/filter, extended status filter, submitter info, audit history
+- Admin inbox Events tab: pending review queue with approve/reject workflow
+- User Settings "My Events" page: event CRUD, status-aware actions, submission flow
+- Public event calendar: type filter (All/GOYA/Member)
+- Audit log complete coverage with shared utility
+
 ## Current State
 
 **As of v1.8 (2026-03-30):** AI-Support-System milestone shipped. Mattea AI chatbot with streaming responses (OpenAI/Anthropic), encrypted third-party key management (AES-256-GCM), FAQ knowledge base with admin CRUD, floating chat widget on all public pages (380x560px desktop, fullscreen mobile), guest and authenticated session persistence, escalation-to-human workflow with support tickets in admin inbox, conversations viewer, and toggleable API tool connections. Admin chatbot configuration at `/admin/chatbot` with 4 tabs. Guest session cleanup via daily cron.
@@ -169,4 +181,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-30 after v1.8 AI-Support-System milestone completed*
+*Last updated: 2026-03-31 after v1.9 Member Events milestone started*
