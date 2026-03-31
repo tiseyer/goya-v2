@@ -18,7 +18,7 @@
 **Milestone Goal:** Teachers can register their yoga school on GOYA — select designations, pay via Stripe, complete onboarding, get admin-verified, and go live with a public school profile.
 
 - [x] **Phase 28: Database Foundation** - Extend schools/profiles tables, add school_designations/faculty/documents tables, RLS policies, TypeScript types (completed 2026-03-31)
-- [ ] **Phase 29: Interest & Entry Points** - Dashboard widget, subscriptions callout, add-ons banner for teachers without a school
+- [x] **Phase 29: Interest & Entry Points** - Dashboard widget, subscriptions callout, add-ons banner for teachers without a school (completed 2026-03-31)
 - [ ] **Phase 30: School Registration Flow** - Name/slug step, designation selection, Stripe Checkout, post-payment school record creation
 - [ ] **Phase 31: School Onboarding Flow** - 9-step onboarding wizard from welcome through review & submit
 - [ ] **Phase 32: School Settings** - Full settings area at /schools/[slug]/settings with sidebar navigation and all section pages
@@ -50,9 +50,9 @@ Plans:
   2. The subscriptions page shows a callout below the teacher subscription card linking to school registration
   3. The add-ons page shows a featured banner for teachers linking to school registration
   4. All three entry points are invisible to non-teachers and to teachers who already own a school
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 29-01-PLAN.md — SchoolRegistrationCTA component + integration into dashboard, subscriptions, add-ons
+- [x] 29-01-PLAN.md — SchoolRegistrationCTA component + integration into dashboard, subscriptions, add-ons
 **UI hint**: yes
 
 ### Phase 30: School Registration Flow
@@ -137,7 +137,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 28. Database Foundation | 2/2 | Complete    | 2026-03-31 |
-| 29. Interest & Entry Points | 0/1 | Not started | - |
+| 29. Interest & Entry Points | 1/1 | Complete   | 2026-03-31 |
 | 30. School Registration Flow | 0/TBD | Not started | - |
 | 31. School Onboarding Flow | 0/TBD | Not started | - |
 | 32. School Settings | 0/TBD | Not started | - |

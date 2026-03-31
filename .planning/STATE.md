@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.14
 milestone_name: School Owner System
 status: verifying
-stopped_at: Completed 28-02-PLAN.md
-last_updated: "2026-03-31T12:03:10.904Z"
+stopped_at: Completed 29-01-PLAN.md
+last_updated: "2026-03-31T12:14:12.582Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 8
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
   percent: 0
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 28 — database-foundation
+**Current focus:** Phase 29 — interest-and-entry-points
 
 ## Current Position
 
-Phase: 29
-Plan: Not started
+Phase: 29 (interest-and-entry-points) — EXECUTING
+Plan: 1 of 1
 Status: Phase complete — ready for verification
 Last activity: 2026-03-31
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 28 P01 | 18 | 2 tasks | 3 files |
 | Phase 28 P02 | 3 | 2 tasks | 4 files |
+| Phase 29-interest-and-entry-points P01 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,7 @@ Recent decisions affecting current work:
 - [Phase 28]: schools status CHECK extended to 5 values: pending, pending_review, approved, rejected, suspended
 - [Phase 28]: Created 20260377_school_rls_policies.sql rather than appending to 20260376 (schema already applied remotely in plan 28-01)
 - [Phase 28]: school_verification_documents has NO public SELECT — private documents visible only to owner and admins
+- [Phase 29-interest-and-entry-points]: Single SchoolRegistrationCTA with variant prop reused across dashboard sidebar, subscriptions callout, and add-ons banner
 
 ### Blockers/Concerns
 
@@ -94,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T11:59:17.041Z
-Stopped at: Completed 28-02-PLAN.md
+Last session: 2026-03-31T12:14:12.580Z
+Stopped at: Completed 29-01-PLAN.md
 Resume file: None
