@@ -210,6 +210,190 @@ export async function getMediaItems(
   return { items, nextCursor };
 }
 
+// ── updateMediaItem ───────────────────────────────────────────────────────────
+
+/**
+ * Updates editable metadata fields on a media_items row.
+ * Called from the detail panel Save button.
+ */
+export async function updateMediaItem(
+  id: string,
+  updates: { title?: string; alt_text?: string; caption?: string }
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = getSupabaseService();
+  const { error } = await supabase
+    .from('media_items')
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+
+  if (error) {
+    console.error('[updateMediaItem] Error:', error.message);
+    return { success: false, error: error.message };
+  }
+  return { success: true };
+}
+
+// ── deleteMediaItem ───────────────────────────────────────────────────────────
+
+/**
+ * Deletes a media item from both Supabase Storage and the media_items table.
+ * Fetches the row first to get bucket + file_path for the Storage delete.
+ */
+export async function deleteMediaItem(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = getSupabaseService();
+
+  // Fetch the row to get bucket + file_path for storage deletion
+  const { data: row, error: fetchError } = await supabase
+    .from('media_items')
+    .select('bucket, file_path')
+    .eq('id', id)
+    .single();
+
+  if (fetchError || !row) {
+    console.error('[deleteMediaItem] Fetch error:', fetchError?.message);
+    return { success: false, error: fetchError?.message ?? 'Item not found' };
+  }
+
+  // Remove from Supabase Storage
+  const { error: storageError } = await supabase.storage
+    .from(row.bucket)
+    .remove([row.file_path]);
+
+  if (storageError) {
+    console.error('[deleteMediaItem] Storage remove error:', storageError.message);
+    // Proceed to DB deletion even if storage remove fails (file may already be gone)
+  }
+
+  // Delete from media_items table
+  const { error: dbError } = await supabase
+    .from('media_items')
+    .delete()
+    .eq('id', id);
+
+  if (dbError) {
+    console.error('[deleteMediaItem] DB delete error:', dbError.message);
+    return { success: false, error: dbError.message };
+  }
+
+  return { success: true };
+}
+
+// ── uploadMediaItem ───────────────────────────────────────────────────────────
+
+/**
+ * Uploads a File to Supabase Storage then registers it in media_items.
+ * Called from MediaUploader after client-side dimension extraction.
+ * Returns the newly created MediaItem on success.
+ */
+export async function uploadMediaItem(params: {
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  fileData: string; // base64-encoded file content
+  bucket: string;
+  folder?: string | null;
+  width?: number | null;
+  height?: number | null;
+  uploadedBy: string;
+  uploadedByRole: string;
+}): Promise<{ success: boolean; item?: MediaItem; error?: string }> {
+  const supabase = getSupabaseService();
+
+  // Build storage path
+  const safeName = params.fileName.replace(/\s+/g, '-');
+  const storagePath = `${Date.now()}-${safeName}`;
+
+  // Decode base64 to Uint8Array for upload
+  const binaryStr = atob(params.fileData);
+  const bytes = new Uint8Array(binaryStr.length);
+  for (let i = 0; i < binaryStr.length; i++) {
+    bytes[i] = binaryStr.charCodeAt(i);
+  }
+
+  // Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from(params.bucket)
+    .upload(storagePath, bytes, {
+      contentType: params.fileType,
+      upsert: false,
+    });
+
+  if (uploadError) {
+    console.error('[uploadMediaItem] Storage upload error:', uploadError.message);
+    return { success: false, error: uploadError.message };
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage
+    .from(params.bucket)
+    .getPublicUrl(storagePath);
+  const fileUrl = urlData.publicUrl;
+
+  // Register in media_items via registerMediaItem utility
+  const { registerMediaItem } = await import('@/lib/media/register');
+  const insertedId = await registerMediaItem({
+    bucket: params.bucket,
+    folder: params.folder ?? null,
+    fileName: params.fileName,
+    filePath: storagePath,
+    fileUrl,
+    fileType: params.fileType,
+    fileSize: params.fileSize,
+    width: params.width ?? null,
+    height: params.height ?? null,
+    uploadedBy: params.uploadedBy,
+    uploadedByRole: params.uploadedByRole,
+  });
+
+  if (!insertedId) {
+    return { success: false, error: 'Failed to register media item in database' };
+  }
+
+  // Fetch the inserted row to return full MediaItem shape
+  const { data: itemRow, error: fetchError } = await supabase
+    .from('media_items')
+    .select('*, profiles!media_items_uploaded_by_fkey(full_name)')
+    .eq('id', insertedId)
+    .single();
+
+  if (fetchError || !itemRow) {
+    console.error('[uploadMediaItem] Fetch after insert error:', fetchError?.message);
+    return { success: false, error: fetchError?.message ?? 'Failed to fetch inserted item' };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const r = itemRow as any;
+  const item: MediaItem = {
+    id: r.id,
+    bucket: r.bucket,
+    folder: r.folder,
+    file_name: r.file_name,
+    file_path: r.file_path,
+    file_url: r.file_url,
+    file_type: r.file_type,
+    file_size: r.file_size ?? 0,
+    width: r.width,
+    height: r.height,
+    title: r.title,
+    alt_text: r.alt_text,
+    caption: r.caption,
+    uploaded_by: r.uploaded_by,
+    uploaded_by_role: r.uploaded_by_role,
+    created_at: r.created_at,
+    updated_at: r.updated_at,
+    uploader_name: r.profiles?.full_name ?? null,
+  };
+
+  return { success: true, item };
+}
+
+// ── getFolders ────────────────────────────────────────────────────────────────
+
 /**
  * Returns all media_folders ordered by sort_order asc, name asc.
  * Uses service role to bypass RLS — admin page only.
