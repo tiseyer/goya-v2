@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "docs:index": "tsx scripts/generate-docs-index.ts",
-    "prebuild": "tsx scripts/generate-docs-index.ts"
+    "prebuild": "tsx scripts/generate-docs-index.ts",
+    "media:backfill": "tsx scripts/backfill-media-items.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
