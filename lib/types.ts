@@ -107,8 +107,6 @@ export interface Event {
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
-  event_type: string;
-  rejection_reason?: string | null;
 }
 
 export interface Course {
