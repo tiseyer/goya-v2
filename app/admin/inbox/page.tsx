@@ -6,6 +6,7 @@ import TeacherUpgradesTab from './TeacherUpgradesTab'
 import CreditsTab from './CreditsTab'
 import SupportTicketsTab from './SupportTicketsTab'
 import EventsTab from './EventsTab'
+import CoursesTab from './CoursesTab'
 import VerificationActions from '@/app/admin/verification/VerificationActions'
 import { listSupportTickets } from './actions'
 
@@ -28,6 +29,8 @@ export default async function InboxPage({
       ? 'schools'
       : tab === 'events'
       ? 'events'
+      : tab === 'courses'
+      ? 'courses'
       : 'credits'
 
   const supabase = await createSupabaseServerClient()
@@ -151,6 +154,42 @@ export default async function InboxPage({
 
   const pendingEventCount = normalizedEvents.filter((e: { status: string }) => e.status === 'pending_review').length
 
+  // Fetch courses with pending_review, published, rejected statuses (member courses only)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: pendingCoursesData } = await (supabaseService as any)
+    .from('courses')
+    .select('id, title, category, duration, status, created_at, created_by, rejection_reason')
+    .in('status', ['pending_review', 'published', 'rejected'])
+    .eq('course_type', 'member')
+    .order('created_at', { ascending: false })
+
+  // Batch-fetch profiles for course submitters
+  const courseUserIds = [...new Set((pendingCoursesData ?? []).filter((c: { created_by: string | null }) => c.created_by).map((c: { created_by: string }) => c.created_by))]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: courseProfiles } = courseUserIds.length > 0
+    ? await (supabaseService as any)
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', courseUserIds)
+    : { data: [] }
+
+  const courseProfileMap = new Map<string, { id: string; full_name: string | null; email: string | null }>()
+  for (const p of courseProfiles ?? []) courseProfileMap.set(p.id, p)
+
+  const normalizedCourses = (pendingCoursesData ?? []).map((c: {
+    created_by: string | null
+    [key: string]: unknown
+  }) => {
+    const profile = c.created_by ? courseProfileMap.get(c.created_by) : null
+    return {
+      ...c,
+      submitter_name: profile?.full_name ?? null,
+      submitter_email: profile?.email ?? null,
+    }
+  })
+
+  const pendingCourseCount = normalizedCourses.filter((c: { status: string }) => c.status === 'pending_review').length
+
   // Fetch verification-pending profiles
   const { data: pendingVerifications } = await supabase
     .from('profiles')
@@ -166,7 +205,7 @@ export default async function InboxPage({
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-[#1B3A5C]">Inbox</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Review credits, verifications, support tickets, teacher upgrades, school registrations, and events
+          Review credits, verifications, support tickets, teacher upgrades, school registrations, events, and courses
         </p>
       </div>
 
@@ -262,6 +301,21 @@ export default async function InboxPage({
             </span>
           )}
         </Link>
+        <Link
+          href="/admin/inbox?tab=courses"
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap inline-flex items-center gap-1.5 ${
+            activeTab === 'courses'
+              ? 'bg-white text-[#1B3A5C] shadow-sm'
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Courses
+          {pendingCourseCount > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+              {pendingCourseCount}
+            </span>
+          )}
+        </Link>
       </div>
 
       {/* Tab content */}
@@ -326,6 +380,7 @@ export default async function InboxPage({
       {activeTab === 'upgrades' && <TeacherUpgradesTab initialRequests={upgradeRequests} />}
       {activeTab === 'schools' && <SchoolRegistrationsTab initialSchools={schools} />}
       {activeTab === 'events' && <EventsTab events={normalizedEvents} />}
+      {activeTab === 'courses' && <CoursesTab courses={normalizedCourses} />}
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { getStripe } from '@/lib/stripe/client'
 import { getSupabaseService } from '@/lib/supabase/service'
 import type { SupportTicket, TicketStatus } from '@/lib/chatbot/types'
 import { writeEventAuditLog } from '@/lib/events/audit'
+import { writeCourseAuditLog } from '@/lib/courses/audit'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -565,6 +566,145 @@ export async function rejectEvent(
   // 5. Write event_audit_log entry
   await writeEventAuditLog({
     event_id: eventId,
+    action: 'status_changed',
+    performed_by: user.id,
+    performed_by_role: adminProfile.role,
+    changes: { old_status: 'pending_review', new_status: 'rejected', rejection_reason: reason.trim() },
+  })
+
+  // 6. Revalidate
+  revalidatePath('/admin/inbox')
+  return { success: true }
+}
+
+// --- Phase 24 additions: Course Approve/Reject ---
+
+/**
+ * Approve a pending_review course — sets status to 'published' and writes audit log.
+ */
+export async function approveCourse(
+  courseId: string,
+): Promise<{ success: boolean; error?: string }> {
+  // 1. Auth guard — require admin or moderator role
+  const supabase = await createSupabaseServerActionClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  const serviceClient = getSupabaseService()
+  const { data: adminProfile } = await serviceClient
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (
+    !adminProfile ||
+    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+  ) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  // 2. Load course to verify it exists and is pending_review
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: course } = await (serviceClient as any)
+    .from('courses')
+    .select('id, status')
+    .eq('id', courseId)
+    .single()
+
+  if (!course || course.status !== 'pending_review') {
+    return { success: false, error: 'Course not found or already reviewed' }
+  }
+
+  // 3. Update status to published
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (serviceClient as any)
+    .from('courses')
+    .update({ status: 'published' })
+    .eq('id', courseId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  // 4. Write course_audit_log entry
+  await writeCourseAuditLog({
+    course_id: courseId,
+    action: 'status_changed',
+    performed_by: user.id,
+    performed_by_role: adminProfile.role,
+    changes: { old_status: 'pending_review', new_status: 'published' },
+  })
+
+  // 5. Revalidate
+  revalidatePath('/admin/inbox')
+  return { success: true }
+}
+
+/**
+ * Reject a pending_review course — sets status to 'rejected', saves reason, writes audit log.
+ */
+export async function rejectCourse(
+  courseId: string,
+  reason: string,
+): Promise<{ success: boolean; error?: string }> {
+  // 1. Auth guard — require admin or moderator role
+  const supabase = await createSupabaseServerActionClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  const serviceClient = getSupabaseService()
+  const { data: adminProfile } = await serviceClient
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (
+    !adminProfile ||
+    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+  ) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  // 2. Validate reason
+  if (!reason || reason.trim().length < 10) {
+    return { success: false, error: 'Rejection reason must be at least 10 characters' }
+  }
+
+  // 3. Load course to verify it exists and is pending_review
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: course } = await (serviceClient as any)
+    .from('courses')
+    .select('id, status')
+    .eq('id', courseId)
+    .single()
+
+  if (!course || course.status !== 'pending_review') {
+    return { success: false, error: 'Course not found or already reviewed' }
+  }
+
+  // 4. Update status to rejected with reason
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (serviceClient as any)
+    .from('courses')
+    .update({
+      status: 'rejected',
+      rejection_reason: reason.trim(),
+    })
+    .eq('id', courseId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  // 5. Write course_audit_log entry
+  await writeCourseAuditLog({
+    course_id: courseId,
     action: 'status_changed',
     performed_by: user.id,
     performed_by_role: adminProfile.role,
