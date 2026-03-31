@@ -105,13 +105,13 @@ export default async function AddonsPage() {
     hasPendingUpgrade = false
   }
 
-  // 3. Check if user is school owner (principal_trainer_id column)
+  // 3. Check if user is school owner (owner_id column)
   let isSchoolOwner = false
   try {
     const { count: schoolCount } = await supabase
       .from('schools')
       .select('id', { count: 'exact', head: true })
-      .eq('principal_trainer_id', user.id)
+      .eq('owner_id', user.id)
     isSchoolOwner = (schoolCount ?? 0) > 0
   } catch {
     isSchoolOwner = false

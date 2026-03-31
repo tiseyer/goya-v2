@@ -296,7 +296,7 @@ export default function DashboardPage() {
             </div>
 
             {/* School Registration CTA — teachers without a school */}
-            {profile?.member_type === 'teacher' && !profile?.principal_trainer_school_id && (
+            {profile?.role === 'teacher' && !profile?.principal_trainer_school_id && (
               <SchoolRegistrationCTA variant="sidebar" />
             )}
 
