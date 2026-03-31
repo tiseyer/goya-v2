@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 Phase: 28 (Database Foundation) — not started
 Plan: —
 Status: Roadmap created, ready to begin Phase 28
-Last activity: 2026-03-31 — Roadmap created for v1.14 School Owner System
+Last activity: 2026-03-31 — Completed quick task 260331-pe2: Migrate WordPress avatar URLs and GOYA logos to Supabase Storage
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -88,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Roadmap created for v1.14 — 8 phases (28-35), 39 requirements mapped
+Stopped at: Completed quick task 260331-pe2 — WP avatar migration script (dry-run verified)
 Resume file: None
