@@ -114,26 +114,31 @@ Each row shows:
 
 Shows all school applications ordered by submission date (newest first).
 
-The table columns are: **School**, **Owner**, **Location**, **Submitted**, **Status**, and **Actions**.
+The table columns are: **School**, **Owner**, **Designations**, **Location**, **Submitted**, **Status**, and **Actions**.
+
+The **Designations** column shows purple pill badges for each designation type the school applied for (e.g. "RYS 200", "RCYS 50"). Schools with no designations show a dash.
 
 **Statuses:**
 | Status | Badge colour |
 |---|---|
 | **pending** | Amber |
+| **In Review** (`pending_review`) | Yellow |
 | **approved** | Green |
 | **rejected** | Rose |
 | **suspended** | Orange |
+
+The badge count on the tab includes both `pending` and `pending_review` schools.
 
 **Actions available:**
 
 | Button | Condition | What it does |
 |---|---|---|
-| **View** | Always | Opens the school's settings page |
-| **Approve** | Not already approved | Sets status to `approved` |
-| **Reject** | Not already rejected | Opens an inline reason field; sets status to `rejected` |
-| **Reset** | Approved, rejected, or suspended | Returns the school to `pending` status |
+| **View** | Always | Opens the admin school detail page at `/admin/schools/[id]` |
+| **Approve** | Not already approved | Sets status to `approved`, records approver and timestamp, sends approval email to school owner |
+| **Reject** | Not already rejected | Opens an inline reason field; sets status to `rejected`, saves reason, sends rejection email to school owner |
+| **Reset** | Approved, rejected, or suspended | Returns the school to `pending` status (client-side only, no email) |
 
-When rejecting, type an optional reason in the inline field and press **Confirm Reject** (or press Enter). Press **Cancel** to discard.
+When rejecting, type a reason in the inline field and press **Confirm Reject** (or press Enter). Press **Cancel** to discard. An email is automatically sent to the school owner upon both approval and rejection.
 
 ---
 
