@@ -18,3 +18,12 @@ These files are the source of truth for project health (LOG.md) and billing/plan
 - Create `activity/quick-tasks/quick-task_TaskName_DD-MM-YYYY.md`
 - TaskName: short-kebab-case summary of what was done
 - File contains: task description, status, solution
+
+## Layout Width Standard
+
+All page content sections must use the `PageContainer` component (`app/components/ui/PageContainer.tsx`) to ensure consistent width alignment with the header and footer.
+
+- **Standard width:** `max-w-7xl` (1280px) with `px-4 sm:px-6 lg:px-8`
+- **Never** hardcode max-width or horizontal padding directly on pages
+- **Full-bleed backgrounds** are fine — just wrap the content inside with `<PageContainer>`
+- **Prose pages** (legal, blog) may use an inner `max-w-3xl` for readability, but the outer container must still be `max-w-7xl`
