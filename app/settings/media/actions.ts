@@ -125,7 +125,8 @@ export async function getMemberMediaItems(
   const hasMore = rows.length > limit;
   const pageRows = hasMore ? rows.slice(0, limit) : rows;
 
-  const items: MediaItem[] = pageRows.map((r) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const items: MediaItem[] = pageRows.map((r: any) => ({
     id: r.id,
     bucket: r.bucket,
     folder: r.folder,
