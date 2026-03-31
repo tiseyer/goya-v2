@@ -39,24 +39,35 @@ export default async function InboxPage({
   const { data: { user: adminUser } } = await supabase.auth.getUser()
   const adminUserId = adminUser?.id ?? ''
 
-  // Fetch all schools with owner profile info
-  const { data: schoolsData } = await supabase
+  // Service role client for cross-table joins
+  const supabaseService = getSupabaseService()
+
+  // Fetch all schools with owner profile info and designations (service role for cross-table join)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: schoolsData } = await (supabaseService as any)
     .from('schools')
     .select(`
       id, name, logo_url, city, country, status, rejection_reason, created_at,
-      owner:owner_id (id, full_name, email)
+      owner:owner_id (id, full_name, email),
+      school_designations (designation_type, status)
     `)
     .order('created_at', { ascending: false })
 
   // The join returns owner as an array; normalize to single object for the component
-  const schools = (schoolsData ?? []).map((s) => ({
+  const schools = (schoolsData ?? []).map((s: {
+    owner: unknown
+    school_designations: unknown
+    status: string
+    [key: string]: unknown
+  }) => ({
     ...s,
     owner: Array.isArray(s.owner) ? s.owner[0] ?? null : s.owner,
+    school_designations: Array.isArray(s.school_designations) ? s.school_designations : [],
   }))
-  const pendingSchoolCount = schools.filter((s) => s.status === 'pending').length
+  // Include both 'pending' and 'pending_review' statuses in badge count
+  const pendingSchoolCount = schools.filter((s: { status: string }) => s.status === 'pending' || s.status === 'pending_review').length
 
   // Fetch upgrade requests with joined profile info (service role needed for joined query)
-  const supabaseService = getSupabaseService()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: upgradeData } = await (supabaseService as any)
     .from('upgrade_requests')

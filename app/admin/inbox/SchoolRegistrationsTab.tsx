@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { approveSchool, rejectSchool } from '@/app/admin/schools/actions';
 
 type Owner = {
   id: string;
@@ -10,16 +11,22 @@ type Owner = {
   email: string | null;
 } | null;
 
+type Designation = {
+  designation_type: string;
+  status: string;
+};
+
 type School = {
   id: string;
   name: string;
   logo_url: string | null;
   city: string | null;
   country: string | null;
-  status: 'pending' | 'approved' | 'rejected' | 'suspended';
+  status: 'pending' | 'pending_review' | 'approved' | 'rejected' | 'suspended';
   rejection_reason: string | null;
   created_at: string;
   owner: Owner;
+  school_designations: Designation[];
 };
 
 interface Props {
@@ -42,10 +49,11 @@ function relativeDate(iso: string): string {
 }
 
 const STATUS_STYLES: Record<School['status'], string> = {
-  pending:   'bg-amber-50 text-amber-700 border border-amber-200',
-  approved:  'bg-green-50 text-green-700 border border-green-200',
-  rejected:  'bg-rose-50 text-rose-700 border border-rose-200',
-  suspended: 'bg-orange-50 text-orange-700 border border-orange-200',
+  pending:        'bg-amber-50 text-amber-700 border border-amber-200',
+  pending_review: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+  approved:       'bg-green-50 text-green-700 border border-green-200',
+  rejected:       'bg-rose-50 text-rose-700 border border-rose-200',
+  suspended:      'bg-orange-50 text-orange-700 border border-orange-200',
 };
 
 export default function SchoolRegistrationsTab({ initialSchools }: Props) {
@@ -56,12 +64,8 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
 
   async function handleApprove(schoolId: string) {
     setBusy(schoolId);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await supabase
-      .from('schools')
-      .update({ status: 'approved', rejection_reason: null })
-      .eq('id', schoolId);
-    if (!error) {
+    const result = await approveSchool(schoolId);
+    if (result.success) {
       setSchools(prev =>
         prev.map(s => s.id === schoolId ? { ...s, status: 'approved', rejection_reason: null } : s)
       );
@@ -71,12 +75,8 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
 
   async function handleReject(schoolId: string) {
     setBusy(schoolId);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await supabase
-      .from('schools')
-      .update({ status: 'rejected', rejection_reason: rejectReason || null })
-      .eq('id', schoolId);
-    if (!error) {
+    const result = await rejectSchool(schoolId, rejectReason);
+    if (result.success) {
       setSchools(prev =>
         prev.map(s => s.id === schoolId ? { ...s, status: 'rejected', rejection_reason: rejectReason || null } : s)
       );
@@ -89,7 +89,7 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
   async function handleReset(schoolId: string) {
     setBusy(schoolId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('schools')
       .update({ status: 'pending', rejection_reason: null })
       .eq('id', schoolId);
@@ -123,8 +123,8 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
   return (
     <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
       {/* Table header */}
-      <div className="hidden md:grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 px-6 py-3 border-b border-slate-100 bg-slate-50">
-        {['SCHOOL', 'OWNER', 'LOCATION', 'SUBMITTED', 'STATUS', 'ACTIONS'].map(col => (
+      <div className="hidden md:grid grid-cols-[2fr_1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto] gap-4 px-6 py-3 border-b border-slate-100 bg-slate-50">
+        {['SCHOOL', 'OWNER', 'DESIGNATIONS', 'LOCATION', 'SUBMITTED', 'STATUS', 'ACTIONS'].map(col => (
           <span key={col} className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             {col}
           </span>
@@ -141,7 +141,7 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
           return (
             <div key={school.id}>
               {/* Main row */}
-              <div className="px-6 py-4 grid grid-cols-1 md:grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 items-center">
+              <div className="px-6 py-4 grid grid-cols-1 md:grid-cols-[2fr_1.2fr_1.5fr_0.8fr_0.8fr_0.8fr_auto] gap-4 items-center">
 
                 {/* SCHOOL */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -175,6 +175,22 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
                   )}
                 </div>
 
+                {/* DESIGNATIONS */}
+                <div className="flex flex-wrap gap-1 min-w-0">
+                  {school.school_designations && school.school_designations.length > 0 ? (
+                    school.school_designations.map((d, i) => (
+                      <span
+                        key={i}
+                        className="bg-purple-50 text-purple-700 border border-purple-200 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap"
+                      >
+                        {d.designation_type}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-slate-400 text-sm">—</span>
+                  )}
+                </div>
+
                 {/* LOCATION */}
                 <div className="text-sm text-slate-500">
                   {location}
@@ -188,14 +204,14 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
                 {/* STATUS */}
                 <div>
                   <span className={`inline-block text-xs px-2.5 py-1 rounded-full font-semibold capitalize ${STATUS_STYLES[school.status]}`}>
-                    {school.status}
+                    {school.status === 'pending_review' ? 'In Review' : school.status}
                   </span>
                 </div>
 
                 {/* ACTIONS */}
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <Link
-                    href={`/schools/${school.id}/settings`}
+                    href={`/admin/schools/${school.id}`}
                     className="px-2.5 py-1.5 text-xs font-semibold border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors whitespace-nowrap"
                   >
                     View
@@ -241,7 +257,7 @@ export default function SchoolRegistrationsTab({ initialSchools }: Props) {
                       type="text"
                       value={rejectReason}
                       onChange={e => setRejectReason(e.target.value)}
-                      placeholder="Rejection reason (optional)"
+                      placeholder="Rejection reason (required)"
                       className="flex-1 text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:border-rose-300 focus:ring-1 focus:ring-rose-100"
                       onKeyDown={e => { if (e.key === 'Enter') handleReject(school.id); if (e.key === 'Escape') setRejectOpen(null); }}
                       autoFocus
