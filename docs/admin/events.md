@@ -89,7 +89,18 @@ When viewing deleted events, the table background becomes red-tinted to indicate
 
 ## Adding a New Event
 
-Click the **Add New Event** button in the top-right corner. This opens `/admin/events/new` — a form for creating a GOYA event with title, date, time, category, format, instructor, pricing, and spot capacity fields.
+Click the **Add New Event** button in the top-right corner. This opens `/admin/events/new` — a card-based form organised into sections:
+
+| Section | Fields |
+|---|---|
+| **Basic Info** | Title, Category, Format, Status |
+| **Schedule** | Date, Start Time, End Time |
+| **Location** | Instructor, Location |
+| **Registration** | Price (with free toggle), Total Spots, Spots Remaining |
+| **Details** | Description, Featured Image |
+| **Organizers** | Coming soon |
+
+Admins and moderators can set status to Published, Draft, or Cancelled. Members creating events see only Draft and Pending Review options.
 
 GOYA events created here are published immediately (or saved as draft) without going through the review queue.
 
