@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import PageHero from '@/app/components/PageHero';
@@ -9,8 +9,10 @@ import {
   allCountries,
   allDesignations,
   allTeachingStyles,
+  type Member,
   type MemberRole,
 } from '@/lib/members-data';
+import { fetchSchoolMembers } from '@/lib/members-actions';
 
 const MapPanel = dynamic(() => import('./MapPanel'), { ssr: false });
 
@@ -110,12 +112,12 @@ function CompactCard({
   highlighted,
   onSelect,
 }: {
-  member: (typeof members)[0];
+  member: Member;
   highlighted: boolean;
   onSelect: (id: string) => void;
 }) {
   const style = ROLE_STYLES[member.role];
-  const ref = useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLButtonElement & HTMLAnchorElement>(null);
 
   useEffect(() => {
     if (highlighted && ref.current) {
@@ -123,22 +125,26 @@ function CompactCard({
     }
   }, [highlighted]);
 
-  return (
-    <button
-      ref={ref}
-      onClick={() => onSelect(member.id)}
-      className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-colors border-l-2 ${
-        highlighted
-          ? 'bg-[#4E87A0]/8 border-l-[#4E87A0]'
-          : 'border-l-transparent hover:bg-slate-50'
-      }`}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={member.photo}
-        alt={member.name}
-        className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-slate-200"
-      />
+  const className = `w-full text-left px-3 py-2.5 flex items-center gap-3 transition-colors border-l-2 ${
+    highlighted
+      ? 'bg-[#4E87A0]/8 border-l-[#4E87A0]'
+      : 'border-l-transparent hover:bg-slate-50'
+  }`;
+
+  const content = (
+    <>
+      {member.photo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={member.photo}
+          alt={member.name}
+          className={`w-9 h-9 object-cover shrink-0 ring-1 ring-slate-200 ${member.role === 'School' ? 'rounded-lg' : 'rounded-full'}`}
+        />
+      ) : (
+        <div className={`w-9 h-9 bg-[#4E87A0]/10 flex items-center justify-center shrink-0 ring-1 ring-slate-200 ${member.role === 'School' ? 'rounded-lg' : 'rounded-full'}`}>
+          <span className="text-[#4E87A0] font-bold text-sm">{member.name.charAt(0)}</span>
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-0.5">
           <span className="font-semibold text-slate-900 text-[13px] truncate leading-tight">
@@ -158,6 +164,24 @@ function CompactCard({
           <span className="text-[10px] text-slate-400 truncate">{member.city}</span>
         </div>
       </div>
+    </>
+  );
+
+  if (member.role === 'School' && member.slug) {
+    return (
+      <Link href={`/schools/${member.slug}`} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      ref={ref as React.RefObject<HTMLButtonElement>}
+      onClick={() => onSelect(member.id)}
+      className={className}
+    >
+      {content}
     </button>
   );
 }
@@ -273,6 +297,110 @@ function FullCard({
   );
 }
 
+// ─── School card ──────────────────────────────────────────────────────────────
+
+function SchoolCard({
+  member,
+  highlighted,
+}: {
+  member: Member;
+  highlighted: boolean;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    if (highlighted && ref.current) {
+      ref.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [highlighted]);
+
+  const visibleBadges = (member.schoolDesignations ?? []).slice(0, 3);
+  const extraCount = (member.schoolDesignations ?? []).length - visibleBadges.length;
+
+  return (
+    <Link
+      href={`/schools/${member.slug}`}
+      ref={ref}
+      className={`group relative bg-white rounded-2xl border overflow-hidden flex flex-col transition-all duration-200 cursor-pointer ${
+        highlighted
+          ? 'border-[#4E87A0] shadow-lg shadow-[#4E87A0]/10 ring-1 ring-[#4E87A0]'
+          : 'border-slate-100 shadow-sm hover:shadow-lg'
+      }`}
+    >
+      <div className="h-1 bg-purple-400" />
+      <div className="p-4 flex flex-col flex-1">
+        {/* Header */}
+        <div className="flex items-start gap-3 mb-3">
+          <div className="shrink-0">
+            {member.photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={member.photo}
+                alt={member.name}
+                className="w-14 h-14 rounded-xl object-cover ring-2 ring-slate-100"
+              />
+            ) : (
+              <div className="w-14 h-14 rounded-xl bg-[#4E87A0]/10 flex items-center justify-center ring-2 ring-slate-100">
+                <span className="text-[#4E87A0] font-bold text-xl">
+                  {member.name.charAt(0)}
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-slate-900 text-sm truncate leading-snug flex items-center gap-1">
+              {member.name}
+            </h3>
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full mt-0.5 bg-purple-50 text-purple-700">
+              <span className="w-1 h-1 rounded-full bg-purple-500" />
+              School
+            </span>
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-1 text-slate-400 text-[11px] mb-2">
+          <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {member.city ? `${member.city}, ${member.country}` : member.country}
+        </div>
+
+        {/* Designation badges */}
+        {visibleBadges.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {visibleBadges.map(d => (
+              <span key={d} className="text-[10px] bg-[#4E87A0]/10 text-[#4E87A0] border border-[#4E87A0]/20 px-2 py-0.5 rounded-full font-medium">
+                {d}
+              </span>
+            ))}
+            {extraCount > 0 && (
+              <span className="text-[10px] text-slate-400 px-1.5 py-0.5">+{extraCount} more</span>
+            )}
+          </div>
+        )}
+
+        {/* Bio */}
+        <p className="text-slate-500 text-[11px] leading-relaxed line-clamp-2 flex-1 mb-3">
+          {member.bio}
+        </p>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
+          <span className="text-[10px] text-slate-400">Since {member.memberSince}</span>
+          <span className="text-[11px] font-semibold text-[#4E87A0] group-hover:text-[#3A7190] flex items-center gap-0.5 transition-colors">
+            View School
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function MembersPage() {
@@ -283,6 +411,21 @@ export default function MembersPage() {
   const [search, setSearch] = useState('');
   const [mapOpen, setMapOpen] = useState(false);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [schoolMembers, setSchoolMembers] = useState<Member[]>([]);
+
+  // Load approved schools from Supabase on mount
+  useEffect(() => {
+    fetchSchoolMembers().then(schools => {
+      // Deduplicate: skip schools whose owner_id already exists in static members
+      const existingIds = new Set(members.map(m => m.id));
+      setSchoolMembers(schools.filter(s => !existingIds.has(s.id)));
+    }).catch(() => {
+      // Silently fail — directory still works with static members only
+    });
+  }, []);
+
+  // Merge static members with dynamically loaded school members
+  const allMembers = useMemo(() => [...members, ...schoolMembers], [schoolMembers]);
 
   const clearFilters = () => {
     setRoleFilter('All');
@@ -295,7 +438,7 @@ export default function MembersPage() {
   const hasFilters = roleFilter !== 'All' || countryFilter !== 'All' ||
     designationFilter.length > 0 || styleFilter.length > 0 || search !== '';
 
-  const filtered = useMemo(() => members.filter(m => {
+  const filtered = useMemo(() => allMembers.filter(m => {
     if (roleFilter !== 'All' && m.role !== roleFilter) return false;
     if (countryFilter !== 'All' && m.country !== countryFilter) return false;
     if (designationFilter.length > 0 && !designationFilter.some(d => m.designations.includes(d))) return false;
@@ -308,7 +451,7 @@ export default function MembersPage() {
           !m.bio.toLowerCase().includes(q)) return false;
     }
     return true;
-  }), [roleFilter, countryFilter, designationFilter, styleFilter, search]);
+  }), [allMembers, roleFilter, countryFilter, designationFilter, styleFilter, search]);
 
   const handleSelect = useCallback((id: string) => {
     setHighlightedId(prev => prev === id ? null : id);
@@ -349,11 +492,15 @@ export default function MembersPage() {
       {/* Mobile grid */}
       <div className="px-4 py-6 max-w-7xl mx-auto">
         <p className="text-sm text-slate-500 mb-4">
-          <span className="font-semibold text-slate-800">{filtered.length}</span> of {members.length} members
+          <span className="font-semibold text-slate-800">{filtered.length}</span> of {allMembers.length} members
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {filtered.map(m => (
-            <FullCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />
+            m.role === 'School' && m.slug ? (
+              <SchoolCard key={m.id} member={m} highlighted={highlightedId === m.id} />
+            ) : (
+              <FullCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />
+            )
           ))}
         </div>
       </div>
@@ -374,7 +521,7 @@ export default function MembersPage() {
         <div className="flex items-center gap-3">
           <h1 className="text-lg font-bold text-[#1B3A5C]">Member Directory</h1>
           <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
-            {filtered.length} / {members.length}
+            {filtered.length} / {allMembers.length}
           </span>
           {hasFilters && (
             <button onClick={clearFilters} className="text-xs text-[#4E87A0] hover:text-[#3A7190] font-semibold flex items-center gap-1 transition-colors">
@@ -491,7 +638,11 @@ export default function MembersPage() {
             ) : (
               <div className="grid gap-4 grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3">
                 {filtered.map(m => (
-                  <FullCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />
+                  m.role === 'School' && m.slug ? (
+                    <SchoolCard key={m.id} member={m} highlighted={highlightedId === m.id} />
+                  ) : (
+                    <FullCard key={m.id} member={m} highlighted={highlightedId === m.id} onSelect={handleSelect} />
+                  )
                 ))}
               </div>
             )}
@@ -504,7 +655,7 @@ export default function MembersPage() {
           style={{ width: mapOpen ? '75%' : '0px' }}
         >
           <MapPanel
-            allMembers={members}
+            allMembers={allMembers}
             filteredMembers={filtered}
             highlightedId={highlightedId}
             onMemberClick={handleSelect}
