@@ -1237,6 +1237,112 @@ export type Database = {
         }
         Relationships: []
       }
+      media_folders: {
+        Row: {
+          bucket: string
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          sort_order: number
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          sort_order?: number
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "media_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_items: {
+        Row: {
+          alt_text: string | null
+          bucket: string
+          caption: string | null
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string
+          file_url: string
+          folder: string | null
+          height: number | null
+          id: string
+          title: string | null
+          updated_at: string
+          uploaded_by: string | null
+          uploaded_by_role: string | null
+          width: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          bucket: string
+          caption?: string | null
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type: string
+          file_url: string
+          folder?: string | null
+          height?: number | null
+          id?: string
+          title?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          uploaded_by_role?: string | null
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          bucket?: string
+          caption?: string | null
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string
+          file_url?: string
+          folder?: string | null
+          height?: number | null
+          id?: string
+          title?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          uploaded_by_role?: string | null
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_items_folder_fkey"
+            columns: ["folder"]
+            isOneToOne: false
+            referencedRelation: "media_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
