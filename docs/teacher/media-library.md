@@ -8,7 +8,54 @@ last_updated: "2026-03-31"
 
 # Media Library
 
-The member Media Library is currently in development as part of milestone v1.11. Once available, you'll be able to view all files you've uploaded across the platform. This documentation will be updated when the feature launches.
+The Media page in your Settings shows all files you have uploaded to GOYA. This includes profile photos, certificates, and any other files you've uploaded across the platform.
+
+## Accessing Your Media
+
+1. Go to **Settings** from your account menu
+2. Click **Media** in the left sidebar
+
+> The Media section is available to teachers, wellness practitioners, and admins. Students do not see this section.
+
+## What You Can See
+
+Your media library shows all files where you are the uploader. Files are displayed in a grid by default. You can switch to list view using the toggle in the top-right of the toolbar.
+
+### Folder Categories
+
+The left sidebar shows three categories:
+
+| Category | Contents |
+|----------|----------|
+| **All Files** | Every file you've uploaded |
+| **Avatars** | Your profile photo uploads |
+| **Certificates** | Teaching certificates you've submitted |
+| **Uploads** | General uploads from other flows |
+
+Click a category to filter the view to files in that bucket.
+
+## Searching and Filtering
+
+Use the toolbar at the top to find specific files:
+
+- **Search** — type to search by file name or title (results update after a short pause)
+- **All files / Images / PDFs / Videos** — filter by file type
+- **All time / Today / This week / This month** — filter by upload date
+- **Sort** — change the order (newest first, oldest first, name A-Z, or file size)
+
+## File Detail Panel
+
+Click any file to open the detail panel on the right. It shows:
+
+- A preview (image files display the actual image; other file types show an icon)
+- File name, type, size
+- Image dimensions (for image files)
+- Upload date
+- The file URL, with a copy button
+
+## Read-Only View
+
+The media library is read-only. You cannot upload or delete files here. Files are added automatically when you upload them elsewhere on the platform (for example, when updating your profile photo or submitting a certificate through the upgrade flow).
 
 ---
 
@@ -17,3 +64,4 @@ The member Media Library is currently in development as part of milestone v1.11.
 - [Teacher Role Overview](./overview.md)
 - [Submitting Events](./my-events.md)
 - [Submitting Courses](./my-courses.md)
+- [Upgrade Guide](./upgrade-guide.md)
