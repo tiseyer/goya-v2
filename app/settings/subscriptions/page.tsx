@@ -69,7 +69,7 @@ export default async function SettingsSubscriptionsPage() {
       </div>
 
       {/* School Registration CTA — teachers without a school */}
-      {profile.role === 'teacher' && !ownsSchool && (
+      {(profile.role === 'teacher' || profile.role === 'admin') && !ownsSchool && (
         <>
           <Separator />
           <SchoolRegistrationCTA variant="callout" />

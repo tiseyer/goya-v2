@@ -161,7 +161,7 @@ export default async function AddonsPage() {
       />
 
       {/* School Registration Banner — teachers without a school */}
-      {role === 'teacher' && !isSchoolOwner && (
+      {(role === 'teacher' || role === 'admin') && !isSchoolOwner && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
           <SchoolRegistrationCTA variant="banner" />
         </div>
