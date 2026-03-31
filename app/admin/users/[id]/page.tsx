@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
 import Badge from '@/app/components/ui/Badge';
-import ResetOnboardingButton from './ResetOnboardingButton';
 import RemoveConnectionButton from './RemoveConnectionButton';
 import UserFlowsSection from './UserFlowsSection';
+import UserDetailClient from './UserDetailClient';
 
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ tab?: string }>;
@@ -34,7 +34,7 @@ export default async function AdminUserDetailPage({
   // Fetch the target user's profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, email, full_name, username, role, member_type, subscription_status, is_verified, verification_status, onboarding_completed, created_at, avatar_url, mrn')
+    .select('id, email, full_name, first_name, last_name, username, role, member_type, subscription_status, is_verified, verification_status, onboarding_completed, created_at, avatar_url, mrn, last_login_at, wp_user_id, wp_roles')
     .eq('id', id)
     .single();
 
@@ -118,65 +118,27 @@ export default async function AdminUserDetailPage({
       </div>
 
       {tab === 'overview' && (
-        <>
-          {/* Profile info */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
-            <h2 className="text-base font-bold text-[#1B3A5C] mb-4">Profile Information</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1">Member Number (MRN)</p>
-                <p className="text-sm text-[#1B3A5C] font-mono">{profile.mrn || '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1">Username</p>
-                <p className="text-sm text-[#1B3A5C]">{profile.username || '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1">Role</p>
-                <p className="text-sm text-[#1B3A5C] capitalize">{profile.role || '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1">Member Type</p>
-                <p className="text-sm text-[#1B3A5C] capitalize">{profile.member_type?.replace('_', ' ') || '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1">Subscription Status</p>
-                <p className="text-sm text-[#1B3A5C] capitalize">{profile.subscription_status || '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1">Verification Status</p>
-                <p className="text-sm text-[#1B3A5C] capitalize">{profile.verification_status || '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1">Member Since</p>
-                <p className="text-sm text-[#1B3A5C]">
-                  {profile.created_at
-                    ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-                    : '—'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Onboarding section */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <h2 className="text-base font-bold text-[#1B3A5C] mb-1">Onboarding</h2>
-            <p className="text-sm text-[#6B7280] mb-4">
-              Status:{' '}
-              <span className={`font-semibold ${profile.onboarding_completed ? 'text-green-600' : 'text-orange-500'}`}>
-                {profile.onboarding_completed ? 'Completed' : 'Not completed'}
-              </span>
-            </p>
-            <ResetOnboardingButton
-              userId={profile.id}
-              userName={displayName}
-              isAdmin={currentUserIsAdmin}
-            />
-            {!currentUserIsAdmin && (
-              <p className="text-xs text-[#6B7280] mt-2">Only admins can reset onboarding.</p>
-            )}
-          </div>
-        </>
+        <UserDetailClient
+          profile={{
+            id: profile.id,
+            email: profile.email,
+            full_name: profile.full_name ?? null,
+            first_name: profile.first_name ?? null,
+            last_name: profile.last_name ?? null,
+            username: profile.username ?? null,
+            role: profile.role,
+            member_type: profile.member_type ?? null,
+            mrn: profile.mrn ?? null,
+            subscription_status: profile.subscription_status ?? null,
+            verification_status: profile.verification_status ?? null,
+            onboarding_completed: profile.onboarding_completed ?? null,
+            created_at: profile.created_at,
+            last_login_at: profile.last_login_at ?? null,
+            wp_user_id: profile.wp_user_id ?? null,
+            wp_roles: profile.wp_roles ?? null,
+          }}
+          isAdmin={currentUserIsAdmin}
+        />
       )}
 
       {tab === 'flows' && (

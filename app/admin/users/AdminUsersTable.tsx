@@ -209,7 +209,7 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
                         href={`/admin/users/${user.id}`}
                         className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#374151] hover:text-[#1B3A5C] hover:border-[#1B3A5C] transition-colors"
                       >
-                        Edit
+                        View
                       </Link>
                       {adminRole === 'admin' && user.role !== 'admin' && user.role !== 'moderator' && (
                         <SwitchToButton userId={user.id} />
