@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getEffectiveUserId, getEffectiveClient } from '@/lib/supabase/getEffectiveUserId'
+import { registerMediaItem } from '@/lib/media/register'
 
 export async function POST(request: Request) {
   let userId: string
@@ -32,6 +33,16 @@ export async function POST(request: Request) {
   }
 
   const { data: publicData } = client.storage.from('avatars').getPublicUrl(path)
+
+  await registerMediaItem({
+    bucket: 'avatars',
+    fileName: file.name || `${Date.now()}.jpg`,
+    filePath: path,
+    fileUrl: publicData.publicUrl,
+    fileType: contentType,
+    fileSize: file.size,
+    uploadedBy: userId,
+  })
 
   return NextResponse.json({ url: publicData.publicUrl })
 }

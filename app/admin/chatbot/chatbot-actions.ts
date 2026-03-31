@@ -3,6 +3,7 @@ import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
+import { registerMediaItem } from '@/lib/media/register'
 import type { ChatbotConfig, ChatMessage, ConversationListItem, FaqItem, FaqStatus } from '@/lib/chatbot/types'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -199,6 +200,20 @@ export async function uploadChatbotAvatar(
     if (!publicUrl) {
       return { success: false, error: 'Failed to get public URL for uploaded image' }
     }
+
+    // Register media item — get admin user id via server action client
+    const authClient = await createSupabaseServerActionClient()
+    const { data: { user } } = await authClient.auth.getUser()
+    await registerMediaItem({
+      bucket: 'chatbot-avatars',
+      fileName: fileName,
+      filePath: fileName,
+      fileUrl: publicUrl,
+      fileType: file.type,
+      fileSize: file.size,
+      uploadedBy: user?.id ?? 'unknown',
+      uploadedByRole: 'admin',
+    })
 
     // Update chatbot_config.avatar_url
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

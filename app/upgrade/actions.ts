@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
 import { getStripe } from '@/lib/stripe/client'
+import { registerMediaItem } from '@/lib/media/register'
 
 const ALLOWED_MIME_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp']
 const MAX_FILE_SIZE = 4 * 1024 * 1024 // 4MB
@@ -37,6 +38,16 @@ export async function uploadCertificate(
   const { data: { publicUrl } } = supabase.storage
     .from('upgrade-certificates')
     .getPublicUrl(path)
+
+  await registerMediaItem({
+    bucket: 'upgrade-certificates',
+    fileName: file.name,
+    filePath: path,
+    fileUrl: publicUrl,
+    fileType: file.type,
+    fileSize: file.size,
+    uploadedBy: user.id,
+  })
 
   return { url: publicUrl }
 }
