@@ -1,12 +1,20 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import {
   saveBasicInfo,
   saveOnlinePresence,
   saveVideoIntro,
   saveTeachingInfo,
+  saveLocation,
+  uploadDocument,
+  deleteDocument,
+  saveFacultyMember,
+  removeFacultyMember,
+  inviteFacultyByEmail,
+  submitForReview,
 } from './actions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -59,6 +67,7 @@ interface OnboardingWizardProps {
     file_name: string | null
     file_url: string
   }[]
+  ownerName?: string
 }
 
 // ── Predefined Lists ──────────────────────────────────────────────────────────
@@ -1182,6 +1191,1007 @@ function Step5TeachingInfo({
   )
 }
 
+// ── Step Navigation Helpers ───────────────────────────────────────────────────
+
+function getVisibleSteps(deliveryFormat: string | null): number[] {
+  const all = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  if (deliveryFormat === 'online') return all.filter((s) => s !== 6)
+  return all
+}
+
+function getNextStep(current: number, deliveryFormat: string | null): number {
+  const steps = getVisibleSteps(deliveryFormat)
+  const idx = steps.indexOf(current)
+  return idx >= 0 && idx < steps.length - 1 ? steps[idx + 1] : current
+}
+
+function getPrevStep(current: number, deliveryFormat: string | null): number {
+  const steps = getVisibleSteps(deliveryFormat)
+  const idx = steps.indexOf(current)
+  return idx > 0 ? steps[idx - 1] : current
+}
+
+// ── Step 6: Location ──────────────────────────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type GoogleMapsType = any
+
+function Step6Location({
+  school,
+  onBack,
+  onNext,
+}: {
+  school: School
+  onBack: () => void
+  onNext: () => void
+}) {
+  const [locationAddress, setLocationAddress] = useState(school.location_address ?? '')
+  const [locationCity, setLocationCity] = useState(school.location_city ?? '')
+  const [locationCountry, setLocationCountry] = useState(school.location_country ?? '')
+  const [locationLat, setLocationLat] = useState<number | null>(school.location_lat ?? null)
+  const [locationLng, setLocationLng] = useState<number | null>(school.location_lng ?? null)
+  const [locationPlaceId, setLocationPlaceId] = useState(school.location_place_id ?? '')
+  const [placeSelected, setPlaceSelected] = useState(!!school.location_address)
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+  const inputRef = useRef<HTMLInputElement>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const autocompleteRef = useRef<GoogleMapsType>(null)
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const win = window as any
+
+    function initAutocomplete() {
+      if (!inputRef.current || !win.google?.maps?.places) return
+      const ac = new win.google.maps.places.Autocomplete(inputRef.current, {
+        types: ['establishment', 'geocode'],
+      })
+      autocompleteRef.current = ac
+      ac.addListener('place_changed', () => {
+        const place = ac.getPlace()
+        if (!place?.geometry?.location) return
+
+        const address = place.formatted_address ?? ''
+        const placeId = place.place_id ?? ''
+        let city = ''
+        let country = ''
+
+        for (const comp of place.address_components ?? []) {
+          if (comp.types.includes('locality')) city = comp.long_name
+          if (comp.types.includes('country')) country = comp.long_name
+        }
+
+        setLocationAddress(address)
+        setLocationCity(city)
+        setLocationCountry(country)
+        setLocationLat(place.geometry.location.lat())
+        setLocationLng(place.geometry.location.lng())
+        setLocationPlaceId(placeId)
+        setPlaceSelected(true)
+        setError(null)
+      })
+    }
+
+    if (win.google?.maps?.places) {
+      initAutocomplete()
+      return
+    }
+
+    const scriptId = 'google-maps-places'
+    if (document.getElementById(scriptId)) {
+      // Script already loading — poll until ready
+      const interval = setInterval(() => {
+        if (win.google?.maps?.places) {
+          clearInterval(interval)
+          initAutocomplete()
+        }
+      }, 200)
+      return () => clearInterval(interval)
+    }
+
+    const script = document.createElement('script')
+    script.id = scriptId
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`
+    script.async = true
+    script.onload = initAutocomplete
+    document.head.appendChild(script)
+  }, [])
+
+  function handleContinue() {
+    setError(null)
+    if (!placeSelected || !locationAddress || !locationLat || !locationLng) {
+      setError('Please select a location from the suggestions.')
+      return
+    }
+
+    startTransition(async () => {
+      const result = await saveLocation(school.slug, {
+        location_address: locationAddress,
+        location_city: locationCity,
+        location_country: locationCountry,
+        location_lat: locationLat!,
+        location_lng: locationLng!,
+        location_place_id: locationPlaceId,
+      })
+      if ('error' in result) {
+        setError(result.error)
+      } else {
+        onNext()
+      }
+    })
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-8 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold text-[#1B3A5C] mb-2">School Location</h2>
+      <p className="text-[#6B7280] text-sm mb-8">
+        Enter your school&apos;s physical address. Start typing and select from the suggestions.
+      </p>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-[#374151] mb-2">
+            Address <span className="text-red-400">*</span>
+          </label>
+          <input
+            ref={inputRef}
+            type="text"
+            defaultValue={locationAddress}
+            placeholder="Start typing your address..."
+            className="w-full text-base border border-[#E5E7EB] rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#1B3A5C]/20 focus:border-[#1B3A5C] transition-colors"
+          />
+        </div>
+
+        {placeSelected && locationAddress && (
+          <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-start gap-3">
+            <svg
+              className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <div>
+              <p className="text-sm font-medium text-green-800">{locationAddress}</p>
+              {(locationCity || locationCountry) && (
+                <p className="text-xs text-green-600 mt-0.5">
+                  {[locationCity, locationCountry].filter(Boolean).join(', ')}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {error && <ErrorMessage message={error} />}
+
+      <NavButtons
+        onBack={onBack}
+        onContinue={handleContinue}
+        isPending={isPending}
+        canContinue={placeSelected}
+      />
+    </div>
+  )
+}
+
+// ── Step 7: Document Upload ───────────────────────────────────────────────────
+
+const DOCUMENT_SLOTS = [
+  { type: 'business_registration', label: 'Business Registration', required: true },
+  { type: 'qualification_certificate', label: 'Qualification Certificate', required: true },
+  { type: 'insurance', label: 'Insurance Document', required: false },
+] as const
+
+type DocumentSlotType = (typeof DOCUMENT_SLOTS)[number]['type']
+
+interface UploadedDoc {
+  id: string
+  file_name: string | null
+  file_url: string
+}
+
+function Step7Documents({
+  school,
+  designations,
+  documents: initialDocuments,
+  onBack,
+  onNext,
+}: {
+  school: School
+  designations: { id: string; designation_type: string; status: string }[]
+  documents: { id: string; designation_id: string; document_type: string; file_name: string | null; file_url: string }[]
+  onBack: () => void
+  onNext: () => void
+}) {
+  // Build a map: designationId -> documentType -> UploadedDoc
+  const [docMap, setDocMap] = useState<Record<string, Record<string, UploadedDoc>>>(() => {
+    const map: Record<string, Record<string, UploadedDoc>> = {}
+    for (const doc of initialDocuments) {
+      if (!map[doc.designation_id]) map[doc.designation_id] = {}
+      map[doc.designation_id][doc.document_type] = { id: doc.id, file_name: doc.file_name, file_url: doc.file_url }
+    }
+    return map
+  })
+
+  // Track uploading/deleting state: `${designationId}_${documentType}`
+  const [loadingSlots, setLoadingSlots] = useState<Set<string>>(new Set())
+  const [slotErrors, setSlotErrors] = useState<Record<string, string>>({})
+  const [error, setError] = useState<string | null>(null)
+
+  function setSlotLoading(key: string, val: boolean) {
+    setLoadingSlots((prev) => {
+      const next = new Set(prev)
+      val ? next.add(key) : next.delete(key)
+      return next
+    })
+  }
+
+  async function handleFileChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+    designationId: string,
+    docType: DocumentSlotType,
+  ) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const slotKey = `${designationId}_${docType}`
+    setSlotLoading(slotKey, true)
+    setSlotErrors((prev) => ({ ...prev, [slotKey]: '' }))
+
+    const formData = new FormData()
+    formData.append('schoolSlug', school.slug)
+    formData.append('designationId', designationId)
+    formData.append('documentType', docType)
+    formData.append('file', file)
+
+    const result = await uploadDocument(formData)
+    setSlotLoading(slotKey, false)
+
+    if ('error' in result) {
+      setSlotErrors((prev) => ({ ...prev, [slotKey]: result.error }))
+    } else {
+      setDocMap((prev) => ({
+        ...prev,
+        [designationId]: {
+          ...(prev[designationId] ?? {}),
+          [docType]: result.document,
+        },
+      }))
+    }
+
+    // Reset input so same file can be re-uploaded after delete
+    e.target.value = ''
+  }
+
+  async function handleDelete(designationId: string, docType: DocumentSlotType) {
+    const doc = docMap[designationId]?.[docType]
+    if (!doc) return
+
+    const slotKey = `${designationId}_${docType}`
+    setSlotLoading(slotKey, true)
+
+    const result = await deleteDocument(school.slug, doc.id)
+    setSlotLoading(slotKey, false)
+
+    if ('error' in result) {
+      setSlotErrors((prev) => ({ ...prev, [slotKey]: result.error }))
+    } else {
+      setDocMap((prev) => {
+        const next = { ...prev }
+        if (next[designationId]) {
+          next[designationId] = { ...next[designationId] }
+          delete next[designationId][docType]
+        }
+        return next
+      })
+    }
+  }
+
+  function canContinue() {
+    for (const des of designations) {
+      for (const slot of DOCUMENT_SLOTS) {
+        if (slot.required && !docMap[des.id]?.[slot.type]) return false
+      }
+    }
+    return true
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-8 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold text-[#1B3A5C] mb-2">Verification Documents</h2>
+      <p className="text-[#6B7280] text-sm mb-8">
+        Upload the required documents for each designation. Accepted: PDF, JPG, PNG (max 10 MB each).
+      </p>
+
+      <div className="space-y-6">
+        {designations.map((des) => (
+          <div key={des.id} className="border border-[#E5E7EB] rounded-xl overflow-hidden">
+            <div className="bg-[#F7F8FA] px-4 py-3 border-b border-[#E5E7EB]">
+              <span className="text-sm font-semibold text-[#1B3A5C]">{des.designation_type}</span>
+            </div>
+            <div className="p-4 space-y-4">
+              {DOCUMENT_SLOTS.map((slot) => {
+                const slotKey = `${des.id}_${slot.type}`
+                const uploaded = docMap[des.id]?.[slot.type]
+                const isLoading = loadingSlots.has(slotKey)
+                const slotError = slotErrors[slotKey]
+
+                return (
+                  <div key={slot.type} className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      {/* Status indicator */}
+                      {uploaded ? (
+                        <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : slot.required ? (
+                        <span className="text-red-400 text-sm font-bold flex-shrink-0">*</span>
+                      ) : (
+                        <span className="text-[#9CA3AF] text-xs flex-shrink-0">○</span>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-[#374151]">
+                          {slot.label}
+                          {!slot.required && (
+                            <span className="ml-1.5 text-xs text-[#9CA3AF] font-normal">(optional)</span>
+                          )}
+                        </p>
+                        {uploaded && (
+                          <p className="text-xs text-[#6B7280] truncate max-w-[200px]">{uploaded.file_name}</p>
+                        )}
+                        {slotError && (
+                          <p className="text-xs text-red-500">{slotError}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {isLoading ? (
+                        <div className="w-6 h-6">
+                          <Spinner />
+                        </div>
+                      ) : uploaded ? (
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(des.id, slot.type)}
+                          className="p-1.5 text-[#9CA3AF] hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                          title="Remove file"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      ) : (
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            className="sr-only"
+                            onChange={(e) => handleFileChange(e, des.id, slot.type)}
+                          />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-xs font-medium text-[#374151] hover:bg-[#F7F8FA] transition-colors">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Choose File
+                          </span>
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {!canContinue() && (
+        <p className="mt-4 text-xs text-amber-600">
+          All required documents (marked with *) must be uploaded before continuing.
+        </p>
+      )}
+
+      {error && <ErrorMessage message={error} />}
+
+      <NavButtons
+        onBack={onBack}
+        onContinue={() => { setError(null); onNext() }}
+        isPending={false}
+        canContinue={canContinue()}
+      />
+    </div>
+  )
+}
+
+// ── Step 8: Faculty ───────────────────────────────────────────────────────────
+
+interface FacultyRow {
+  id: string
+  profile_id: string | null
+  invited_email: string | null
+  full_name?: string
+  position: string | null
+  is_principal_trainer: boolean
+  status: string
+}
+
+interface SearchResult {
+  id: string
+  full_name: string
+  avatar_url: string | null
+}
+
+function Step8Faculty({
+  school,
+  faculty: initialFaculty,
+  ownerName,
+  onBack,
+  onNext,
+}: {
+  school: School
+  faculty: {
+    id: string
+    profile_id: string | null
+    invited_email: string | null
+    position: string | null
+    is_principal_trainer: boolean
+    status: string
+  }[]
+  ownerName: string
+  onBack: () => void
+  onNext: () => void
+}) {
+  const [facultyList, setFacultyList] = useState<FacultyRow[]>(initialFaculty)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [selectedMember, setSelectedMember] = useState<SearchResult | null>(null)
+  const [memberPosition, setMemberPosition] = useState('')
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [invitePosition, setInvitePosition] = useState('')
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const debouncedSearch = useCallback((query: string) => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    if (!query.trim()) {
+      setSearchResults([])
+      return
+    }
+    searchTimerRef.current = setTimeout(async () => {
+      setIsSearching(true)
+      try {
+        const res = await fetch(`/api/schools/faculty-search?q=${encodeURIComponent(query)}&school_id=${school.id}`)
+        if (res.ok) {
+          const data = await res.json() as { results: SearchResult[] }
+          setSearchResults(data.results ?? [])
+        }
+      } finally {
+        setIsSearching(false)
+      }
+    }, 500)
+  }, [school.id])
+
+  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const q = e.target.value
+    setSearchQuery(q)
+    debouncedSearch(q)
+  }
+
+  function handleSelectMember(member: SearchResult) {
+    setSelectedMember(member)
+    setSearchQuery('')
+    setSearchResults([])
+  }
+
+  function handleAddMember() {
+    if (!selectedMember || !memberPosition.trim()) return
+    setActionError(null)
+    startTransition(async () => {
+      const result = await saveFacultyMember(school.slug, {
+        profile_id: selectedMember.id,
+        position: memberPosition.trim(),
+      })
+      if ('error' in result) {
+        setActionError(result.error)
+      } else {
+        setFacultyList((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            profile_id: selectedMember.id,
+            invited_email: null,
+            full_name: selectedMember.full_name,
+            position: memberPosition.trim(),
+            is_principal_trainer: false,
+            status: 'active',
+          },
+        ])
+        setSelectedMember(null)
+        setMemberPosition('')
+      }
+    })
+  }
+
+  function handleInvite() {
+    setActionError(null)
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailPattern.test(inviteEmail)) {
+      setActionError('Please enter a valid email address.')
+      return
+    }
+    if (!invitePosition.trim()) {
+      setActionError('Position is required.')
+      return
+    }
+    startTransition(async () => {
+      const result = await inviteFacultyByEmail(school.slug, {
+        email: inviteEmail.trim(),
+        position: invitePosition.trim(),
+      })
+      if ('error' in result) {
+        setActionError(result.error)
+      } else {
+        setFacultyList((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            profile_id: null,
+            invited_email: inviteEmail.trim(),
+            position: invitePosition.trim(),
+            is_principal_trainer: false,
+            status: 'pending',
+          },
+        ])
+        setInviteEmail('')
+        setInvitePosition('')
+      }
+    })
+  }
+
+  async function handleRemove(facultyId: string) {
+    setActionError(null)
+    startTransition(async () => {
+      const result = await removeFacultyMember(school.slug, facultyId)
+      if ('error' in result) {
+        setActionError(result.error)
+      } else {
+        setFacultyList((prev) => prev.filter((f) => f.id !== facultyId))
+      }
+    })
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-8 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold text-[#1B3A5C] mb-2">Faculty Members</h2>
+      <p className="text-[#6B7280] text-sm mb-8">
+        Add your teaching staff. You can also invite people who are not yet GOYA members.
+      </p>
+
+      {/* Owner auto-listed */}
+      <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center gap-3 mb-6">
+        <div className="w-8 h-8 rounded-full bg-[#1B3A5C] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          {ownerName.charAt(0).toUpperCase()}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-[#1B3A5C]">{ownerName}</p>
+          <p className="text-xs text-[#4E87A0]">Principal Trainer (you)</p>
+        </div>
+        <span className="text-xs bg-[#1B3A5C] text-white px-2 py-0.5 rounded-full font-medium">
+          Principal Trainer
+        </span>
+      </div>
+
+      {/* Search GOYA members */}
+      <div className="space-y-4 mb-6">
+        <h3 className="text-sm font-semibold text-[#374151]">Search GOYA Members</h3>
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Search by name..."
+            className="w-full text-sm border border-[#E5E7EB] rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#1B3A5C]/20 focus:border-[#1B3A5C] transition-colors"
+          />
+          {isSearching && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <Spinner />
+            </div>
+          )}
+          {searchResults.length > 0 && (
+            <div className="absolute z-10 top-full mt-1 left-0 right-0 bg-white border border-[#E5E7EB] rounded-xl shadow-lg overflow-hidden max-h-48 overflow-y-auto">
+              {searchResults.map((member) => (
+                <button
+                  key={member.id}
+                  type="button"
+                  onClick={() => handleSelectMember(member)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F7F8FA] transition-colors"
+                >
+                  <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xs font-bold text-[#6B7280] flex-shrink-0 overflow-hidden">
+                    {member.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={member.avatar_url} alt={member.full_name} className="w-full h-full object-cover" />
+                    ) : (
+                      member.full_name.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <span className="text-sm text-[#374151]">{member.full_name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {selectedMember && (
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-[#374151] mb-1">
+                Adding: <span className="text-[#1B3A5C]">{selectedMember.full_name}</span>
+              </p>
+              <input
+                type="text"
+                value={memberPosition}
+                onChange={(e) => setMemberPosition(e.target.value)}
+                placeholder="Position (e.g. Senior Teacher)"
+                className="w-full text-sm border border-[#E5E7EB] rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#1B3A5C]/20 focus:border-[#1B3A5C] transition-colors"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleAddMember}
+              disabled={!memberPosition.trim() || isPending}
+              className="px-4 py-2.5 bg-[#1B3A5C] text-white rounded-xl text-sm font-medium hover:bg-[#16304f] transition-colors disabled:opacity-50"
+            >
+              Add
+            </button>
+            <button
+              type="button"
+              onClick={() => { setSelectedMember(null); setMemberPosition('') }}
+              className="px-3 py-2.5 border border-[#E5E7EB] text-[#6B7280] rounded-xl text-sm hover:bg-[#F7F8FA] transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Invite by email */}
+      <div className="space-y-3 mb-6 p-4 bg-[#F7F8FA] rounded-xl border border-[#E5E7EB]">
+        <h3 className="text-sm font-semibold text-[#374151]">Invite by Email</h3>
+        <p className="text-xs text-[#6B7280]">For people who are not yet GOYA members.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input
+            type="email"
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+            placeholder="Email address"
+            className="text-sm border border-[#E5E7EB] rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#1B3A5C]/20 focus:border-[#1B3A5C] transition-colors bg-white"
+          />
+          <input
+            type="text"
+            value={invitePosition}
+            onChange={(e) => setInvitePosition(e.target.value)}
+            placeholder="Position"
+            className="text-sm border border-[#E5E7EB] rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#1B3A5C]/20 focus:border-[#1B3A5C] transition-colors bg-white"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={handleInvite}
+          disabled={!inviteEmail.trim() || !invitePosition.trim() || isPending}
+          className="px-4 py-2 bg-[#4E87A0] text-white rounded-xl text-sm font-medium hover:bg-[#3d6d83] transition-colors disabled:opacity-50"
+        >
+          Send Invite
+        </button>
+      </div>
+
+      {/* Faculty list */}
+      {facultyList.filter((f) => !f.is_principal_trainer).length > 0 && (
+        <div className="space-y-2 mb-4">
+          <h3 className="text-sm font-semibold text-[#374151]">Added Faculty</h3>
+          {facultyList
+            .filter((f) => !f.is_principal_trainer)
+            .map((f) => (
+              <div
+                key={f.id}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[#E5E7EB] bg-white"
+              >
+                <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xs font-bold text-[#6B7280] flex-shrink-0">
+                  {(f.full_name ?? f.invited_email ?? '?').charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#374151] truncate">
+                    {f.full_name ?? f.invited_email}
+                  </p>
+                  <p className="text-xs text-[#6B7280]">{f.position}</p>
+                </div>
+                {f.status === 'pending' && (
+                  <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                    Invited
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleRemove(f.id)}
+                  disabled={isPending}
+                  className="p-1.5 text-[#9CA3AF] hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 disabled:opacity-50"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+        </div>
+      )}
+
+      {actionError && <ErrorMessage message={actionError} />}
+
+      <NavButtons
+        onBack={onBack}
+        onContinue={onNext}
+        isPending={isPending}
+      />
+    </div>
+  )
+}
+
+// ── Step 9: Review & Submit ───────────────────────────────────────────────────
+
+function Step9Review({
+  school,
+  designations,
+  faculty,
+  documents,
+  onBack,
+  goToStep,
+}: {
+  school: School
+  designations: { id: string; designation_type: string; status: string }[]
+  faculty: {
+    id: string
+    profile_id: string | null
+    invited_email: string | null
+    full_name?: string
+    position: string | null
+    is_principal_trainer: boolean
+    status: string
+  }[]
+  documents: { id: string; designation_id: string; document_type: string; file_name: string | null; file_url: string }[]
+  onBack: () => void
+  goToStep: (n: number) => void
+}) {
+  const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  function handleSubmit() {
+    setError(null)
+    startTransition(async () => {
+      const result = await submitForReview(school.slug)
+      if ('error' in result) {
+        setError(result.error)
+      } else {
+        setSubmitted(true)
+      }
+    })
+  }
+
+  if (submitted) {
+    return (
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-10 max-w-xl mx-auto text-center">
+        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-6 mx-auto">
+          <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-[#1B3A5C] mb-3">
+          Your school has been submitted for review
+        </h2>
+        <p className="text-[#6B7280] text-sm mb-8 leading-relaxed">
+          Our team will review your school and get back to you. This typically takes up to 1 week.
+        </p>
+        <Link
+          href="/dashboard"
+          className="inline-block bg-[#1B3A5C] text-white rounded-xl px-6 py-3 font-semibold text-sm hover:bg-[#16304f] transition-colors"
+        >
+          Go to Dashboard
+        </Link>
+      </div>
+    )
+  }
+
+  const format = school.course_delivery_format
+  const isOnline = format === 'online'
+
+  function SectionHeader({ title, step }: { title: string; step: number }) {
+    return (
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-[#374151] uppercase tracking-wide">{title}</h3>
+        <button
+          type="button"
+          onClick={() => goToStep(step)}
+          className="text-xs text-[#4E87A0] hover:text-[#1B3A5C] font-medium transition-colors"
+        >
+          Edit
+        </button>
+      </div>
+    )
+  }
+
+  function Field({ label, value }: { label: string; value: string | null | undefined }) {
+    if (!value) return null
+    return (
+      <div className="flex gap-3">
+        <span className="text-xs text-[#9CA3AF] w-28 flex-shrink-0 pt-0.5">{label}</span>
+        <span className="text-sm text-[#374151]">{value}</span>
+      </div>
+    )
+  }
+
+  const docsPerDesignation = designations.map((des) => {
+    const uploaded = documents.filter((d) => d.designation_id === des.id)
+    return { designation: des, uploaded, total: DOCUMENT_SLOTS.length }
+  })
+
+  return (
+    <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-8 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold text-[#1B3A5C] mb-2">Review & Submit</h2>
+      <p className="text-[#6B7280] text-sm mb-8">
+        Review your information before submitting for review.
+      </p>
+
+      <div className="space-y-6">
+        {/* Basic Info */}
+        <div className="bg-[#F7F8FA] rounded-xl p-4 border border-[#E5E7EB]">
+          <SectionHeader title="Basic Info" step={2} />
+          <div className="space-y-2">
+            <Field label="School Name" value={school.name} />
+            <Field label="Short Bio" value={school.short_bio} />
+            <Field label="Established" value={school.established_year ? String(school.established_year) : null} />
+          </div>
+        </div>
+
+        {/* Online Presence */}
+        <div className="bg-[#F7F8FA] rounded-xl p-4 border border-[#E5E7EB]">
+          <SectionHeader title="Online Presence" step={3} />
+          <div className="space-y-2">
+            <Field label="Website" value={school.website} />
+            <Field label="Instagram" value={school.instagram} />
+            <Field label="Facebook" value={school.facebook} />
+            <Field label="TikTok" value={school.tiktok} />
+            <Field label="YouTube" value={school.youtube} />
+          </div>
+          {!school.website && !school.instagram && !school.facebook && !school.tiktok && !school.youtube && (
+            <p className="text-xs text-[#9CA3AF]">None provided</p>
+          )}
+        </div>
+
+        {/* Video */}
+        <div className="bg-[#F7F8FA] rounded-xl p-4 border border-[#E5E7EB]">
+          <SectionHeader title="Video Introduction" step={4} />
+          {school.video_url ? (
+            <div className="space-y-2">
+              <Field label="Platform" value={school.video_platform ?? ''} />
+              <Field label="URL" value={school.video_url} />
+            </div>
+          ) : (
+            <p className="text-xs text-[#9CA3AF]">None</p>
+          )}
+        </div>
+
+        {/* Teaching */}
+        <div className="bg-[#F7F8FA] rounded-xl p-4 border border-[#E5E7EB]">
+          <SectionHeader title="Teaching Info" step={5} />
+          <div className="space-y-2">
+            <Field
+              label="Practice Styles"
+              value={school.practice_styles?.join(', ') || null}
+            />
+            <Field
+              label="Programs"
+              value={school.programs_offered?.join(', ') || null}
+            />
+            <Field
+              label="Delivery Format"
+              value={
+                format === 'in_person' ? 'In-Person' :
+                format === 'online' ? 'Online' :
+                format === 'hybrid' ? 'Hybrid' : null
+              }
+            />
+            <Field label="Lineage" value={school.lineage} />
+            <Field label="Languages" value={school.languages?.join(', ') || null} />
+          </div>
+        </div>
+
+        {/* Location */}
+        {!isOnline && (
+          <div className="bg-[#F7F8FA] rounded-xl p-4 border border-[#E5E7EB]">
+            <SectionHeader title="Location" step={6} />
+            {school.location_address ? (
+              <div className="space-y-2">
+                <Field label="Address" value={school.location_address} />
+                <Field label="City" value={school.location_city} />
+                <Field label="Country" value={school.location_country} />
+              </div>
+            ) : (
+              <p className="text-xs text-amber-600">No location set yet</p>
+            )}
+          </div>
+        )}
+        {isOnline && (
+          <div className="bg-[#F7F8FA] rounded-xl p-4 border border-[#E5E7EB]">
+            <SectionHeader title="Location" step={7} />
+            <p className="text-sm text-[#6B7280]">Online School</p>
+          </div>
+        )}
+
+        {/* Documents */}
+        <div className="bg-[#F7F8FA] rounded-xl p-4 border border-[#E5E7EB]">
+          <SectionHeader title="Documents" step={7} />
+          <div className="space-y-1">
+            {docsPerDesignation.map(({ designation, uploaded, total }) => (
+              <div key={designation.id} className="flex items-center justify-between text-sm">
+                <span className="text-[#374151]">{designation.designation_type}</span>
+                <span className={`font-medium tabular-nums ${uploaded.length < total ? 'text-amber-600' : 'text-green-600'}`}>
+                  {uploaded.length}/{total} uploaded
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Faculty */}
+        <div className="bg-[#F7F8FA] rounded-xl p-4 border border-[#E5E7EB]">
+          <SectionHeader title="Faculty" step={8} />
+          {faculty.length === 0 ? (
+            <p className="text-xs text-[#9CA3AF]">No additional faculty added</p>
+          ) : (
+            <div className="space-y-1">
+              {faculty.map((f) => (
+                <div key={f.id} className="flex items-center justify-between text-sm">
+                  <span className="text-[#374151]">{f.full_name ?? f.invited_email ?? 'Unknown'}</span>
+                  <span className="text-xs text-[#9CA3AF]">{f.position}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {error && <ErrorMessage message={error} />}
+
+      <div className="mt-8 space-y-3">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={isPending}
+          className="w-full bg-[#1B3A5C] text-white rounded-xl px-6 py-4 font-semibold text-base hover:bg-[#16304f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {isPending ? <Spinner /> : null}
+          Submit for Review
+        </button>
+        <button
+          type="button"
+          onClick={onBack}
+          disabled={isPending}
+          className="w-full px-6 py-3 rounded-xl font-semibold text-sm border border-[#E5E7EB] text-[#4E87A0] hover:bg-[#F7F8FA] transition-colors disabled:opacity-50"
+        >
+          ← Back
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Main Wizard ───────────────────────────────────────────────────────────────
 
 export default function OnboardingWizard({
@@ -1189,12 +2199,17 @@ export default function OnboardingWizard({
   designations,
   faculty,
   documents,
+  ownerName,
 }: OnboardingWizardProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  const deliveryFormat = school.course_delivery_format
+  const visibleSteps = getVisibleSteps(deliveryFormat)
+
   const stepParam = parseInt(searchParams.get('step') ?? '1', 10)
-  const currentStep = isNaN(stepParam) || stepParam < 1 || stepParam > 9 ? 1 : stepParam
+  const currentStep =
+    isNaN(stepParam) || !visibleSteps.includes(stepParam) ? 1 : stepParam
 
   function goToStep(n: number) {
     const params = new URLSearchParams(searchParams.toString())
@@ -1207,87 +2222,70 @@ export default function OnboardingWizard({
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const next = () => goToStep(getNextStep(currentStep, deliveryFormat))
+  const prev = () => goToStep(getPrevStep(currentStep, deliveryFormat))
+
+  // Compute display step index for the StepIndicator (based on visible steps)
+  const displayStep = visibleSteps.indexOf(currentStep) + 1
+
   return (
     <div className="relative">
-      <StepIndicator currentStep={currentStep} />
+      <StepIndicator currentStep={displayStep} />
 
       {currentStep === 1 && (
-        <Step1Welcome school={school} onContinue={() => goToStep(2)} />
+        <Step1Welcome school={school} onContinue={next} />
       )}
 
       {currentStep === 2 && (
-        <Step2BasicInfo
-          school={school}
-          onBack={() => goToStep(1)}
-          onNext={() => goToStep(3)}
-        />
+        <Step2BasicInfo school={school} onBack={prev} onNext={next} />
       )}
 
       {currentStep === 3 && (
-        <Step3OnlinePresence
-          school={school}
-          onBack={() => goToStep(2)}
-          onNext={() => goToStep(4)}
-        />
+        <Step3OnlinePresence school={school} onBack={prev} onNext={next} />
       )}
 
       {currentStep === 4 && (
-        <Step4VideoIntro
-          school={school}
-          onBack={() => goToStep(3)}
-          onNext={() => goToStep(5)}
-        />
+        <Step4VideoIntro school={school} onBack={prev} onNext={next} />
       )}
 
       {currentStep === 5 && (
-        <Step5TeachingInfo
+        <Step5TeachingInfo school={school} onBack={prev} onNext={next} />
+      )}
+
+      {currentStep === 6 && (
+        <Step6Location school={school} onBack={prev} onNext={next} />
+      )}
+
+      {currentStep === 7 && (
+        <Step7Documents
           school={school}
-          onBack={() => goToStep(4)}
-          onNext={() => goToStep(6)}
+          designations={designations}
+          documents={documents}
+          onBack={prev}
+          onNext={next}
         />
       )}
 
-      {/* Steps 6-9: placeholders — implemented in Plan 31-03 */}
-      {currentStep >= 6 && currentStep <= 9 && (
-        <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-8 max-w-2xl mx-auto">
-          <div className="flex items-center justify-center min-h-[200px] text-center">
-            <div>
-              <div className="w-12 h-12 rounded-full bg-[#F7F8FA] border border-[#E5E7EB] flex items-center justify-center mx-auto mb-4">
-                <span className="text-lg font-bold text-[#9CA3AF]">{currentStep}</span>
-              </div>
-              <p className="text-[#6B7280] text-sm font-medium">
-                Step {currentStep} — {STEP_LABELS[currentStep - 1]}
-              </p>
-              <p className="text-[#9CA3AF] text-xs mt-1">Coming soon in the next update</p>
-            </div>
-          </div>
-          <div className="flex gap-3 mt-4">
-            <button
-              type="button"
-              onClick={() => goToStep(currentStep - 1)}
-              className="flex-1 px-6 py-3 rounded-xl font-semibold text-sm border border-[#E5E7EB] text-[#4E87A0] hover:bg-[#F7F8FA] transition-colors"
-            >
-              ← Back
-            </button>
-            {currentStep < 9 && (
-              <button
-                type="button"
-                onClick={() => goToStep(currentStep + 1)}
-                className="flex-1 bg-[#1B3A5C] text-white rounded-xl px-6 py-3 font-semibold text-sm hover:bg-[#16304f] transition-colors"
-              >
-                Continue →
-              </button>
-            )}
-          </div>
-        </div>
+      {currentStep === 8 && (
+        <Step8Faculty
+          school={school}
+          faculty={faculty}
+          ownerName={ownerName ?? school.name}
+          onBack={prev}
+          onNext={next}
+        />
       )}
 
-      {/* Suppress unused var warnings for props passed to future steps */}
-      <div className="hidden" aria-hidden="true">
-        {JSON.stringify(designations?.length)}
-        {JSON.stringify(faculty?.length)}
-        {JSON.stringify(documents?.length)}
-      </div>
+      {currentStep === 9 && (
+        <Step9Review
+          school={school}
+          designations={designations}
+          faculty={faculty}
+          documents={documents}
+          onBack={prev}
+          goToStep={goToStep}
+        />
+      )}
     </div>
   )
 }

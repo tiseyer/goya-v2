@@ -57,6 +57,16 @@ export default async function SchoolOnboardingPage({
     .select('id, designation_id, document_type, file_name, file_url')
     .eq('school_id', school.id)
 
+  // Fetch owner's full name for the Faculty step
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: ownerProfile } = await (supabase as any)
+    .from('profiles')
+    .select('full_name')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const ownerName: string = ownerProfile?.full_name ?? 'You'
+
   return (
     <PageContainer className="py-8">
       <Suspense
@@ -92,6 +102,7 @@ export default async function SchoolOnboardingPage({
           designations={designations ?? []}
           faculty={faculty ?? []}
           documents={documents ?? []}
+          ownerName={ownerName}
         />
       </Suspense>
     </PageContainer>
