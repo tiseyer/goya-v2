@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import type { DocMeta, DocPage, NavSection } from '@/lib/docs/types'
 import MarkdownRenderer from '@/app/admin/docs/components/MarkdownRenderer'
+import SearchModal from '@/app/components/docs/SearchModal'
+import { useDocSearch } from '@/app/components/docs/useDocSearch'
 
 type TocItem = { id: string; text: string; level: 2 | 3 }
 
@@ -44,6 +46,10 @@ export default function HelpDocViewer({ doc, navTree, allDocs, prevDoc, nextDoc 
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set())
   const [activeHeading, setActiveHeading] = useState<string>('')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const { isOpen: searchOpen, open: openSearch, close: closeSearch } = useDocSearch()
+
+  // Extract allowed audiences from the navTree sections
+  const allowedAudiences = Array.from(new Set(allDocs.flatMap(d => d.audience)))
   const contentRef = useRef<HTMLDivElement>(null)
 
   const headings = extractHeadings(doc.content)
@@ -110,9 +116,19 @@ export default function HelpDocViewer({ doc, navTree, allDocs, prevDoc, nextDoc 
             </button>
           </div>
 
-          {/* No audience filter for non-admins — content is pre-filtered */}
+          {/* Search trigger */}
+          <button
+            onClick={openSearch}
+            className="mt-3 w-full flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300 hover:text-slate-500 transition-colors text-left"
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span className="flex-1">Search...</span>
+            <kbd className="hidden sm:inline text-[10px] font-mono bg-white px-1 py-0.5 rounded border border-slate-200">⌘K</kbd>
+          </button>
 
-          <nav className="space-y-1">
+          <nav className="mt-3 space-y-1">
             {navTree.map(section => {
               const isCollapsed = collapsedSections.has(section.section)
               return (
@@ -222,6 +238,14 @@ export default function HelpDocViewer({ doc, navTree, allDocs, prevDoc, nextDoc 
           </nav>
         </aside>
       )}
+
+      {/* Search modal — role-filtered */}
+      <SearchModal
+        isOpen={searchOpen}
+        onClose={closeSearch}
+        basePath="/settings/help/docs"
+        allowedAudiences={allowedAudiences}
+      />
     </div>
   )
 }

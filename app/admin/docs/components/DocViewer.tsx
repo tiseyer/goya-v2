@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import type { DocMeta, DocPage, NavSection } from '@/lib/docs/types';
 import MarkdownRenderer from './MarkdownRenderer';
+import SearchModal from '@/app/components/docs/SearchModal';
+import { useDocSearch } from '@/app/components/docs/useDocSearch';
 
 const AUDIENCES = ['all', 'admin', 'moderator', 'teacher', 'student', 'developer'] as const;
 
@@ -48,6 +50,7 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
   const [activeHeading, setActiveHeading] = useState<string>('');
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const { isOpen: searchOpen, open: openSearch, close: closeSearch } = useDocSearch();
 
   // Load persisted sidebar state
   useEffect(() => {
@@ -154,15 +157,17 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
             GOYA Documentation
           </Link>
 
-          {/* Search placeholder */}
-          <div className="mt-3">
-            <input
-              type="text"
-              placeholder="Search docs..."
-              disabled
-              className="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed"
-            />
-          </div>
+          {/* Search trigger */}
+          <button
+            onClick={openSearch}
+            className="mt-3 w-full flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300 hover:text-slate-500 transition-colors text-left"
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span className="flex-1">Search docs...</span>
+            <kbd className="hidden sm:inline text-[10px] font-mono bg-white px-1 py-0.5 rounded border border-slate-200">⌘K</kbd>
+          </button>
 
           {/* Audience filter tabs */}
           <div className="mt-3 flex flex-wrap gap-1">
@@ -327,6 +332,13 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
           )}
         </div>
       </aside>
+
+      {/* Search modal */}
+      <SearchModal
+        isOpen={searchOpen}
+        onClose={closeSearch}
+        basePath="/admin/docs"
+      />
     </div>
   );
 }

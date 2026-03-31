@@ -10,7 +10,7 @@ interface DocEntry {
 }
 
 const DOCS_DIR = path.join(process.cwd(), 'docs')
-const OUTPUT_FILE = path.join(DOCS_DIR, 'search-index.json')
+const OUTPUT_FILE = path.join(process.cwd(), 'public', 'docs', 'search-index.json')
 const SECTIONS = ['admin', 'moderator', 'teacher', 'student', 'developer']
 
 function parseFrontmatter(raw: string): { meta: Record<string, unknown>; content: string } {
