@@ -70,7 +70,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
         <h1 className="text-2xl font-bold text-[#1B3A5C]">Edit Event</h1>
         <p className="text-sm text-[#6B7280] mt-0.5 truncate max-w-lg">{(data as Event).title}</p>
       </div>
-      <EventForm event={data as Event} />
+      <EventForm event={data as Event} userRole={userRole} />
 
       {/* Audit History — Admin only */}
       {isAdmin && auditEntries.length > 0 && (
