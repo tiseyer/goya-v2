@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import type { Course } from '@/lib/types';
+import { logAdminCourseAction } from '@/app/admin/courses/actions';
 
 const CATEGORIES = ['Workshop', 'Yoga Sequence', 'Dharma Talk', 'Music Playlist', 'Research'] as const;
 const LEVELS     = ['Beginner', 'Intermediate', 'Advanced', 'All Levels'] as const;
@@ -62,11 +63,27 @@ export default function CourseForm({ course }: Props) {
       };
 
       if (isEdit) {
+        // Build changes object for audit log (compare old vs new)
+        const changes: Record<string, { old: unknown; new: unknown }> = {};
+        for (const [key, newVal] of Object.entries(payload)) {
+          const oldVal = course[key as keyof Course];
+          if (oldVal !== newVal) {
+            changes[key] = { old: oldVal, new: newVal };
+          }
+        }
+
         const { error } = await supabase.from('courses').update(payload).eq('id', course.id);
         if (error) throw new Error(error.message);
+
+        if (Object.keys(changes).length > 0) {
+          await logAdminCourseAction(course.id, 'edited', changes);
+        }
       } else {
-        const { error } = await supabase.from('courses').insert(payload);
+        const { data: inserted, error } = await supabase.from('courses').insert(payload).select('id').single();
         if (error) throw new Error(error.message);
+        if (inserted) {
+          await logAdminCourseAction(inserted.id, 'created', payload);
+        }
       }
 
       router.push('/admin/courses');
