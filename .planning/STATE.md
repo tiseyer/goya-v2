@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-03-31 — Milestone v1.14 started
+Last activity: 2026-03-31 — Completed quick task 260331-oyj: Admin sidebar docs link + media library header alignment
 
 Progress: [░░░░░░░░░░] 0%
 
