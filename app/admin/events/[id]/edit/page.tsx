@@ -46,7 +46,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profileRow } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, full_name, avatar_url')
     .eq('id', user!.id)
     .single();
   const userRole = (profileRow?.role as string) ?? 'moderator';
@@ -70,7 +70,13 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
         <h1 className="text-2xl font-bold text-[#1B3A5C]">Edit Event</h1>
         <p className="text-sm text-[#6B7280] mt-0.5 truncate max-w-lg">{(data as Event).title}</p>
       </div>
-      <EventForm event={data as Event} userRole={userRole} />
+      <EventForm
+        event={data as Event}
+        userRole={userRole}
+        currentUserId={user!.id}
+        currentUserName={profileRow?.full_name ?? user!.email ?? 'You'}
+        currentUserAvatar={(profileRow as Record<string, unknown> | null)?.avatar_url as string | null ?? null}
+      />
 
       {/* Audit History — Admin only */}
       {isAdmin && auditEntries.length > 0 && (
