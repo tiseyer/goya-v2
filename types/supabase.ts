@@ -636,6 +636,51 @@ export type Database = {
         }
         Relationships: []
       }
+      event_audit_log: {
+        Row: {
+          action: string
+          changes: Json | null
+          created_at: string
+          event_id: string
+          id: string
+          performed_by: string | null
+          performed_by_role: string | null
+        }
+        Insert: {
+          action: string
+          changes?: Json | null
+          created_at?: string
+          event_id: string
+          id?: string
+          performed_by?: string | null
+          performed_by_role?: string | null
+        }
+        Update: {
+          action?: string
+          changes?: Json | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          performed_by?: string | null
+          performed_by_role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_audit_log_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_audit_log_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
           created_at: string | null
@@ -675,9 +720,11 @@ export type Database = {
         Row: {
           category: string
           created_at: string | null
+          created_by: string | null
           date: string
           deleted_at: string | null
           description: string | null
+          event_type: string
           featured_image_url: string | null
           format: string
           id: string
@@ -685,6 +732,7 @@ export type Database = {
           is_free: boolean | null
           location: string | null
           price: number | null
+          rejection_reason: string | null
           spots_remaining: number | null
           spots_total: number | null
           status: string | null
@@ -696,9 +744,11 @@ export type Database = {
         Insert: {
           category: string
           created_at?: string | null
+          created_by?: string | null
           date: string
           deleted_at?: string | null
           description?: string | null
+          event_type?: string
           featured_image_url?: string | null
           format: string
           id?: string
@@ -706,6 +756,7 @@ export type Database = {
           is_free?: boolean | null
           location?: string | null
           price?: number | null
+          rejection_reason?: string | null
           spots_remaining?: number | null
           spots_total?: number | null
           status?: string | null
@@ -717,9 +768,11 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string | null
+          created_by?: string | null
           date?: string
           deleted_at?: string | null
           description?: string | null
+          event_type?: string
           featured_image_url?: string | null
           format?: string
           id?: string
@@ -727,6 +780,7 @@ export type Database = {
           is_free?: boolean | null
           location?: string | null
           price?: number | null
+          rejection_reason?: string | null
           spots_remaining?: number | null
           spots_total?: number | null
           status?: string | null
@@ -735,11 +789,20 @@ export type Database = {
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       faq_items: {
         Row: {
           answer: string
+          category: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -749,6 +812,7 @@ export type Database = {
         }
         Insert: {
           answer: string
+          category?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -758,6 +822,7 @@ export type Database = {
         }
         Update: {
           answer?: string
+          category?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -774,6 +839,314 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      flow_action_executions: {
+        Row: {
+          action_type: string
+          executed_at: string
+          flow_id: string
+          id: string
+          step_id: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          executed_at?: string
+          flow_id: string
+          id?: string
+          step_id: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          executed_at?: string
+          flow_id?: string
+          id?: string
+          step_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_action_executions_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "flows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flow_action_executions_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "flow_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flow_analytics: {
+        Row: {
+          created_at: string
+          event: string
+          flow_id: string
+          id: string
+          step_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          flow_id: string
+          id?: string
+          step_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          flow_id?: string
+          id?: string
+          step_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_analytics_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "flows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flow_analytics_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "flow_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flow_branches: {
+        Row: {
+          answer_value: string
+          element_key: string
+          id: string
+          step_id: string
+          target_step_id: string
+        }
+        Insert: {
+          answer_value: string
+          element_key: string
+          id?: string
+          step_id: string
+          target_step_id: string
+        }
+        Update: {
+          answer_value?: string
+          element_key?: string
+          id?: string
+          step_id?: string
+          target_step_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_branches_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "flow_steps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flow_branches_target_step_id_fkey"
+            columns: ["target_step_id"]
+            isOneToOne: false
+            referencedRelation: "flow_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flow_responses: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          flow_id: string
+          id: string
+          last_step_id: string | null
+          responses: Json
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          flow_id: string
+          id?: string
+          last_step_id?: string | null
+          responses?: Json
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          flow_id?: string
+          id?: string
+          last_step_id?: string | null
+          responses?: Json
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_responses_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "flows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flow_responses_last_step_id_fkey"
+            columns: ["last_step_id"]
+            isOneToOne: false
+            referencedRelation: "flow_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flow_steps: {
+        Row: {
+          actions: Json
+          created_at: string
+          elements: Json
+          flow_id: string
+          id: string
+          position: number
+          schema_version: number
+          title: string | null
+        }
+        Insert: {
+          actions?: Json
+          created_at?: string
+          elements?: Json
+          flow_id: string
+          id?: string
+          position?: number
+          schema_version?: number
+          title?: string | null
+        }
+        Update: {
+          actions?: Json
+          created_at?: string
+          elements?: Json
+          flow_id?: string
+          id?: string
+          position?: number
+          schema_version?: number
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_steps_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "flows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flows: {
+        Row: {
+          conditions: Json | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          display_type: string
+          frequency: string
+          id: string
+          is_template: boolean
+          modal_backdrop: string | null
+          modal_dismissible: boolean
+          name: string
+          priority: number
+          schema_version: number
+          status: string
+          template_name: string | null
+          trigger_delay_seconds: number | null
+          trigger_type: string
+          updated_at: string
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_type?: string
+          frequency?: string
+          id?: string
+          is_template?: boolean
+          modal_backdrop?: string | null
+          modal_dismissible?: boolean
+          name: string
+          priority?: number
+          schema_version?: number
+          status?: string
+          template_name?: string | null
+          trigger_delay_seconds?: number | null
+          trigger_type?: string
+          updated_at?: string
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_type?: string
+          frequency?: string
+          id?: string
+          is_template?: boolean
+          modal_backdrop?: string | null
+          modal_dismissible?: boolean
+          name?: string
+          priority?: number
+          schema_version?: number
+          status?: string
+          template_name?: string | null
+          trigger_delay_seconds?: number | null
+          trigger_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      health_monitor_log: {
+        Row: {
+          alert_sent: boolean | null
+          alert_type: string | null
+          checked_at: string | null
+          checks: Json
+          id: string
+          overall_status: string
+        }
+        Insert: {
+          alert_sent?: boolean | null
+          alert_type?: string | null
+          checked_at?: string | null
+          checks: Json
+          id?: string
+          overall_status: string
+        }
+        Update: {
+          alert_sent?: boolean | null
+          alert_type?: string | null
+          checked_at?: string | null
+          checks?: Json
+          id?: string
+          overall_status?: string
+        }
+        Relationships: []
       }
       impersonation_log: {
         Row: {
@@ -1258,6 +1631,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          birthday: string | null
           certificate_is_official: boolean | null
           certificate_url: string | null
           city: string | null
@@ -1305,12 +1679,16 @@ export type Database = {
           wellness_org_name: string | null
           wellness_regulatory_body: boolean | null
           wellness_regulatory_designations: string | null
+          wp_registered_at: string | null
+          wp_roles: Json | null
+          wp_user_id: number | null
           youtube: string | null
           youtube_intro_url: string | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          birthday?: string | null
           certificate_is_official?: boolean | null
           certificate_url?: string | null
           city?: string | null
@@ -1358,12 +1736,16 @@ export type Database = {
           wellness_org_name?: string | null
           wellness_regulatory_body?: boolean | null
           wellness_regulatory_designations?: string | null
+          wp_registered_at?: string | null
+          wp_roles?: Json | null
+          wp_user_id?: number | null
           youtube?: string | null
           youtube_intro_url?: string | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          birthday?: string | null
           certificate_is_official?: boolean | null
           certificate_url?: string | null
           city?: string | null
@@ -1411,6 +1793,9 @@ export type Database = {
           wellness_org_name?: string | null
           wellness_regulatory_body?: boolean | null
           wellness_regulatory_designations?: string | null
+          wp_registered_at?: string | null
+          wp_roles?: Json | null
+          wp_user_id?: number | null
           youtube?: string | null
           youtube_intro_url?: string | null
         }
@@ -1973,6 +2358,7 @@ export type Database = {
       count_distinct_countries: { Args: never; Returns: number }
       generate_mrn: { Args: never; Returns: string }
       is_admin: { Args: never; Returns: boolean }
+      is_event_submitter: { Args: never; Returns: boolean }
       sum_approved_hours: { Args: never; Returns: number }
     }
     Enums: {
