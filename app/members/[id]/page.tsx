@@ -74,7 +74,7 @@ export default async function MemberProfilePage({
             Back to Directory
           </Link>
 
-          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6">
             {/* Avatar */}
             <div className="relative shrink-0">
               <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl bg-[#4E87A0]/20 flex items-center justify-center overflow-hidden ring-4 ring-white/10 shadow-2xl">
@@ -94,19 +94,19 @@ export default async function MemberProfilePage({
             </div>
 
             {/* Info */}
-            <div className="text-center sm:text-left pb-1">
-              <div className="flex flex-wrap items-center gap-2 mb-3 justify-center sm:justify-start">
+            <div className="text-left pb-1">
+              <div className="flex flex-wrap items-center gap-2 mb-3 justify-start">
                 <span className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full ${heroStyle.badge}`}>
                   {roleLabel}
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight">
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 leading-tight">
                 {displayName}
               </h1>
 
               {(profile.city || profile.country) && (
-                <div className="flex items-center justify-center sm:justify-start gap-1.5 text-slate-400 text-sm mt-2">
+                <div className="flex items-center justify-start gap-1.5 text-slate-400 text-sm mt-1">
                   <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
