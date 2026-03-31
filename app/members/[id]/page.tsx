@@ -61,7 +61,7 @@ export default async function MemberProfilePage({
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#4E87A0] opacity-[0.05] rounded-full blur-3xl translate-x-1/2 -translate-y-1/4" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back link */}
           <Link
             href="/members"

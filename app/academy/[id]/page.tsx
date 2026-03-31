@@ -68,7 +68,7 @@ export default async function CourseOverviewPage({
         className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8"
         style={{ background: `linear-gradient(135deg, ${course.gradient_from}dd, ${course.gradient_to}dd)` }}
       >
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/academy"
             className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-sm mb-8 transition-colors group"
@@ -132,7 +132,7 @@ export default async function CourseOverviewPage({
       </div>
 
       {/* Main content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
 
           {/* LEFT column */}

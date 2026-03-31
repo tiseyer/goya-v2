@@ -3,7 +3,7 @@ export default function CodeOfConductPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="bg-primary-dark pt-24 pb-14 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">Code of Conduct</h1>
           <p className="text-primary-200 text-lg">Our shared commitment to a respectful and inclusive yoga community.</p>
         </div>

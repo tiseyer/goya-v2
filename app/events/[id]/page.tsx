@@ -56,7 +56,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           {/* Gradient overlay — stronger at bottom */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-6 lg:px-8 pb-8">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-7xl mx-auto">
               <Link
                 href="/events"
                 className="inline-flex items-center gap-1.5 text-white/75 hover:text-white text-sm mb-5 transition-colors"
@@ -93,7 +93,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           {/* Soft glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
-          <div className="max-w-5xl mx-auto relative">
+          <div className="max-w-7xl mx-auto relative">
             <Link
               href="/events"
               className="inline-flex items-center gap-1.5 text-primary-200 hover:text-white text-sm mb-6 transition-colors"
@@ -119,7 +119,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
       )}
 
       {/* ── Main content ─────────────────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_308px] gap-8">
 
           {/* LEFT: Details */}

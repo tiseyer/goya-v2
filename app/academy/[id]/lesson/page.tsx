@@ -87,7 +87,7 @@ export default function LessonPage() {
 
       {/* Top lesson bar */}
       <div className="bg-white border-b border-[#E5E7EB] sticky top-16 z-30">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Lesson 1 of 1
           </span>
@@ -116,7 +116,7 @@ export default function LessonPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-6 flex-wrap">
