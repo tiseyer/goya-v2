@@ -134,7 +134,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 28. Database Foundation | 2/2 | Complete   | 2026-03-31 |
+| 28. Database Foundation | 2/2 | Complete    | 2026-03-31 |
 | 29. Interest & Entry Points | 0/TBD | Not started | - |
 | 30. School Registration Flow | 0/TBD | Not started | - |
 | 31. School Onboarding Flow | 0/TBD | Not started | - |
