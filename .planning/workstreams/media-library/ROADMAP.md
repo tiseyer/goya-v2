@@ -11,11 +11,11 @@ created: 2026-03-31
 
 ## Phases
 
-- [ ] **Phase 1: Database & Storage Foundation** — Schema, RLS, storage buckets, and instrumentation of all existing upload flows
-- [ ] **Phase 2: Admin Media Library Page** — Three-panel admin UI with upload, browse, filter, search, and detail editing
-- [ ] **Phase 3: Member Media Library in Settings** — Read-only member view of own uploads in Settings sidebar
-- [ ] **Phase 4: Folder Management** — Admin/mod folder CRUD with create, rename, reorder, and delete
-- [ ] **Phase 5: Search & Polish** — Combined search/filters, skeleton states, animations, and mobile responsiveness
+- [x] **Phase 1: Database & Storage Foundation** — Schema, RLS, storage buckets, and instrumentation of all existing upload flows
+- [x] **Phase 2: Admin Media Library Page** — Three-panel admin UI with upload, browse, filter, search, and detail editing
+- [x] **Phase 3: Member Media Library in Settings** — Read-only member view of own uploads in Settings sidebar
+- [x] **Phase 4: Folder Management** — Admin/mod folder CRUD with create, rename, reorder, and delete
+- [x] **Phase 5: Search & Polish** — Combined search/filters, skeleton states, animations, and mobile responsiveness
 
 ---
 
@@ -88,11 +88,11 @@ created: 2026-03-31
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Database & Storage Foundation | 0/0 | Not started | - |
-| 2. Admin Media Library Page | 0/0 | Not started | - |
-| 3. Member Media Library in Settings | 0/0 | Not started | - |
-| 4. Folder Management | 0/0 | Not started | - |
-| 5. Search & Polish | 0/0 | Not started | - |
+| 1. Database & Storage Foundation | 1/1 | ✓ Complete | 2026-03-31 |
+| 2. Admin Media Library Page | 3/3 | ✓ Complete | 2026-03-31 |
+| 3. Member Media Library in Settings | 1/1 | ✓ Complete | 2026-03-31 |
+| 4. Folder Management | 1/1 | ✓ Complete | 2026-03-31 |
+| 5. Search & Polish | 1/1 | ✓ Complete | 2026-03-31 |
 
 ---
 
