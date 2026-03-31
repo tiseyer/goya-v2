@@ -36,7 +36,10 @@
   3. school_faculty table exists with position, principal_trainer flag, and invited_email for non-members
   4. school_verification_documents table exists linked to school and designation with file storage references
   5. Profiles table has principal_trainer_school_id and faculty_school_ids columns; RLS restricts school data by owner/public/admin role; tsc --noEmit passes with no type errors
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 28-01-PLAN.md — Schema migration: extend schools, create 3 new tables, extend profiles
+- [ ] 28-02-PLAN.md — RLS policies for new tables, TypeScript type regeneration, tsc verification
 
 ### Phase 29: Interest & Entry Points
 **Goal**: Teachers who do not yet own a school are prompted to register from three distinct surfaces in the platform
@@ -131,7 +134,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 28. Database Foundation | 0/TBD | Not started | - |
+| 28. Database Foundation | 0/2 | Not started | - |
 | 29. Interest & Entry Points | 0/TBD | Not started | - |
 | 30. School Registration Flow | 0/TBD | Not started | - |
 | 31. School Onboarding Flow | 0/TBD | Not started | - |
