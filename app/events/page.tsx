@@ -3,9 +3,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import type { Event, EventCategory } from '@/lib/types';
+import type { Event, EventCategory, EventCategoryRow } from '@/lib/types';
 import PageHero from '@/app/components/PageHero';
 import { CATEGORY_BADGE, CATEGORY_DOT, FORMAT_BADGE } from '@/app/components/ui/Badge';
+import LocationFilter, { haversine } from './LocationFilter';
 
 const ALL_CATEGORIES: Array<'All' | EventCategory> = [
   'All', 'Workshop', 'Teacher Training', 'Dharma Talk', 'Conference',
@@ -182,18 +183,29 @@ function MiniCalendar({ calYear, calMonth, selectedDate, eventDates, today, onPr
   );
 }
 
+interface LocationState {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
 export default function EventsPage() {
   const today = new Date();
-  const [calYear,         setCalYear]         = useState(today.getFullYear());
-  const [calMonth,        setCalMonth]        = useState(today.getMonth());
-  const [selectedDate,    setSelectedDate]    = useState<string | null>(null);
-  const [categoryFilter,  setCategoryFilter]  = useState<'All' | EventCategory>('All');
-  const [typeFilter,      setTypeFilter]      = useState<'all' | 'goya' | 'member'>('all');
-  const [events,          setEvents]          = useState<Event[]>([]);
-  const [loading,         setLoading]         = useState(true);
-  const [dateSheetOpen,   setDateSheetOpen]   = useState(false);
+  const [calYear,           setCalYear]           = useState(today.getFullYear());
+  const [calMonth,          setCalMonth]          = useState(today.getMonth());
+  const [selectedDate,      setSelectedDate]      = useState<string | null>(null);
+  const [categoryFilter,    setCategoryFilter]    = useState<string>('All');
+  const [typeFilter,        setTypeFilter]        = useState<'all' | 'goya' | 'member'>('all');
+  const [formatFilter,      setFormatFilter]      = useState<string>('all');
+  const [filterLocation,    setFilterLocation]    = useState<LocationState | null>(null);
+  const [filterRadius,      setFilterRadius]      = useState(50);
+  const [events,            setEvents]            = useState<Event[]>([]);
+  const [dbCategories,      setDbCategories]      = useState<EventCategoryRow[]>([]);
+  const [loading,           setLoading]           = useState(true);
+  const [dateSheetOpen,     setDateSheetOpen]     = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
 
+  // Fetch events
   useEffect(() => {
     supabase
       .from('events')
@@ -207,6 +219,35 @@ export default function EventsPage() {
         setLoading(false);
       });
   }, []);
+
+  // Fetch DB categories — fallback to hardcoded if empty/error
+  useEffect(() => {
+    supabase
+      .from('event_categories')
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('name', { ascending: true })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('[EventCategories] fetch error:', error.message);
+          return;
+        }
+        if (data && data.length > 0) {
+          setDbCategories(data as EventCategoryRow[]);
+        }
+      });
+  }, []);
+
+  // Build category list from DB with fallback to hardcoded
+  const categoryList = useMemo(() => {
+    if (dbCategories.length === 0) {
+      return ALL_CATEGORIES.map(c => ({ name: c as string, color: '' }));
+    }
+    return [
+      { name: 'All', color: '' },
+      ...dbCategories.map(c => ({ name: c.name, color: c.color })),
+    ];
+  }, [dbCategories]);
 
   const eventDates = useMemo(() => new Set(events.map(e => e.date)), [events]);
 
@@ -226,16 +267,57 @@ export default function EventsPage() {
       if (categoryFilter !== 'All' && e.category !== categoryFilter) return false;
       if (selectedDate && e.date !== selectedDate) return false;
       if (typeFilter !== 'all' && e.event_type !== typeFilter) return false;
+      if (formatFilter !== 'all' && e.format !== formatFilter) return false;
+      // Distance filter: only when In Person + location set
+      if (formatFilter === 'In Person' && filterLocation) {
+        if (e.location_lat == null || e.location_lng == null) return false;
+        const dist = haversine(filterLocation.lat, filterLocation.lng, e.location_lat, e.location_lng);
+        if (dist > filterRadius) return false;
+      }
       return true;
     });
-  }, [events, categoryFilter, selectedDate, typeFilter]);
+  }, [events, categoryFilter, selectedDate, typeFilter, formatFilter, filterLocation, filterRadius]);
 
-  const activeFilters = (selectedDate ? 1 : 0) + (categoryFilter !== 'All' ? 1 : 0) + (typeFilter !== 'all' ? 1 : 0);
+  const activeFilters =
+    (selectedDate ? 1 : 0) +
+    (categoryFilter !== 'All' ? 1 : 0) +
+    (typeFilter !== 'all' ? 1 : 0) +
+    (formatFilter !== 'all' ? 1 : 0) +
+    (filterLocation ? 1 : 0);
+
+  function clearAllFilters() {
+    setSelectedDate(null);
+    setCategoryFilter('All');
+    setTypeFilter('all');
+    setFormatFilter('all');
+    setFilterLocation(null);
+    setFilterRadius(50);
+  }
+
+  // Get DB category entry for inline badge styling
+  function getCatDbEntry(catName: string): EventCategoryRow | undefined {
+    return dbCategories.find(c => c.name === catName);
+  }
+
+  function getCatBadgeStyle(catName: string): React.CSSProperties | null {
+    const entry = getCatDbEntry(catName);
+    if (!entry) return null;
+    const hex = entry.color;
+    return {
+      backgroundColor: `${hex}15`,
+      color: hex,
+      borderColor: `${hex}40`,
+    };
+  }
+
+  function getCatDotColor(catName: string): string | null {
+    const entry = getCatDbEntry(catName);
+    return entry ? entry.color : null;
+  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <PageHero
-        variant="dark"
         pill="Events"
         title="Events"
         subtitle="Workshops, teacher trainings, dharma talks, and conferences from the global GOYA community."
@@ -260,6 +342,36 @@ export default function EventsPage() {
             </button>
           ))}
         </div>
+
+        {/* Format filter row */}
+        <div className="flex rounded-full border border-slate-200 overflow-hidden">
+          {([['all', 'All'], ['Online', 'Online'], ['In Person', 'In Person']] as [string, string][]).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setFormatFilter(key)}
+              className={[
+                'flex-1 text-center text-xs font-semibold py-1.5 transition-all cursor-pointer',
+                formatFilter === key
+                  ? 'bg-primary-dark text-white'
+                  : 'text-slate-500 hover:bg-slate-50',
+              ].join(' ')}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Location filter — shown when In Person selected */}
+        {formatFilter === 'In Person' && (
+          <div className="px-1 pb-1">
+            <LocationFilter
+              onLocationChange={setFilterLocation}
+              onRadiusChange={setFilterRadius}
+              radius={filterRadius}
+            />
+          </div>
+        )}
+
         <div className="flex gap-2">
           <button
             onClick={() => { setDateSheetOpen(true); setCategorySheetOpen(false); }}
@@ -346,12 +458,54 @@ export default function EventsPage() {
               </div>
             </div>
 
+            {/* Format filter */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Format</p>
+              <div className="flex flex-col gap-0.5">
+                {([['all', 'All Events'], ['Online', 'Online'], ['In Person', 'In Person']] as [string, string][]).map(([key, label]) => {
+                  const isActive = formatFilter === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setFormatFilter(key)}
+                      className={[
+                        'flex items-center gap-2.5 text-left px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer',
+                        isActive
+                          ? 'bg-primary-dark text-white'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary-dark',
+                      ].join(' ')}
+                    >
+                      {key !== 'all' && (
+                        <span className={[
+                          'w-2 h-2 rounded-full shrink-0 transition-colors',
+                          isActive ? 'bg-white/60' : key === 'Online' ? 'bg-slate-400' : 'bg-primary',
+                        ].join(' ')} />
+                      )}
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Location filter — only shown when In Person selected */}
+              {formatFilter === 'In Person' && (
+                <div className="mt-3 border-t border-slate-100 pt-3">
+                  <LocationFilter
+                    onLocationChange={setFilterLocation}
+                    onRadiusChange={setFilterRadius}
+                    radius={filterRadius}
+                  />
+                </div>
+              )}
+            </div>
+
             {/* Category filter */}
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Category</p>
               <div className="flex flex-col gap-0.5">
-                {ALL_CATEGORIES.map(cat => {
+                {categoryList.map(({ name: cat, color }) => {
                   const isActive = categoryFilter === cat;
+                  const dotColor = cat !== 'All' ? getCatDotColor(cat) : null;
                   return (
                     <button
                       key={cat}
@@ -364,10 +518,17 @@ export default function EventsPage() {
                       ].join(' ')}
                     >
                       {cat !== 'All' && (
-                        <span className={[
-                          'w-2 h-2 rounded-full shrink-0 transition-colors',
-                          isActive ? 'bg-white/60' : (CATEGORY_DOT[cat] ?? 'bg-slate-400'),
-                        ].join(' ')} />
+                        dotColor ? (
+                          <span
+                            className="w-2 h-2 rounded-full shrink-0 transition-colors"
+                            style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.6)' : dotColor }}
+                          />
+                        ) : (
+                          <span className={[
+                            'w-2 h-2 rounded-full shrink-0 transition-colors',
+                            isActive ? 'bg-white/60' : (CATEGORY_DOT[cat] ?? 'bg-slate-400'),
+                          ].join(' ')} />
+                        )
                       )}
                       {cat === 'All' ? 'All Events' : cat}
                     </button>
@@ -395,7 +556,7 @@ export default function EventsPage() {
               </div>
               {activeFilters > 0 && (
                 <button
-                  onClick={() => { setSelectedDate(null); setCategoryFilter('All'); setTypeFilter('all'); }}
+                  onClick={clearAllFilters}
                   className="flex items-center gap-1.5 text-xs font-semibold text-primary-light hover:text-primary-dark px-3 py-1.5 rounded-full border border-primary-light/30 hover:border-primary-dark/40 transition-all duration-200 cursor-pointer"
                 >
                   Clear {activeFilters > 1 ? `${activeFilters} filters` : 'filter'}
@@ -416,11 +577,13 @@ export default function EventsPage() {
                     ? 'No events on this date. Try another day.'
                     : categoryFilter !== 'All'
                     ? `No ${categoryFilter} events scheduled. Check back soon.`
+                    : formatFilter === 'In Person' && filterLocation
+                    ? `No in-person events within ${filterRadius} km of ${filterLocation.name}.`
                     : 'No upcoming events yet. Check back soon.'}
                 </p>
                 {activeFilters > 0 && (
                   <button
-                    onClick={() => { setSelectedDate(null); setCategoryFilter('All'); setTypeFilter('all'); }}
+                    onClick={clearAllFilters}
                     className="mt-5 text-sm font-semibold text-primary-light hover:text-primary-dark transition-colors cursor-pointer"
                   >
                     Clear all filters
@@ -430,7 +593,8 @@ export default function EventsPage() {
             ) : (
               <div className="space-y-3">
                 {filtered.map(event => {
-                  const catBadge = CATEGORY_BADGE[event.category] ?? 'bg-slate-100 text-slate-600 border-slate-200';
+                  const catStyle = getCatBadgeStyle(event.category);
+                  const catBadgeClass = CATEGORY_BADGE[event.category] ?? 'bg-slate-100 text-slate-600 border-slate-200';
                   const [year, month, dayStr] = event.date.split('-');
                   const dayNum = dayStr;
                   const monthAbbr = MONTHS[parseInt(month) - 1].slice(0, 3);
@@ -453,9 +617,18 @@ export default function EventsPage() {
                         <div className="flex-1 min-w-0">
                           {/* Badges */}
                           <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                            <span className={`inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catBadge}`}>
-                              {event.category}
-                            </span>
+                            {catStyle ? (
+                              <span
+                                className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full border"
+                                style={catStyle}
+                              >
+                                {event.category}
+                              </span>
+                            ) : (
+                              <span className={`inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catBadgeClass}`}>
+                                {event.category}
+                              </span>
+                            )}
                             <span className={`inline-flex items-center text-xs px-2.5 py-0.5 rounded-full border font-medium ${FORMAT_BADGE[event.format] ?? 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                               {event.format}
                             </span>
@@ -575,8 +748,9 @@ export default function EventsPage() {
               </button>
             </div>
             <div className="flex flex-col gap-0.5">
-              {ALL_CATEGORIES.map(cat => {
+              {categoryList.map(({ name: cat }) => {
                 const isActive = categoryFilter === cat;
+                const dotColor = cat !== 'All' ? getCatDotColor(cat) : null;
                 return (
                   <button
                     key={cat}
@@ -589,10 +763,17 @@ export default function EventsPage() {
                     ].join(' ')}
                   >
                     {cat !== 'All' && (
-                      <span className={[
-                        'w-2 h-2 rounded-full shrink-0',
-                        isActive ? 'bg-white/60' : (CATEGORY_DOT[cat] ?? 'bg-slate-400'),
-                      ].join(' ')} />
+                      dotColor ? (
+                        <span
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.6)' : dotColor }}
+                        />
+                      ) : (
+                        <span className={[
+                          'w-2 h-2 rounded-full shrink-0',
+                          isActive ? 'bg-white/60' : (CATEGORY_DOT[cat] ?? 'bg-slate-400'),
+                        ].join(' ')} />
+                      )
                     )}
                     {cat === 'All' ? 'All Events' : cat}
                   </button>
