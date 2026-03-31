@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { Event } from '@/lib/types';
 import { CATEGORY_BADGE } from '@/app/components/ui/Badge';
+import PageContainer from '@/app/components/ui/PageContainer';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,8 +56,8 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           />
           {/* Gradient overlay — stronger at bottom */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-6 lg:px-8 pb-8">
-            <div className="max-w-7xl mx-auto">
+          <div className="absolute bottom-0 left-0 right-0 pb-8">
+            <PageContainer>
               <Link
                 href="/events"
                 className="inline-flex items-center gap-1.5 text-white/75 hover:text-white text-sm mb-5 transition-colors"
@@ -76,12 +77,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                 )}
               </div>
               <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">{ev.title}</h1>
-            </div>
+            </PageContainer>
           </div>
         </div>
       ) : (
         /* Gradient hero (no image) */
-        <div className="bg-primary-dark relative overflow-hidden pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="bg-primary-dark relative overflow-hidden pt-24 pb-12">
           {/* Subtle background texture */}
           <div
             className="absolute inset-0 opacity-[0.04]"
@@ -93,7 +94,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           {/* Soft glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
-          <div className="max-w-7xl mx-auto relative">
+          <PageContainer className="relative">
             <Link
               href="/events"
               className="inline-flex items-center gap-1.5 text-primary-200 hover:text-white text-sm mb-6 transition-colors"
@@ -114,12 +115,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             </div>
             <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-3">{ev.title}</h1>
             <p className="text-primary-200 text-sm font-medium">{dateFormatted}</p>
-          </div>
+          </PageContainer>
         </div>
       )}
 
       {/* ── Main content ─────────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <PageContainer className="py-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_308px] gap-8">
 
           {/* LEFT: Details */}
@@ -255,7 +256,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           </div>
 
         </div>
-      </div>
+      </PageContainer>
     </div>
   );
 }
