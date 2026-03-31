@@ -824,12 +824,14 @@ export type Database = {
       }
       events: {
         Row: {
+          all_day: boolean | null
           category: string
           created_at: string | null
           created_by: string | null
           date: string
           deleted_at: string | null
           description: string | null
+          end_date: string | null
           event_type: string
           featured_image_url: string | null
           format: string
@@ -839,7 +841,11 @@ export type Database = {
           location: string | null
           location_lat: number | null
           location_lng: number | null
+          online_platform_name: string | null
+          online_platform_url: string | null
+          organizer_ids: string[] | null
           price: number | null
+          registration_required: boolean | null
           rejection_reason: string | null
           spots_remaining: number | null
           spots_total: number | null
@@ -848,14 +854,17 @@ export type Database = {
           time_start: string
           title: string
           updated_at: string | null
+          website_url: string | null
         }
         Insert: {
+          all_day?: boolean | null
           category: string
           created_at?: string | null
           created_by?: string | null
           date: string
           deleted_at?: string | null
           description?: string | null
+          end_date?: string | null
           event_type?: string
           featured_image_url?: string | null
           format: string
@@ -865,7 +874,11 @@ export type Database = {
           location?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          online_platform_name?: string | null
+          online_platform_url?: string | null
+          organizer_ids?: string[] | null
           price?: number | null
+          registration_required?: boolean | null
           rejection_reason?: string | null
           spots_remaining?: number | null
           spots_total?: number | null
@@ -874,14 +887,17 @@ export type Database = {
           time_start: string
           title: string
           updated_at?: string | null
+          website_url?: string | null
         }
         Update: {
+          all_day?: boolean | null
           category?: string
           created_at?: string | null
           created_by?: string | null
           date?: string
           deleted_at?: string | null
           description?: string | null
+          end_date?: string | null
           event_type?: string
           featured_image_url?: string | null
           format?: string
@@ -891,7 +907,11 @@ export type Database = {
           location?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          online_platform_name?: string | null
+          online_platform_url?: string | null
+          organizer_ids?: string[] | null
           price?: number | null
+          registration_required?: boolean | null
           rejection_reason?: string | null
           spots_remaining?: number | null
           spots_total?: number | null
@@ -900,6 +920,7 @@ export type Database = {
           time_start?: string
           title?: string
           updated_at?: string | null
+          website_url?: string | null
         }
         Relationships: [
           {
