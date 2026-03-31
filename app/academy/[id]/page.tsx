@@ -80,7 +80,7 @@ export default async function CourseOverviewPage({
         <PageContainer className="relative">
           <Link
             href="/academy"
-            className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-sm mb-2 transition-colors group"
+            className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-sm mb-4 transition-colors group"
           >
             <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -89,7 +89,7 @@ export default async function CourseOverviewPage({
           </Link>
 
           {/* Badges */}
-          <div className="flex flex-wrap items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${CATEGORY_COLORS[course.category] ?? 'text-slate-600 bg-slate-100 border-slate-200'}`}>
               {course.category}
             </span>
@@ -107,10 +107,24 @@ export default async function CourseOverviewPage({
             )}
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 max-w-3xl">{course.title}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 max-w-3xl">{course.title}</h1>
           {course.short_description && (
             <p className="text-white/85 text-sm max-w-2xl">{course.short_description}</p>
           )}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-white/70 text-sm mt-1">
+            {course.instructor && (
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                {course.instructor}
+              </span>
+            )}
+            {course.duration && (
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                {course.duration}
+              </span>
+            )}
+          </div>
         </PageContainer>
       </div>
 

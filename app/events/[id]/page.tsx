@@ -60,7 +60,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             <PageContainer>
               <Link
                 href="/events"
-                className="inline-flex items-center gap-1.5 text-white/75 hover:text-white text-sm mb-5 transition-colors"
+                className="inline-flex items-center gap-1.5 text-white/75 hover:text-white text-sm mb-4 transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -76,7 +76,8 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                   </span>
                 )}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">{ev.title}</h1>
+              <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">{ev.title}</h1>
+              <p className="text-white/70 text-sm font-medium mt-2">{dateFormatted}</p>
             </PageContainer>
           </div>
         </div>
@@ -104,7 +105,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               </svg>
               Back to Events
             </Link>
-            <div className="flex flex-wrap items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
               <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catBadge}`}>{ev.category}</span>
               <span className="px-2.5 py-0.5 bg-white/12 text-white/90 text-xs font-semibold rounded-full border border-white/15">{ev.format}</span>
               {isPast && (
@@ -113,7 +114,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                 </span>
               )}
             </div>
-            <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-3">{ev.title}</h1>
+            <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-3">{ev.title}</h1>
             <p className="text-primary-200 text-sm font-medium">{dateFormatted}</p>
           </PageContainer>
         </div>
