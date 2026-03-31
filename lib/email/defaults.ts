@@ -108,4 +108,14 @@ export const DEFAULT_TEMPLATES: Record<string, { subject: string; content: strin
 </p>
 <p style="color:#94a3b8;font-size:13px;margin-top:24px;">If you didn't request a password reset, you can safely ignore this email.</p>`,
   },
+  faculty_invite: {
+    subject: `You've been invited to join {{schoolName}} on GOYA`,
+    content: `<h1 style="color:#0f2044;margin:0 0 16px;">You've been invited to join {{schoolName}}!</h1>
+<p>You've been added as <strong>{{position}}</strong> at <strong>{{schoolName}}</strong> on GOYA — the global online yoga association.</p>
+<p>Create your free GOYA account to accept the invitation and join the school's faculty team.</p>
+<p style="text-align:center;margin-top:32px;">
+  <a href="{{registerUrl}}" style="display:inline-block;background-color:#14b8a6;color:white;padding:12px 32px;border-radius:6px;text-decoration:none;font-weight:bold;">Create Your Account →</a>
+</p>
+<p style="color:#94a3b8;font-size:13px;margin-top:24px;">If you weren't expecting this invitation, you can safely ignore this email.</p>`,
+  },
 }

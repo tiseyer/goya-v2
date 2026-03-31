@@ -2,6 +2,7 @@
 
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
+import { sendEmailFromTemplate } from '@/lib/email/send'
 
 // ---------------------------------------------------------------------------
 // Helper: get a school the caller owns
@@ -431,7 +432,24 @@ export async function inviteFacultyByEmail(
     })
 
   if (error) return { error: error.message }
-  // NOTE: Actual email sending deferred to Phase 35 (FAC-01)
+
+  // Send invitation email (fire-and-forget — do not fail the action if email fails)
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+    const registerUrl = `${appUrl}/register?school=${schoolSlug}&invite=${inviteToken}`
+    await sendEmailFromTemplate({
+      to: data.email,
+      templateKey: 'faculty_invite',
+      variables: {
+        schoolName: school.name,
+        position: data.position,
+        registerUrl,
+      },
+    })
+  } catch (emailErr) {
+    console.error('[inviteFacultyByEmail] email send error:', emailErr)
+  }
+
   return { success: true }
 }
 

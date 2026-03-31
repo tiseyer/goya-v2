@@ -55,4 +55,9 @@ export const TEMPLATE_VARIABLES: Record<string, Array<{ key: string; label: stri
     { key: 'resetUrl',       label: 'Reset URL',   example: 'https://goya.community/reset-password?token=...'     },
     { key: 'expiryMinutes',  label: 'Link Expiry', example: '60'                                                   },
   ],
+  faculty_invite: [
+    { key: 'schoolName',   label: 'School Name',       example: 'Zen Yoga Studio'                                                               },
+    { key: 'position',     label: 'Faculty Position',  example: 'Senior Instructor'                                                             },
+    { key: 'registerUrl',  label: 'Register URL',      example: 'https://goya.community/register?school=zen-yoga&invite=abc-123'                },
+  ],
 }
