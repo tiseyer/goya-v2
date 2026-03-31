@@ -65,7 +65,7 @@ export default async function CourseOverviewPage({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="bg-primary relative overflow-hidden flex items-center h-[200px] sm:h-[220px] md:h-[240px]">
+      <div className="bg-primary relative overflow-hidden flex items-center h-[240px] sm:h-[260px] md:h-[280px]">
         {/* Subtle background texture */}
         <div
           className="absolute inset-0 opacity-[0.04]"

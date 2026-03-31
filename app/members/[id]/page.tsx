@@ -57,7 +57,7 @@ export default async function MemberProfilePage({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="bg-primary relative overflow-hidden flex items-center h-[200px] sm:h-[220px] md:h-[240px]">
+      <div className="bg-primary relative overflow-hidden flex items-center h-[240px] sm:h-[260px] md:h-[280px]">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-light opacity-[0.05] rounded-full blur-3xl translate-x-1/2 -translate-y-1/4" />
         </div>

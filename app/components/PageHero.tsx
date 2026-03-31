@@ -25,7 +25,7 @@ export default function PageHero({ pill, pillIcon, title, subtitle, customPill, 
 
   if (isDark) {
     return (
-      <section className="flex items-center justify-center w-full h-[200px] sm:h-[220px] md:h-[240px] bg-primary relative overflow-hidden">
+      <section className="flex items-center justify-center w-full h-[240px] sm:h-[260px] md:h-[280px] bg-primary relative overflow-hidden">
         {/* Subtle dot-grid texture overlay */}
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -38,7 +38,7 @@ export default function PageHero({ pill, pillIcon, title, subtitle, customPill, 
         {/* Soft glow top-right */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true" />
         {/* Background glow center */}
-        <div className="absolute pointer-events-none inset-x-0 top-0 h-[240px] overflow-hidden" aria-hidden="true">
+        <div className="absolute pointer-events-none inset-x-0 top-0 h-[280px] overflow-hidden" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-white opacity-[0.05] rounded-full blur-3xl" />
         </div>
         <div className="relative text-center px-4 max-w-3xl mx-auto flex flex-col items-center">
@@ -53,9 +53,9 @@ export default function PageHero({ pill, pillIcon, title, subtitle, customPill, 
   }
 
   return (
-    <section className="flex items-center justify-center w-full h-[200px] sm:h-[220px] md:h-[240px] bg-surface-muted border-b border-slate-200">
+    <section className="flex items-center justify-center w-full h-[240px] sm:h-[260px] md:h-[280px] bg-surface-muted border-b border-slate-200">
       {/* Subtle background glow */}
-      <div className="absolute pointer-events-none inset-x-0 top-0 h-[240px] overflow-hidden" aria-hidden="true">
+      <div className="absolute pointer-events-none inset-x-0 top-0 h-[280px] overflow-hidden" aria-hidden="true">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-primary opacity-[0.03] rounded-full blur-3xl" />
       </div>
       <div className="relative text-center px-4 max-w-3xl mx-auto flex flex-col items-center">
