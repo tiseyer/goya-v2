@@ -31,3 +31,39 @@ export async function getUserTickets(): Promise<SupportTicket[]> {
     return []
   }
 }
+
+/** Get current user's role from profiles table */
+export async function getUserRole(): Promise<string | null> {
+  try {
+    const supabase = await createSupabaseServerClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user?.id) return null
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase as any)
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    return data?.role ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Map user roles to the doc audiences they can access */
+export function getAudiencesForRole(role: string | null): string[] {
+  const map: Record<string, string[]> = {
+    student: ['student'],
+    teacher: ['teacher', 'student'],
+    wellness_practitioner: ['teacher', 'student'],
+    school: ['teacher', 'student'],
+    moderator: ['moderator', 'teacher', 'student'],
+    admin: ['admin', 'moderator', 'teacher', 'student', 'developer'],
+  }
+  return map[role ?? 'student'] ?? map.student
+}
