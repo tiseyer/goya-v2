@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-03-31 - Completed quick task 260331-lcm: Fix TypeScript string→union type errors
+Last activity: 2026-03-31 - Completed quick task 260331-mbq: Harmonize UI colors with #345c83 primary blue
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -82,9 +82,10 @@ None yet.
 | 260331-kny | Hero consistency — GOYA blue, shared height, vertical centering on event/course/member detail pages | 2026-03-31 | 0c6126f | [260331-kny](./quick/260331-kny-hero-consistency-goya-blue-shared-height/) |
 | 260331-l3g | Fix unknown→ReactNode type error in admin event edit page (proper String extraction) | 2026-03-31 | 5f677eb | [260331-l3g](./quick/260331-l3g-fix-unknown-to-reactnode-type-error-in-a/) |
 | 260331-lcm | Fix TypeScript string→union type errors in MyEventsClient setCategory/setFormat | 2026-03-31 | c37fe16 | [260331-lcm](./quick/260331-lcm-fix-typescript-build-error-in-myeventscl/) |
+| 260331-mbq | Harmonize UI accent colors with new #345c83 primary blue — CSS variables + light-mode overrides | 2026-03-31 | d9134d4 | [260331-mbq](./quick/260331-mbq-harmonize-ui-accent-colors-with-new-345c/) |
 
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Completed quick task 260331-lcm — fix string→union type errors in MyEventsClient
+Stopped at: Completed quick task 260331-mbq — harmonize UI colors with #345c83 primary blue
 Resume file: None

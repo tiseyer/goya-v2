@@ -17,8 +17,8 @@
 
   /* Primary Blue family */
   --goya-primary:       #345c83;
-  --goya-primary-light: #4e87a0;
-  --goya-primary-dark:  #1e3a52;
+  --goya-primary-light: #4a7aab;
+  --goya-primary-dark:  #2a4d6e;
   --goya-primary-50:    #eef4f9;
   --goya-primary-100:   #d6e7f1;
   --goya-primary-200:   #afd0e4;
@@ -145,6 +145,33 @@ html:not(.no-transitions) body,
 html:not(.no-transitions) body * {
   transition: background-color 200ms ease, border-color 200ms ease;
 }
+
+/* ─── Light mode overrides: remap old navy #1B3A5C → new primary #345c83 ── */
+/* ~100+ components hardcode bg-[#1B3A5C] for buttons. Rather than editing    */
+/* every file, remap the old navy to the new primary palette via CSS.         */
+
+.bg-\[\#1B3A5C\] { background-color: var(--goya-primary) !important; }
+.bg-\[\#1a2744\] { background-color: var(--goya-primary) !important; }
+
+/* Additional old navy variants → new primary */
+.bg-\[\#1e3a5f\] { background-color: var(--goya-primary) !important; }
+
+/* Old hover-dark variants → new primary-dark */
+.hover\:bg-\[\#142d47\]:hover { background-color: var(--goya-primary-dark) !important; }
+.hover\:bg-\[\#162f4a\]:hover { background-color: var(--goya-primary-dark) !important; }
+.hover\:bg-\[\#15304d\]:hover { background-color: var(--goya-primary-dark) !important; }
+.hover\:bg-\[\#16304f\]:hover { background-color: var(--goya-primary-dark) !important; }
+.hover\:bg-\[\#162d4a\]:hover { background-color: var(--goya-primary-dark) !important; }
+.hover\:bg-\[\#1e3a52\]:hover { background-color: var(--goya-primary-dark) !important; }
+
+/* Old navy borders → new primary */
+.border-\[\#1B3A5C\] { border-color: var(--goya-primary) !important; }
+.border-\[\#1a2744\] { border-color: var(--goya-primary) !important; }
+
+/* Old teal #4E87A0 backgrounds → new primary-light */
+.bg-\[\#4E87A0\] { background-color: var(--goya-primary-light) !important; }
+.hover\:bg-\[\#4E87A0\]:hover { background-color: var(--goya-primary-light) !important; }
+.hover\:bg-\[\#3A7190\]:hover { background-color: var(--goya-primary) !important; }
 
 /* ─── Dark mode overrides for hardcoded Tailwind utilities ───────────────── */
 /* These cover the ~128 files using bg-white, bg-slate-50, text-[#1B3A5C] etc. */
