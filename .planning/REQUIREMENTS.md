@@ -3,121 +3,158 @@
 **Defined:** 2026-03-31
 **Core Value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## v1.10 Requirements
+## v1.14 Requirements
 
-Requirements for Member Courses milestone. Each maps to roadmap phases.
+Requirements for School Owner System milestone. Each maps to roadmap phases.
 
-### Database & Schema
+### Database Foundation
 
-- [ ] **CDB-01**: Courses table has `course_type` column distinguishing 'goya' vs 'member' courses
-- [ ] **CDB-02**: Courses table has `created_by` FK to profiles for member-submitted courses
-- [ ] **CDB-03**: Courses table has status workflow supporting draft, pending_review, published, rejected, deleted
-- [ ] **CDB-04**: Courses table has `rejection_reason` text column for moderator feedback
-- [ ] **CDB-05**: `course_audit_log` table tracks all course lifecycle actions with performer, role, and changes diff
-- [ ] **CDB-06**: RLS: teachers/WPs/admins can INSERT own courses, SELECT own non-deleted, UPDATE own draft/pending/rejected
-- [ ] **CDB-07**: RLS: moderators can SELECT all non-deleted courses, UPDATE status to published/rejected
-- [ ] **CDB-08**: RLS: admins have full access including deleted courses
-- [ ] **CDB-09**: RLS: public authenticated users can SELECT only published courses
+- [ ] **DB-01**: Schools table extended with bio, video, practice_styles, programs, delivery format, lineage, languages, insurance, onboarding fields
+- [ ] **DB-02**: school_designations table with designation type, Stripe subscription/payment tracking, status workflow
+- [ ] **DB-03**: school_faculty table with position, principal_trainer flag, invited_email for non-members
+- [ ] **DB-04**: school_verification_documents table with document type, designation link, file storage
+- [ ] **DB-05**: Profiles table extended with principal_trainer_school_id and faculty_school_ids
+- [ ] **DB-06**: RLS policies: owner CRUD own school, public SELECT approved, admin/mod full access
+- [ ] **DB-07**: TypeScript types regenerated and tsc --noEmit passes
 
-### Admin Courses
+### Interest & Entry Points
 
-- [ ] **CADM-01**: Admin courses table shows course_type badge (GOYA/Member) and type filter dropdown
-- [ ] **CADM-02**: Admin courses table shows submitter name for member courses via created_by join
-- [ ] **CADM-03**: Admin courses status filter includes all statuses (Published, Draft, Pending Review, Rejected, Deleted)
-- [ ] **CADM-04**: Deleted courses visible to admins only, not moderators
-- [ ] **CADM-05**: Course detail/edit page shows audit history timeline from course_audit_log (admin only)
+- [ ] **INT-01**: Dashboard right sidebar widget for teachers without a school — CTA to /schools/create
+- [ ] **INT-02**: Subscriptions page callout below teacher subscription card — CTA to register school
+- [ ] **INT-03**: Add-Ons page featured banner for teachers — CTA to register school
+- [ ] **INT-04**: All entry points role-gated to teachers with no principal_trainer_school_id
 
-### Admin Inbox
+### Registration Flow
 
-- [ ] **CINB-01**: Courses tab in admin inbox shows all pending_review courses
-- [ ] **CINB-02**: Courses tab columns: title, submitted by (name+email), category, duration, submitted time ago, actions
-- [ ] **CINB-03**: Approve action sets status to published, writes audit log, updates badge count
-- [ ] **CINB-04**: Reject action shows modal with required rejection reason, sets status to rejected, saves reason, writes audit log
-- [ ] **CINB-05**: Badge count on Courses tab shows number of pending_review courses
+- [ ] **REG-01**: School name + auto-generated slug with uniqueness check at /schools/create step 1
+- [ ] **REG-02**: Designation selection step showing 8 products as cards with prices and running total
+- [ ] **REG-03**: Stripe Checkout session with annual subscription + signup fee per selected designation
+- [ ] **REG-04**: Post-payment: school record created with status='pending', school_designations created
+- [ ] **REG-05**: Redirect to onboarding flow after successful payment
 
-### My Courses
+### Onboarding Flow
 
-- [ ] **MYCR-01**: Settings page "My Courses" at correct path, gated to teacher/WP/admin roles
-- [ ] **MYCR-02**: Empty state with icon, descriptive text, and "+ Add New Course" button
-- [ ] **MYCR-03**: Courses list with title, category, status badge, status-aware actions
-- [ ] **MYCR-04**: Status badges: Draft (grey), Pending Review (amber), Published (green), Rejected (red with reason)
-- [ ] **MYCR-05**: Draft actions: Edit, Delete, Submit for Review
-- [ ] **MYCR-06**: Pending Review actions: Delete only
-- [ ] **MYCR-07**: Published actions: View, Delete
-- [ ] **MYCR-08**: Rejected actions: Edit, Delete, Resubmit (clears rejection_reason, resets to pending_review)
-- [ ] **MYCR-09**: First-time info modal on first "+ Add New Course" click, dismissible via localStorage
-- [ ] **MYCR-10**: Course creation form with all standard fields, "Save as Draft" and "Submit for Review" buttons
-- [ ] **MYCR-11**: Edit form pre-filled, only accessible for draft/rejected courses
+- [ ] **ONB-01**: Welcome step with instructions and time estimate
+- [ ] **ONB-02**: Basic info step: school name (pre-filled), short bio, full bio, established year
+- [ ] **ONB-03**: Online presence step: website + social links with at-least-one validation
+- [ ] **ONB-04**: Video introduction step: YouTube/Vimeo toggle + URL (optional)
+- [ ] **ONB-05**: Teaching info step: practice styles, programs, delivery format, lineage, languages
+- [ ] **ONB-06**: Location step with Google Places autocomplete (conditional on in-person/hybrid)
+- [ ] **ONB-07**: Document upload step per designation: business registration, qualification cert, insurance
+- [ ] **ONB-08**: Faculty step: search GOYA members, invite non-members by email, assign positions
+- [ ] **ONB-09**: Review & submit: summary, set onboarding_completed=true, status='pending_review', admin notification
 
-### Public Academy
+### School Settings
 
-- [ ] **ACAD-01**: /academy page has type filter: All Courses, GOYA Courses, Member Courses
-- [ ] **ACAD-02**: Filter uses existing UI pattern and works with existing category/progress filters
-- [ ] **ACAD-03**: Only published courses shown regardless of filter
+- [ ] **SET-01**: School Settings link in user dropdown between Settings and Admin Settings (owner only)
+- [ ] **SET-02**: Settings shell at /schools/[slug]/settings with collapsible sidebar matching existing pattern
+- [ ] **SET-03**: General section: name, slug, bio, established year (name/slug change triggers re-review)
+- [ ] **SET-04**: Online Presence section: website, social links, video intro
+- [ ] **SET-05**: Teaching Info section: practice styles, programs, delivery format, lineage, languages
+- [ ] **SET-06**: Location section with Google Places autocomplete
+- [ ] **SET-07**: Faculty section: manage members, assign positions
+- [ ] **SET-08**: Designations section: view active, add new designations
+- [ ] **SET-09**: Documents section: view/re-upload verification documents
+- [ ] **SET-10**: Subscription section: view billing status
+- [ ] **SET-11**: Status banner when pending_review
 
-### Audit Coverage
+### Admin Management
 
-- [ ] **CAUD-01**: Shared server utility (lib/courses/audit.ts) for all audit log writes
-- [ ] **CAUD-02**: All code paths (admin create/edit/status/delete, user create/edit/submit/delete, approve, reject) write audit log
+- [ ] **ADM-01**: Admin inbox School Registrations tab updated with new school data, designations, approve/reject
+- [ ] **ADM-02**: Admin school detail/review page at /admin/schools/[id] with all fields and documents
+- [ ] **ADM-03**: Approve action: set status='approved', send approval email via Resend
+- [ ] **ADM-04**: Reject action: set status='rejected', save reason, send rejection email
+- [ ] **ADM-05**: Member profile "Visit School" button for Principal Trainers/Faculty of approved schools
+
+### Public Profile
+
+- [ ] **PUB-01**: Public school profile at /schools/[slug] with hero, bio, teaching info, faculty
+- [ ] **PUB-02**: Hero: logo, name, designation badges, location or "Online School"
+- [ ] **PUB-03**: Body: about, practice styles, programs, languages, lineage, video (left), sidebar with details + faculty (right)
+- [ ] **PUB-04**: Member directory integration: School filter type, school cards with logo and designation badges
+
+### Faculty Invitations
+
+- [ ] **FAC-01**: Invitation email via Resend when owner adds non-member faculty by email
+- [ ] **FAC-02**: Email links to /register?school=[slug]&invite=[token]
+- [ ] **FAC-03**: Auto-link profile to school faculty on registration with valid invite token
 
 ## Future Requirements
 
-None currently deferred.
+### School Enhancements (deferred)
+
+- **SCH-F01**: School analytics dashboard (visitor stats, inquiry tracking)
+- **SCH-F02**: School-level course/event listings on school profile
+- **SCH-F03**: Student reviews and ratings for schools
+- **SCH-F04**: School search with map view and filters
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Email notifications on approval/rejection | Notification system not yet built |
-| Course analytics for member submissions | Admin analytics dashboard covers overall |
-| Course co-authoring / multiple instructors | Single created_by sufficient for initial release |
-| Student course submissions | Students are learners, not instructors |
-| Lesson/module management for member courses | Members submit course metadata only, admin manages content |
+| School-to-school networking | Social features between schools are deferred |
+| Multi-owner schools | Single owner (Principal Trainer) per school for v1 |
+| School billing portal | Schools manage via Stripe Customer Portal, no custom portal |
+| Automated document verification | Admin manual review for v1, AI verification deferred |
+| School messaging/chat | Use existing DM system between members |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CDB-01 | Phase 22 | Pending |
-| CDB-02 | Phase 22 | Pending |
-| CDB-03 | Phase 22 | Pending |
-| CDB-04 | Phase 22 | Pending |
-| CDB-05 | Phase 22 | Pending |
-| CDB-06 | Phase 22 | Pending |
-| CDB-07 | Phase 22 | Pending |
-| CDB-08 | Phase 22 | Pending |
-| CDB-09 | Phase 22 | Pending |
-| CADM-01 | Phase 23 | Pending |
-| CADM-02 | Phase 23 | Pending |
-| CADM-03 | Phase 23 | Pending |
-| CADM-04 | Phase 23 | Pending |
-| CADM-05 | Phase 23 | Pending |
-| CINB-01 | Phase 24 | Pending |
-| CINB-02 | Phase 24 | Pending |
-| CINB-03 | Phase 24 | Pending |
-| CINB-04 | Phase 24 | Pending |
-| CINB-05 | Phase 24 | Pending |
-| MYCR-01 | Phase 25 | Pending |
-| MYCR-02 | Phase 25 | Pending |
-| MYCR-03 | Phase 25 | Pending |
-| MYCR-04 | Phase 25 | Pending |
-| MYCR-05 | Phase 25 | Pending |
-| MYCR-06 | Phase 25 | Pending |
-| MYCR-07 | Phase 25 | Pending |
-| MYCR-08 | Phase 25 | Pending |
-| MYCR-09 | Phase 25 | Pending |
-| MYCR-10 | Phase 25 | Pending |
-| MYCR-11 | Phase 25 | Pending |
-| ACAD-01 | Phase 26 | Pending |
-| ACAD-02 | Phase 26 | Pending |
-| ACAD-03 | Phase 26 | Pending |
-| CAUD-01 | Phase 27 | Pending |
-| CAUD-02 | Phase 27 | Pending |
+| DB-01 | — | Pending |
+| DB-02 | — | Pending |
+| DB-03 | — | Pending |
+| DB-04 | — | Pending |
+| DB-05 | — | Pending |
+| DB-06 | — | Pending |
+| DB-07 | — | Pending |
+| INT-01 | — | Pending |
+| INT-02 | — | Pending |
+| INT-03 | — | Pending |
+| INT-04 | — | Pending |
+| REG-01 | — | Pending |
+| REG-02 | — | Pending |
+| REG-03 | — | Pending |
+| REG-04 | — | Pending |
+| REG-05 | — | Pending |
+| ONB-01 | — | Pending |
+| ONB-02 | — | Pending |
+| ONB-03 | — | Pending |
+| ONB-04 | — | Pending |
+| ONB-05 | — | Pending |
+| ONB-06 | — | Pending |
+| ONB-07 | — | Pending |
+| ONB-08 | — | Pending |
+| ONB-09 | — | Pending |
+| SET-01 | — | Pending |
+| SET-02 | — | Pending |
+| SET-03 | — | Pending |
+| SET-04 | — | Pending |
+| SET-05 | — | Pending |
+| SET-06 | — | Pending |
+| SET-07 | — | Pending |
+| SET-08 | — | Pending |
+| SET-09 | — | Pending |
+| SET-10 | — | Pending |
+| SET-11 | — | Pending |
+| ADM-01 | — | Pending |
+| ADM-02 | — | Pending |
+| ADM-03 | — | Pending |
+| ADM-04 | — | Pending |
+| ADM-05 | — | Pending |
+| PUB-01 | — | Pending |
+| PUB-02 | — | Pending |
+| PUB-03 | — | Pending |
+| PUB-04 | — | Pending |
+| FAC-01 | — | Pending |
+| FAC-02 | — | Pending |
+| FAC-03 | — | Pending |
 
 **Coverage:**
-- v1.10 requirements: 31 total
-- Mapped to phases: 31
-- Unmapped: 0 ✓
+- v1.14 requirements: 39 total
+- Mapped to phases: 0
+- Unmapped: 39 ⚠️
 
 ---
 *Requirements defined: 2026-03-31*
