@@ -110,6 +110,7 @@ export interface Event {
   created_by: string | null;
   rejection_reason: string | null;
   status: EventStatus;
+  organizer_ids: string[] | null;
   deleted_at: string | null;
   created_at: string;
   updated_at: string;

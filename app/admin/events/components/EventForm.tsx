@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import type { Event, EventStatus } from '@/lib/types';
 import { logAdminEventAction } from '@/app/admin/events/actions';
 import { registerMediaItemAction } from '@/app/actions/media';
+import OrganizerPicker from '@/app/components/OrganizerPicker';
 
 const GooglePlacesAutocomplete = dynamic(() => import('@/app/components/GooglePlacesAutocomplete'), { ssr: false });
 
@@ -45,9 +46,12 @@ function AnimatedField({ show, children }: { show: boolean; children: React.Reac
 interface Props {
   event?: Event;
   userRole?: string;
+  currentUserId?: string;
+  currentUserName?: string;
+  currentUserAvatar?: string | null;
 }
 
-export default function EventForm({ event, userRole }: Props) {
+export default function EventForm({ event, userRole, currentUserId, currentUserName, currentUserAvatar }: Props) {
   const router  = useRouter();
   const isEdit  = !!event;
 
@@ -73,6 +77,11 @@ export default function EventForm({ event, userRole }: Props) {
   const [spotsRem,  setSpotsRem]  = useState(String(event?.spots_remaining ?? ''));
   const [registrationRequired, setRegistrationRequired] = useState(event?.registration_required ?? false);
   const [websiteUrl, setWebsiteUrl] = useState(event?.website_url ?? '');
+
+  // Organizer state — stored IDs exclude the current user (added in payload)
+  const [organizerIds, setOrganizerIds] = useState<string[]>(
+    () => (event?.organizer_ids ?? []).filter(id => id !== currentUserId)
+  );
 
   // Image state
   const [currentImageUrl, setCurrentImageUrl] = useState(event?.featured_image_url ?? null);
@@ -206,6 +215,9 @@ export default function EventForm({ event, userRole }: Props) {
         spots_remaining:    spotsRem   ? parseInt(spotsRem, 10)   : null,
         website_url:        websiteUrl.trim() || null,
         featured_image_url: imageUrl,
+        organizer_ids: currentUserId
+          ? [currentUserId, ...organizerIds].filter(Boolean)
+          : organizerIds,
       };
 
       if (isEdit) {
@@ -513,10 +525,19 @@ export default function EventForm({ event, userRole }: Props) {
         </div>
       </FormSection>
 
-      {/* ── Organizers (placeholder for Phase 5) ────────────────────────── */}
-      <FormSection title="Organizers" description="Co-organizers and collaborators for this event.">
-        <p className="text-sm text-foreground-tertiary italic">Organizer management coming in a future update.</p>
-      </FormSection>
+      {/* ── Organizers ──────────────────────────────────────────────────── */}
+      {currentUserId && currentUserName && (
+        <FormSection title="Organizers" description="Add up to 5 co-organizers for this event.">
+          <OrganizerPicker
+            currentUserId={currentUserId}
+            currentUserName={currentUserName}
+            currentUserAvatar={currentUserAvatar}
+            currentUserRole={userRole ?? 'admin'}
+            value={organizerIds}
+            onChange={setOrganizerIds}
+          />
+        </FormSection>
+      )}
 
       {/* ── Actions ─────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 pt-2">
