@@ -333,7 +333,7 @@ export default function ChatPanel({
       role="dialog"
       aria-label="Chat with Mattea"
       aria-modal="true"
-      className="fixed z-50 flex flex-col bg-[var(--goya-surface)] border border-[var(--goya-border)] shadow-[var(--shadow-elevated)]
+      className="fixed z-50 flex flex-col bg-[var(--goya-surface)] border border-[var(--goya-border)] shadow-[var(--shadow-elevated)] overflow-hidden
         inset-0 rounded-none h-[100dvh]
         md:inset-auto md:bottom-24 md:right-6 md:w-[380px] md:h-[560px] md:rounded-2xl
         animate-[slideUp_280ms_ease-out]"

@@ -102,7 +102,7 @@ export default async function RootLayout({
           {!isAdmin && <ChatWidgetLoader />}
 
           {/* Cookie consent banner + floating button */}
-          <CookieConsent />
+          {!isAdmin && <CookieConsent />}
         </ClientProviders>
 
         {/* Vercel Analytics — always on (necessary/first-party) */}

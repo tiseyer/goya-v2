@@ -100,22 +100,23 @@ export default function ChatWidget() {
     badge = 'preview'
   }
 
+  function toggleChat() {
+    if (isOpen) handleClose()
+    else handleOpen()
+  }
+
   return (
     <>
-      {!isOpen && (
-        <>
-          <FloatingButton onClick={handleOpen} />
-          {badge === 'preview' && (
-            <span className="fixed bottom-16 right-4 z-50 text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full font-medium leading-none pointer-events-none">
-              Preview
-            </span>
-          )}
-          {badge === 'maintenance' && (
-            <span className="fixed bottom-16 right-4 z-50 text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-medium leading-none pointer-events-none">
-              Maintenance
-            </span>
-          )}
-        </>
+      <FloatingButton onClick={toggleChat} isOpen={isOpen} />
+      {!isOpen && badge === 'preview' && (
+        <span className="fixed bottom-16 right-4 z-50 text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full font-medium leading-none pointer-events-none">
+          Preview
+        </span>
+      )}
+      {!isOpen && badge === 'maintenance' && (
+        <span className="fixed bottom-16 right-4 z-50 text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-medium leading-none pointer-events-none">
+          Maintenance
+        </span>
       )}
       <ChatPanel
         isOpen={isOpen}
