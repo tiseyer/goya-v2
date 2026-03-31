@@ -2,29 +2,17 @@
 
 ## What This Is
 
-GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions through a unified settings section. Members and visitors can chat with Mattea, an AI-powered support chatbot that answers questions using FAQ knowledge and platform data, with automatic escalation to human support. Admins manage the community through a full-featured admin panel with a comprehensive Shop section, chatbot configuration, FAQ management, conversation review, and support ticket handling. External services can programmatically access and manage all entities through a secure, documented REST API.
+GOYA v2 is a professional community platform for yoga and wellness practitioners — teachers, students, and wellness practitioners. Members can connect with peers, attend events, complete CPD-accredited courses, track credits, and manage their professional profile and subscriptions through a unified settings section. Teachers can register their yoga school on GOYA with designation-based Stripe subscriptions, complete a 9-step onboarding flow, and manage their school through a dedicated settings area — schools go live after admin verification with a public profile page and member directory integration. Members and visitors can chat with Mattea, an AI-powered support chatbot that answers questions using FAQ knowledge and platform data, with automatic escalation to human support. Admins manage the community through a full-featured admin panel with a comprehensive Shop section, chatbot configuration, FAQ management, conversation review, support ticket handling, and school registration review. External services can programmatically access and manage all entities through a secure, documented REST API.
 
 ## Core Value
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: v1.14 School Owner System
-
-**Goal:** Teachers can register their yoga school on GOYA — select designations, pay via Stripe, complete onboarding, get admin-verified, and go live with a public school profile.
-
-**Target features:**
-- Database foundation: extend schools table, add school_designations/faculty/documents tables, profiles extensions
-- Interest & entry points: dashboard widget, subscriptions callout, add-ons banner for teachers
-- School registration flow: multi-step wizard with Stripe checkout for designation payments
-- School onboarding flow: 9-step flow (bio, presence, teaching info, location, documents, faculty, review)
-- School Settings: full settings area at /schools/[slug]/settings with sidebar navigation
-- Admin school management: inbox tab updates, school detail/review page, member profile integration
-- Public school profile: /schools/[slug] with hero, body, faculty, member directory integration
-- Faculty invitations: email invites for non-members with auto-link on registration
-
 ## Current State
 
-**As of v1.10 (2026-03-31):** Member Courses milestone shipped. Teachers, WPs, and admins can submit courses via My Courses settings page. Courses go through draft→pending_review→published/rejected workflow. Admin inbox has Courses tab for approve/reject. Public academy has GOYA/Member type filter. Full audit logging via shared utility covering all 10 code paths.
+**As of v1.14 (2026-03-31):** School Owner System milestone shipped. Teachers can register their yoga school on GOYA: select designations → pay via Stripe (€40/year + €99 signup per designation) → complete 9-step onboarding → admin review → public school profile. Schools have a dedicated settings area, admin inbox approve/reject workflow with Resend emails, public profile at /schools/[slug] with designation badges, and faculty invitation system with auto-link on registration.
+
+**Previous v1.10 (2026-03-31):** Member Courses milestone shipped. Teachers, WPs, and admins can submit courses via My Courses settings page. Courses go through draft→pending_review→published/rejected workflow. Admin inbox has Courses tab for approve/reject. Public academy has GOYA/Member type filter. Full audit logging via shared utility covering all 10 code paths.
 
 **Previous v1.9 (2026-03-31):** Member Events milestone shipped. Teachers, wellness practitioners, and admins can submit events via My Events settings page. Events go through draft→pending_review→published/rejected workflow. Admin inbox has Events tab for approve/reject. Public calendar has GOYA/Member type filter. Full audit logging via shared utility covering all 10 code paths.
 
@@ -146,6 +134,16 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 - ✓ Public academy page type filter: All/GOYA/Member with published-only enforcement — v1.10
 - ✓ Shared audit utility (lib/courses/audit.ts) covering all 10 course-changing code paths — v1.10
 
+<!-- v1.14 School Owner System milestone -->
+- ✓ Schools table extended with 21 columns, 3 new tables, profiles extended, 15 RLS policies — v1.14
+- ✓ Teacher entry points: dashboard widget, subscriptions callout, add-ons banner for school registration — v1.14
+- ✓ School registration wizard: name/slug, 8 designation cards with EUR pricing, Stripe Checkout — v1.14
+- ✓ 9-step school onboarding flow: bio, presence, video, teaching info, location, documents, faculty, review — v1.14
+- ✓ School Settings at /schools/[slug]/settings: 8-section sidebar with all CRUD operations — v1.14
+- ✓ Admin school management: inbox tab with designations, detail/review page, approve/reject with emails — v1.14
+- ✓ Public school profile at /schools/[slug] with hero, designation badges, faculty, directory integration — v1.14
+- ✓ Faculty invitation system: Resend email invites, auto-link on registration — v1.14
+
 ### Out of Scope
 
 - Notification preferences — out of scope for settings MVP
@@ -239,4 +237,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-31 after v1.14 School Owner System milestone started*
+*Last updated: 2026-03-31 after v1.14 School Owner System milestone shipped*

@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.14 School Owner System (Shipped: 2026-03-31)
+
+**Phases completed:** 8 phases, 16 plans, 24 tasks
+
+**Key accomplishments:**
+
+- Database foundation: schools table extended with 21 columns, 3 new tables (school_designations, school_faculty, school_verification_documents), profiles extended, 15 RLS policies, TypeScript types regenerated
+- School registration wizard at /schools/create: name/slug entry, 8 designation cards with EUR pricing, Stripe Checkout (subscription + signup fee), post-payment school creation via webhook
+- 9-step school onboarding flow: basic info, online presence, video intro, teaching info, Google Places location, per-designation document uploads, faculty management, review & submit
+- School Settings area at /schools/[slug]/settings: 8-section sidebar (General, Online Presence, Teaching Info, Location, Faculty, Designations, Documents, Subscription), name/slug re-review trigger, pending_review status banner
+- Admin school management: inbox tab with designation badges and approve/reject workflow, school detail/review page with signed document URLs, approval/rejection emails via Resend
+- Public school profile at /schools/[slug] with GOYA blue hero, designation badges, 2-column body, faculty section with member profile links; member directory school filter with SchoolCard component
+- Faculty invitation system: Resend email invites for non-members, /register?school=[slug]&invite=[token] links, auto-link on registration (email/password and OAuth)
+- Teacher entry points: dashboard sidebar widget, subscriptions callout, add-ons banner — all role-gated to teachers without a school
+
+---
+
 ## v1.10 Member Courses (Shipped: 2026-03-31)
 
 **Phases completed:** 6 phases (22-27), 31 requirements
