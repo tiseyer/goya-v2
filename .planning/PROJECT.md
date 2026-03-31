@@ -184,6 +184,21 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 | In-memory rate limiter for chatbot | Matches REST API pattern, sufficient for single-instance | ✓ 20/session/hour — v1.8 |
 | Single-row chatbot_config table | Upsert pattern, all config in one place | ✓ chatbot_config — v1.8 |
 
+## Parallel Workstream: v1.11 Media Library
+
+**Workstream:** `media-library` (runs in parallel to v1.10 Member Courses)
+**Goal:** Central media management system — every file uploaded anywhere on the platform gets tracked in `media_items`, with a full admin library and a read-only member view.
+
+**Target features:**
+- Database schema: media_items, media_folders tables with role-based RLS
+- Instrument all existing upload flows (avatars, events, certificates, schools, chatbot, feed) to write to media_items
+- Admin Media Library: three-panel layout (folder tree, grid/list, detail panel) with upload, search, filters
+- Member Media page in Settings: read-only view of own uploads
+- Folder management for admins/mods (create, rename, reorder, delete)
+- Search, skeleton states, animations, mobile responsiveness
+
+**Artifacts:** `.planning/workstreams/media-library/`
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -195,4 +210,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-31 after v1.10 Member Courses milestone completed*
+*Last updated: 2026-03-31 after v1.11 Media Library workstream started*
