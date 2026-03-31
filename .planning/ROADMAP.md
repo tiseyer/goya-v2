@@ -116,7 +116,10 @@ Plans:
   3. Approving a school sets status to 'approved' and sends an approval email to the owner via Resend
   4. Rejecting a school requires a reason; reason is saved, status set to 'rejected', and a rejection email sent via Resend
   5. A "Visit School" button appears on member profile pages for Principal Trainers and Faculty of approved schools
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 33-01-PLAN.md — Server actions (approve/reject with email) + inbox tab update with designations
+- [ ] 33-02-PLAN.md — Admin school detail/review page + member profile Visit School button
 **UI hint**: yes
 
 ### Phase 34: Public School Profile
@@ -152,6 +155,6 @@ Plans:
 | 30. School Registration Flow | 2/2 | Complete   | 2026-03-31 |
 | 31. School Onboarding Flow | 3/3 | Complete    | 2026-03-31 |
 | 32. School Settings | 3/3 | Complete    | 2026-03-31 |
-| 33. Admin School Management | 0/TBD | Not started | - |
+| 33. Admin School Management | 0/2 | Not started | - |
 | 34. Public School Profile | 0/TBD | Not started | - |
 | 35. Faculty Invitations | 0/TBD | Not started | - |
