@@ -23,7 +23,7 @@
 - [x] **Phase 31: School Onboarding Flow** - 9-step onboarding wizard from welcome through review & submit (completed 2026-03-31)
 - [x] **Phase 32: School Settings** - Full settings area at /schools/[slug]/settings with sidebar navigation and all section pages (completed 2026-03-31)
 - [x] **Phase 33: Admin School Management** - Inbox tab updates, school detail/review page, approve/reject workflow, member profile integration (completed 2026-03-31)
-- [ ] **Phase 34: Public School Profile** - /schools/[slug] with hero, bio, teaching info, faculty, and member directory integration
+- [x] **Phase 34: Public School Profile** - /schools/[slug] with hero, bio, teaching info, faculty, and member directory integration (completed 2026-03-31)
 - [ ] **Phase 35: Faculty Invitations** - Email invites for non-members, invite link at registration, auto-link on account creation
 
 ### Phase 28: Database Foundation
@@ -159,5 +159,5 @@ Plans:
 | 31. School Onboarding Flow | 3/3 | Complete    | 2026-03-31 |
 | 32. School Settings | 3/3 | Complete    | 2026-03-31 |
 | 33. Admin School Management | 2/2 | Complete    | 2026-03-31 |
-| 34. Public School Profile | 0/2 | Not started | - |
+| 34. Public School Profile | 2/2 | Complete    | 2026-03-31 |
 | 35. Faculty Invitations | 0/TBD | Not started | - |
