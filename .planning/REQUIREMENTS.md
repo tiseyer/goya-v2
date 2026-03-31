@@ -75,9 +75,9 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 
 ### Faculty Invitations
 
-- [ ] **FAC-01**: Invitation email via Resend when owner adds non-member faculty by email
-- [ ] **FAC-02**: Email links to /register?school=[slug]&invite=[token]
-- [ ] **FAC-03**: Auto-link profile to school faculty on registration with valid invite token
+- [x] **FAC-01**: Invitation email via Resend when owner adds non-member faculty by email
+- [x] **FAC-02**: Email links to /register?school=[slug]&invite=[token]
+- [x] **FAC-03**: Auto-link profile to school faculty on registration with valid invite token
 
 ## Future Requirements
 
@@ -147,9 +147,9 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 | PUB-02 | Phase 34 | Pending |
 | PUB-03 | Phase 34 | Pending |
 | PUB-04 | Phase 34 | Pending |
-| FAC-01 | Phase 35 | Pending |
-| FAC-02 | Phase 35 | Pending |
-| FAC-03 | Phase 35 | Pending |
+| FAC-01 | Phase 35 | Complete |
+| FAC-02 | Phase 35 | Complete |
+| FAC-03 | Phase 35 | Complete |
 
 **Coverage:**
 - v1.14 requirements: 39 total

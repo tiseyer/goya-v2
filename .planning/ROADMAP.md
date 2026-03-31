@@ -24,7 +24,7 @@
 - [x] **Phase 32: School Settings** - Full settings area at /schools/[slug]/settings with sidebar navigation and all section pages (completed 2026-03-31)
 - [x] **Phase 33: Admin School Management** - Inbox tab updates, school detail/review page, approve/reject workflow, member profile integration (completed 2026-03-31)
 - [x] **Phase 34: Public School Profile** - /schools/[slug] with hero, bio, teaching info, faculty, and member directory integration (completed 2026-03-31)
-- [ ] **Phase 35: Faculty Invitations** - Email invites for non-members, invite link at registration, auto-link on account creation
+- [x] **Phase 35: Faculty Invitations** - Email invites for non-members, invite link at registration, auto-link on account creation (completed 2026-03-31)
 
 ### Phase 28: Database Foundation
 **Goal**: The database fully supports the school owner system — extended schema, all new tables, role-scoped access, and TypeScript types passing
@@ -145,9 +145,9 @@ Plans:
   1. When an owner adds a faculty member by email who is not a GOYA member, an invitation email is sent via Resend
   2. The invitation email contains a link to /register?school=[slug]&invite=[token]
   3. A new member who registers using a valid invite link is automatically linked to the school's faculty
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 35-01-PLAN.md — Faculty invitation email + registration auto-link
+- [x] 35-01-PLAN.md — Faculty invitation email + registration auto-link
 
 ## Progress
 
@@ -162,4 +162,4 @@ Plans:
 | 32. School Settings | 3/3 | Complete    | 2026-03-31 |
 | 33. Admin School Management | 2/2 | Complete    | 2026-03-31 |
 | 34. Public School Profile | 2/2 | Complete    | 2026-03-31 |
-| 35. Faculty Invitations | 0/1 | Not started | - |
+| 35. Faculty Invitations | 1/1 | Complete   | 2026-03-31 |

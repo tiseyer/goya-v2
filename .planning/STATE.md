@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.14
 milestone_name: School Owner System
 status: verifying
-stopped_at: Completed 31-03-PLAN.md
-last_updated: "2026-03-31T13:38:53.025Z"
+stopped_at: Completed 35-faculty-invitations/35-01-PLAN.md
+last_updated: "2026-03-31T15:48:50.646Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 8
-  completed_phases: 3
-  total_plans: 8
-  completed_plans: 7
+  completed_phases: 8
+  total_plans: 16
+  completed_plans: 16
   percent: 0
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 30 — school-registration-flow
+**Current focus:** Phase 35 — faculty-invitations
 
 ## Current Position
 
-Phase: 30 (school-registration-flow) — EXECUTING
-Plan: 2 of 2
+Phase: 35 (faculty-invitations) — EXECUTING
+Plan: 1 of 1
 Status: Phase complete — ready for verification
 Last activity: 2026-03-31
 
@@ -61,6 +61,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 30-school-registration-flow P02 | 10min | 1 tasks | 4 files |
 | Phase 31-school-onboarding-flow P02 | 4 | 2 tasks | 2 files |
 | Phase 31 P03 | 10 | 1 tasks | 2 files |
+| Phase 35-faculty-invitations P01 | 6 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,8 @@ Recent decisions affecting current work:
 - [Phase 31-school-onboarding-flow]: Lineage stored as comma-separated string matching actions.ts, rendered as tag chips in wizard UI
 - [Phase 31]: Google Maps API loaded dynamically in useEffect to avoid SSR; window typed as any to avoid global Window conflicts
 - [Phase 31]: Conditional step navigation via getVisibleSteps helper — step 6 excluded for online delivery format
+- [Phase 35-faculty-invitations]: Email sending fire-and-forget: errors logged but do not block success response
+- [Phase 35-faculty-invitations]: OAuth invite claim handled server-side in auth/callback using service role
 
 ### Blockers/Concerns
 
@@ -111,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T13:38:53.023Z
-Stopped at: Completed 31-03-PLAN.md
+Last session: 2026-03-31T15:48:50.642Z
+Stopped at: Completed 35-faculty-invitations/35-01-PLAN.md
 Resume file: None
