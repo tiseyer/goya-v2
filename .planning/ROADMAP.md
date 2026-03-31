@@ -20,7 +20,7 @@
 - [x] **Phase 28: Database Foundation** - Extend schools/profiles tables, add school_designations/faculty/documents tables, RLS policies, TypeScript types (completed 2026-03-31)
 - [x] **Phase 29: Interest & Entry Points** - Dashboard widget, subscriptions callout, add-ons banner for teachers without a school (completed 2026-03-31)
 - [x] **Phase 30: School Registration Flow** - Name/slug step, designation selection, Stripe Checkout, post-payment school record creation (completed 2026-03-31)
-- [ ] **Phase 31: School Onboarding Flow** - 9-step onboarding wizard from welcome through review & submit
+- [x] **Phase 31: School Onboarding Flow** - 9-step onboarding wizard from welcome through review & submit (completed 2026-03-31)
 - [ ] **Phase 32: School Settings** - Full settings area at /schools/[slug]/settings with sidebar navigation and all section pages
 - [ ] **Phase 33: Admin School Management** - Inbox tab updates, school detail/review page, approve/reject workflow, member profile integration
 - [ ] **Phase 34: Public School Profile** - /schools/[slug] with hero, bio, teaching info, faculty, and member directory integration
