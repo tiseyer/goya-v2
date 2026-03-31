@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "media:backfill": "tsx scripts/backfill-media-items.ts"
   },
   "dependencies": {
     "@react-email/components": "^1.0.10",
