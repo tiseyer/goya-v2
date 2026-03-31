@@ -160,7 +160,7 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
       </button>
 
       {/* LEFT SIDEBAR */}
-      <aside className={`${mobileNavOpen ? 'fixed inset-0 z-10 bg-white' : 'hidden'} lg:block lg:w-[250px] lg:shrink-0 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] overflow-y-auto border-r border-slate-200 bg-white print:hidden`}>
+      <aside className={`${mobileNavOpen ? 'fixed inset-0 z-10 bg-white' : 'hidden'} lg:block lg:w-[280px] lg:shrink-0 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] overflow-y-auto border-r border-slate-200 bg-white print:hidden`}>
         <div className="p-4">
           <Link
             href="/admin/docs"
@@ -251,8 +251,8 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
       </aside>
 
       {/* MIDDLE CONTENT */}
-      <main className="flex-1 min-w-0 px-8 py-6">
-        <div className="max-w-3xl mx-auto">
+      <main className="flex-1 min-w-0 px-10 py-6 lg:px-12">
+        <div className="max-w-4xl">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-sm text-slate-400 mb-6">
             <Link href="/admin/docs" className="hover:text-[var(--goya-primary)] transition-colors">
@@ -307,13 +307,13 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
       </main>
 
       {/* RIGHT SIDEBAR — Table of Contents */}
-      <aside className="w-[220px] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto hidden xl:block print:hidden">
-        <div className="p-4">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+      <aside className="w-[240px] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto hidden xl:block border-l border-slate-200 print:hidden">
+        <div className="p-5">
+          <p className="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-4">
             On this page
           </p>
           {headings.length > 0 ? (
-            <nav className="space-y-1">
+            <nav className="space-y-1.5">
               {headings.map((h) => (
                 <a
                   key={h.id}
@@ -327,7 +327,7 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
                       window.history.replaceState(null, '', `#${h.id}`);
                     }
                   }}
-                  className={`block text-sm transition-colors ${
+                  className={`block text-[13px] leading-snug py-0.5 transition-colors ${
                     h.level === 3 ? 'pl-3' : ''
                   } ${
                     activeHeading === h.id
@@ -340,7 +340,7 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
               ))}
             </nav>
           ) : (
-            <p className="text-xs text-slate-400">No headings found.</p>
+            <p className="text-sm text-slate-400">No headings found.</p>
           )}
         </div>
       </aside>

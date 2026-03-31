@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-03-31 — Completed quick task 260331-oyv: Backfill existing Storage files into media_items table
+Last activity: 2026-03-31 — Completed quick task 260331-p7b: Fix admin docs viewer layout proportions
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -74,6 +74,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 1 | Admin sidebar docs icon + media library header alignment | 2026-03-31 | b1b6efa, 21437bd | 260331-oyj-admin-sidebar-docs-link-media-library-he |
 | 260331-oyv | Backfill existing Storage files into media_items table | 2026-03-31 | be4b692 | [260331-oyv-backfill-existing-storage-files-into-med](./quick/260331-oyv-backfill-existing-storage-files-into-med/) |
+| 260331-p7b | Fix admin docs viewer layout proportions | 2026-03-31 | — | [260331-p7b-fix-admin-docs-viewer-layout-proportions](./quick/260331-p7b-fix-admin-docs-viewer-layout-proportions/) |
 
 ## Session Continuity
 
