@@ -49,6 +49,7 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
   const [audience, setAudience] = useState<string>('all');
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
   const [activeHeading, setActiveHeading] = useState<string>('');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const { isOpen: searchOpen, open: openSearch, close: closeSearch } = useDocSearch();
 
@@ -147,8 +148,19 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
+      {/* Mobile nav toggle */}
+      <button
+        onClick={() => setMobileNavOpen(!mobileNavOpen)}
+        className="lg:hidden fixed bottom-4 left-4 z-20 w-12 h-12 rounded-full bg-[var(--goya-primary)] text-white shadow-lg flex items-center justify-center print:hidden"
+        aria-label="Toggle navigation"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileNavOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
+        </svg>
+      </button>
+
       {/* LEFT SIDEBAR */}
-      <aside className="w-[250px] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto border-r border-slate-200 bg-white">
+      <aside className={`${mobileNavOpen ? 'fixed inset-0 z-10 bg-white' : 'hidden'} lg:block lg:w-[250px] lg:shrink-0 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] overflow-y-auto border-r border-slate-200 bg-white print:hidden`}>
         <div className="p-4">
           <Link
             href="/admin/docs"
@@ -295,7 +307,7 @@ export default function DocViewer({ doc, navTree, allDocs, prevDoc, nextDoc }: P
       </main>
 
       {/* RIGHT SIDEBAR — Table of Contents */}
-      <aside className="w-[220px] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto hidden xl:block">
+      <aside className="w-[220px] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto hidden xl:block print:hidden">
         <div className="p-4">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
             On this page

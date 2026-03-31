@@ -337,3 +337,13 @@ html:not(.no-transitions) body * {
 }
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* ─── Print styles for documentation ────────────────────────────────── */
+@media print {
+  body { background: white !important; }
+  main { max-width: 100% !important; padding: 0 !important; }
+  a[href]::after { content: none !important; }
+  pre { white-space: pre-wrap !important; word-wrap: break-word !important; }
+  table { page-break-inside: avoid; }
+  h2, h3 { page-break-after: avoid; }
+}
