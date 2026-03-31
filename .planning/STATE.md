@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.14
 milestone_name: School Owner System
 status: verifying
-stopped_at: "Completed 30-02 task 1 — awaiting checkpoint:human-verify (task 2)"
-last_updated: "2026-03-31T12:54:57.476Z"
+stopped_at: Completed 31-03-PLAN.md
+last_updated: "2026-03-31T13:38:53.025Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 8
   completed_phases: 3
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 8
+  completed_plans: 7
   percent: 0
 ---
 
@@ -59,6 +59,8 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 29-interest-and-entry-points P01 | 4min | 2 tasks | 5 files |
 | Phase 30-school-registration-flow P01 | 5min | 2 tasks | 5 files |
 | Phase 30-school-registration-flow P02 | 10min | 1 tasks | 4 files |
+| Phase 31-school-onboarding-flow P02 | 4 | 2 tasks | 2 files |
+| Phase 31 P03 | 10 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -82,6 +84,10 @@ Recent decisions affecting current work:
 - [Phase 30-school-registration-flow]: Slug embedded in success_url to avoid webhook race condition on success page redirect
 - [Phase 30-school-registration-flow]: Wizard split into page.tsx (server RSC) + SchoolCreateWizard.tsx (client) for clean RSC boundary
 - [Phase 30-school-registration-flow]: Step navigation via URL params (?step=2) so browser back button works and Stripe cancel_url returns to correct step
+- [Phase 31-school-onboarding-flow]: StepIndicator uses desktop/mobile variants — full 9-step on desktop, compact current-step on mobile
+- [Phase 31-school-onboarding-flow]: Lineage stored as comma-separated string matching actions.ts, rendered as tag chips in wizard UI
+- [Phase 31]: Google Maps API loaded dynamically in useEffect to avoid SSR; window typed as any to avoid global Window conflicts
+- [Phase 31]: Conditional step navigation via getVisibleSteps helper — step 6 excluded for online delivery format
 
 ### Blockers/Concerns
 
@@ -105,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T12:54:57.473Z
-Stopped at: Completed 30-02 task 1 — awaiting checkpoint:human-verify (task 2)
+Last session: 2026-03-31T13:38:53.023Z
+Stopped at: Completed 31-03-PLAN.md
 Resume file: None

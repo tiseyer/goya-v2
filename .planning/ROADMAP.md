@@ -82,10 +82,10 @@ Plans:
   4. The location step with Google Places autocomplete appears only for in-person or hybrid delivery formats
   5. The owner can upload required documents per designation and search/invite faculty members (GOYA members or non-members by email)
   6. The review step summarises all entered data; submitting sets onboarding_completed=true, status='pending_review', and triggers an admin notification
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 Plans:
-- [ ] 31-01-PLAN.md — Server actions + faculty search API for all onboarding steps
-- [ ] 31-02-PLAN.md — Onboarding wizard UI: page wrapper + steps 1-5 (Welcome, Basic Info, Online Presence, Video, Teaching)
+- [x] 31-01-PLAN.md — Server actions + faculty search API for all onboarding steps
+- [x] 31-02-PLAN.md — Onboarding wizard UI: page wrapper + steps 1-5 (Welcome, Basic Info, Online Presence, Video, Teaching)
 - [ ] 31-03-PLAN.md — Onboarding wizard UI: steps 6-9 (Location, Documents, Faculty, Review & Submit) + visual verification
 **UI hint**: yes
 
@@ -146,7 +146,7 @@ Plans:
 | 28. Database Foundation | 2/2 | Complete    | 2026-03-31 |
 | 29. Interest & Entry Points | 1/1 | Complete    | 2026-03-31 |
 | 30. School Registration Flow | 2/2 | Complete   | 2026-03-31 |
-| 31. School Onboarding Flow | 0/3 | Not started | - |
+| 31. School Onboarding Flow | 2/3 | In Progress|  |
 | 32. School Settings | 0/TBD | Not started | - |
 | 33. Admin School Management | 0/TBD | Not started | - |
 | 34. Public School Profile | 0/TBD | Not started | - |
