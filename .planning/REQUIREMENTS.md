@@ -102,60 +102,60 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | — | Pending |
-| DB-02 | — | Pending |
-| DB-03 | — | Pending |
-| DB-04 | — | Pending |
-| DB-05 | — | Pending |
-| DB-06 | — | Pending |
-| DB-07 | — | Pending |
-| INT-01 | — | Pending |
-| INT-02 | — | Pending |
-| INT-03 | — | Pending |
-| INT-04 | — | Pending |
-| REG-01 | — | Pending |
-| REG-02 | — | Pending |
-| REG-03 | — | Pending |
-| REG-04 | — | Pending |
-| REG-05 | — | Pending |
-| ONB-01 | — | Pending |
-| ONB-02 | — | Pending |
-| ONB-03 | — | Pending |
-| ONB-04 | — | Pending |
-| ONB-05 | — | Pending |
-| ONB-06 | — | Pending |
-| ONB-07 | — | Pending |
-| ONB-08 | — | Pending |
-| ONB-09 | — | Pending |
-| SET-01 | — | Pending |
-| SET-02 | — | Pending |
-| SET-03 | — | Pending |
-| SET-04 | — | Pending |
-| SET-05 | — | Pending |
-| SET-06 | — | Pending |
-| SET-07 | — | Pending |
-| SET-08 | — | Pending |
-| SET-09 | — | Pending |
-| SET-10 | — | Pending |
-| SET-11 | — | Pending |
-| ADM-01 | — | Pending |
-| ADM-02 | — | Pending |
-| ADM-03 | — | Pending |
-| ADM-04 | — | Pending |
-| ADM-05 | — | Pending |
-| PUB-01 | — | Pending |
-| PUB-02 | — | Pending |
-| PUB-03 | — | Pending |
-| PUB-04 | — | Pending |
-| FAC-01 | — | Pending |
-| FAC-02 | — | Pending |
-| FAC-03 | — | Pending |
+| DB-01 | Phase 28 | Pending |
+| DB-02 | Phase 28 | Pending |
+| DB-03 | Phase 28 | Pending |
+| DB-04 | Phase 28 | Pending |
+| DB-05 | Phase 28 | Pending |
+| DB-06 | Phase 28 | Pending |
+| DB-07 | Phase 28 | Pending |
+| INT-01 | Phase 29 | Pending |
+| INT-02 | Phase 29 | Pending |
+| INT-03 | Phase 29 | Pending |
+| INT-04 | Phase 29 | Pending |
+| REG-01 | Phase 30 | Pending |
+| REG-02 | Phase 30 | Pending |
+| REG-03 | Phase 30 | Pending |
+| REG-04 | Phase 30 | Pending |
+| REG-05 | Phase 30 | Pending |
+| ONB-01 | Phase 31 | Pending |
+| ONB-02 | Phase 31 | Pending |
+| ONB-03 | Phase 31 | Pending |
+| ONB-04 | Phase 31 | Pending |
+| ONB-05 | Phase 31 | Pending |
+| ONB-06 | Phase 31 | Pending |
+| ONB-07 | Phase 31 | Pending |
+| ONB-08 | Phase 31 | Pending |
+| ONB-09 | Phase 31 | Pending |
+| SET-01 | Phase 32 | Pending |
+| SET-02 | Phase 32 | Pending |
+| SET-03 | Phase 32 | Pending |
+| SET-04 | Phase 32 | Pending |
+| SET-05 | Phase 32 | Pending |
+| SET-06 | Phase 32 | Pending |
+| SET-07 | Phase 32 | Pending |
+| SET-08 | Phase 32 | Pending |
+| SET-09 | Phase 32 | Pending |
+| SET-10 | Phase 32 | Pending |
+| SET-11 | Phase 32 | Pending |
+| ADM-01 | Phase 33 | Pending |
+| ADM-02 | Phase 33 | Pending |
+| ADM-03 | Phase 33 | Pending |
+| ADM-04 | Phase 33 | Pending |
+| ADM-05 | Phase 33 | Pending |
+| PUB-01 | Phase 34 | Pending |
+| PUB-02 | Phase 34 | Pending |
+| PUB-03 | Phase 34 | Pending |
+| PUB-04 | Phase 34 | Pending |
+| FAC-01 | Phase 35 | Pending |
+| FAC-02 | Phase 35 | Pending |
+| FAC-03 | Phase 35 | Pending |
 
 **Coverage:**
 - v1.14 requirements: 39 total
-- Mapped to phases: 0
-- Unmapped: 39 ⚠️
+- Mapped to phases: 39
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-03-31 after initial definition*
+*Last updated: 2026-03-31 after roadmap creation*
