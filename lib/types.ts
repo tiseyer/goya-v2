@@ -3,6 +3,18 @@ export type SubscriptionStatus = 'member' | 'guest';
 export type MemberType = 'student' | 'teacher' | 'wellness_practitioner';
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
 export type EventCategory = 'Workshop' | 'Teacher Training' | 'Dharma Talk' | 'Conference' | 'Yoga Sequence' | 'Music Playlist' | 'Research';
+
+export interface EventCategoryRow {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  color: string;
+  parent_id: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
 export type EventFormat = 'Online' | 'In Person' | 'Hybrid';
 export type EventStatus = 'published' | 'draft' | 'pending_review' | 'rejected' | 'cancelled' | 'deleted';
 export type CourseCategory = 'Workshop' | 'Yoga Sequence' | 'Dharma Talk' | 'Music Playlist' | 'Research';
@@ -80,6 +92,8 @@ export interface Event {
   time_start: string;
   time_end: string;
   location: string | null;
+  location_lat?: number | null;
+  location_lng?: number | null;
   instructor: string | null;
   price: number;
   is_free: boolean;
@@ -93,6 +107,8 @@ export interface Event {
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
+  event_type: string;
+  rejection_reason?: string | null;
 }
 
 export interface Course {

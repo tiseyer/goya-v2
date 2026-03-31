@@ -132,6 +132,11 @@ export default function MemberMediaClient({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
 
+  // POLISH-03: Panel animation state
+  const [isPanelClosing, setIsPanelClosing] = useState(false);
+  const lastPanelItemRef = useRef<MediaItem | null>(null);
+  if (selectedItem) lastPanelItemRef.current = selectedItem;
+
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // ── Hydrate localStorage prefs on mount ────────────────────────────────────
@@ -265,131 +270,139 @@ export default function MemberMediaClient({
     });
   }
 
+  // POLISH-03: Animate panel close
+  const handlePanelClose = useCallback(() => {
+    setIsPanelClosing(true);
+    setTimeout(() => {
+      setSelectedItem(null);
+      setIsPanelClosing(false);
+      lastPanelItemRef.current = null;
+    }, 200);
+  }, []);
+
   const hasFilters = !!(debouncedQ || type !== 'all' || date !== 'all');
+
+  // POLISH-04: Mobile folder options
+  const MEMBER_FOLDER_OPTIONS = [
+    { value: '', label: 'All Files' },
+    { value: 'avatars', label: 'Avatars' },
+    { value: 'upgrade-certificates', label: 'Certificates' },
+    { value: 'uploads', label: 'Uploads' },
+  ];
+
+  // The item to show in the panel (keep last item during closing animation)
+  const panelItem = selectedItem ?? lastPanelItemRef.current;
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
-      {/* Folder sidebar */}
-      <MemberFolderSidebar
-        activeFolder={activeFolder}
-        onFolderSelect={handleFolderSelect}
-        collapsed={sidebarCollapsed}
-        onCollapse={handleSidebarCollapse}
-      />
+      {/* POLISH-04: Folder sidebar — hidden on mobile, visible md+ */}
+      <div className="hidden md:flex">
+        <MemberFolderSidebar
+          activeFolder={activeFolder}
+          onFolderSelect={handleFolderSelect}
+          collapsed={sidebarCollapsed}
+          onCollapse={handleSidebarCollapse}
+        />
+      </div>
 
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Toolbar */}
-        <div className="h-14 border-b border-slate-200 bg-white flex items-center px-4 gap-2 shrink-0 w-full">
-          {/* Search */}
-          <div className="relative flex-1 max-w-xs">
-            <svg
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
-              fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"
+        {/* POLISH-04: Mobile folder dropdown */}
+        <div className="md:hidden border-b border-slate-200 bg-white px-3 py-2 shrink-0">
+          <div className="relative">
+            <select
+              value={activeFolder ?? ''}
+              onChange={(e) => handleFolderSelect(e.target.value || null)}
+              aria-label="Select folder"
+              className="w-full h-8 pl-3 pr-8 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors duration-150"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              {MEMBER_FOLDER_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
-            <input
-              type="search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search files..."
-              aria-label="Search files"
-              className={[
-                'w-full h-8 pl-8 pr-3 text-xs text-slate-700 bg-white border border-slate-200 rounded-lg',
-                'placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30',
-                'focus:border-primary transition-colors duration-150',
-              ].join(' ')}
-            />
           </div>
+        </div>
 
-          {/* Filter: file type */}
-          <div className="relative">
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value as 'all' | 'images' | 'pdfs' | 'videos')}
-              aria-label="Filter by file type"
-              className={SELECT_CLS}
-            >
-              <option value="all">All files</option>
-              <option value="images">Images</option>
-              <option value="pdfs">PDFs</option>
-              <option value="videos">Videos</option>
-            </select>
-            {CHEVRON_DOWN}
+        {/* Toolbar — POLISH-04: two-row on mobile, single-row on sm+ */}
+        <div className="border-b border-slate-200 bg-white shrink-0 w-full">
+          {/* Mobile: two rows */}
+          <div className="flex flex-col sm:hidden">
+            <div className="flex items-center gap-2 px-3 pt-2.5 pb-1.5">
+              <div className="relative flex-1">
+                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search files..." aria-label="Search files" className="w-full h-8 pl-8 pr-3 text-xs text-slate-700 bg-white border border-slate-200 rounded-lg placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors duration-150" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 px-3 pb-2.5 overflow-x-auto">
+              <div className="relative shrink-0">
+                <select value={type} onChange={(e) => setType(e.target.value as 'all' | 'images' | 'pdfs' | 'videos')} aria-label="Filter by file type" className={SELECT_CLS}>
+                  <option value="all">All files</option><option value="images">Images</option><option value="pdfs">PDFs</option><option value="videos">Videos</option>
+                </select>
+                {CHEVRON_DOWN}
+              </div>
+              <div className="relative shrink-0">
+                <select value={date} onChange={(e) => setDate(e.target.value as 'all' | 'today' | 'week' | 'month')} aria-label="Filter by date" className={SELECT_CLS}>
+                  <option value="all">All time</option><option value="today">Today</option><option value="week">This week</option><option value="month">This month</option>
+                </select>
+                {CHEVRON_DOWN}
+              </div>
+              <div className="h-5 w-px bg-slate-200 shrink-0" aria-hidden="true" />
+              <div className="relative shrink-0">
+                <select value={sort} onChange={(e) => setSort(e.target.value as 'newest' | 'oldest' | 'name' | 'size')} aria-label="Sort order" className={SELECT_CLS}>
+                  <option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name">Name A-Z</option><option value="size">File size</option>
+                </select>
+                {CHEVRON_DOWN}
+              </div>
+              <div className="flex items-center gap-1 border border-slate-200 rounded-lg p-0.5 shrink-0">
+                <button onClick={() => handleViewMode('grid')} aria-label="Grid view" aria-pressed={viewMode === 'grid'} className={['w-7 h-7 flex items-center justify-center rounded transition-colors duration-150 cursor-pointer', viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-slate-400 hover:text-slate-600'].join(' ')}><GridIcon /></button>
+                <button onClick={() => handleViewMode('list')} aria-label="List view" aria-pressed={viewMode === 'list'} className={['w-7 h-7 flex items-center justify-center rounded transition-colors duration-150 cursor-pointer', viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-slate-400 hover:text-slate-600'].join(' ')}><ListIcon /></button>
+              </div>
+            </div>
           </div>
-
-          {/* Filter: date */}
-          <div className="relative">
-            <select
-              value={date}
-              onChange={(e) => setDate(e.target.value as 'all' | 'today' | 'week' | 'month')}
-              aria-label="Filter by date"
-              className={SELECT_CLS}
-            >
-              <option value="all">All time</option>
-              <option value="today">Today</option>
-              <option value="week">This week</option>
-              <option value="month">This month</option>
-            </select>
-            {CHEVRON_DOWN}
-          </div>
-
-          {/* Divider */}
-          <div className="h-5 w-px bg-slate-200 mx-1 shrink-0" aria-hidden="true" />
-
-          {/* Sort */}
-          <div className="relative">
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as 'newest' | 'oldest' | 'name' | 'size')}
-              aria-label="Sort order"
-              className={SELECT_CLS}
-            >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-              <option value="name">Name A-Z</option>
-              <option value="size">File size</option>
-            </select>
-            {CHEVRON_DOWN}
-          </div>
-
-          {/* View toggle */}
-          <div className="flex items-center gap-1 border border-slate-200 rounded-lg p-0.5 ml-1">
-            <button
-              onClick={() => handleViewMode('grid')}
-              aria-label="Grid view"
-              aria-pressed={viewMode === 'grid'}
-              className={[
-                'w-7 h-7 flex items-center justify-center rounded transition-colors duration-150 cursor-pointer',
-                viewMode === 'grid'
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-slate-400 hover:text-slate-600',
-              ].join(' ')}
-            >
-              <GridIcon />
-            </button>
-            <button
-              onClick={() => handleViewMode('list')}
-              aria-label="List view"
-              aria-pressed={viewMode === 'list'}
-              className={[
-                'w-7 h-7 flex items-center justify-center rounded transition-colors duration-150 cursor-pointer',
-                viewMode === 'list'
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-slate-400 hover:text-slate-600',
-              ].join(' ')}
-            >
-              <ListIcon />
-            </button>
+          {/* sm+: single row */}
+          <div className="hidden sm:flex h-14 items-center px-4 gap-2">
+            <div className="relative flex-1 max-w-xs">
+              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search files..." aria-label="Search files" className="w-full h-8 pl-8 pr-3 text-xs text-slate-700 bg-white border border-slate-200 rounded-lg placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors duration-150" />
+            </div>
+            <div className="relative">
+              <select value={type} onChange={(e) => setType(e.target.value as 'all' | 'images' | 'pdfs' | 'videos')} aria-label="Filter by file type" className={SELECT_CLS}>
+                <option value="all">All files</option><option value="images">Images</option><option value="pdfs">PDFs</option><option value="videos">Videos</option>
+              </select>
+              {CHEVRON_DOWN}
+            </div>
+            <div className="relative">
+              <select value={date} onChange={(e) => setDate(e.target.value as 'all' | 'today' | 'week' | 'month')} aria-label="Filter by date" className={SELECT_CLS}>
+                <option value="all">All time</option><option value="today">Today</option><option value="week">This week</option><option value="month">This month</option>
+              </select>
+              {CHEVRON_DOWN}
+            </div>
+            <div className="h-5 w-px bg-slate-200 mx-1 shrink-0" aria-hidden="true" />
+            <div className="relative">
+              <select value={sort} onChange={(e) => setSort(e.target.value as 'newest' | 'oldest' | 'name' | 'size')} aria-label="Sort order" className={SELECT_CLS}>
+                <option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name">Name A-Z</option><option value="size">File size</option>
+              </select>
+              {CHEVRON_DOWN}
+            </div>
+            <div className="flex items-center gap-1 border border-slate-200 rounded-lg p-0.5 ml-1">
+              <button onClick={() => handleViewMode('grid')} aria-label="Grid view" aria-pressed={viewMode === 'grid'} className={['w-7 h-7 flex items-center justify-center rounded transition-colors duration-150 cursor-pointer', viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-slate-400 hover:text-slate-600'].join(' ')}><GridIcon /></button>
+              <button onClick={() => handleViewMode('list')} aria-label="List view" aria-pressed={viewMode === 'list'} className={['w-7 h-7 flex items-center justify-center rounded transition-colors duration-150 cursor-pointer', viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-slate-400 hover:text-slate-600'].join(' ')}><ListIcon /></button>
+            </div>
           </div>
         </div>
 
         {/* Content area */}
-        <div className="overflow-y-auto p-6 h-full">
+        <div className="overflow-y-auto p-4 sm:p-6 h-full">
           {isLoading ? (
             viewMode === 'grid' ? (
               <MediaGrid items={[]} selectedId={null} onSelect={() => {}} isLoading />
@@ -426,12 +439,36 @@ export default function MemberMediaClient({
         </div>
       </div>
 
-      {/* Detail panel */}
-      {selectedItem && (
-        <MemberMediaDetailPanel
-          item={selectedItem}
-          onClose={() => setSelectedItem(null)}
-        />
+      {/*
+        POLISH-03 + POLISH-04: Detail panel
+        - Desktop (md+): side panel with slide-in/out animation
+        - Mobile (< md): bottom sheet with slide-up/down animation
+      */}
+      {panelItem && (
+        <>
+          {/* Mobile bottom sheet */}
+          <div className="md:hidden">
+            <div
+              className={['fixed inset-0 z-30 bg-black/40 transition-opacity duration-200', isPanelClosing ? 'opacity-0' : 'opacity-100'].join(' ')}
+              onClick={handlePanelClose}
+              aria-hidden="true"
+            />
+            <MemberMediaDetailPanel
+              item={panelItem}
+              onClose={handlePanelClose}
+              isClosing={isPanelClosing}
+              asSheet
+            />
+          </div>
+          {/* Desktop side panel */}
+          <div className="hidden md:block overflow-hidden shrink-0">
+            <MemberMediaDetailPanel
+              item={panelItem}
+              onClose={handlePanelClose}
+              isClosing={isPanelClosing}
+            />
+          </div>
+        </>
       )}
     </div>
   );

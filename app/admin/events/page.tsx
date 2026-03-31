@@ -4,6 +4,8 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { Event } from '@/lib/types';
 import AdminEventsFilters from './AdminEventsFilters';
 import AdminEventActions from './AdminEventActions';
+import CategoryManager from './categories/CategoryManager';
+import { getCategories } from './categories/actions';
 
 const CATEGORY_BADGE: Record<string, string> = {
   Workshop:           'bg-blue-50 text-blue-700',
@@ -43,14 +45,15 @@ export default async function AdminEventsPage({
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  const sp       = await searchParams;
+  const sp        = await searchParams;
+  const tab       = sp.tab      ?? 'events';
   const search    = sp.search   ?? '';
   const category  = sp.category ?? '';
   const format    = sp.format   ?? '';
   const status    = sp.status   ?? '';   // '' means "active" (exclude deleted)
   const eventType = sp.type     ?? '';   // '' = all, 'goya', 'member'
   const sort      = sp.sort     ?? 'date_asc';
-  const page     = Math.max(1, parseInt(sp.page ?? '1', 10));
+  const page      = Math.max(1, parseInt(sp.page ?? '1', 10));
 
   // ── Current user's role ───────────────────────────────────────────────────
   const supabase   = await createSupabaseServerClient();
@@ -63,18 +66,54 @@ export default async function AdminEventsPage({
   const userRole = (profileRow?.role as string) ?? 'moderator';
   const isAdmin  = userRole === 'admin';
 
-  // ── Guard: moderators cannot view deleted events ──────────────────────────
-  // If a moderator somehow reaches ?status=deleted, treat it as no filter
+  // ── Tabs ──────────────────────────────────────────────────────────────────
+  const tabs = [
+    { key: 'events',     label: 'Events'     },
+    { key: 'categories', label: 'Categories' },
+  ];
+
+  // ── Categories tab ────────────────────────────────────────────────────────
+  if (tab === 'categories') {
+    const categories = await getCategories();
+    return (
+      <div className="p-6 lg:p-8">
+        {/* Page header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1B3A5C]">Events</h1>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-[#E5E7EB] mb-6">
+          {tabs.map(t => (
+            <Link
+              key={t.key}
+              href={`/admin/events?tab=${t.key}`}
+              className={[
+                'px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors',
+                t.key === tab
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-[#6B7280] hover:text-[#374151] hover:border-slate-300',
+              ].join(' ')}
+            >
+              {t.label}
+            </Link>
+          ))}
+        </div>
+
+        <CategoryManager initialCategories={categories} />
+      </div>
+    );
+  }
+
+  // ── Events tab ────────────────────────────────────────────────────────────
   const effectiveStatus = (status === 'deleted' && !isAdmin) ? '' : status;
 
   // ── Query ─────────────────────────────────────────────────────────────────
   let query = supabase.from('events').select('*, profiles!created_by(full_name, email)', { count: 'exact' });
 
   if (effectiveStatus) {
-    // Explicit status filter (including 'deleted' for admins)
     query = query.eq('status', effectiveStatus);
   } else {
-    // Default: show active events only (not deleted)
     query = query.neq('status', 'deleted');
   }
 
@@ -115,6 +154,24 @@ export default async function AdminEventsPage({
           </svg>
           Add New Event
         </Link>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-[#E5E7EB] mb-6">
+        {tabs.map(t => (
+          <Link
+            key={t.key}
+            href={`/admin/events?tab=${t.key}`}
+            className={[
+              'px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors',
+              t.key === tab
+                ? 'border-primary text-primary'
+                : 'border-transparent text-[#6B7280] hover:text-[#374151] hover:border-slate-300',
+            ].join(' ')}
+          >
+            {t.label}
+          </Link>
+        ))}
       </div>
 
       {/* Filters */}

@@ -166,6 +166,18 @@ export default function MediaPageClient({
   // ── Upload cards state ─────────────────────────────────────────────────────
   const [uploadCards, setUploadCards] = useState<UploadCard[]>([]);
 
+  // ── POLISH-03: Panel animation state ──────────────────────────────────────
+  // isPanelClosing drives the slide-out animation; after 200ms the item is cleared.
+  const [isPanelClosing, setIsPanelClosing] = useState(false);
+  // lastPanelItem keeps the panel rendered during the closing animation.
+  const lastPanelItemRef = useRef<MediaItem | null>(null);
+  if (selectedItem) lastPanelItemRef.current = selectedItem;
+
+  // ── POLISH-04: Mobile folder dropdown ─────────────────────────────────────
+  // On mobile (< md) FolderSidebar is hidden; a <select> dropdown is shown above toolbar.
+  const [mobileFolderOpen, setMobileFolderOpen] = useState(false);
+  void mobileFolderOpen; // used only for potential future sheet — currently using <select>
+
   // Ref to the MediaUploader so we can call openFilePicker() from the toolbar
   const uploaderRef = useRef<MediaUploaderHandle>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -207,6 +219,11 @@ export default function MediaPageClient({
   }, [q]);
 
   // ── Load items whenever filters change ─────────────────────────────────────
+  // POLISH-01: All filter params (activeFolder, debouncedQ, type, date, by, sort) are
+  // independent state values passed together in a single loadItems call. No filter resets
+  // another — each onChange handler only calls setX(value) for its own dimension.
+  // POLISH-02: setIsLoading(true) is called at the start of every fetch (including
+  // filter changes), so skeletons always display during transitions, not just initial load.
   const loadItems = useCallback(async () => {
     setIsLoading(true);
     setSelectedItem(null);
@@ -317,6 +334,17 @@ export default function MediaPageClient({
   const handleDelete = useCallback((id: string) => {
     setItems(prev => prev.filter(i => i.id !== id));
     setSelectedItem(null);
+    lastPanelItemRef.current = null;
+  }, []);
+
+  // POLISH-03: Animate panel out before clearing selectedItem
+  const handlePanelClose = useCallback(() => {
+    setIsPanelClosing(true);
+    setTimeout(() => {
+      setSelectedItem(null);
+      setIsPanelClosing(false);
+      lastPanelItemRef.current = null;
+    }, 200);
   }, []);
 
   // ── Upload handlers ────────────────────────────────────────────────────────
@@ -347,24 +375,56 @@ export default function MediaPageClient({
   const hasFilters = !!(debouncedQ || type !== 'all' || date !== 'all' || by !== 'all');
   const pendingCards = uploadCards.filter(c => !c.done);
 
+  // ── POLISH-04: Build mobile folder options list ────────────────────────────
+  const mobileFolderOptions: { value: string; label: string }[] = [
+    { value: '', label: 'All Media' },
+    ...MEDIA_BUCKETS.map(b => ({ value: b.key, label: b.label })),
+    ...folders.map(f => ({ value: f.id, label: `  ${f.name}` })),
+  ];
+
+  // The item to show in the panel (keep last item during closing animation)
+  const panelItem = selectedItem ?? lastPanelItemRef.current;
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
-      {/* Folder sidebar */}
-      <FolderSidebar
-        folders={folders}
-        activeFolder={activeFolder}
-        onFolderSelect={handleFolderSelect}
-        collapsed={sidebarCollapsed}
-        onCollapse={handleSidebarCollapse}
-        isAdmin={isAdmin}
-        currentUserId={currentUserId}
-        onFoldersChange={setFolders}
-      />
+      {/* POLISH-04: Folder sidebar — hidden on mobile, visible md+ */}
+      <div className="hidden md:flex">
+        <FolderSidebar
+          folders={folders}
+          activeFolder={activeFolder}
+          onFolderSelect={handleFolderSelect}
+          collapsed={sidebarCollapsed}
+          onCollapse={handleSidebarCollapse}
+          isAdmin={isAdmin}
+          currentUserId={currentUserId}
+          onFoldersChange={setFolders}
+        />
+      </div>
 
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* POLISH-04: Mobile folder dropdown — only visible below md breakpoint */}
+        <div className="md:hidden border-b border-slate-200 bg-white px-3 py-2 shrink-0">
+          <div className="relative">
+            <select
+              value={activeFolder ?? ''}
+              onChange={(e) => handleFolderSelect(e.target.value || null)}
+              aria-label="Select folder"
+              className="w-full h-8 pl-3 pr-8 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors duration-150"
+            >
+              {mobileFolderOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
         {/* Toolbar with search, filters, sort, view toggle, and upload button */}
         <MediaToolbar
           q={q}
@@ -395,7 +455,7 @@ export default function MediaPageClient({
           onUploadProgress={handleUploadProgress}
           onUploadStart={handleUploadStart}
         >
-          <div className="overflow-y-auto p-6 h-full">
+          <div className="overflow-y-auto p-4 sm:p-6 h-full">
             {/* Upload progress cards at top of grid while uploading */}
             {pendingCards.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 mb-4">
@@ -442,15 +502,47 @@ export default function MediaPageClient({
         </MediaUploader>
       </div>
 
-      {/* Detail panel — 380px push-content (not overlay); renders when an item is selected */}
-      {selectedItem && (
-        <MediaDetailPanel
-          item={selectedItem}
-          onClose={() => setSelectedItem(null)}
-          onUpdate={handleUpdate}
-          onDelete={handleDelete}
-          isAdmin={isAdmin}
-        />
+      {/*
+        POLISH-03 + POLISH-04: Detail panel
+        - Desktop (md+): 380px side panel, slides in/out horizontally
+        - Mobile (< md): bottom sheet, slides up/down
+        Panel stays mounted during closing animation (panelItem uses lastPanelItemRef).
+      */}
+      {panelItem && (
+        <>
+          {/* Mobile bottom sheet */}
+          <div className="md:hidden">
+            {/* Backdrop */}
+            <div
+              className={[
+                'fixed inset-0 z-30 bg-black/40 transition-opacity duration-200',
+                isPanelClosing ? 'opacity-0' : 'opacity-100',
+              ].join(' ')}
+              onClick={handlePanelClose}
+              aria-hidden="true"
+            />
+            <MediaDetailPanel
+              item={panelItem}
+              onClose={handlePanelClose}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              isAdmin={isAdmin}
+              isClosing={isPanelClosing}
+              asSheet
+            />
+          </div>
+          {/* Desktop side panel */}
+          <div className="hidden md:block overflow-hidden shrink-0">
+            <MediaDetailPanel
+              item={panelItem}
+              onClose={handlePanelClose}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              isAdmin={isAdmin}
+              isClosing={isPanelClosing}
+            />
+          </div>
+        </>
       )}
     </div>
   );

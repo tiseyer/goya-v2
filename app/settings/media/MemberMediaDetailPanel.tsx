@@ -12,6 +12,10 @@ import { getFileTypeColor, getFileTypeLabel, formatFileSize } from '@/app/admin/
 export interface MemberMediaDetailPanelProps {
   item: MediaItem;
   onClose: () => void;
+  /** When true the panel animates out. Parent controls this before unmounting. */
+  isClosing?: boolean;
+  /** Render as a bottom sheet (mobile) instead of a side panel (desktop default). */
+  asSheet?: boolean;
 }
 
 // ── Inline icons ──────────────────────────────────────────────────────────────
@@ -102,6 +106,8 @@ function MetaRow({ label, value }: { label: string; value: string }) {
 export default function MemberMediaDetailPanel({
   item,
   onClose,
+  isClosing = false,
+  asSheet = false,
 }: MemberMediaDetailPanelProps) {
   const isImage = item.file_type.startsWith('image/');
   const colorClasses = getFileTypeColor(item.file_type);
@@ -117,8 +123,22 @@ export default function MemberMediaDetailPanel({
     }
   }, [item.file_url]);
 
+  // POLISH-03 + POLISH-04: animate in/out and support bottom sheet on mobile
+  const panelCls = asSheet
+    ? [
+        'fixed inset-x-0 bottom-0 z-40 flex flex-col bg-white rounded-t-2xl shadow-2xl',
+        'max-h-[80vh] overflow-y-auto overflow-x-hidden',
+        'transition-transform duration-200 ease-in-out',
+        isClosing ? 'translate-y-full' : 'translate-y-0',
+      ].join(' ')
+    : [
+        'w-[340px] shrink-0 flex flex-col border-l border-slate-200 bg-white overflow-y-auto overflow-x-hidden',
+        'transition-transform duration-200 ease-in-out',
+        isClosing ? 'translate-x-full' : 'translate-x-0',
+      ].join(' ');
+
   return (
-    <div className="w-[340px] shrink-0 flex flex-col border-l border-slate-200 bg-white overflow-y-auto overflow-x-hidden">
+    <div className={panelCls}>
 
       {/* ── Header ── */}
       <div className="h-12 border-b border-slate-200 px-4 flex items-center justify-between shrink-0">
