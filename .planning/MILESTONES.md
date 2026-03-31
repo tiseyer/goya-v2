@@ -1,5 +1,20 @@
 # Milestones
 
+## v1.10 Member Courses (Shipped: 2026-03-31)
+
+**Phases completed:** 6 phases (22-27), 31 requirements
+
+**Key accomplishments:**
+
+- Database foundation: course_type, created_by, status workflow (draft→pending→published/rejected), course_audit_log table, RLS per role, soft-delete
+- Admin courses list: type badge (GOYA/Member), type filter, submitter info, extended status filter, soft-delete with restore, audit history timeline
+- Admin inbox Courses tab: pending review queue with approve/reject workflow, rejection reason modal, badge count
+- My Courses settings page: role-gated course CRUD for teachers/WPs/admins, status-aware actions, first-time info modal, inline create/edit form with gradient preview
+- Public academy page: type filter (All/GOYA/Member), published-only enforcement
+- Shared audit utility at lib/courses/audit.ts wired to all 10 course-changing code paths
+
+---
+
 ## v1.9 Member Events (Shipped: 2026-03-31)
 
 **Phases completed:** 6 phases (16-21), 31 requirements

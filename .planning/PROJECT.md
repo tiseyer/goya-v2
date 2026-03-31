@@ -8,21 +8,11 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: v1.10 Member Courses
-
-**Goal:** Enable teachers, wellness practitioners, and admins to submit courses for admin/moderator review before publication in the Academy.
-
-**Target features:**
-- Database schema: course_type, created_by, status workflow, course_audit_log, RLS policies per role
-- Admin courses list: type column/filter, extended status filter, submitter info, audit history
-- Admin inbox Courses tab: pending review queue with approve/reject workflow
-- User Settings "My Courses" page: course CRUD, status-aware actions, submission flow
-- Public Academy: type filter (All/GOYA/Member)
-- Audit log complete coverage with shared utility
-
 ## Current State
 
-**As of v1.9 (2026-03-31):** Member Events milestone shipped. Teachers, wellness practitioners, and admins can submit events via My Events settings page. Events go through draft→pending_review→published/rejected workflow. Admin inbox has Events tab for approve/reject. Public calendar has GOYA/Member type filter. Full audit logging via shared utility covering all 10 code paths.
+**As of v1.10 (2026-03-31):** Member Courses milestone shipped. Teachers, WPs, and admins can submit courses via My Courses settings page. Courses go through draft→pending_review→published/rejected workflow. Admin inbox has Courses tab for approve/reject. Public academy has GOYA/Member type filter. Full audit logging via shared utility covering all 10 code paths.
+
+**Previous v1.9 (2026-03-31):** Member Events milestone shipped. Teachers, wellness practitioners, and admins can submit events via My Events settings page. Events go through draft→pending_review→published/rejected workflow. Admin inbox has Events tab for approve/reject. Public calendar has GOYA/Member type filter. Full audit logging via shared utility covering all 10 code paths.
 
 **Previous v1.8 (2026-03-30):** AI-Support-System milestone shipped. Mattea AI chatbot with streaming responses (OpenAI/Anthropic), encrypted third-party key management (AES-256-GCM), FAQ knowledge base with admin CRUD, floating chat widget on all public pages (380x560px desktop, fullscreen mobile), guest and authenticated session persistence, escalation-to-human workflow with support tickets in admin inbox, conversations viewer, and toggleable API tool connections. Admin chatbot configuration at `/admin/chatbot` with 4 tabs. Guest session cleanup via daily cron.
 
@@ -131,6 +121,17 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 - ✓ Public events page type filter: All/GOYA/Member with published-only enforcement — v1.9
 - ✓ Shared audit utility (lib/events/audit.ts) covering all 10 event-changing code paths — v1.9
 
+<!-- v1.10 Member Courses milestone -->
+- ✓ Courses table extended with course_type, created_by, status workflow, rejection_reason, deleted_at — v1.10
+- ✓ course_audit_log table with full lifecycle tracking — v1.10
+- ✓ RLS policies: member insert/read/update own courses, moderator approve/reject, admin full access — v1.10
+- ✓ Admin courses table: type badge, type filter, submitter info, extended status filter, soft-delete + restore — v1.10
+- ✓ Admin course edit page: audit history timeline (admin only) — v1.10
+- ✓ Admin inbox Courses tab with pending review queue, approve/reject workflow, badge count — v1.10
+- ✓ My Courses settings page: role-gated CRUD for teachers/WPs/admins with submission workflow — v1.10
+- ✓ Public academy page type filter: All/GOYA/Member with published-only enforcement — v1.10
+- ✓ Shared audit utility (lib/courses/audit.ts) covering all 10 course-changing code paths — v1.10
+
 ### Out of Scope
 
 - Notification preferences — out of scope for settings MVP
@@ -194,4 +195,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-31 after v1.10 Member Courses milestone started*
+*Last updated: 2026-03-31 after v1.10 Member Courses milestone completed*
