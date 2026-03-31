@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { decrypt } from '@/lib/secrets/encryption'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { detectEscalation } from './escalation'
+import { getRoleScopedDocs } from '@/lib/docs/context'
 import type { ChatStreamResult } from './types'
 
 const ESCALATION_RESPONSE =
@@ -170,8 +171,29 @@ export async function streamChatResponse(params: {
     faqContext = `\n\n<faq_context>\n${items}\n</faq_context>`
   }
 
+  // 6b. Resolve user role and build doc context
+  let userRole: string | null = null
+  if (userId) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single()
+    userRole = profile?.role ?? null
+  }
+
+  const docContent = getRoleScopedDocs(userRole, message)
+  let docContext = ''
+  if (docContent) {
+    docContext = `\n\n<documentation_context>
+You have access to the following GOYA documentation relevant to this user's role. Use it to answer questions accurately. Do NOT reveal documentation from other roles. If the user asks about features outside their role's documentation, say "I don't have information about that for your account type" rather than making things up or revealing restricted content.
+
+${docContent}
+</documentation_context>`
+  }
+
   // 7. Build messages array
-  const systemPrompt = config.system_prompt + faqContext
+  const systemPrompt = config.system_prompt + faqContext + docContext
   const messagesForAI = history.map((m) => ({
     role: m.role as 'user' | 'assistant',
     content: m.content,
