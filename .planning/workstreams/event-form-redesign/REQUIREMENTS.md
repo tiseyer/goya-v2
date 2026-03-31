@@ -18,10 +18,10 @@
 
 ### LOC — Format-Conditional Location
 - [ ] **LOC-01**: Database has `location_lat`, `location_lng` (float, nullable), `online_platform_name`, `online_platform_url` (text, nullable) columns
-- [ ] **LOC-02**: When format is "Online", Location field is hidden and Online Platform name + URL fields are shown
-- [ ] **LOC-03**: When format is "In Person" or "Hybrid", Location field shows Google Places Autocomplete
-- [ ] **LOC-04**: Google Places library is loaded dynamically only when the autocomplete field is rendered
-- [ ] **LOC-05**: Selected place stores display name, lat, and lng in separate DB columns
+- [x] **LOC-02**: When format is "Online", Location field is hidden and Online Platform name + URL fields are shown
+- [x] **LOC-03**: When format is "In Person" or "Hybrid", Location field shows Google Places Autocomplete
+- [x] **LOC-04**: Google Places library is loaded dynamically only when the autocomplete field is rendered
+- [x] **LOC-05**: Selected place stores display name, lat, and lng in separate DB columns
 
 ### REG — Registration Control
 - [ ] **REG-01**: Database has `registration_required` (boolean, default false) column
