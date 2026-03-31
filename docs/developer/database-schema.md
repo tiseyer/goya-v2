@@ -22,6 +22,7 @@ All tables live in the `public` schema of Supabase (PostgreSQL). Row-Level Secur
 - [Flow Builder](#flow-builder)
 - [Admin and System](#admin-and-system)
 - [Media Library](#media-library)
+- [School Owner System](#school-owner-system)
 - [RLS Policy Summary](#rls-policy-summary)
 
 ---
@@ -47,6 +48,8 @@ Auto-created by trigger on `auth.users` insert. One row per registered user.
 | `member_type` | `text` | Extended member classification |
 | `theme_preference` | `text` | `light` \| `dark` \| `system` |
 | `created_at` | `timestamptz` | — |
+| `principal_trainer_school_id` | `uuid` | FK → `schools`, school where this profile is principal trainer |
+| `faculty_school_ids` | `uuid[]` | Array of school IDs where this profile is faculty |
 
 **RLS:** Authenticated users can read all profiles. Users update only their own row. Insert handled by service-role trigger only.
 
@@ -460,6 +463,101 @@ Hierarchical folder structure for media organisation.
 
 ---
 
+## School Owner System
+
+### `schools`
+
+Yoga school registrations. Extended with v1.14 to support the full school owner system.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid` | PK |
+| `owner_id` | `uuid` | FK → `auth.users` |
+| `name` | `text` | — |
+| `slug` | `text` | Unique, URL-safe identifier |
+| `logo_url` | `text` | Supabase Storage URL |
+| `description` | `text` | — |
+| `short_bio` | `text` | Brief tagline (added v1.14) |
+| `bio` | `text` | Full school bio (added v1.14) |
+| `video_platform` | `text` | `youtube` \| `vimeo` |
+| `video_url` | `text` | — |
+| `practice_styles` | `text[]` | e.g. Hatha, Vinyasa |
+| `programs_offered` | `text[]` | — |
+| `course_delivery_format` | `text` | `in_person` \| `online` \| `hybrid` |
+| `location_address` / `location_city` / `location_country` | `text` | Structured location fields |
+| `location_lat` / `location_lng` | `double precision` | Coordinates |
+| `location_place_id` | `text` | Google Maps place ID |
+| `lineage` | `text` | Yoga lineage or tradition |
+| `established_year` | `integer` | — |
+| `languages` | `text[]` | Languages taught |
+| `is_insured` | `boolean` | — |
+| `onboarding_completed` | `boolean` | Whether owner completed onboarding |
+| `onboarding_completed_at` | `timestamptz` | — |
+| `approved_at` | `timestamptz` | When admin approved |
+| `approved_by` | `uuid` | FK → `auth.users` |
+| `cover_image_url` | `text` | Hero/cover image |
+| `status` | `text` | `pending` \| `pending_review` \| `approved` \| `rejected` \| `suspended` |
+| `rejection_reason` | `text` | Admin-set on rejection |
+| `is_featured` | `boolean` | — |
+
+Storage buckets: `school-logos` (public), `school-documents` (private), `school-covers` (public).
+
+### `school_designations`
+
+Each row represents a yoga designation a school has applied for or holds.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid` | PK |
+| `school_id` | `uuid` | FK → `schools` ON DELETE CASCADE |
+| `designation_type` | `text` | `CYS200` \| `CYS300` \| `CYS500` \| `CCYS` \| `CPYS` \| `CMS` \| `CYYS` \| `CRYS` |
+| `status` | `text` | `pending` \| `active` \| `suspended` \| `cancelled` |
+| `stripe_subscription_id` / `stripe_price_id` | `text` | Stripe references |
+| `signup_fee_paid` | `boolean` | — |
+| `signup_fee_amount` / `annual_fee_amount` | `integer` | Cents |
+| `activated_at` / `cancelled_at` | `timestamptz` | — |
+
+Unique constraint: `(school_id, designation_type)` — one row per designation per school. **RLS:** Enabled (policies TBD in next phase).
+
+### `school_faculty`
+
+Faculty members of a school. Supports both existing GOYA members and pending email invites.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid` | PK |
+| `school_id` | `uuid` | FK → `schools` ON DELETE CASCADE |
+| `profile_id` | `uuid` | FK → `profiles`, nullable (set when invite accepted) |
+| `invited_email` | `text` | Email for non-member invites |
+| `invite_token` | `text` | Unique token for invite link |
+| `position` | `text` | Teacher role/title |
+| `is_principal_trainer` | `boolean` | Whether this faculty member is the principal trainer |
+| `status` | `text` | `pending` \| `active` \| `removed` |
+
+Constraint: `faculty_has_profile_or_email` — at least one of `profile_id` or `invited_email` must be set. **RLS:** Enabled.
+
+### `school_verification_documents`
+
+Documents uploaded for school or designation verification.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid` | PK |
+| `school_id` | `uuid` | FK → `schools` ON DELETE CASCADE |
+| `designation_id` | `uuid` | FK → `school_designations`, nullable |
+| `document_type` | `text` | `business_registration` \| `qualification_certificate` \| `insurance` \| `other` |
+| `file_url` | `text` | Supabase Storage URL |
+| `file_name` / `file_size` | `text` / `integer` | — |
+| `uploaded_at` | `timestamptz` | — |
+| `reviewed_at` | `timestamptz` | When admin reviewed |
+| `reviewed_by` | `uuid` | FK → `auth.users` |
+| `status` | `text` | `pending` \| `approved` \| `rejected` |
+| `rejection_reason` | `text` | — |
+
+**RLS:** Enabled. Storage: `school-documents` private bucket, owner-namespaced paths.
+
+---
+
 ## RLS Policy Summary
 
 | Table | Anonymous | Authenticated Member | Admin / Moderator |
@@ -476,6 +574,10 @@ Hierarchical folder structure for media organisation.
 | `audit_log` | No access | No access | Read only |
 | `email_templates` | No access | No access | Full CRUD |
 | `site_settings` | No access | Read (some keys) | Full CRUD |
+| `schools` | Read approved | Owner read/update own | Full CRUD |
+| `school_designations` | No access | Owner read own | Full CRUD (admin) |
+| `school_faculty` | No access | School owner read own | Full CRUD (admin) |
+| `school_verification_documents` | No access | Owner read/upload own | Full CRUD (admin) |
 
 ---
 
