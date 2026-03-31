@@ -1,5 +1,20 @@
 # Milestones
 
+## v1.9 Member Events (Shipped: 2026-03-31)
+
+**Phases completed:** 6 phases (16-21), 31 requirements
+
+**Key accomplishments:**
+
+- Database foundation: event_type, created_by, status workflow (draft→pending→published/rejected), event_audit_log table, RLS per role
+- Admin events list: type badge (GOYA/Member), type filter, submitter info for member events, extended status filter, audit history timeline
+- Admin inbox Events tab (Tab 6): pending review queue with approve/reject workflow, rejection reason modal, badge count
+- My Events settings page: role-gated event CRUD for teachers/WPs/admins, status-aware actions, first-time info modal, inline create/edit form
+- Public events page: type filter (All/GOYA/Member) in sidebar and mobile, published-only enforcement
+- Shared audit utility at lib/events/audit.ts wired to all 10 event-changing code paths
+
+---
+
 ## v1.8 AI-Support-System (Shipped: 2026-03-30)
 
 **Phases completed:** 4 phases, 12 plans, 4 tasks
