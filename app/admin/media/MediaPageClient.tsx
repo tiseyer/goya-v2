@@ -160,6 +160,7 @@ export default function MediaPageClient({
   const [items, setItems] = useState<MediaItem[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
 
@@ -224,21 +225,35 @@ export default function MediaPageClient({
   // filter changes), so skeletons always display during transitions, not just initial load.
   const loadItems = useCallback(async () => {
     setIsLoading(true);
+    setLoadError(null);
     setSelectedItem(null);
     try {
-      const result = await getMediaItems({
-        folder: activeFolder,
-        q: debouncedQ || undefined,
-        type,
-        date,
-        by,
-        sort,
-        cursor: undefined,
-      });
+      // Timeout wrapper — abort after 15s to prevent infinite skeleton
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15_000);
+      const result = await Promise.race([
+        getMediaItems({
+          folder: activeFolder,
+          q: debouncedQ || undefined,
+          type,
+          date,
+          by,
+          sort,
+          cursor: undefined,
+        }),
+        new Promise<never>((_, reject) => {
+          controller.signal.addEventListener('abort', () =>
+            reject(new Error('Media query timed out after 15 seconds'))
+          );
+        }),
+      ]);
+      clearTimeout(timeout);
       setItems(result.items);
       setNextCursor(result.nextCursor);
     } catch (err) {
-      console.error('[MediaPageClient] Error loading media items:', err);
+      const message = err instanceof Error ? err.message : 'Failed to load media items';
+      console.error('[MediaPageClient] Error loading media items:', message);
+      setLoadError(message);
       setItems([]);
       setNextCursor(null);
     } finally {
@@ -469,6 +484,21 @@ export default function MediaPageClient({
               ) : (
                 <MediaList items={[]} selectedId={null} onSelect={() => {}} isLoading />
               )
+            ) : loadError ? (
+              <div className="flex flex-col items-center justify-center h-full min-h-[320px] text-center px-4">
+                <svg className="w-12 h-12 text-red-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <p className="text-sm text-slate-500 mb-1">Failed to load media</p>
+                <p className="text-xs text-slate-400 mb-3">{loadError}</p>
+                <button
+                  onClick={loadItems}
+                  className="text-xs font-medium text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                >
+                  Try again
+                </button>
+              </div>
             ) : items.length === 0 && pendingCards.length === 0 ? (
               <EmptyState activeFolder={activeFolder} hasFilters={hasFilters} />
             ) : viewMode === 'grid' ? (
