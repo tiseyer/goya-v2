@@ -65,15 +65,16 @@ async function migrateAvatars(): Promise<{ migrated: number; failed: number; ski
   let migrated = 0
   let failed = 0
   let skipped = 0
-  let offset = 0
   const batchSize = 50
 
   while (true) {
+    // Always query from offset 0: migrated profiles drop out of the WHERE filter,
+    // so the next batch automatically starts with the first unmigrated profile.
     const { data: profiles, error } = await supabase
       .from('profiles')
       .select('id, avatar_url')
       .like('avatar_url', '%members.globalonlineyogaassociation.org%')
-      .range(offset, offset + batchSize - 1)
+      .range(0, batchSize - 1)
 
     if (error) {
       console.error('Error querying profiles:', error.message)
@@ -81,13 +82,13 @@ async function migrateAvatars(): Promise<{ migrated: number; failed: number; ski
     }
 
     if (!profiles || profiles.length === 0) {
-      if (offset === 0) {
+      if (migrated === 0 && failed === 0) {
         console.log('No profiles with WordPress avatar URLs found.\n')
       }
       break
     }
 
-    console.log(`Processing batch at offset ${offset}: ${profiles.length} profiles`)
+    console.log(`Processing batch: ${profiles.length} profiles (${migrated + failed + skipped} processed so far)`)
 
     for (const profile of profiles as Profile[]) {
       const { id: userId, avatar_url: oldUrl } = profile
@@ -176,7 +177,6 @@ async function migrateAvatars(): Promise<{ migrated: number; failed: number; ski
     }
 
     if (profiles.length < batchSize) break
-    offset += batchSize
   }
 
   return { migrated, failed, skipped }
