@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-03-31 - Completed quick task 260331-my2: Fix hero layout on detail pages (left-align, spacing, title size)
+Last activity: 2026-03-31 - Completed quick task 260331-n9o: Fix use server export error in media actions
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -85,9 +85,10 @@ None yet.
 | 260331-mbq | Harmonize UI accent colors with new #345c83 primary blue — CSS variables + light-mode overrides | 2026-03-31 | d9134d4 | [260331-mbq](./quick/260331-mbq-harmonize-ui-accent-colors-with-new-345c/) |
 | 260331-mky | Increase hero section height +40px for more breathing room (200→240, 220→260, 240→280) | 2026-03-31 | — | [260331-mky](./quick/260331-mky-increase-hero-section-height-for-more-br/) |
 | 260331-my2 | Fix hero layout on detail pages — left-align, spacing, text-4xl md:text-5xl titles, meta lines | 2026-03-31 | 5bbb045 | [260331-my2](./quick/260331-my2-fix-hero-layout-on-detail-pages-left-ali/) |
+| 260331-n9o | Fix "use server" export error — move MEDIA_BUCKETS const to constants.ts | 2026-03-31 | — | [260331-n9o](./quick/260331-n9o-fix-use-server-export-error-in-admin-med/) |
 
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Completed quick task 260331-my2 — fix hero layout on detail pages
+Stopped at: Completed quick task 260331-n9o — fix use server export error in media actions
 Resume file: None

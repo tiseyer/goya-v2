@@ -12,7 +12,8 @@ import MediaUploader, {
   type UploadCard,
   type MediaUploaderHandle,
 } from './MediaUploader';
-import { MEDIA_BUCKETS, getMediaItems, type MediaItem, type MediaFolder } from './actions';
+import { MEDIA_BUCKETS } from './constants';
+import { getMediaItems, type MediaItem, type MediaFolder } from './actions';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

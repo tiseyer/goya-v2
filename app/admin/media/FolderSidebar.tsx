@@ -1,6 +1,7 @@
 'use client';
 
-import { MEDIA_BUCKETS, type MediaFolder } from './actions';
+import { MEDIA_BUCKETS } from './constants';
+import type { MediaFolder } from './actions';
 
 interface FolderSidebarProps {
   folders: MediaFolder[];

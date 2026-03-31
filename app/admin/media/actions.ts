@@ -6,16 +6,7 @@
 
 import { getSupabaseService } from '@/lib/supabase/service'
 import type { Database } from '@/types/supabase'
-
-export const MEDIA_BUCKETS = [
-  { key: 'avatars',              label: 'Avatars' },
-  { key: 'event-images',         label: 'Events' },
-  { key: 'school-logos',         label: 'Courses' },
-  { key: 'upgrade-certificates', label: 'Certificates' },
-  { key: 'uploads',              label: 'Uploads' },
-] as const;
-
-export type BucketKey = typeof MEDIA_BUCKETS[number]['key'];
+import { MEDIA_BUCKETS } from './constants';
 
 export type MediaFolder = Database['public']['Tables']['media_folders']['Row'];
 
