@@ -82,7 +82,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         </div>
       ) : (
         /* Gradient hero (no image) */
-        <div className="bg-primary-dark relative overflow-hidden pt-24 pb-12">
+        <div className="bg-primary relative overflow-hidden flex items-center h-[200px] sm:h-[220px] md:h-[240px]">
           {/* Subtle background texture */}
           <div
             className="absolute inset-0 opacity-[0.04]"
@@ -97,7 +97,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           <PageContainer className="relative">
             <Link
               href="/events"
-              className="inline-flex items-center gap-1.5 text-primary-200 hover:text-white text-sm mb-6 transition-colors"
+              className="inline-flex items-center gap-1.5 text-primary-200 hover:text-white text-sm mb-4 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

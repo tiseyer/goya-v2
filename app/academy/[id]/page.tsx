@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { Course, UserCourseProgress } from '@/lib/types';
 import { enrollAndStart } from './actions';
 import CourseEnrollCard from './CourseEnrollCard';
+import PageContainer from '@/app/components/ui/PageContainer';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,14 +65,22 @@ export default async function CourseOverviewPage({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div
-        className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8"
-        style={{ background: `linear-gradient(135deg, ${course.gradient_from}dd, ${course.gradient_to}dd)` }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-primary relative overflow-hidden flex items-center h-[200px] sm:h-[220px] md:h-[240px]">
+        {/* Subtle background texture */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+            backgroundSize: '28px 28px',
+          }}
+        />
+        {/* Soft glow */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+
+        <PageContainer className="relative">
           <Link
             href="/academy"
-            className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-sm mb-8 transition-colors group"
+            className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-sm mb-2 transition-colors group"
           >
             <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -80,7 +89,7 @@ export default async function CourseOverviewPage({
           </Link>
 
           {/* Badges */}
-          <div className="flex flex-wrap items-center gap-2 mb-4">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${CATEGORY_COLORS[course.category] ?? 'text-slate-600 bg-slate-100 border-slate-200'}`}>
               {course.category}
             </span>
@@ -98,41 +107,15 @@ export default async function CourseOverviewPage({
             )}
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 max-w-3xl">{course.title}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 max-w-3xl">{course.title}</h1>
           {course.short_description && (
-            <p className="text-white/85 text-base max-w-2xl mb-5">{course.short_description}</p>
+            <p className="text-white/85 text-sm max-w-2xl">{course.short_description}</p>
           )}
-
-          {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-5 text-sm text-white/75">
-            {course.instructor && (
-              <span className="flex items-center gap-1.5">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                {course.instructor}
-              </span>
-            )}
-            {course.duration && (
-              <span className="flex items-center gap-1.5">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {course.duration}
-              </span>
-            )}
-            <span className="flex items-center gap-1.5">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-              </svg>
-              1 Lesson
-            </span>
-          </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <PageContainer className="py-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
 
           {/* LEFT column */}
@@ -240,7 +223,7 @@ export default async function CourseOverviewPage({
             </div>
           </div>
         </div>
-      </div>
+      </PageContainer>
     </div>
   );
 }
