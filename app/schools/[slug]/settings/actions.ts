@@ -218,6 +218,223 @@ export async function updateTeachingInfo(
 }
 
 // ---------------------------------------------------------------------------
+// Faculty actions (settings-specific — always allow completed schools)
+// ---------------------------------------------------------------------------
+
+export async function saveFacultyMember(
+  schoolSlug: string,
+  data: { profile_id: string; position: string },
+): Promise<{ success: true } | { error: string }> {
+  const result = await getOwnedSchool(schoolSlug)
+  if ('error' in result) return result
+
+  const { school } = result
+  const supabase = await createSupabaseServerActionClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('school_faculty')
+    .insert({
+      school_id: school.id,
+      profile_id: data.profile_id,
+      position: data.position,
+      status: 'active',
+    })
+
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function removeFacultyMember(
+  schoolSlug: string,
+  facultyId: string,
+): Promise<{ success: true } | { error: string }> {
+  const result = await getOwnedSchool(schoolSlug)
+  if ('error' in result) return result
+
+  const { school } = result
+  const supabase = await createSupabaseServerActionClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('school_faculty')
+    .delete()
+    .eq('id', facultyId)
+    .eq('school_id', school.id)
+
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function inviteFacultyByEmail(
+  schoolSlug: string,
+  data: { email: string; position: string },
+): Promise<{ success: true } | { error: string }> {
+  const result = await getOwnedSchool(schoolSlug)
+  if ('error' in result) return result
+
+  const { school } = result
+  const inviteToken = crypto.randomUUID()
+
+  const supabase = await createSupabaseServerActionClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('school_faculty')
+    .insert({
+      school_id: school.id,
+      invited_email: data.email,
+      invite_token: inviteToken,
+      position: data.position,
+      status: 'pending',
+    })
+
+  if (error) return { error: error.message }
+  // NOTE: Actual email sending deferred to Phase 35 (FAC-01)
+  return { success: true }
+}
+
+// ---------------------------------------------------------------------------
+// Document actions (settings-specific — always allow completed schools)
+// ---------------------------------------------------------------------------
+
+export async function uploadDocument(
+  formData: FormData,
+): Promise<{ success: true; document: { id: string; file_name: string; file_url: string } } | { error: string }> {
+  const schoolSlug = formData.get('schoolSlug') as string
+  const designationId = formData.get('designationId') as string
+  const documentType = formData.get('documentType') as string
+  const file = formData.get('file') as File | null
+
+  if (!schoolSlug || !designationId || !documentType || !file) {
+    return { error: 'Missing required fields' }
+  }
+
+  const result = await getOwnedSchool(schoolSlug)
+  if ('error' in result) return result
+
+  const { school, userId } = result
+
+  const ext = file.name.split('.').pop() ?? 'bin'
+  const timestamp = Date.now()
+  const storagePath = `${userId}/${school.id}/${designationId}/${documentType}_${timestamp}.${ext}`
+
+  const supabase = await createSupabaseServerActionClient()
+  const arrayBuffer = await file.arrayBuffer()
+  const fileBuffer = new Uint8Array(arrayBuffer)
+
+  const { error: uploadError } = await supabase.storage
+    .from('school-documents')
+    .upload(storagePath, fileBuffer, {
+      contentType: file.type,
+      upsert: false,
+    })
+
+  if (uploadError) return { error: uploadError.message }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: row, error: insertError } = await (supabase as any)
+    .from('school_verification_documents')
+    .insert({
+      school_id: school.id,
+      designation_id: designationId,
+      document_type: documentType,
+      file_url: storagePath,
+      file_name: file.name,
+      file_size: file.size,
+      status: 'pending',
+    })
+    .select('id, file_name, file_url')
+    .single()
+
+  if (insertError) {
+    await supabase.storage.from('school-documents').remove([storagePath])
+    return { error: insertError.message }
+  }
+
+  return { success: true, document: row as { id: string; file_name: string; file_url: string } }
+}
+
+export async function deleteDocument(
+  schoolSlug: string,
+  documentId: string,
+): Promise<{ success: true } | { error: string }> {
+  const result = await getOwnedSchool(schoolSlug)
+  if ('error' in result) return result
+
+  const { school } = result
+  const supabase = await createSupabaseServerActionClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: doc, error: fetchError } = await (supabase as any)
+    .from('school_verification_documents')
+    .select('id, file_url')
+    .eq('id', documentId)
+    .eq('school_id', school.id)
+    .maybeSingle()
+
+  if (fetchError) return { error: fetchError.message }
+  if (!doc) return { error: 'Document not found' }
+
+  const { error: storageError } = await supabase.storage
+    .from('school-documents')
+    .remove([doc.file_url])
+
+  if (storageError) {
+    console.error('[deleteDocument] storage remove error:', storageError.message)
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: deleteError } = await (supabase as any)
+    .from('school_verification_documents')
+    .delete()
+    .eq('id', documentId)
+    .eq('school_id', school.id)
+
+  if (deleteError) return { error: deleteError.message }
+  return { success: true }
+}
+
+// ---------------------------------------------------------------------------
+// Stripe billing portal action
+// ---------------------------------------------------------------------------
+
+export async function createBillingPortalSession(
+  schoolSlug: string,
+): Promise<{ url: string } | { error: string }> {
+  const result = await getOwnedSchool(schoolSlug)
+  if ('error' in result) return result
+
+  const { school } = result
+  const supabase = await createSupabaseServerActionClient()
+
+  // Fetch the Stripe customer ID from the school's active designation
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: designation } = await (supabase as any)
+    .from('school_designations')
+    .select('stripe_customer_id')
+    .eq('school_id', school.id)
+    .not('stripe_customer_id', 'is', null)
+    .limit(1)
+    .maybeSingle()
+
+  if (!designation?.stripe_customer_id) {
+    return { error: 'No billing account found for this school' }
+  }
+
+  try {
+    const { getStripe } = await import('@/lib/stripe/client')
+    const session = await getStripe().billingPortal.sessions.create({
+      customer: designation.stripe_customer_id,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/schools/${schoolSlug}/settings/subscription`,
+    })
+    return { url: session.url }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to create portal session'
+    return { error: message }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // updateLocation
 // ---------------------------------------------------------------------------
 
