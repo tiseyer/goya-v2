@@ -153,6 +153,7 @@ export default async function AddonsPage() {
     <div className="min-h-screen bg-white">
 
       <PageHero
+        variant="dark"
         pill="Brightcoms"
         title="All Add-Ons & Upgrades"
         subtitle="Enhance your GOYA profile with verified designation badges, continuing education credits, and more."

@@ -121,6 +121,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <PageHero
+        variant="dark"
         pill="GOYA Dashboard"
         title={`Welcome back, ${firstName}`}
         subtitle="Your yoga community hub."

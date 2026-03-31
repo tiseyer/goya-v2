@@ -233,6 +233,7 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <PageHero
+        variant="dark"
         pill="Events"
         title="Events"
         subtitle="Workshops, teacher trainings, dharma talks, and conferences from the global GOYA community."
