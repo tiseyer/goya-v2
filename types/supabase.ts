@@ -435,11 +435,58 @@ export type Database = {
         }
         Relationships: []
       }
+      course_audit_log: {
+        Row: {
+          action: string
+          changes: Json | null
+          course_id: string
+          created_at: string
+          id: string
+          performed_by: string | null
+          performed_by_role: string | null
+        }
+        Insert: {
+          action: string
+          changes?: Json | null
+          course_id: string
+          created_at?: string
+          id?: string
+          performed_by?: string | null
+          performed_by_role?: string | null
+        }
+        Update: {
+          action?: string
+          changes?: Json | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          performed_by?: string | null
+          performed_by_role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_audit_log_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_audit_log_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           access: string | null
           category: string
+          course_type: string
           created_at: string | null
+          created_by: string | null
           deleted_at: string | null
           description: string | null
           duration: string | null
@@ -448,6 +495,7 @@ export type Database = {
           id: string
           instructor: string | null
           level: string | null
+          rejection_reason: string | null
           short_description: string | null
           status: string | null
           thumbnail_url: string | null
@@ -458,7 +506,9 @@ export type Database = {
         Insert: {
           access?: string | null
           category: string
+          course_type?: string
           created_at?: string | null
+          created_by?: string | null
           deleted_at?: string | null
           description?: string | null
           duration?: string | null
@@ -467,6 +517,7 @@ export type Database = {
           id?: string
           instructor?: string | null
           level?: string | null
+          rejection_reason?: string | null
           short_description?: string | null
           status?: string | null
           thumbnail_url?: string | null
@@ -477,7 +528,9 @@ export type Database = {
         Update: {
           access?: string | null
           category?: string
+          course_type?: string
           created_at?: string | null
+          created_by?: string | null
           deleted_at?: string | null
           description?: string | null
           duration?: string | null
@@ -486,6 +539,7 @@ export type Database = {
           id?: string
           instructor?: string | null
           level?: string | null
+          rejection_reason?: string | null
           short_description?: string | null
           status?: string | null
           thumbnail_url?: string | null
@@ -493,7 +547,15 @@ export type Database = {
           updated_at?: string | null
           vimeo_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "courses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       credit_entries: {
         Row: {
