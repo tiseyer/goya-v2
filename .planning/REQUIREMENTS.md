@@ -19,18 +19,18 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 
 ### Interest & Entry Points
 
-- [ ] **INT-01**: Dashboard right sidebar widget for teachers without a school — CTA to /schools/create
-- [ ] **INT-02**: Subscriptions page callout below teacher subscription card — CTA to register school
-- [ ] **INT-03**: Add-Ons page featured banner for teachers — CTA to register school
-- [ ] **INT-04**: All entry points role-gated to teachers with no principal_trainer_school_id
+- [x] **INT-01**: Dashboard right sidebar widget for teachers without a school — CTA to /schools/create
+- [x] **INT-02**: Subscriptions page callout below teacher subscription card — CTA to register school
+- [x] **INT-03**: Add-Ons page featured banner for teachers — CTA to register school
+- [x] **INT-04**: All entry points role-gated to teachers with no principal_trainer_school_id
 
 ### Registration Flow
 
-- [ ] **REG-01**: School name + auto-generated slug with uniqueness check at /schools/create step 1
+- [x] **REG-01**: School name + auto-generated slug with uniqueness check at /schools/create step 1
 - [ ] **REG-02**: Designation selection step showing 8 products as cards with prices and running total
-- [ ] **REG-03**: Stripe Checkout session with annual subscription + signup fee per selected designation
-- [ ] **REG-04**: Post-payment: school record created with status='pending', school_designations created
-- [ ] **REG-05**: Redirect to onboarding flow after successful payment
+- [x] **REG-03**: Stripe Checkout session with annual subscription + signup fee per selected designation
+- [x] **REG-04**: Post-payment: school record created with status='pending', school_designations created
+- [x] **REG-05**: Redirect to onboarding flow after successful payment
 
 ### Onboarding Flow
 
@@ -109,15 +109,15 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 | DB-05 | Phase 28 | Complete |
 | DB-06 | Phase 28 | Complete |
 | DB-07 | Phase 28 | Complete |
-| INT-01 | Phase 29 | Pending |
-| INT-02 | Phase 29 | Pending |
-| INT-03 | Phase 29 | Pending |
-| INT-04 | Phase 29 | Pending |
-| REG-01 | Phase 30 | Pending |
+| INT-01 | Phase 29 | Complete |
+| INT-02 | Phase 29 | Complete |
+| INT-03 | Phase 29 | Complete |
+| INT-04 | Phase 29 | Complete |
+| REG-01 | Phase 30 | Complete |
 | REG-02 | Phase 30 | Pending |
-| REG-03 | Phase 30 | Pending |
-| REG-04 | Phase 30 | Pending |
-| REG-05 | Phase 30 | Pending |
+| REG-03 | Phase 30 | Complete |
+| REG-04 | Phase 30 | Complete |
+| REG-05 | Phase 30 | Complete |
 | ONB-01 | Phase 31 | Pending |
 | ONB-02 | Phase 31 | Pending |
 | ONB-03 | Phase 31 | Pending |

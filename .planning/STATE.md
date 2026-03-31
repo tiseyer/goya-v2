@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.14
 milestone_name: School Owner System
-status: verifying
-stopped_at: Completed 29-01-PLAN.md
-last_updated: "2026-03-31T12:22:25.588Z"
+status: executing
+stopped_at: Completed 30-01-PLAN.md
+last_updated: "2026-03-31T12:47:10.295Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 29 — interest-and-entry-points
+**Current focus:** Phase 30 — school-registration-flow
 
 ## Current Position
 
-Phase: 30
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 30 (school-registration-flow) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-03-31
 
 Progress: [░░░░░░░░░░] 0%
@@ -57,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 28 P01 | 18 | 2 tasks | 3 files |
 | Phase 28 P02 | 3 | 2 tasks | 4 files |
 | Phase 29-interest-and-entry-points P01 | 4min | 2 tasks | 5 files |
+| Phase 30-school-registration-flow P01 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - [Phase 28]: Created 20260377_school_rls_policies.sql rather than appending to 20260376 (schema already applied remotely in plan 28-01)
 - [Phase 28]: school_verification_documents has NO public SELECT — private documents visible only to owner and admins
 - [Phase 29-interest-and-entry-points]: Single SchoolRegistrationCTA with variant prop reused across dashboard sidebar, subscriptions callout, and add-ons banner
+- [Phase 30-school-registration-flow]: 2 shared Stripe price IDs (STRIPE_SCHOOL_ANNUAL_PRICE_ID + STRIPE_SCHOOL_SIGNUP_PRICE_ID) used for all 8 designations since pricing is identical
+- [Phase 30-school-registration-flow]: checkout.sessions.create cast to any for add_invoice_items — valid Stripe API field missing from SDK v20 TypeScript types
+- [Phase 30-school-registration-flow]: Slug embedded in success_url to avoid webhook race condition on success page redirect
 
 ### Blockers/Concerns
 
@@ -96,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T12:14:12.580Z
-Stopped at: Completed 29-01-PLAN.md
+Last session: 2026-03-31T12:47:10.293Z
+Stopped at: Completed 30-01-PLAN.md
 Resume file: None
