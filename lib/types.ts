@@ -4,7 +4,7 @@ export type MemberType = 'student' | 'teacher' | 'wellness_practitioner';
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
 export type EventCategory = 'Workshop' | 'Teacher Training' | 'Dharma Talk' | 'Conference' | 'Yoga Sequence' | 'Music Playlist' | 'Research';
 export type EventFormat = 'Online' | 'In Person' | 'Hybrid';
-export type EventStatus = 'published' | 'draft' | 'cancelled' | 'deleted';
+export type EventStatus = 'published' | 'draft' | 'pending_review' | 'rejected' | 'cancelled' | 'deleted';
 export type CourseCategory = 'Workshop' | 'Yoga Sequence' | 'Dharma Talk' | 'Music Playlist' | 'Research';
 export type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced' | 'All Levels';
 export type CourseAccess = 'members_only' | 'free';
@@ -86,6 +86,9 @@ export interface Event {
   spots_total: number | null;
   spots_remaining: number | null;
   featured_image_url: string | null;
+  event_type: 'goya' | 'member';
+  created_by: string | null;
+  rejection_reason: string | null;
   status: EventStatus;
   deleted_at: string | null;
   created_at: string;

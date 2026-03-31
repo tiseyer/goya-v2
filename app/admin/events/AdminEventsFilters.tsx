@@ -6,9 +6,16 @@ import { useCallback, useState } from 'react';
 const CATEGORIES = ['Workshop', 'Teacher Training', 'Dharma Talk', 'Conference', 'Yoga Sequence', 'Music Playlist', 'Research'];
 const FORMATS    = ['Online', 'In Person', 'Hybrid'];
 const BASE_STATUSES: Array<{ value: string; label: string }> = [
-  { value: 'published', label: 'Published' },
-  { value: 'draft',     label: 'Draft'     },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'published',      label: 'Published'      },
+  { value: 'draft',          label: 'Draft'           },
+  { value: 'pending_review', label: 'Pending Review'  },
+  { value: 'rejected',       label: 'Rejected'        },
+  { value: 'cancelled',      label: 'Cancelled'       },
+];
+
+const EVENT_TYPES: Array<{ value: string; label: string }> = [
+  { value: 'goya',   label: 'GOYA Events'   },
+  { value: 'member', label: 'Member Events'  },
 ];
 const SORT_OPTS = [
   { value: 'date_asc',        label: 'Date (oldest first)' },
@@ -26,11 +33,12 @@ export default function AdminEventsFilters({ userRole }: Props) {
   const router       = useRouter();
   const searchParams = useSearchParams();
 
-  const [search,   setSearch]   = useState(searchParams.get('search')   ?? '');
-  const [category, setCategory] = useState(searchParams.get('category') ?? '');
-  const [format,   setFormat]   = useState(searchParams.get('format')   ?? '');
-  const [status,   setStatus]   = useState(searchParams.get('status')   ?? '');
-  const [sort,     setSort]     = useState(searchParams.get('sort')     ?? 'date_asc');
+  const [search,    setSearch]    = useState(searchParams.get('search')   ?? '');
+  const [category,  setCategory]  = useState(searchParams.get('category') ?? '');
+  const [format,    setFormat]    = useState(searchParams.get('format')   ?? '');
+  const [status,    setStatus]    = useState(searchParams.get('status')   ?? '');
+  const [eventType, setEventType] = useState(searchParams.get('type')     ?? '');
+  const [sort,      setSort]      = useState(searchParams.get('sort')     ?? 'date_asc');
 
   const isAdmin = userRole === 'admin';
 
@@ -40,14 +48,14 @@ export default function AdminEventsFilters({ userRole }: Props) {
 
   const apply = useCallback((overrides: Record<string, string> = {}) => {
     const params = new URLSearchParams();
-    const vals = { search, category, format, status, sort, ...overrides };
+    const vals = { search, category, format, status, type: eventType, sort, ...overrides };
     Object.entries(vals).forEach(([k, v]) => { if (v) params.set(k, v); });
     params.set('page', '1');
     router.replace(`/admin/events?${params.toString()}`);
-  }, [search, category, format, status, sort, router]);
+  }, [search, category, format, status, eventType, sort, router]);
 
   function reset() {
-    setSearch(''); setCategory(''); setFormat(''); setStatus(''); setSort('date_asc');
+    setSearch(''); setCategory(''); setFormat(''); setStatus(''); setEventType(''); setSort('date_asc');
     router.replace('/admin/events');
   }
 
@@ -75,9 +83,15 @@ export default function AdminEventsFilters({ userRole }: Props) {
         {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
       </select>
 
+      {/* Type */}
+      <select value={eventType} onChange={e => { setEventType(e.target.value); apply({ type: e.target.value }); }} className={SEL}>
+        <option value="">All Types</option>
+        {EVENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+      </select>
+
       {/* Status — 'Deleted' option only shown to admins */}
       <select value={status} onChange={e => { setStatus(e.target.value); apply({ status: e.target.value }); }} className={SEL}>
-        <option value="">Active (pub / draft / cancelled)</option>
+        <option value="">Active (all non-deleted)</option>
         {allStatuses.map(s => (
           <option key={s.value} value={s.value}>{s.label}</option>
         ))}

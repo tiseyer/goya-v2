@@ -16,10 +16,17 @@ const CATEGORY_BADGE: Record<string, string> = {
 };
 
 const STATUS_BADGE: Record<string, string> = {
-  published: 'bg-emerald-50 text-emerald-700',
-  draft:     'bg-amber-50 text-amber-700',
-  cancelled: 'bg-red-50 text-red-700',
-  deleted:   'bg-red-50 text-red-700 line-through',
+  published:      'bg-emerald-50 text-emerald-700',
+  draft:          'bg-amber-50 text-amber-700',
+  pending_review: 'bg-amber-50 text-amber-700',
+  rejected:       'bg-red-50 text-red-700',
+  cancelled:      'bg-red-50 text-red-700',
+  deleted:        'bg-red-50 text-red-700 line-through',
+};
+
+const TYPE_BADGE: Record<string, string> = {
+  goya:   'bg-blue-50 text-blue-700',
+  member: 'bg-indigo-50 text-indigo-700',
 };
 
 function fmtTime(t: string) {
@@ -37,11 +44,12 @@ export default async function AdminEventsPage({
   searchParams: Promise<Record<string, string>>;
 }) {
   const sp       = await searchParams;
-  const search   = sp.search   ?? '';
-  const category = sp.category ?? '';
-  const format   = sp.format   ?? '';
-  const status   = sp.status   ?? '';   // '' means "active" (exclude deleted)
-  const sort     = sp.sort     ?? 'date_asc';
+  const search    = sp.search   ?? '';
+  const category  = sp.category ?? '';
+  const format    = sp.format   ?? '';
+  const status    = sp.status   ?? '';   // '' means "active" (exclude deleted)
+  const eventType = sp.type     ?? '';   // '' = all, 'goya', 'member'
+  const sort      = sp.sort     ?? 'date_asc';
   const page     = Math.max(1, parseInt(sp.page ?? '1', 10));
 
   // ── Current user's role ───────────────────────────────────────────────────
@@ -60,7 +68,7 @@ export default async function AdminEventsPage({
   const effectiveStatus = (status === 'deleted' && !isAdmin) ? '' : status;
 
   // ── Query ─────────────────────────────────────────────────────────────────
-  let query = supabase.from('events').select('*', { count: 'exact' });
+  let query = supabase.from('events').select('*, profiles!created_by(full_name, email)', { count: 'exact' });
 
   if (effectiveStatus) {
     // Explicit status filter (including 'deleted' for admins)
@@ -70,9 +78,10 @@ export default async function AdminEventsPage({
     query = query.neq('status', 'deleted');
   }
 
-  if (search)   query = query.ilike('title', `%${search}%`);
-  if (category) query = query.eq('category', category);
-  if (format)   query = query.eq('format', format);
+  if (search)    query = query.ilike('title', `%${search}%`);
+  if (category)  query = query.eq('category', category);
+  if (format)    query = query.eq('format', format);
+  if (eventType) query = query.eq('event_type', eventType);
 
   if (sort === 'date_desc')            query = query.order('date', { ascending: false });
   else if (sort === 'created_at_desc') query = query.order('created_at', { ascending: false });
@@ -83,7 +92,8 @@ export default async function AdminEventsPage({
 
   const { data, count, error } = await query;
 
-  const events     = (data as Event[]) ?? [];
+  type EventWithProfile = Event & { profiles: { full_name: string; email: string } | null };
+  const events     = (data as EventWithProfile[]) ?? [];
   const total      = count ?? 0;
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const viewingDeleted = effectiveStatus === 'deleted';
@@ -140,6 +150,7 @@ export default async function AdminEventsPage({
               <thead>
                 <tr className={`border-b border-[#E5E7EB] ${viewingDeleted ? 'bg-red-50' : 'bg-slate-50'}`}>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Event</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Type</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Date</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Time</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider hidden md:table-cell">Instructor</th>
@@ -159,6 +170,11 @@ export default async function AdminEventsPage({
                         <p className={`font-medium truncate ${isDeleted ? 'text-[#9CA3AF] line-through' : 'text-[#1B3A5C]'}`}>
                           {ev.title}
                         </p>
+                        {ev.event_type === 'member' && ev.profiles && (
+                          <p className="text-[10px] text-[#6B7280] mt-0.5 truncate">
+                            Submitted by {ev.profiles.full_name || ev.profiles.email}
+                          </p>
+                        )}
                         <div className="flex flex-wrap gap-1 mt-1">
                           <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${CATEGORY_BADGE[ev.category] ?? 'bg-slate-100 text-slate-600'}`}>
                             {ev.category}
@@ -167,6 +183,12 @@ export default async function AdminEventsPage({
                             {ev.format}
                           </span>
                         </div>
+                      </td>
+                      {/* Type */}
+                      <td className="px-4 py-3">
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full uppercase ${TYPE_BADGE[ev.event_type] ?? 'bg-slate-100 text-slate-600'}`}>
+                          {ev.event_type === 'member' ? 'Member' : 'GOYA'}
+                        </span>
                       </td>
                       {/* Date */}
                       <td className="px-4 py-3 text-[#374151] whitespace-nowrap">
@@ -187,7 +209,7 @@ export default async function AdminEventsPage({
                       {/* Status */}
                       <td className="px-4 py-3">
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${STATUS_BADGE[ev.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                          {ev.status}
+                          {ev.status === 'pending_review' ? 'Pending Review' : ev.status}
                         </span>
                         {isDeleted && ev.deleted_at && (
                           <p className="text-[9px] text-[#9CA3AF] mt-0.5">
