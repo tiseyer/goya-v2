@@ -15,17 +15,6 @@
 
 ## Phases
 
-### ✅ v1.10 Member Courses (Shipped 2026-03-31)
-
-- [x] **Phase 22: Database Foundation** - Course type, status workflow, audit log, and RLS policies
-- [x] **Phase 23: Admin Courses List Updates** - Type badge/filter, submitter column, extended status filter, audit history
-- [x] **Phase 24: Admin Inbox Courses Tab** - Pending review queue with approve/reject workflow
-- [x] **Phase 25: My Courses Settings Page** - Member course CRUD with status-aware actions and submission flow
-- [x] **Phase 26: Public Academy Type Filter** - All/GOYA/Member filter on public academy page
-- [x] **Phase 27: Audit Log Complete Coverage** - Shared audit utility wired to all code paths
-
-### 🚧 v1.14 School Owner System (In Progress)
-
 **Milestone Goal:** Teachers can register their yoga school on GOYA — select designations, pay via Stripe, complete onboarding, get admin-verified, and go live with a public school profile.
 
 - [ ] **Phase 28: Database Foundation** - Extend schools/profiles tables, add school_designations/faculty/documents tables, RLS policies, TypeScript types
@@ -36,8 +25,6 @@
 - [ ] **Phase 33: Admin School Management** - Inbox tab updates, school detail/review page, approve/reject workflow, member profile integration
 - [ ] **Phase 34: Public School Profile** - /schools/[slug] with hero, bio, teaching info, faculty, and member directory integration
 - [ ] **Phase 35: Faculty Invitations** - Email invites for non-members, invite link at registration, auto-link on account creation
-
-## Phase Details (v1.14)
 
 ### Phase 28: Database Foundation
 **Goal**: The database fully supports the school owner system — extended schema, all new tables, role-scoped access, and TypeScript types passing
