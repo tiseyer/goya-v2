@@ -1,100 +1,62 @@
 'use server';
 
-import { getSupabaseService } from '@/lib/supabase/service';
-import type { Member, MemberRole } from '@/lib/members-data';
+import { createSupabaseServerClient } from './supabaseServer';
+import { type Member, type MemberRole } from './members-data';
 
-function mapRole(memberType: string | null, role: string | null): MemberRole {
-  const mt = memberType?.toLowerCase();
-  if (mt === 'school') return 'School';
-  if (mt === 'teacher') return 'Teacher';
-  if (mt === 'student') return 'Student';
-  if (mt === 'wellness_practitioner') return 'Wellness Practitioner';
+/**
+ * Fetches approved schools from Supabase and maps them to the Member format
+ * for display in the member directory.
+ */
+export async function fetchSchoolMembers(): Promise<Member[]> {
+  const supabase = await createSupabaseServerClient();
 
-  const r = role?.toLowerCase();
-  if (r === 'teacher') return 'Teacher';
-  if (r === 'student') return 'Student';
-  if (r === 'wellness_practitioner') return 'Wellness Practitioner';
+  // Fetch approved schools
+  const { data: schoolRows, error: schoolError } = await supabase
+    .from('schools')
+    .select('id, name, slug, logo_url, bio, short_bio, city, country, location_city, location_country, course_delivery_format, created_at, owner_id')
+    .eq('status', 'approved');
 
-  return 'Student';
-}
-
-export async function fetchMembers(): Promise<{
-  members: Member[];
-  allDesignations: string[];
-  allTeachingStyles: string[];
-}> {
-  const supabase = getSupabaseService();
-
-  const PAGE_SIZE = 1000;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let allRows: any[] = [];
-  let from = 0;
-
-  // Supabase PostgREST defaults to 1000 rows — paginate to fetch all members
-  while (true) {
-    const { data: page, error } = await supabase
-      .from('profiles')
-      .select(
-        'id, full_name, first_name, last_name, avatar_url, bio, city, country, role, member_type, designations, teaching_styles, wellness_designations, is_verified, verification_status, website, instagram, youtube, youtube_intro_url, created_at, onboarding_completed'
-      )
-      .eq('onboarding_completed', true)
-      .order('created_at', { ascending: false })
-      .range(from, from + PAGE_SIZE - 1);
-
-    if (error) {
-      console.error('[fetchMembers] Supabase error:', error);
-      return { members: [], allDesignations: [], allTeachingStyles: [] };
-    }
-
-    if (page) allRows = allRows.concat(page);
-    if (!page || page.length < PAGE_SIZE) break;
-    from += PAGE_SIZE;
+  if (schoolError || !schoolRows?.length) {
+    return [];
   }
 
-  const members: Member[] = allRows.map((p) => {
-    const name =
-      p.full_name ||
-      [p.first_name, p.last_name].filter(Boolean).join(' ') ||
-      'Unknown Member';
+  // Fetch school designations for all approved schools
+  const schoolIds = schoolRows.map(s => s.id);
+  const { data: schoolDesRows } = schoolIds.length > 0
+    ? await supabase
+        .from('school_designations')
+        .select('school_id, designation_type')
+        .in('school_id', schoolIds)
+    : { data: [] };
 
-    const designations = [
-      ...((p.designations as string[] | null) ?? []),
-      ...((p.wellness_designations as string[] | null) ?? []),
-    ].filter(Boolean);
+  // Group designations by school_id
+  const desBySchool: Record<string, string[]> = {};
+  for (const d of schoolDesRows ?? []) {
+    if (!desBySchool[d.school_id]) desBySchool[d.school_id] = [];
+    desBySchool[d.school_id].push(d.designation_type);
+  }
 
-    return {
-      id: p.id,
-      name,
-      role: mapRole(p.member_type ?? null, p.role ?? null),
-      country: p.country ?? 'Unknown',
-      city: p.city ?? '',
-      coordinates: [0, 0],
-      bio: p.bio ?? '',
-      photo: p.avatar_url ?? '',
-      designations,
-      teachingStyles: ((p.teaching_styles as string[] | null) ?? []).filter(Boolean),
-      specialties: [],
-      credits: { CE: 0, Community: 0, Karma: 0, Practice: 0 },
-      social: {
-        website: p.website ?? undefined,
-        instagram: p.instagram ?? undefined,
-        youtube: p.youtube ?? undefined,
-      },
-      memberSince: p.created_at
-        ? String(new Date(p.created_at).getFullYear())
-        : '',
-      is_verified: p.verification_status === 'verified',
-      videoIntroUrl: (p.youtube_intro_url as string | null) ?? undefined,
-    };
-  });
+  // Map schools to Member format
+  const schoolMembers: Member[] = schoolRows.map(s => ({
+    id: s.owner_id ?? s.id,
+    name: s.name,
+    role: 'School' as MemberRole,
+    country: s.location_country ?? s.country ?? 'Unknown',
+    city: s.location_city ?? s.city ?? '',
+    coordinates: [0, 0] as [number, number],
+    bio: s.short_bio ?? s.bio ?? '',
+    photo: s.logo_url ?? '',
+    designations: desBySchool[s.id] ?? [],
+    teachingStyles: [],
+    specialties: [],
+    credits: { CE: 0, Community: 0, Karma: 0, Practice: 0 },
+    social: {},
+    memberSince: s.created_at
+      ? new Date(s.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      : '',
+    slug: s.slug ?? undefined,
+    schoolDesignations: desBySchool[s.id] ?? [],
+  }));
 
-  const allDesignations = Array.from(
-    new Set(members.flatMap((m) => m.designations).filter(Boolean))
-  ).sort();
-
-  const allTeachingStyles = Array.from(
-    new Set(members.flatMap((m) => m.teachingStyles).filter(Boolean))
-  ).sort();
-
-  return { members, allDesignations, allTeachingStyles };
+  return schoolMembers;
 }
