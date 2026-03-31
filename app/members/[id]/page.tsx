@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getSupabaseService } from '@/lib/supabase/service';
 import ConnectButton from '@/app/components/ConnectButton';
 import ConnectionsSection from '@/app/components/ConnectionsSection';
+import PageContainer from '@/app/components/ui/PageContainer';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,16 +57,16 @@ export default async function MemberProfilePage({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="bg-gradient-to-b from-[#1B3A5C] via-[#1B3A5C] to-[#1e3a5f] pt-20 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-primary relative overflow-hidden flex items-center h-[200px] sm:h-[220px] md:h-[240px]">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#4E87A0] opacity-[0.05] rounded-full blur-3xl translate-x-1/2 -translate-y-1/4" />
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-light opacity-[0.05] rounded-full blur-3xl translate-x-1/2 -translate-y-1/4" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer className="relative">
           {/* Back link */}
           <Link
             href="/members"
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm font-medium mb-10 transition-colors group"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm font-medium mb-4 transition-colors group"
           >
             <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -115,11 +116,11 @@ export default async function MemberProfilePage({
               )}
             </div>
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 pb-16">
+      <PageContainer className="-mt-8 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left column */}
           <div className="lg:col-span-2 space-y-6">
@@ -220,7 +221,7 @@ export default async function MemberProfilePage({
             </div>
           </div>
         </div>
-      </div>
+      </PageContainer>
     </div>
   );
 }
