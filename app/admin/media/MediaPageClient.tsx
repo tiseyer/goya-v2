@@ -175,8 +175,6 @@ export default function MediaPageClient({
 
   // ── POLISH-04: Mobile folder dropdown ─────────────────────────────────────
   // On mobile (< md) FolderSidebar is hidden; a <select> dropdown is shown above toolbar.
-  const [mobileFolderOpen, setMobileFolderOpen] = useState(false);
-  void mobileFolderOpen; // used only for potential future sheet — currently using <select>
 
   // Ref to the MediaUploader so we can call openFilePicker() from the toolbar
   const uploaderRef = useRef<MediaUploaderHandle>(null);
