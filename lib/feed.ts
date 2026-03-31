@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { registerMediaItemAction } from '@/app/actions/media'
 
 // Types
 export type PostType = 'text' | 'image' | 'video' | 'audio' | 'gif' | 'poll'
@@ -364,5 +365,15 @@ export async function uploadPostMedia(
   if (error) throw error
 
   const { data } = supabase.storage.from(bucket).getPublicUrl(filename)
+  // Fire-and-forget — non-critical, do not block UX on failure
+  registerMediaItemAction({
+    bucket,
+    fileName: file.name,
+    filePath: filename,
+    fileUrl: data.publicUrl,
+    fileType: file.type,
+    fileSize: file.size,
+    uploadedBy: userId,
+  }).catch(console.error)
   return data.publicUrl
 }

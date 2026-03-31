@@ -11,6 +11,7 @@ import {
   submitEventForReview,
   deleteMemberEvent,
 } from './actions';
+import { registerMediaItemAction } from '@/app/actions/media';
 
 const CATEGORIES: EventCategory[] = ['Workshop', 'Teacher Training', 'Dharma Talk', 'Conference', 'Yoga Sequence', 'Music Playlist', 'Research'];
 const FORMATS: EventFormat[] = ['Online', 'In Person', 'Hybrid'];
@@ -115,6 +116,17 @@ export default function MyEventsClient({ initialEvents }: Props) {
         if (uploadErr) throw new Error(`Image upload failed: ${uploadErr.message}`);
         const { data: urlData } = supabase.storage.from('event-images').getPublicUrl(path);
         imageUrl = urlData.publicUrl;
+        // Fire-and-forget — non-critical, do not block UX on failure
+        const { data: { user } } = await supabase.auth.getUser();
+        registerMediaItemAction({
+          bucket: 'event-images',
+          fileName: file.name,
+          filePath: path,
+          fileUrl: imageUrl,
+          fileType: file.type,
+          fileSize: file.size,
+          uploadedBy: user?.id ?? '',
+        }).catch(console.error);
       }
 
       const payload = {

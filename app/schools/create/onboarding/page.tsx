@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { registerMediaItemAction } from '@/app/actions/media';
 
 const TOTAL_STEPS = 6;
 const DRAFT_KEY = 'school-onboarding-draft';
@@ -160,6 +161,16 @@ export default function SchoolOnboardingPage() {
 
         const { data: urlData } = supabase.storage.from('school-logos').getPublicUrl(path);
         finalLogoUrl = urlData.publicUrl;
+        // Fire-and-forget — non-critical, do not block UX on failure
+        registerMediaItemAction({
+          bucket: 'school-logos',
+          fileName: logoFile.name,
+          filePath: path,
+          fileUrl: finalLogoUrl,
+          fileType: logoFile.type,
+          fileSize: logoFile.size,
+          uploadedBy: user.id,
+        }).catch(console.error);
       }
 
       // Generate and verify slug uniqueness

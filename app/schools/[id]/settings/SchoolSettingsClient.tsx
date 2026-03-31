@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { registerMediaItemAction } from '@/app/actions/media';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -170,6 +171,17 @@ export default function SchoolSettingsClient({
         const { data: urlData } = supabase.storage.from('school-logos').getPublicUrl(path);
         finalLogoUrl = urlData.publicUrl;
         setLogoUrl(finalLogoUrl);
+        // Fire-and-forget — non-critical, do not block UX on failure
+        const logoFileRef = logoFile;
+        registerMediaItemAction({
+          bucket: 'school-logos',
+          fileName: logoFileRef.name,
+          filePath: path,
+          fileUrl: finalLogoUrl,
+          fileType: logoFileRef.type,
+          fileSize: logoFileRef.size,
+          uploadedBy: userId,
+        }).catch(console.error);
         setLogoFile(null);
       }
 

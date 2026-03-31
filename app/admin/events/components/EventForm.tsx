@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import type { Event } from '@/lib/types';
 import { logAdminEventAction } from '@/app/admin/events/actions';
+import { registerMediaItemAction } from '@/app/actions/media';
 
 const CATEGORIES = ['Workshop', 'Teacher Training', 'Dharma Talk', 'Conference', 'Yoga Sequence', 'Music Playlist', 'Research'] as const;
 const FORMATS    = ['Online', 'In Person', 'Hybrid'] as const;
@@ -92,6 +93,17 @@ export default function EventForm({ event }: Props) {
         if (uploadErr) throw new Error(`Image upload failed: ${uploadErr.message}`);
         const { data: urlData } = supabase.storage.from('event-images').getPublicUrl(path);
         imageUrl = urlData.publicUrl;
+        // Fire-and-forget — non-critical, do not block UX on failure
+        const { data: { user } } = await supabase.auth.getUser();
+        registerMediaItemAction({
+          bucket: 'event-images',
+          fileName: imageFile.name,
+          filePath: path,
+          fileUrl: imageUrl,
+          fileType: imageFile.type,
+          fileSize: imageFile.size,
+          uploadedBy: user?.id ?? '',
+        }).catch(console.error);
       }
 
       const payload = {
