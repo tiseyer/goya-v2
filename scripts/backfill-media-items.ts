@@ -2,6 +2,9 @@ import { createClient } from '@supabase/supabase-js'
 import { config } from 'dotenv'
 import { resolve } from 'path'
 
+// Try loading from project root (works both in main repo and worktrees)
+config({ path: resolve(process.cwd(), '.env.local') })
+// Also try relative to script dir (fallback)
 config({ path: resolve(__dirname, '..', '.env.local') })
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
