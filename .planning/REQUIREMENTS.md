@@ -27,7 +27,7 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 ### Registration Flow
 
 - [x] **REG-01**: School name + auto-generated slug with uniqueness check at /schools/create step 1
-- [ ] **REG-02**: Designation selection step showing 8 products as cards with prices and running total
+- [x] **REG-02**: Designation selection step showing 8 products as cards with prices and running total
 - [x] **REG-03**: Stripe Checkout session with annual subscription + signup fee per selected designation
 - [x] **REG-04**: Post-payment: school record created with status='pending', school_designations created
 - [x] **REG-05**: Redirect to onboarding flow after successful payment
@@ -114,7 +114,7 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 | INT-03 | Phase 29 | Complete |
 | INT-04 | Phase 29 | Complete |
 | REG-01 | Phase 30 | Complete |
-| REG-02 | Phase 30 | Pending |
+| REG-02 | Phase 30 | Complete |
 | REG-03 | Phase 30 | Complete |
 | REG-04 | Phase 30 | Complete |
 | REG-05 | Phase 30 | Complete |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.14
 milestone_name: School Owner System
-status: executing
-stopped_at: Completed 30-01-PLAN.md
-last_updated: "2026-03-31T12:47:10.295Z"
+status: verifying
+stopped_at: "Completed 30-02 task 1 — awaiting checkpoint:human-verify (task 2)"
+last_updated: "2026-03-31T12:54:57.476Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 
 Phase: 30 (school-registration-flow) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-31
 
 Progress: [░░░░░░░░░░] 0%
@@ -58,6 +58,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 28 P02 | 3 | 2 tasks | 4 files |
 | Phase 29-interest-and-entry-points P01 | 4min | 2 tasks | 5 files |
 | Phase 30-school-registration-flow P01 | 5min | 2 tasks | 5 files |
+| Phase 30-school-registration-flow P02 | 10min | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - [Phase 30-school-registration-flow]: 2 shared Stripe price IDs (STRIPE_SCHOOL_ANNUAL_PRICE_ID + STRIPE_SCHOOL_SIGNUP_PRICE_ID) used for all 8 designations since pricing is identical
 - [Phase 30-school-registration-flow]: checkout.sessions.create cast to any for add_invoice_items — valid Stripe API field missing from SDK v20 TypeScript types
 - [Phase 30-school-registration-flow]: Slug embedded in success_url to avoid webhook race condition on success page redirect
+- [Phase 30-school-registration-flow]: Wizard split into page.tsx (server RSC) + SchoolCreateWizard.tsx (client) for clean RSC boundary
+- [Phase 30-school-registration-flow]: Step navigation via URL params (?step=2) so browser back button works and Stripe cancel_url returns to correct step
 
 ### Blockers/Concerns
 
@@ -100,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T12:47:10.293Z
-Stopped at: Completed 30-01-PLAN.md
+Last session: 2026-03-31T12:54:57.473Z
+Stopped at: Completed 30-02 task 1 — awaiting checkpoint:human-verify (task 2)
 Resume file: None

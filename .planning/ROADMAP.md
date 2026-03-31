@@ -19,7 +19,7 @@
 
 - [x] **Phase 28: Database Foundation** - Extend schools/profiles tables, add school_designations/faculty/documents tables, RLS policies, TypeScript types (completed 2026-03-31)
 - [x] **Phase 29: Interest & Entry Points** - Dashboard widget, subscriptions callout, add-ons banner for teachers without a school (completed 2026-03-31)
-- [ ] **Phase 30: School Registration Flow** - Name/slug step, designation selection, Stripe Checkout, post-payment school record creation
+- [x] **Phase 30: School Registration Flow** - Name/slug step, designation selection, Stripe Checkout, post-payment school record creation (completed 2026-03-31)
 - [ ] **Phase 31: School Onboarding Flow** - 9-step onboarding wizard from welcome through review & submit
 - [ ] **Phase 32: School Settings** - Full settings area at /schools/[slug]/settings with sidebar navigation and all section pages
 - [ ] **Phase 33: Admin School Management** - Inbox tab updates, school detail/review page, approve/reject workflow, member profile integration
@@ -65,10 +65,10 @@ Plans:
   3. Continuing creates a Stripe Checkout session with annual subscription and signup fee per selected designation
   4. After successful payment a school record with status='pending' and linked school_designations rows exist in the database
   5. The teacher is redirected to the onboarding flow at /schools/[slug]/onboarding
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 30-01-PLAN.md — Server-side foundation: slug utility, check-slug API, Stripe Checkout action, webhook handler, success page
-- [ ] 30-02-PLAN.md — Multi-step registration wizard UI: name/slug step, designation selection with pricing, Stripe redirect
+- [x] 30-02-PLAN.md — Multi-step registration wizard UI: name/slug step, designation selection with pricing, Stripe redirect
 **UI hint**: yes
 
 ### Phase 31: School Onboarding Flow
@@ -141,7 +141,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 28. Database Foundation | 2/2 | Complete    | 2026-03-31 |
 | 29. Interest & Entry Points | 1/1 | Complete    | 2026-03-31 |
-| 30. School Registration Flow | 1/2 | In Progress|  |
+| 30. School Registration Flow | 2/2 | Complete   | 2026-03-31 |
 | 31. School Onboarding Flow | 0/TBD | Not started | - |
 | 32. School Settings | 0/TBD | Not started | - |
 | 33. Admin School Management | 0/TBD | Not started | - |
