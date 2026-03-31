@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 Phase: 16 of 21 (Database Foundation)
 Plan: —
 Status: Ready to plan
-Last activity: 2026-03-31 — Roadmap created for v1.9 Member Events (Phases 16-21)
+Last activity: 2026-03-31 - Completed quick task 260331-kp2: Fix TypeScript unknown→ReactNode error
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -78,6 +78,7 @@ None yet.
 | 260331-k2r | Extract Email Templates from System Settings into standalone page at /admin/settings/email-templates | 2026-03-31 | da39228 | [260331-k2r](./quick/260331-k2r-extract-email-templates-from-system-sett/) |
 | 260331-kdt | Chatbot UI improvements — toggle icon swap, bottom border radius, admin hiding, Help page with inline chat | 2026-03-31 | 8426ea3 | [260331-kdt](./quick/260331-kdt-chatbot-ui-improvements-toggle-icon-bord/) |
 | 260331-kil | Apply GOYA primary blue (#345c83) dark hero background to Dashboard, Events, Academy, Add-Ons pages | 2026-03-31 | 35bb518 | [260331-kil](./quick/260331-kil-apply-goya-primary-blue-background-to-he/) |
+| 260331-kp2 | Fix TypeScript build error: unknown not assignable to ReactNode in events edit page | 2026-03-31 | — | [260331-kp2](./quick/260331-kp2-fix-typescript-build-error-unknown-not-a/) |
 
 ## Session Continuity
 
