@@ -99,10 +99,10 @@ Plans:
   3. General section allows editing name, slug, and bio; changing name or slug triggers a re-review status banner
   4. All other sections (online presence, teaching info, location, faculty, designations, documents, subscription) are fully editable with appropriate controls
   5. When the school is pending_review a visible status banner is shown in the settings area
-**Plans:** 3 plans
+**Plans:** 2/3 plans complete
 Plans:
-- [ ] 32-01-PLAN.md — Settings shell + header dropdown + server actions
-- [ ] 32-02-PLAN.md — Settings pages: General, Online Presence, Teaching Info, Location
+- [x] 32-01-PLAN.md — Settings shell + header dropdown + server actions
+- [x] 32-02-PLAN.md — Settings pages: General, Online Presence, Teaching Info, Location
 - [ ] 32-03-PLAN.md — Settings pages: Faculty, Designations, Documents, Subscription
 **UI hint**: yes
 
@@ -150,8 +150,8 @@ Plans:
 | 28. Database Foundation | 2/2 | Complete    | 2026-03-31 |
 | 29. Interest & Entry Points | 1/1 | Complete    | 2026-03-31 |
 | 30. School Registration Flow | 2/2 | Complete   | 2026-03-31 |
-| 31. School Onboarding Flow | 2/3 | In Progress|  |
-| 32. School Settings | 0/3 | Not started | - |
+| 31. School Onboarding Flow | 3/3 | Complete    | 2026-03-31 |
+| 32. School Settings | 2/3 | In progress | - |
 | 33. Admin School Management | 0/TBD | Not started | - |
 | 34. Public School Profile | 0/TBD | Not started | - |
 | 35. Faculty Invitations | 0/TBD | Not started | - |
