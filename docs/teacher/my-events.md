@@ -77,6 +77,7 @@ You control the transition from **Draft** to **Pending Review** by clicking **Su
 | **Total Spots** | No | Shown when registration is required. Leave empty for unlimited capacity |
 | **Spots Remaining** | No | Shown when registration is required. Current availability |
 | **Event Website** | No | Link to an external event page or registration site |
+| **Organizers** | No | You are shown as the default organizer. Search and add up to 4 co-organizers from your connections. Each co-organizer appears as a removable chip. |
 | **Featured Image** | No | JPEG, PNG, or WebP, max 5 MB |
 
 The form requires **Title**, **Start Date**, and (unless **All Day Event** is checked) **Start Time** and **End Time** before the save or submit buttons become active.

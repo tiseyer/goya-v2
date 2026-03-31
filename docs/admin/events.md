@@ -98,7 +98,7 @@ Click the **Add New Event** button in the top-right corner. This opens `/admin/e
 | **Location** | Instructor, Location |
 | **Registration** | Registration Required toggle, Price (with free toggle), Total Spots (placeholder "Unlimited"), Spots Remaining, Event Website (always visible) |
 | **Details** | Description, Featured Image |
-| **Organizers** | Coming soon |
+| **Organizers** | You appear as the default organizer (non-removable). Search and add up to 4 additional co-organizers by name. Each appears as a removable avatar chip. Admins can search all members; non-admins search within their connections. |
 
 Admins and moderators can set status to Published, Draft, or Cancelled. Members creating events see only Draft and Pending Review options.
 
