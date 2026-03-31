@@ -420,11 +420,14 @@ export async function createFolder(params: {
   const supabase = getSupabaseService();
 
   // Determine next sort_order
-  const { data: existing } = await supabase
+  let sortQuery = supabase
     .from('media_folders')
     .select('sort_order')
-    .eq('bucket', params.bucket)
-    .is('parent_id', params.parentId ?? null)
+    .eq('bucket', params.bucket);
+  sortQuery = params.parentId
+    ? sortQuery.eq('parent_id', params.parentId)
+    : sortQuery.is('parent_id', null);
+  const { data: existing } = await sortQuery
     .order('sort_order', { ascending: false })
     .limit(1);
 
