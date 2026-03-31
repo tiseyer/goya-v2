@@ -75,9 +75,10 @@ None yet.
 | 260331-ihy | Restructure admin sidebar navigation with groups, dividers, inbox verifications | 2026-03-31 | 9ba0ddc | [260331-ihy](./quick/260331-ihy-restructure-admin-sidebar-navigation-wit/) |
 | 260331-j10 | Global layout width consistency — PageContainer + fix 8 pages to max-w-7xl | 2026-03-31 | cc297ae | [260331-j10](./quick/260331-j10-implement-global-layout-width-consistenc/) |
 | 260331-jpr | Apply PageContainer to missed legal pages and event detail page | 2026-03-31 | 3cac382 | [260331-jpr](./quick/260331-jpr-apply-pagecontainer-to-missed-legal-and-/) |
+| 260331-k2r | Extract Email Templates from System Settings into standalone page at /admin/settings/email-templates | 2026-03-31 | da39228 | [260331-k2r](./quick/260331-k2r-extract-email-templates-from-system-sett/) |
 
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Roadmap created for v1.9 — ready to run /gsd:plan-phase 16
+Stopped at: Completed quick task 260331-k2r — extract email templates to standalone page
 Resume file: None
