@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: Member-Events
 status: planning
-stopped_at: Defining requirements
+stopped_at: Roadmap created — ready to plan Phase 16
 last_updated: "2026-03-31"
 last_activity: 2026-03-31
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Defining requirements for v1.9 Member Events
+**Current focus:** Phase 16 — Database Foundation (v1.9 Member Events)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 16 of 21 (Database Foundation)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-31 — Milestone v1.9 started
+Status: Ready to plan
+Last activity: 2026-03-31 — Roadmap created for v1.9 Member Events (Phases 16-21)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -36,26 +36,17 @@ Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed: 1 (this milestone)
-- Average duration: ~5 min
-- Total execution time: ~5 min
+- Total plans completed: 0 (this milestone)
+- Average duration: —
+- Total execution time: —
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 12-encrypted-secrets-key-management P01 | 2 tasks | ~5 min | 3 files |
+| — | — | — | — |
 
 *Updated after each plan completion*
-| Phase 11-endpoints-documentation P01 | 8 | 2 tasks | 4 files |
-| Phase 13 P01 | 11 | 2 tasks | 6 files |
-| Phase 13 P02 | 6 | 2 tasks | 4 files |
-| Phase 13 P03 | 5 | 2 tasks | 4 files |
-| Phase 14 P01 | 10 | 2 tasks | 7 files |
-| Phase 14-ai-backend-streaming-chat-widget P02 | 215 | 2 tasks | 9 files |
-| Phase 14 P03 | 162 | 2 tasks | 3 files |
-| Phase 15-escalation-support-tickets-conversations-admin P01 | 12 | 2 tasks | 6 files |
-| Phase 15-escalation-support-tickets-conversations-admin P02 | 15 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -64,36 +55,14 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- v1.7: Third Party Keys tab at /admin/api-keys is a placeholder — Phase 12 activates it
-- v1.6: Per-route auth composition — /api/ excluded from middleware; chatbot route validates explicitly
-- v1.6: In-memory rate limiter sufficient for REST API — chatbot needs distributed (Upstash/Vercel KV)
-- [Phase 11-endpoints-documentation]: Static typed array for endpoint registry — no DB needed, endpoints are stable API surface
-- [Phase 11-endpoints-documentation]: No props on EndpointsTab — imports static data directly, simpler component API
-- [Phase 12-01]: listSecrets filters provider IS NULL — AI keys excluded from general secrets view; dedicated listAiProviderKeys for AI tab
-- [Phase 12-01]: seedSecrets no longer seeds ANTHROPIC_API_KEY — AI keys use dedicated createAiProviderKey flow
-- [Phase 12-02]: AiProvidersSection uses local formatRelative copy — not extracted to shared util (premature abstraction for 2 callers)
-- [Phase 12-02]: Provider disabled in edit mode — AI keys are immutable on provider field after creation
-- [Phase 13]: Service role only for chatbot_config and support_tickets — no RLS policies needed since these are admin-only
-- [Phase 13]: Auto-fetch Mattea avatar from GOYA CDN on first config save when avatar_url is null (ADMIN-04 one-time operation)
-- [Phase 13]: FAQ tab renders PlaceholderTab until Plan 03 wires FaqTab — avoids import cycle without stub complexity
-- [Phase 13]: FaqTab manages expandedId centrally, passing isExpanded/onExpand to FaqRow for single-row constraint enforcement at parent level
-- [Phase 14]: In-memory sliding window for chat rate limit (20/session/hr) — same pattern as REST API, no external deps
-- [Phase 14]: JSON-line streaming format — each line is JSON (type: token|done|error|escalation) terminated by newline
-- [Phase 14]: ChatWidget uses ssr:false dynamic import — client-side only, avoids SSR bundle cost
-- [Phase 14]: Session restore uses both localStorage (session ID) and cookie (anonymous ID) — localStorage for cross-navigation restore, cookie for server-side anonymous identity
-- [Phase 14]: AbortController used for in-flight stream cancellation on new chat/unmount — prevents state updates after panel teardown
-- [Phase 15]: Used 20260361 migration filename — 20260360 was already taken by health_monitor_log
-- [Phase 15]: replyToTicket only advances open→in_progress, never re-opens resolved tickets
-- [Phase 15]: updateEnabledTools always forces faq into tools array regardless of caller input
-- [Phase 15]: relativeDate helper copied per-file — consistent with SchoolRegistrationsTab pattern, no shared util
-- [Phase 15]: SupportTicketsTab fetches messages on-demand — avoids N+1 on initial inbox page load
+- v1.8: Chat route must run Node.js runtime — crypto required for AES-256-GCM decryption
+- v1.8: UUID cookie for guest sessions — no Supabase anon auth needed
+- v1.6: Per-route auth composition — /api/ excluded from middleware; each handler validates explicitly
+- v1.9: event_type distinguishes 'goya' vs 'member' — enables public calendar filter and admin column
 
 ### Blockers/Concerns
 
-- Phase 13: Supabase anonymous auth RLS pattern needs verification before schema is locked (anon sign-in JWT vs cookie UUID)
-- Phase 14: Distributed rate limiter choice (Upstash Redis vs Vercel KV) to resolve during planning
-- Phase 14: Chat route MUST run Node.js runtime (not Edge) — crypto module required for AES-256-GCM decryption
-- Phase 14: SECRETS_MASTER_KEY must never have NEXT_PUBLIC_ prefix — enforce in secrets service module
+None yet.
 
 ### Pending Todos
 
@@ -103,34 +72,12 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
-| 260327-l8q | Fix theme toggle buttons in navbar dropdown to span full width as segmented control | 2026-03-27 | 98430af | [260327-l8q](./quick/260327-l8q-fix-theme-toggle-buttons-in-navbar-dropd/) |
-| 260327-lpc | Remove label text from theme toggle — show icons only | 2026-03-27 | 6430dad | [260327-lpc](./quick/260327-lpc-remove-label-text-from-theme-toggle-show/) |
-| 260327-ldq | Implement MRN system - generation, storage, uniqueness, backfill | 2026-03-27 | 8938ce5 | [260327-ldq](./quick/260327-ldq-implement-mrn-system-generation-storage-/) |
-| 260327-nep | Admin MRN display and search fixes | 2026-03-27 | — | [260327-nep](./quick/260327-nep-admin-mrn-display-and-search-fixes/) |
-| 260329-rwg | Add live Vercel Analytics section to admin dashboard | 2026-03-29 | 2fd0a7b | [260329-rwg](./quick/260329-rwg-add-live-vercel-analytics-section-to-adm/) |
-| 260330-cwt | Fix overwrite mode — handle already-registered users gracefully in migration import | 2026-03-30 | 65e09ba | [260330-cwt](./quick/260330-cwt-fix-overwrite-mode-handle-already-regist/) |
-| 260330-ey9 | Fix chat widget visibility and add Maintenance tab to /admin/settings | 2026-03-30 | 4f80c10 | [260330-ey9](./quick/260330-ey9-fix-chat-widget-visibility-and-add-maint/) |
-| 260330-f5s | Fix Member Directory Search — replace mock data with real Supabase queries | 2026-03-30 | 144aeb0 | [260330-f5s](./quick/260330-f5s-fix-member-directory-search-showing-wron/) |
-| 260330-hch | Migration upload via Supabase Storage to bypass Vercel 4.5MB body limit | 2026-03-30 | 06cf491 | [260330-hch](./quick/260330-hch-migration-upload-via-supabase-storage-to/) |
-| 260330-gu2 | Add FAQ category field + seed 33 FAQs for Mattea chatbot | 2026-03-30 | ca59dc7 | [260330-gu2](./quick/260330-gu2-add-faq-category-field-and-seed-33-faqs-/) |
-| 260330-hva | Add category filter tabs to FAQ admin UI | 2026-03-30 | 7057ec5 | [260330-hva](./quick/260330-hva-add-category-filter-tabs-to-faq-admin-ui/) |
-| 260330-jew | Verify Google + Apple OAuth — no code changes, dashboard config needed | 2026-03-30 | — | [260330-jew](./quick/260330-jew-verify-and-fix-google-apple-oauth-redire/) |
-| 260330-mlx | Add live deployments branch switcher to admin dashboard | 2026-03-30 | b024d68 | [260330-mlx](./quick/260330-mlx-add-live-deployments-branch-switcher-to-/) |
-| 260330-nij | Fix member directory 1000-user hardcap and restore designation/style filter UI | 2026-03-30 | f406537 | [260330-nij](./quick/260330-nij-fix-member-directory-1000-user-hardcap-a/) |
-| 260330-ngh | Fix broken profile links across app — dropdown nav, messages, member directory all 404 | 2026-03-30 | ceddbd1 | [260330-ngh](./quick/260330-ngh-fix-broken-profile-links-across-app-drop/) |
-| 260330-naz | Fix impersonation — all data queries must respect impersonated user ID | 2026-03-30 | e847943 | [260330-naz](./quick/260330-naz-fix-impersonation-all-data-queries-must-/) |
-| 260330-o30 | GA4 and Clarity full tracking implementation | 2026-03-30 | d84dcb9 | [260330-o30](./quick/260330-o30-ga4-and-clarity-full-tracking-implementa/) |
-| 260330-oyn | Remove staticMembers lookup fallback in members detail page | 2026-03-30 | 0d2d87c | [260330-oyn](./quick/260330-oyn-remove-staticmembers-lookup-fallback-in-/) |
-| 260330-o9t | Stripe reconciliation analysis for WC users without Stripe sub IDs — script + WC data | 2026-03-30 | 3ab4391 | [260330-o9t](./quick/260330-o9t-stripe-reconciliation-analysis-for-875-w/) |
-| 260330-pwe | Change stripe-events cron schedule back to every 5 minutes | 2026-03-30 | 74cf79c | [260330-pwe](./quick/260330-pwe-change-stripe-events-cron-schedule-back-/) |
-| 260330-prz | Re-run Stripe recon with live key — 807 C2 (customer no subs), 4164 C (no customer) | 2026-03-30 | — | [260330-prz](./quick/260330-prz-re-run-stripe-reconciliation-with-live-k/) |
-| 260331-ijj | Fix build: commit untracked CreateUserButton.tsx to unblock Vercel deploy | 2026-03-31 | 985607b | [260331-ijj](./quick/260331-ijj-fix-build-commit-untracked-createuserbut/) |
 | 260331-ihy | Restructure admin sidebar navigation with groups, dividers, inbox verifications | 2026-03-31 | 9ba0ddc | [260331-ihy](./quick/260331-ihy-restructure-admin-sidebar-navigation-wit/) |
 | 260331-j10 | Global layout width consistency — PageContainer + fix 8 pages to max-w-7xl | 2026-03-31 | cc297ae | [260331-j10](./quick/260331-j10-implement-global-layout-width-consistenc/) |
 | 260331-jpr | Apply PageContainer to missed legal pages and event detail page | 2026-03-31 | 3cac382 | [260331-jpr](./quick/260331-jpr-apply-pagecontainer-to-missed-legal-and-/) |
 
 ## Session Continuity
 
-Last session: 2026-03-31T07:00:00Z
-Stopped at: Completed quick-260331-jpr: PageContainer on legal pages and event detail
+Last session: 2026-03-31
+Stopped at: Roadmap created for v1.9 — ready to run /gsd:plan-phase 16
 Resume file: None
