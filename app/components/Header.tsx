@@ -787,7 +787,7 @@ export default function Header() {
   const [profile, setProfile] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [maintenanceActive, setMaintenanceActive] = useState(false);
-  const [schoolId, setSchoolId] = useState<string | null>(null);
+  const [schoolSlug, setSchoolSlug] = useState<string | null>(null);
   const { isImpersonating, targetProfile, adminProfile } = useImpersonation();
 
   function checkMaintenance(role: string | undefined) {
@@ -824,8 +824,8 @@ export default function Header() {
             setAuthLoading(false);
             checkMaintenance(p?.role);
             if (p?.role === 'teacher') {
-              supabase.from('schools').select('id').eq('owner_id', data.user!.id).maybeSingle()
-                .then(({ data: s }: { data: { id: string } | null }) => setSchoolId(s?.id ?? null));
+              supabase.from('schools').select('slug').eq('owner_id', data.user!.id).maybeSingle()
+                .then(({ data: s }: { data: { slug: string } | null }) => setSchoolSlug(s?.slug ?? null));
             }
           });
       } else {
@@ -840,16 +840,16 @@ export default function Header() {
             setProfile(p);
             checkMaintenance(p?.role);
             if (p?.role === 'teacher') {
-              supabase.from('schools').select('id').eq('owner_id', session.user!.id).maybeSingle()
-                .then(({ data: s }: { data: { id: string } | null }) => setSchoolId(s?.id ?? null));
+              supabase.from('schools').select('slug').eq('owner_id', session.user!.id).maybeSingle()
+                .then(({ data: s }: { data: { slug: string } | null }) => setSchoolSlug(s?.slug ?? null));
             } else {
-              setSchoolId(null);
+              setSchoolSlug(null);
             }
           });
       } else {
         setProfile(null);
         setMaintenanceActive(false);
-        setSchoolId(null);
+        setSchoolSlug(null);
       }
     });
     return () => subscription.unsubscribe();
@@ -944,7 +944,7 @@ export default function Header() {
                   userRole={profile?.role}
                   userId={isImpersonating && targetProfile ? targetProfile.id : profile?.id}
                   userMemberType={isImpersonating && targetProfile ? (targetProfile.member_type ?? undefined) : profile?.member_type}
-                  userSchoolId={schoolId ?? undefined}
+                  userSchoolId={schoolSlug ?? undefined}
                   onLogout={handleLogout}
                   isImpersonating={isImpersonating}
                   adminName={adminProfile?.full_name ?? 'Admin'}
@@ -1123,8 +1123,8 @@ export default function Header() {
                 </Link>
               )}
               {!isImpersonating && profile?.role === 'teacher' && (
-                schoolId ? (
-                  <Link href={`/schools/${schoolId}/settings`} onClick={() => setProfileOpen(false)}
+                schoolSlug ? (
+                  <Link href={`/schools/${schoolSlug}/settings`} onClick={() => setProfileOpen(false)}
                     className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
                   >
                     School Settings
