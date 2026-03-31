@@ -8,7 +8,15 @@ import MediaPageClient from './MediaPageClient';
 export default async function AdminMediaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ folder?: string; view?: string }>;
+  searchParams: Promise<{
+    folder?: string;
+    view?: string;
+    q?: string;
+    type?: string;
+    date?: string;
+    by?: string;
+    sort?: string;
+  }>;
 }) {
   const [initialFolders, sp] = await Promise.all([
     getFolders(),
@@ -20,6 +28,11 @@ export default async function AdminMediaPage({
       initialFolders={initialFolders}
       folder={sp.folder}
       view={sp.view}
+      q={sp.q}
+      type={sp.type}
+      date={sp.date}
+      by={sp.by}
+      sort={sp.sort}
     />
   );
 }
