@@ -5,6 +5,7 @@ import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
 import { getStripe } from '@/lib/stripe/client'
 import { getSupabaseService } from '@/lib/supabase/service'
 import type { SupportTicket, TicketStatus } from '@/lib/chatbot/types'
+import { writeEventAuditLog } from '@/lib/events/audit'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -489,16 +490,13 @@ export async function approveEvent(
   }
 
   // 4. Write event_audit_log entry
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (serviceClient as any)
-    .from('event_audit_log')
-    .insert({
-      event_id: eventId,
-      action: 'status_changed',
-      performed_by: user.id,
-      performed_by_role: adminProfile.role,
-      changes: { old_status: 'pending_review', new_status: 'published' },
-    })
+  await writeEventAuditLog({
+    event_id: eventId,
+    action: 'status_changed',
+    performed_by: user.id,
+    performed_by_role: adminProfile.role,
+    changes: { old_status: 'pending_review', new_status: 'published' },
+  })
 
   // 5. Revalidate
   revalidatePath('/admin/inbox')
@@ -565,16 +563,13 @@ export async function rejectEvent(
   }
 
   // 5. Write event_audit_log entry
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (serviceClient as any)
-    .from('event_audit_log')
-    .insert({
-      event_id: eventId,
-      action: 'status_changed',
-      performed_by: user.id,
-      performed_by_role: adminProfile.role,
-      changes: { old_status: 'pending_review', new_status: 'rejected', rejection_reason: reason.trim() },
-    })
+  await writeEventAuditLog({
+    event_id: eventId,
+    action: 'status_changed',
+    performed_by: user.id,
+    performed_by_role: adminProfile.role,
+    changes: { old_status: 'pending_review', new_status: 'rejected', rejection_reason: reason.trim() },
+  })
 
   // 6. Revalidate
   revalidatePath('/admin/inbox')

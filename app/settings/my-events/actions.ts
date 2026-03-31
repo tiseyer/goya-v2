@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
+import { writeEventAuditLog } from '@/lib/events/audit';
 
 const ALLOWED_ROLES = ['teacher', 'wellness_practitioner', 'admin'];
 
@@ -22,23 +23,6 @@ async function getAuthenticatedUser() {
   if (!ALLOWED_ROLES.includes(profile.role)) throw new Error('Unauthorized role');
 
   return { user, profile };
-}
-
-async function writeAuditLog(
-  eventId: string,
-  action: string,
-  performedBy: string,
-  performedByRole: string,
-  changes: Record<string, unknown> = {},
-) {
-  const service = getSupabaseService() as any;
-  await service.from('event_audit_log').insert({
-    event_id: eventId,
-    action,
-    performed_by: performedBy,
-    performed_by_role: performedByRole,
-    changes,
-  });
 }
 
 export interface MemberEventFormData {
@@ -85,9 +69,12 @@ export async function createMemberEvent(formData: MemberEventFormData) {
 
   if (error) return { success: false, error: error.message };
 
-  await writeAuditLog(data.id, 'created', user.id, profile.role, {
-    title: formData.title,
-    status: formData.status,
+  await writeEventAuditLog({
+    event_id: data.id,
+    action: 'created',
+    performed_by: user.id,
+    performed_by_role: profile.role,
+    changes: { title: formData.title, status: formData.status },
   });
 
   revalidatePath('/settings/my-events');
@@ -141,10 +128,12 @@ export async function updateMemberEvent(eventId: string, formData: MemberEventFo
 
   if (error) return { success: false, error: error.message };
 
-  await writeAuditLog(eventId, 'edited', user.id, profile.role, {
-    previous_status: existing.status,
-    new_status: formData.status,
-    title: formData.title,
+  await writeEventAuditLog({
+    event_id: eventId,
+    action: 'edited',
+    performed_by: user.id,
+    performed_by_role: profile.role,
+    changes: { previous_status: existing.status, new_status: formData.status, title: formData.title },
   });
 
   revalidatePath('/settings/my-events');
@@ -174,9 +163,12 @@ export async function submitEventForReview(eventId: string) {
 
   if (error) return { success: false, error: error.message };
 
-  await writeAuditLog(eventId, 'status_changed', user.id, profile.role, {
-    previous_status: 'draft',
-    new_status: 'pending_review',
+  await writeEventAuditLog({
+    event_id: eventId,
+    action: 'status_changed',
+    performed_by: user.id,
+    performed_by_role: profile.role,
+    changes: { previous_status: 'draft', new_status: 'pending_review' },
   });
 
   revalidatePath('/settings/my-events');
@@ -203,8 +195,12 @@ export async function deleteMemberEvent(eventId: string) {
 
   if (error) return { success: false, error: error.message };
 
-  await writeAuditLog(eventId, 'deleted', user.id, profile.role, {
-    previous_status: existing.status,
+  await writeEventAuditLog({
+    event_id: eventId,
+    action: 'deleted',
+    performed_by: user.id,
+    performed_by_role: profile.role,
+    changes: { previous_status: existing.status },
   });
 
   revalidatePath('/settings/my-events');

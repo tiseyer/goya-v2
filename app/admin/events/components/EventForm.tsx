@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import type { Event } from '@/lib/types';
+import { logAdminEventAction } from '@/app/admin/events/actions';
 
 const CATEGORIES = ['Workshop', 'Teacher Training', 'Dharma Talk', 'Conference', 'Yoga Sequence', 'Music Playlist', 'Research'] as const;
 const FORMATS    = ['Online', 'In Person', 'Hybrid'] as const;
@@ -114,9 +115,13 @@ export default function EventForm({ event }: Props) {
       if (isEdit) {
         const { error } = await supabase.from('events').update(payload).eq('id', event.id);
         if (error) throw new Error(error.message);
+        await logAdminEventAction(event.id, 'edited', { title: payload.title, status: payload.status });
       } else {
-        const { error } = await supabase.from('events').insert(payload);
+        const { data: inserted, error } = await supabase.from('events').insert(payload).select('id').single();
         if (error) throw new Error(error.message);
+        if (inserted) {
+          await logAdminEventAction(inserted.id, 'created', { title: payload.title, status: payload.status });
+        }
       }
 
       router.push('/admin/events');

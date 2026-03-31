@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { logAdminEventAction } from '@/app/admin/events/actions';
 
 interface Props {
   eventId:   string;
@@ -27,6 +28,7 @@ export default function AdminEventActions({ eventId, imageUrl, isDeleted, userRo
       .update({ status: 'deleted', deleted_at: new Date().toISOString() })
       .eq('id', eventId);
     if (dbErr) { setError(dbErr.message); setBusy(false); return; }
+    await logAdminEventAction(eventId, 'deleted', { previous_status: 'active' });
     router.refresh();
   }
 
@@ -39,6 +41,7 @@ export default function AdminEventActions({ eventId, imageUrl, isDeleted, userRo
       .update({ status: 'draft', deleted_at: null })
       .eq('id', eventId);
     if (dbErr) { setError(dbErr.message); setBusy(false); return; }
+    await logAdminEventAction(eventId, 'status_changed', { old_status: 'deleted', new_status: 'draft' });
     router.refresh();
   }
 
