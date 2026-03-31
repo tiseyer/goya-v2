@@ -1,16 +1,19 @@
+import PageContainer from '@/app/components/ui/PageContainer'
+
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="bg-primary-dark pt-24 pb-14 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="bg-primary-dark pt-24 pb-14">
+        <PageContainer>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">Terms of Use</h1>
           <p className="text-primary-200 text-lg">Last updated: March 2026</p>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Content */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-14 pb-24">
+      <PageContainer className="py-14 pb-24">
+        <div className="max-w-3xl mx-auto">
         <div className="space-y-10">
 
           <section className="space-y-4">
@@ -98,7 +101,8 @@ export default function TermsPage() {
           </section>
 
         </div>
-      </div>
+        </div>
+      </PageContainer>
     </div>
   );
 }
