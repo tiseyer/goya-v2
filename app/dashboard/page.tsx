@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { useImpersonation } from '@/app/context/ImpersonationContext';
 import FeedView from './FeedView';
 import PageHero from '@/app/components/PageHero';
+import SchoolRegistrationCTA from '@/app/components/SchoolRegistrationCTA';
 
 // ─── Profile completion ───────────────────────────────────────────────────────
 
@@ -31,6 +32,8 @@ interface ProfileData {
   youtube?: string | null
   avatar_url?: string | null
   role?: string | null
+  member_type?: string | null
+  principal_trainer_school_id?: string | null
 }
 
 function getCompletion(profile: ProfileData | null) {
@@ -291,6 +294,11 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
+
+            {/* School Registration CTA — teachers without a school */}
+            {profile?.member_type === 'teacher' && !profile?.principal_trainer_school_id && (
+              <SchoolRegistrationCTA variant="sidebar" />
+            )}
 
           </div>
         </div>
