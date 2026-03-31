@@ -1879,6 +1879,7 @@ export type Database = {
           designations: string[] | null
           email: string | null
           facebook: string | null
+          faculty_school_ids: string[] | null
           first_name: string | null
           full_name: string | null
           id: string
@@ -1899,6 +1900,7 @@ export type Database = {
           other_org_registration: string | null
           phone: string | null
           practice_format: string | null
+          principal_trainer_school_id: string | null
           requires_password_reset: boolean
           role: Database["public"]["Enums"]["user_role"]
           stripe_customer_id: string | null
@@ -1936,6 +1938,7 @@ export type Database = {
           designations?: string[] | null
           email?: string | null
           facebook?: string | null
+          faculty_school_ids?: string[] | null
           first_name?: string | null
           full_name?: string | null
           id: string
@@ -1956,6 +1959,7 @@ export type Database = {
           other_org_registration?: string | null
           phone?: string | null
           practice_format?: string | null
+          principal_trainer_school_id?: string | null
           requires_password_reset?: boolean
           role?: Database["public"]["Enums"]["user_role"]
           stripe_customer_id?: string | null
@@ -1993,6 +1997,7 @@ export type Database = {
           designations?: string[] | null
           email?: string | null
           facebook?: string | null
+          faculty_school_ids?: string[] | null
           first_name?: string | null
           full_name?: string | null
           id?: string
@@ -2013,6 +2018,7 @@ export type Database = {
           other_org_registration?: string | null
           phone?: string | null
           practice_format?: string | null
+          principal_trainer_school_id?: string | null
           requires_password_reset?: boolean
           role?: Database["public"]["Enums"]["user_role"]
           stripe_customer_id?: string | null
@@ -2038,74 +2044,321 @@ export type Database = {
           youtube?: string | null
           youtube_intro_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_principal_trainer_school_id_fkey"
+            columns: ["principal_trainer_school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_designations: {
+        Row: {
+          activated_at: string | null
+          annual_fee_amount: number | null
+          cancelled_at: string | null
+          created_at: string
+          designation_type: string
+          id: string
+          school_id: string
+          signup_fee_amount: number | null
+          signup_fee_paid: boolean | null
+          status: string
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          annual_fee_amount?: number | null
+          cancelled_at?: string | null
+          created_at?: string
+          designation_type: string
+          id?: string
+          school_id: string
+          signup_fee_amount?: number | null
+          signup_fee_paid?: boolean | null
+          status?: string
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          annual_fee_amount?: number | null
+          cancelled_at?: string | null
+          created_at?: string
+          designation_type?: string
+          id?: string
+          school_id?: string
+          signup_fee_amount?: number | null
+          signup_fee_paid?: boolean | null
+          status?: string
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_designations_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_faculty: {
+        Row: {
+          created_at: string
+          id: string
+          invite_token: string | null
+          invited_email: string | null
+          is_principal_trainer: boolean | null
+          position: string | null
+          profile_id: string | null
+          school_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_token?: string | null
+          invited_email?: string | null
+          is_principal_trainer?: boolean | null
+          position?: string | null
+          profile_id?: string | null
+          school_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_token?: string | null
+          invited_email?: string | null
+          is_principal_trainer?: boolean | null
+          position?: string | null
+          profile_id?: string | null
+          school_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_faculty_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_faculty_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_verification_documents: {
+        Row: {
+          created_at: string
+          designation_id: string | null
+          document_type: string
+          file_name: string | null
+          file_size: number | null
+          file_url: string
+          id: string
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          school_id: string
+          status: string
+          uploaded_at: string
+        }
+        Insert: {
+          created_at?: string
+          designation_id?: string | null
+          document_type: string
+          file_name?: string | null
+          file_size?: number | null
+          file_url: string
+          id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_id: string
+          status?: string
+          uploaded_at?: string
+        }
+        Update: {
+          created_at?: string
+          designation_id?: string | null
+          document_type?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_id?: string
+          status?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_verification_documents_designation_id_fkey"
+            columns: ["designation_id"]
+            isOneToOne: false
+            referencedRelation: "school_designations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_verification_documents_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       schools: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
+          bio: string | null
           city: string | null
           country: string | null
+          course_delivery_format: string | null
+          cover_image_url: string | null
           created_at: string | null
           description: string | null
+          established_year: number | null
           facebook: string | null
           id: string
           instagram: string | null
           is_featured: boolean | null
+          is_insured: boolean | null
+          languages: string[] | null
+          lineage: string | null
+          location_address: string | null
+          location_city: string | null
+          location_country: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_place_id: string | null
           logo_url: string | null
           name: string
+          onboarding_completed: boolean | null
+          onboarding_completed_at: string | null
           owner_id: string
+          practice_styles: string[] | null
+          programs_offered: string[] | null
           rejection_reason: string | null
+          short_bio: string | null
           slug: string | null
           state: string | null
           status: string | null
           street_address: string | null
           tiktok: string | null
           updated_at: string | null
+          video_platform: string | null
+          video_url: string | null
           website: string | null
           youtube: string | null
           zip: string | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bio?: string | null
           city?: string | null
           country?: string | null
+          course_delivery_format?: string | null
+          cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
+          established_year?: number | null
           facebook?: string | null
           id?: string
           instagram?: string | null
           is_featured?: boolean | null
+          is_insured?: boolean | null
+          languages?: string[] | null
+          lineage?: string | null
+          location_address?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_place_id?: string | null
           logo_url?: string | null
           name: string
+          onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
           owner_id: string
+          practice_styles?: string[] | null
+          programs_offered?: string[] | null
           rejection_reason?: string | null
+          short_bio?: string | null
           slug?: string | null
           state?: string | null
           status?: string | null
           street_address?: string | null
           tiktok?: string | null
           updated_at?: string | null
+          video_platform?: string | null
+          video_url?: string | null
           website?: string | null
           youtube?: string | null
           zip?: string | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bio?: string | null
           city?: string | null
           country?: string | null
+          course_delivery_format?: string | null
+          cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
+          established_year?: number | null
           facebook?: string | null
           id?: string
           instagram?: string | null
           is_featured?: boolean | null
+          is_insured?: boolean | null
+          languages?: string[] | null
+          lineage?: string | null
+          location_address?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_place_id?: string | null
           logo_url?: string | null
           name?: string
+          onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
           owner_id?: string
+          practice_styles?: string[] | null
+          programs_offered?: string[] | null
           rejection_reason?: string | null
+          short_bio?: string | null
           slug?: string | null
           state?: string | null
           status?: string | null
           street_address?: string | null
           tiktok?: string | null
           updated_at?: string | null
+          video_platform?: string | null
+          video_url?: string | null
           website?: string | null
           youtube?: string | null
           zip?: string | null
