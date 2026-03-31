@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
@@ -59,10 +59,11 @@ const STEPS = [
 const INPUT = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#345c83]/20 focus:border-[#345c83] transition-colors';
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide';
 
-// ─── page ──────────────────────────────────────────────────────────────────────
+// ─── inner component (uses useSearchParams — requires Suspense boundary) ──────
 
-export default function RegisterPage() {
+function RegisterPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(1);
   const [role, setRole] = useState<Role | null>(null);
   const [error, setError] = useState('');
@@ -70,6 +71,10 @@ export default function RegisterPage() {
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', password: '', country: '', agreed: false,
   });
+
+  // Read invite params from URL (e.g. /register?school=zen-yoga&invite=<token>)
+  const inviteSchool = searchParams.get('school');
+  const inviteToken = searchParams.get('invite');
 
   useEffect(() => {
     if (step === 3) {
@@ -90,7 +95,7 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?role=${role}`,
+        redirectTo: `${window.location.origin}/auth/callback?role=${role}${inviteToken ? `&invite=${inviteToken}` : ''}${inviteSchool ? `&school=${inviteSchool}` : ''}`,
       },
     })
     if (error) setError(error.message)
@@ -376,6 +381,18 @@ export default function RegisterPage() {
                           const { trackSignUp } = await import('@/lib/analytics/tracking');
                           trackSignUp();
                         } catch { /* analytics non-critical */ }
+                        // Claim faculty invite if present (non-critical)
+                        if (inviteToken) {
+                          try {
+                            await fetch('/api/faculty-invite/claim', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ invite_token: inviteToken }),
+                            });
+                          } catch {
+                            // Non-critical — user can be linked manually
+                          }
+                        }
                         setStep(3);
                       }}
                       className="flex-1 bg-[#345c83] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[#1e3a52] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
@@ -448,5 +465,20 @@ export default function RegisterPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// ─── page ─────────────────────────────────────────────────────────────────────
+// Wrap in Suspense — required because RegisterPageInner uses useSearchParams()
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen flex items-center justify-center bg-[#f8f9fa]">
+        <div className="w-8 h-8 border-2 border-[#345c83] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <RegisterPageInner />
+    </Suspense>
   );
 }
