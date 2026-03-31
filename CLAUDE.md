@@ -1,3 +1,25 @@
+## Documentation
+
+After completing ANY task (quick task, milestone phase, or bug fix), you MUST:
+
+1. Identify which features were added, changed, or removed
+2. Find the corresponding `docs/` files for those features using the audience mapping below
+3. Update those files accurately — check the actual code, do not guess
+4. Update the `last_updated` frontmatter date on any changed file
+5. If a new feature has no docs file yet, create one in the correct audience folder
+6. Regenerate the search index: `npm run docs:index`
+7. Commit doc changes in the same commit as the feature, or immediately after
+8. Never skip this step — documentation is part of done
+
+**Audience mapping:**
+- Admin backend changes → `docs/admin/`
+- Moderator workflow changes → `docs/moderator/`
+- User settings / member features → `docs/teacher/` and/or `docs/student/`
+- API / DB / architecture changes → `docs/developer/`
+- Changes affecting multiple roles → update all relevant files
+
+Do NOT document internal implementation details in user-facing docs. Keep admin/moderator/teacher/student docs focused on **how to use** the feature, not how it is built.
+
 ## Logging & Activity Tracking
 
 ### On errors or unexpected behavior

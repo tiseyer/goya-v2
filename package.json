@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "docs:index": "tsx scripts/generate-docs-index.ts",
+    "prebuild": "tsx scripts/generate-docs-index.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
@@ -34,7 +36,9 @@
     "openai": "^6.33.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-markdown": "^10.1.0",
     "recharts": "3.8.0",
+    "remark-gfm": "^4.0.1",
     "resend": "^6.9.4",
     "stripe": "^20.4.1",
     "zustand": "^5.0.12"
