@@ -131,7 +131,10 @@ Plans:
   2. The hero section shows logo, school name, designation badges, and location or "Online School"
   3. The body shows about text, practice styles, programs, languages, lineage, video on the left, and a sidebar with school details and faculty on the right
   4. The member directory has a School filter type; school cards show logo and designation badges
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 34-01-PLAN.md — Public school profile page with hero, body, sidebar, faculty links
+- [ ] 34-02-PLAN.md — Member directory integration: fetchMembers with schools, SchoolCard component
 **UI hint**: yes
 
 ### Phase 35: Faculty Invitations
@@ -156,5 +159,5 @@ Plans:
 | 31. School Onboarding Flow | 3/3 | Complete    | 2026-03-31 |
 | 32. School Settings | 3/3 | Complete    | 2026-03-31 |
 | 33. Admin School Management | 2/2 | Complete    | 2026-03-31 |
-| 34. Public School Profile | 0/TBD | Not started | - |
+| 34. Public School Profile | 0/2 | Not started | - |
 | 35. Faculty Invitations | 0/TBD | Not started | - |
