@@ -62,6 +62,7 @@ export default function AcademyPage() {
   const [userId,         setUserId]         = useState<string | null>(null);
   const [loading,        setLoading]        = useState(true);
   const [categoryFilter, setCategoryFilter] = useState<'All' | CourseCategory>('All');
+  const [typeFilter,     setTypeFilter]     = useState<'all' | 'goya' | 'member'>('all');
   const [progressFilter, setProgressFilter] = useState<ProgressFilter>('All');
 
   useEffect(() => {
@@ -101,12 +102,13 @@ export default function AcademyPage() {
   const filtered = useMemo(() => {
     return courses.filter(c => {
       if (categoryFilter !== 'All' && c.category !== categoryFilter) return false;
+      if (typeFilter !== 'all' && c.course_type !== typeFilter) return false;
       if (progressFilter === 'My Courses')  return enrolledIds.has(c.id);
       if (progressFilter === 'In Progress') { const p = progressMap[c.id]; return !!p && p.status === 'in_progress'; }
       if (progressFilter === 'Completed')   { const p = progressMap[c.id]; return !!p && p.status === 'completed'; }
       return true;
     });
-  }, [courses, categoryFilter, progressFilter, enrolledIds, progressMap]);
+  }, [courses, categoryFilter, typeFilter, progressFilter, enrolledIds, progressMap]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -143,6 +145,24 @@ export default function AcademyPage() {
             <span className="ml-auto text-sm text-slate-400">
               <span className="font-semibold text-slate-700">{filtered.length}</span> course{filtered.length !== 1 ? 's' : ''}
             </span>
+          </div>
+
+          {/* Type filter row */}
+          <div className="py-2.5 flex flex-wrap gap-2 items-center border-b border-slate-100">
+            <span className="text-xs text-slate-400 font-medium">Type:</span>
+            {([['all', 'All Courses'], ['goya', 'GOYA Courses'], ['member', 'Member Courses']] as const).map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setTypeFilter(key)}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${
+                  typeFilter === key
+                    ? 'bg-primary-dark text-white border-[#1B3A5C]'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
           {/* Progress filter row — only when logged in */}
