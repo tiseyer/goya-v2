@@ -404,27 +404,25 @@ export async function createBillingPortalSession(
   const result = await getOwnedSchool(schoolSlug)
   if ('error' in result) return result
 
-  const { school } = result
+  const { userId } = result
   const supabase = await createSupabaseServerActionClient()
 
-  // Fetch the Stripe customer ID from the school's active designation
+  // Fetch the Stripe customer ID from the school owner's profile
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: designation } = await (supabase as any)
-    .from('school_designations')
+  const { data: profile } = await (supabase as any)
+    .from('profiles')
     .select('stripe_customer_id')
-    .eq('school_id', school.id)
-    .not('stripe_customer_id', 'is', null)
-    .limit(1)
+    .eq('id', userId)
     .maybeSingle()
 
-  if (!designation?.stripe_customer_id) {
+  if (!profile?.stripe_customer_id) {
     return { error: 'No billing account found for this school' }
   }
 
   try {
     const { getStripe } = await import('@/lib/stripe/client')
     const session = await getStripe().billingPortal.sessions.create({
-      customer: designation.stripe_customer_id,
+      customer: profile.stripe_customer_id,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/schools/${schoolSlug}/settings/subscription`,
     })
     return { url: session.url }
