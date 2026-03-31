@@ -430,7 +430,7 @@ export default function FolderSidebar({
         className="h-full flex-shrink-0 bg-white border-r border-slate-200 flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out"
       >
         {/* Header */}
-        <div className="flex items-center h-12 px-2 border-b border-slate-200 shrink-0">
+        <div className="flex items-center h-14 px-2 border-b border-slate-200 shrink-0">
           <button
             onClick={onCollapse}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary hover:bg-primary-50 transition-colors cursor-pointer shrink-0"
