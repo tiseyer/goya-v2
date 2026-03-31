@@ -1,27 +1,20 @@
----
-task: 260331-my2
-date: 2026-03-31
-status: completed
----
-
 # Quick Task: Fix Hero Layout on Detail Pages
+
+**Date:** 2026-03-31
+**Status:** Complete
+**Task ID:** 260331-my2
 
 ## Description
 
-Fixed hero layout on three detail pages (event, course, member profile) to be left-aligned with increased spacing, larger titles, and consistent structure.
-
-## Status
-
-Completed
+Fix the hero layout on event detail, course detail, and member profile pages: left-align all hero content, increase vertical spacing between elements, bump H1 titles to text-4xl md:text-5xl, and establish consistent structure (back link > pills > H1 > meta info).
 
 ## Solution
 
-**Files modified:**
+- **app/events/[id]/page.tsx** — Image hero and gradient hero both updated: title to `text-4xl md:text-5xl`, date meta line added after H1, spacing increased between back link/pills/title
+- **app/academy/[id]/page.tsx** — Back link gap `mb-2`→`mb-4`, pills `mb-2`→`mb-3`, title to `text-4xl md:text-5xl`, instructor + duration meta line added
+- **app/members/[id]/page.tsx** — Removed mobile `text-center`, all hero text left-aligned with `items-start` and `text-left`, title to `text-4xl md:text-5xl`
 
-- `app/events/[id]/page.tsx` — Image hero: bumped title to `text-4xl md:text-5xl`, added date meta line, tightened back link gap. Gradient hero: pills `mb-4`→`mb-3`, title updated to `md:text-5xl`.
-- `app/academy/[id]/page.tsx` — Back link `mb-2`→`mb-4`, pills `mb-2`→`mb-3`, title `text-3xl sm:text-4xl`→`text-4xl md:text-5xl`, instructor + duration meta line added.
-- `app/members/[id]/page.tsx` — All hero text left-aligned (removed text-center/justify-center), title `text-3xl sm:text-4xl lg:text-5xl`→`text-4xl md:text-5xl`, location meta `mt-2`→`mt-1`.
+## Commits
 
-**Commits:**
-- `43354ed` — event + course heroes
-- `5bbb045` — member profile hero
+- `43354ed` feat(quick-260331-my2): fix event and course detail hero spacing, title size, meta line
+- `5bbb045` feat(quick-260331-my2): left-align member profile hero and bump title size
