@@ -134,15 +134,19 @@ export default function MyEventsClient({ initialEvents }: Props) {
         category: formData.category,
         format: formData.format,
         date: formData.date,
-        time_start: formData.time_start,
-        time_end: formData.time_end,
+        end_date: formData.end_date,
+        all_day: formData.all_day,
+        time_start: formData.all_day ? null : formData.time_start,
+        time_end: formData.all_day ? null : formData.time_end,
         instructor: formData.instructor,
         location: formData.location,
         description: formData.description,
         price: formData.is_free ? 0 : (formData.price ?? 0),
         is_free: formData.is_free,
+        registration_required: formData.registration_required,
         spots_total: formData.spots_total,
         spots_remaining: formData.spots_remaining,
+        website_url: formData.website_url,
         featured_image_url: imageUrl,
         status,
       };
@@ -403,6 +407,8 @@ interface FormValues {
   category: string;
   format: string;
   date: string;
+  end_date: string | null;
+  all_day: boolean;
   time_start: string;
   time_end: string;
   instructor: string;
@@ -410,8 +416,10 @@ interface FormValues {
   description: string;
   price: number;
   is_free: boolean;
+  registration_required: boolean;
   spots_total: number | null;
   spots_remaining: number | null;
+  website_url: string | null;
   featured_image_url: string | null;
   _imageFile?: File;
   _removeImage?: boolean;
@@ -435,6 +443,8 @@ function MemberEventForm({
   const [category, setCategory] = useState<EventCategory>(event?.category ?? 'Workshop');
   const [format, setFormat] = useState<EventFormat>(event?.format ?? 'Online');
   const [date, setDate] = useState(event?.date ?? '');
+  const [endDate, setEndDate] = useState(event?.end_date ?? '');
+  const [allDay, setAllDay] = useState(event?.all_day ?? false);
   const [timeStart, setTimeStart] = useState(event?.time_start?.slice(0, 5) ?? '');
   const [timeEnd, setTimeEnd] = useState(event?.time_end?.slice(0, 5) ?? '');
   const [instructor, setInstructor] = useState(event?.instructor ?? '');
@@ -444,6 +454,8 @@ function MemberEventForm({
   const [isFree, setIsFree] = useState(event?.is_free ?? false);
   const [spotsTotal, setSpotsTotal] = useState(String(event?.spots_total ?? ''));
   const [spotsRem, setSpotsRem] = useState(String(event?.spots_remaining ?? ''));
+  const [registrationRequired, setRegistrationRequired] = useState(event?.registration_required ?? false);
+  const [websiteUrl, setWebsiteUrl] = useState(event?.website_url ?? '');
 
   const [currentImageUrl, setCurrentImageUrl] = useState(event?.featured_image_url ?? null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -474,6 +486,8 @@ function MemberEventForm({
       category,
       format,
       date,
+      end_date: endDate || null,
+      all_day: allDay,
       time_start: timeStart,
       time_end: timeEnd,
       instructor: instructor.trim(),
@@ -481,8 +495,10 @@ function MemberEventForm({
       description: description.trim(),
       price: isFree ? 0 : parseFloat(price) || 0,
       is_free: isFree,
+      registration_required: registrationRequired,
       spots_total: spotsTotal ? parseInt(spotsTotal, 10) : null,
       spots_remaining: spotsRem ? parseInt(spotsRem, 10) : null,
+      website_url: websiteUrl.trim() || null,
       featured_image_url: removeImage ? null : (imageFile ? null : currentImageUrl),
       _imageFile: imageFile ?? undefined,
       _removeImage: removeImage,
@@ -518,19 +534,44 @@ function MemberEventForm({
         </div>
 
         {/* Date / Start / End */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className={LABEL}>Date *</label>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} className={INPUT} required />
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={LABEL}>Start Date *</label>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} className={INPUT} required />
+            </div>
+            <div>
+              <label className={LABEL}>End Date</label>
+              <input
+                type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+                className={INPUT} placeholder="Optional"
+                min={date || undefined}
+              />
+            </div>
           </div>
-          <div>
-            <label className={LABEL}>Start Time *</label>
-            <input type="time" value={timeStart} onChange={e => setTimeStart(e.target.value)} className={INPUT} required />
-          </div>
-          <div>
-            <label className={LABEL}>End Time *</label>
-            <input type="time" value={timeEnd} onChange={e => setTimeEnd(e.target.value)} className={INPUT} required />
-          </div>
+
+          {/* All Day toggle */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox" checked={allDay} onChange={e => setAllDay(e.target.checked)}
+              className="w-4 h-4 rounded accent-[#4E87A0]"
+            />
+            <span className="text-sm text-[#374151]">All day event</span>
+          </label>
+
+          {/* Time fields — hidden when all-day */}
+          {!allDay && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={LABEL}>Start Time *</label>
+                <input type="time" value={timeStart} onChange={e => setTimeStart(e.target.value)} className={INPUT} required />
+              </div>
+              <div>
+                <label className={LABEL}>End Time *</label>
+                <input type="time" value={timeEnd} onChange={e => setTimeEnd(e.target.value)} className={INPUT} required />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Instructor / Location */}
@@ -555,48 +596,71 @@ function MemberEventForm({
           />
         </div>
 
-        {/* Price */}
-        <div className="space-y-2">
-          <label className={LABEL}>Price</label>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox" checked={isFree} onChange={e => setIsFree(e.target.checked)}
-                className="w-4 h-4 rounded accent-[#4E87A0]"
-              />
-              <span className="text-sm text-[#374151]">This event is free</span>
-            </label>
-          </div>
-          {!isFree && (
-            <div className="relative max-w-[180px]">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] text-sm">$</span>
-              <input
-                type="number" min="0" step="0.01" value={price}
-                onChange={e => setPrice(e.target.value)}
-                className={`${INPUT} pl-7`} placeholder="0.00"
-              />
-            </div>
-          )}
-        </div>
+        {/* Registration Required toggle */}
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox" checked={registrationRequired} onChange={e => setRegistrationRequired(e.target.checked)}
+            className="w-4 h-4 rounded accent-[#4E87A0]"
+          />
+          <span className="text-sm text-[#374151]">Registration required</span>
+        </label>
 
-        {/* Spots */}
-        <div className="grid grid-cols-2 gap-4 max-w-xs">
-          <div>
-            <label className={LABEL}>Total Spots</label>
-            <input
-              type="number" min="0" value={spotsTotal}
-              onChange={e => setSpotsTotal(e.target.value)}
-              className={INPUT} placeholder="--"
-            />
+        {/* Price / Spots — only shown when registration is required */}
+        {registrationRequired && (
+          <div className="space-y-4">
+            {/* Price */}
+            <div className="space-y-2">
+              <label className={LABEL}>Price</label>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox" checked={isFree} onChange={e => setIsFree(e.target.checked)}
+                    className="w-4 h-4 rounded accent-[#4E87A0]"
+                  />
+                  <span className="text-sm text-[#374151]">This event is free</span>
+                </label>
+              </div>
+              {!isFree && (
+                <div className="relative max-w-[180px]">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] text-sm">$</span>
+                  <input
+                    type="number" min="0" step="0.01" value={price}
+                    onChange={e => setPrice(e.target.value)}
+                    className={`${INPUT} pl-7`} placeholder="0.00"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Spots */}
+            <div className="grid grid-cols-2 gap-4 max-w-xs">
+              <div>
+                <label className={LABEL}>Total Spots</label>
+                <input
+                  type="number" min="0" value={spotsTotal}
+                  onChange={e => setSpotsTotal(e.target.value)}
+                  className={INPUT} placeholder="Unlimited"
+                />
+              </div>
+              <div>
+                <label className={LABEL}>Spots Remaining</label>
+                <input
+                  type="number" min="0" value={spotsRem}
+                  onChange={e => setSpotsRem(e.target.value)}
+                  className={INPUT} placeholder="--"
+                />
+              </div>
+            </div>
           </div>
-          <div>
-            <label className={LABEL}>Spots Remaining</label>
-            <input
-              type="number" min="0" value={spotsRem}
-              onChange={e => setSpotsRem(e.target.value)}
-              className={INPUT} placeholder="--"
-            />
-          </div>
+        )}
+
+        {/* Event Website — always visible */}
+        <div>
+          <label className={LABEL}>Event Website</label>
+          <input
+            type="url" value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)}
+            className={INPUT} placeholder="https://example.com"
+          />
         </div>
 
         {/* Featured Image */}
@@ -640,7 +704,7 @@ function MemberEventForm({
         <div className="flex items-center gap-3 pt-4 border-t border-[#E5E7EB]">
           <button
             type="button"
-            disabled={busy || !title.trim() || !date || !timeStart || !timeEnd}
+            disabled={busy || !title.trim() || !date || (!allDay && (!timeStart || !timeEnd))}
             onClick={() => onSubmit(buildFormValues(), 'draft')}
             className="px-6 py-2.5 border border-[#E5E7EB] text-[#374151] text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-60"
           >
@@ -648,7 +712,7 @@ function MemberEventForm({
           </button>
           <button
             type="button"
-            disabled={busy || !title.trim() || !date || !timeStart || !timeEnd}
+            disabled={busy || !title.trim() || !date || (!allDay && (!timeStart || !timeEnd))}
             onClick={() => onSubmit(buildFormValues(), 'pending_review')}
             className="px-6 py-2.5 bg-[#4E87A0] text-white text-sm font-semibold rounded-lg hover:bg-[#3A7190] transition-colors disabled:opacity-60"
           >

@@ -89,6 +89,8 @@ export interface Event {
   format: EventFormat;
   description: string | null;
   date: string;
+  end_date: string | null;
+  all_day: boolean | null;
   time_start: string;
   time_end: string;
   location: string | null;
@@ -99,6 +101,8 @@ export interface Event {
   is_free: boolean;
   spots_total: number | null;
   spots_remaining: number | null;
+  registration_required: boolean | null;
+  website_url: string | null;
   featured_image_url: string | null;
   event_type: 'goya' | 'member';
   created_by: string | null;

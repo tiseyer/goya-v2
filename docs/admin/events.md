@@ -94,9 +94,9 @@ Click the **Add New Event** button in the top-right corner. This opens `/admin/e
 | Section | Fields |
 |---|---|
 | **Basic Info** | Title, Category, Format, Status |
-| **Schedule** | Date, Start Time, End Time |
+| **Schedule** | Start Date, End Date (optional), All Day toggle, Start Time, End Time (hidden when All Day) |
 | **Location** | Instructor, Location |
-| **Registration** | Price (with free toggle), Total Spots, Spots Remaining |
+| **Registration** | Registration Required toggle, Price (with free toggle), Total Spots (placeholder "Unlimited"), Spots Remaining, Event Website (always visible) |
 | **Details** | Description, Featured Image |
 | **Organizers** | Coming soon |
 

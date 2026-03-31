@@ -53,6 +53,8 @@ export default function EventForm({ event, userRole }: Props) {
   const [format,    setFormat]    = useState(event?.format    ?? 'Online');
   const [status,    setStatus]    = useState<EventStatus>(event?.status    ?? 'published');
   const [date,      setDate]      = useState(event?.date      ?? '');
+  const [endDate,   setEndDate]   = useState(event?.end_date  ?? '');
+  const [allDay,    setAllDay]    = useState(event?.all_day   ?? false);
   const [timeStart, setTimeStart] = useState(event?.time_start?.slice(0,5) ?? '');
   const [timeEnd,   setTimeEnd]   = useState(event?.time_end?.slice(0,5)   ?? '');
   const [instructor,setInstructor]= useState(event?.instructor ?? '');
@@ -62,6 +64,8 @@ export default function EventForm({ event, userRole }: Props) {
   const [isFree,    setIsFree]    = useState(event?.is_free   ?? false);
   const [spotsTotal,setSpotsTotal]= useState(String(event?.spots_total ?? ''));
   const [spotsRem,  setSpotsRem]  = useState(String(event?.spots_remaining ?? ''));
+  const [registrationRequired, setRegistrationRequired] = useState(event?.registration_required ?? false);
+  const [websiteUrl, setWebsiteUrl] = useState(event?.website_url ?? '');
 
   // Image state
   const [currentImageUrl, setCurrentImageUrl] = useState(event?.featured_image_url ?? null);
@@ -170,15 +174,19 @@ export default function EventForm({ event, userRole }: Props) {
         format,
         status,
         date,
-        time_start:         timeStart,
-        time_end:           timeEnd,
+        end_date:           endDate || null,
+        all_day:            allDay,
+        time_start:         allDay ? null : timeStart,
+        time_end:           allDay ? null : timeEnd,
         instructor:         instructor.trim() || null,
         location:           location.trim()   || null,
         description:        description.trim() || null,
         price:              isFree ? 0 : parseFloat(price) || 0,
         is_free:            isFree,
+        registration_required: registrationRequired,
         spots_total:        spotsTotal ? parseInt(spotsTotal, 10) : null,
         spots_remaining:    spotsRem   ? parseInt(spotsRem, 10)   : null,
+        website_url:        websiteUrl.trim() || null,
         featured_image_url: imageUrl,
       };
 
@@ -260,19 +268,44 @@ export default function EventForm({ event, userRole }: Props) {
 
       {/* ── Schedule ────────────────────────────────────────────────────── */}
       <FormSection title="Schedule" description="Date and time of the event.">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className={LABEL}>Date *</label>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} className={INPUT} required />
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={LABEL}>Start Date *</label>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} className={INPUT} required />
+            </div>
+            <div>
+              <label className={LABEL}>End Date</label>
+              <input
+                type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+                className={INPUT} placeholder="Optional"
+                min={date || undefined}
+              />
+            </div>
           </div>
-          <div>
-            <label className={LABEL}>Start Time *</label>
-            <input type="time" value={timeStart} onChange={e => setTimeStart(e.target.value)} className={INPUT} required />
-          </div>
-          <div>
-            <label className={LABEL}>End Time *</label>
-            <input type="time" value={timeEnd} onChange={e => setTimeEnd(e.target.value)} className={INPUT} required />
-          </div>
+
+          {/* All Day toggle */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox" checked={allDay} onChange={e => setAllDay(e.target.checked)}
+              className="w-4 h-4 rounded accent-primary"
+            />
+            <span className="text-sm text-foreground">All day event</span>
+          </label>
+
+          {/* Time fields — hidden when all-day */}
+          <AnimatedField show={!allDay}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div>
+                <label className={LABEL}>Start Time {!allDay && '*'}</label>
+                <input type="time" value={timeStart} onChange={e => setTimeStart(e.target.value)} className={INPUT} required={!allDay} />
+              </div>
+              <div>
+                <label className={LABEL}>End Time {!allDay && '*'}</label>
+                <input type="time" value={timeEnd} onChange={e => setTimeEnd(e.target.value)} className={INPUT} required={!allDay} />
+              </div>
+            </div>
+          </AnimatedField>
         </div>
       </FormSection>
 
@@ -293,48 +326,71 @@ export default function EventForm({ event, userRole }: Props) {
       {/* ── Registration ────────────────────────────────────────────────── */}
       <FormSection title="Registration" description="Pricing and capacity settings.">
         <div className="space-y-4">
-          {/* Price */}
-          <div className="space-y-2">
-            <label className={LABEL}>Price</label>
-            <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox" checked={isFree} onChange={e => setIsFree(e.target.checked)}
-                  className="w-4 h-4 rounded accent-primary"
-                />
-                <span className="text-sm text-foreground">This event is free</span>
-              </label>
-            </div>
-            <AnimatedField show={!isFree}>
-              <div className="relative max-w-[180px] pt-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary text-sm">$</span>
-                <input
-                  type="number" min="0" step="0.01" value={price}
-                  onChange={e => setPrice(e.target.value)}
-                  className={`${INPUT} pl-7`} placeholder="0.00"
-                />
-              </div>
-            </AnimatedField>
-          </div>
+          {/* Registration Required toggle */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox" checked={registrationRequired} onChange={e => setRegistrationRequired(e.target.checked)}
+              className="w-4 h-4 rounded accent-primary"
+            />
+            <span className="text-sm text-foreground">Registration required</span>
+          </label>
 
-          {/* Spots */}
-          <div className="grid grid-cols-2 gap-4 max-w-xs">
-            <div>
-              <label className={LABEL}>Total Spots</label>
-              <input
-                type="number" min="0" value={spotsTotal}
-                onChange={e => setSpotsTotal(e.target.value)}
-                className={INPUT} placeholder="--"
-              />
+          {/* Price / Spots — only shown when registration is required */}
+          <AnimatedField show={registrationRequired}>
+            <div className="space-y-4 pt-1">
+              {/* Price */}
+              <div className="space-y-2">
+                <label className={LABEL}>Price</label>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox" checked={isFree} onChange={e => setIsFree(e.target.checked)}
+                      className="w-4 h-4 rounded accent-primary"
+                    />
+                    <span className="text-sm text-foreground">This event is free</span>
+                  </label>
+                </div>
+                <AnimatedField show={!isFree}>
+                  <div className="relative max-w-[180px] pt-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary text-sm">$</span>
+                    <input
+                      type="number" min="0" step="0.01" value={price}
+                      onChange={e => setPrice(e.target.value)}
+                      className={`${INPUT} pl-7`} placeholder="0.00"
+                    />
+                  </div>
+                </AnimatedField>
+              </div>
+
+              {/* Spots */}
+              <div className="grid grid-cols-2 gap-4 max-w-xs">
+                <div>
+                  <label className={LABEL}>Total Spots</label>
+                  <input
+                    type="number" min="0" value={spotsTotal}
+                    onChange={e => setSpotsTotal(e.target.value)}
+                    className={INPUT} placeholder="Unlimited"
+                  />
+                </div>
+                <div>
+                  <label className={LABEL}>Spots Remaining</label>
+                  <input
+                    type="number" min="0" value={spotsRem}
+                    onChange={e => setSpotsRem(e.target.value)}
+                    className={INPUT} placeholder="--"
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <label className={LABEL}>Spots Remaining</label>
-              <input
-                type="number" min="0" value={spotsRem}
-                onChange={e => setSpotsRem(e.target.value)}
-                className={INPUT} placeholder="--"
-              />
-            </div>
+          </AnimatedField>
+
+          {/* Event Website — always visible */}
+          <div>
+            <label className={LABEL}>Event Website</label>
+            <input
+              type="url" value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)}
+              className={INPUT} placeholder="https://example.com"
+            />
           </div>
         </div>
       </FormSection>

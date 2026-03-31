@@ -64,18 +64,22 @@ You control the transition from **Draft** to **Pending Review** by clicking **Su
 | **Title** | Yes | The name of your event |
 | **Category** | Yes | Workshop, Teacher Training, Dharma Talk, Conference, Yoga Sequence, Music Playlist, or Research |
 | **Format** | Yes | Online, In Person, or Hybrid |
-| **Date** | Yes | The date the event takes place |
-| **Start Time** | Yes | Event start time |
-| **End Time** | Yes | Event end time |
+| **Start Date** | Yes | The date the event begins |
+| **End Date** | No | For multi-day events; must be on or after the start date |
+| **All Day Event** | No | Check this to hide the start and end time fields |
+| **Start Time** | Yes (unless All Day) | Event start time |
+| **End Time** | Yes (unless All Day) | Event end time |
 | **Instructor** | No | Name of the instructor if different from you |
 | **Location** | No | Physical address or online platform (e.g. "Online via Zoom" or "Berlin, Germany") |
 | **Description** | No | Full description of the event |
-| **Price** | No | Enter a price, or tick **This event is free** |
-| **Total Spots** | No | Maximum number of attendees |
-| **Spots Remaining** | No | Current availability |
+| **Registration Required** | No | Toggle on to reveal pricing and capacity fields |
+| **Price** | No | Shown when registration is required. Enter a price, or tick **This event is free** |
+| **Total Spots** | No | Shown when registration is required. Leave empty for unlimited capacity |
+| **Spots Remaining** | No | Shown when registration is required. Current availability |
+| **Event Website** | No | Link to an external event page or registration site |
 | **Featured Image** | No | JPEG, PNG, or WebP, max 5 MB |
 
-The form requires **Title**, **Date**, **Start Time**, and **End Time** before the save or submit buttons become active.
+The form requires **Title**, **Start Date**, and (unless **All Day Event** is checked) **Start Time** and **End Time** before the save or submit buttons become active.
 
 ---
 

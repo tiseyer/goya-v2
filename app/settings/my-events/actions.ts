@@ -30,15 +30,19 @@ export interface MemberEventFormData {
   category: string;
   format: string;
   date: string;
-  time_start: string;
-  time_end: string;
+  end_date?: string | null;
+  all_day?: boolean;
+  time_start: string | null;
+  time_end: string | null;
   instructor?: string;
   location?: string;
   description?: string;
   price?: number;
   is_free?: boolean;
+  registration_required?: boolean;
   spots_total?: number | null;
   spots_remaining?: number | null;
+  website_url?: string | null;
   featured_image_url?: string | null;
   status: 'draft' | 'pending_review';
 }
