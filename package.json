@@ -10,7 +10,8 @@
     "docs:index": "tsx scripts/generate-docs-index.ts",
     "prebuild": "tsx scripts/generate-docs-index.ts",
     "media:backfill": "tsx scripts/backfill-media-items.ts",
-    "avatars:migrate": "tsx scripts/migrate-wp-avatars.ts"
+    "avatars:migrate": "tsx scripts/migrate-wp-avatars.ts",
+    "buckets:ensure": "tsx scripts/ensure-buckets.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
