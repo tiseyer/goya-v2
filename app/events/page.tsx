@@ -188,6 +188,7 @@ export default function EventsPage() {
   const [calMonth,        setCalMonth]        = useState(today.getMonth());
   const [selectedDate,    setSelectedDate]    = useState<string | null>(null);
   const [categoryFilter,  setCategoryFilter]  = useState<'All' | EventCategory>('All');
+  const [typeFilter,      setTypeFilter]      = useState<'all' | 'goya' | 'member'>('all');
   const [events,          setEvents]          = useState<Event[]>([]);
   const [loading,         setLoading]         = useState(true);
   const [dateSheetOpen,   setDateSheetOpen]   = useState(false);
@@ -224,11 +225,12 @@ export default function EventsPage() {
     return events.filter(e => {
       if (categoryFilter !== 'All' && e.category !== categoryFilter) return false;
       if (selectedDate && e.date !== selectedDate) return false;
+      if (typeFilter !== 'all' && e.event_type !== typeFilter) return false;
       return true;
     });
-  }, [events, categoryFilter, selectedDate]);
+  }, [events, categoryFilter, selectedDate, typeFilter]);
 
-  const activeFilters = (selectedDate ? 1 : 0) + (categoryFilter !== 'All' ? 1 : 0);
+  const activeFilters = (selectedDate ? 1 : 0) + (categoryFilter !== 'All' ? 1 : 0) + (typeFilter !== 'all' ? 1 : 0);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -240,7 +242,24 @@ export default function EventsPage() {
       />
 
       {/* ── Mobile filter bar ──────────────────────────────────────────────── */}
-      <div className="lg:hidden sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-4 py-2.5">
+      <div className="lg:hidden sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-4 py-2.5 space-y-2">
+        {/* Type filter row */}
+        <div className="flex rounded-full border border-slate-200 overflow-hidden">
+          {([['all', 'All'], ['goya', 'GOYA'], ['member', 'Member']] as const).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTypeFilter(key)}
+              className={[
+                'flex-1 text-center text-xs font-semibold py-1.5 transition-all cursor-pointer',
+                typeFilter === key
+                  ? 'bg-primary-dark text-white'
+                  : 'text-slate-500 hover:bg-slate-50',
+              ].join(' ')}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <div className="flex gap-2">
           <button
             onClick={() => { setDateSheetOpen(true); setCategorySheetOpen(false); }}
@@ -297,6 +316,36 @@ export default function EventsPage() {
               />
             </div>
 
+            {/* Event type filter */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Event Type</p>
+              <div className="flex flex-col gap-0.5">
+                {([['all', 'All Events'], ['goya', 'GOYA Events'], ['member', 'Member Events']] as const).map(([key, label]) => {
+                  const isActive = typeFilter === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setTypeFilter(key)}
+                      className={[
+                        'flex items-center gap-2.5 text-left px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer',
+                        isActive
+                          ? 'bg-primary-dark text-white'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary-dark',
+                      ].join(' ')}
+                    >
+                      {key !== 'all' && (
+                        <span className={[
+                          'w-2 h-2 rounded-full shrink-0 transition-colors',
+                          isActive ? 'bg-white/60' : key === 'goya' ? 'bg-blue-400' : 'bg-indigo-400',
+                        ].join(' ')} />
+                      )}
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Category filter */}
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Category</p>
@@ -346,7 +395,7 @@ export default function EventsPage() {
               </div>
               {activeFilters > 0 && (
                 <button
-                  onClick={() => { setSelectedDate(null); setCategoryFilter('All'); }}
+                  onClick={() => { setSelectedDate(null); setCategoryFilter('All'); setTypeFilter('all'); }}
                   className="flex items-center gap-1.5 text-xs font-semibold text-primary-light hover:text-primary-dark px-3 py-1.5 rounded-full border border-primary-light/30 hover:border-primary-dark/40 transition-all duration-200 cursor-pointer"
                 >
                   Clear {activeFilters > 1 ? `${activeFilters} filters` : 'filter'}
@@ -371,7 +420,7 @@ export default function EventsPage() {
                 </p>
                 {activeFilters > 0 && (
                   <button
-                    onClick={() => { setSelectedDate(null); setCategoryFilter('All'); }}
+                    onClick={() => { setSelectedDate(null); setCategoryFilter('All'); setTypeFilter('all'); }}
                     className="mt-5 text-sm font-semibold text-primary-light hover:text-primary-dark transition-colors cursor-pointer"
                   >
                     Clear all filters
