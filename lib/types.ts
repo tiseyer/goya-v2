@@ -96,6 +96,8 @@ export interface Event {
   location: string | null;
   location_lat?: number | null;
   location_lng?: number | null;
+  online_platform_name?: string | null;
+  online_platform_url?: string | null;
   instructor: string | null;
   price: number;
   is_free: boolean;
