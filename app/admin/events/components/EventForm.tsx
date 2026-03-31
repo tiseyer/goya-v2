@@ -1,12 +1,15 @@
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabase';
 import type { Event, EventStatus } from '@/lib/types';
 import { logAdminEventAction } from '@/app/admin/events/actions';
 import { registerMediaItemAction } from '@/app/actions/media';
+
+const GooglePlacesAutocomplete = dynamic(() => import('@/app/components/GooglePlacesAutocomplete'), { ssr: false });
 
 const CATEGORIES = ['Workshop', 'Teacher Training', 'Dharma Talk', 'Conference', 'Yoga Sequence', 'Music Playlist', 'Research'] as const;
 const FORMATS    = ['Online', 'In Person', 'Hybrid'] as const;
@@ -59,6 +62,10 @@ export default function EventForm({ event, userRole }: Props) {
   const [timeEnd,   setTimeEnd]   = useState(event?.time_end?.slice(0,5)   ?? '');
   const [instructor,setInstructor]= useState(event?.instructor ?? '');
   const [location,  setLocation]  = useState(event?.location  ?? '');
+  const [locationLat, setLocationLat] = useState<number | null>(event?.location_lat ?? null);
+  const [locationLng, setLocationLng] = useState<number | null>(event?.location_lng ?? null);
+  const [onlinePlatformName, setOnlinePlatformName] = useState(event?.online_platform_name ?? '');
+  const [onlinePlatformUrl, setOnlinePlatformUrl] = useState(event?.online_platform_url ?? '');
   const [description,setDesc]     = useState(event?.description ?? '');
   const [price,     setPrice]     = useState(String(event?.price ?? '0'));
   const [isFree,    setIsFree]    = useState(event?.is_free   ?? false);
@@ -126,7 +133,14 @@ export default function EventForm({ event, userRole }: Props) {
     if (fileRef.current) fileRef.current.value = '';
   }
 
-  /* ── Submit handler (unchanged logic) ──────────────────────────────────── */
+  /* ── Place selection handler ────────────────────────────────────────────── */
+  const handlePlaceSelect = useCallback((place: { name: string; lat: number; lng: number }) => {
+    setLocation(place.name);
+    setLocationLat(place.lat);
+    setLocationLng(place.lng);
+  }, []);
+
+  /* ── Submit handler ──────────────────────────────────────────────────────── */
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -180,6 +194,10 @@ export default function EventForm({ event, userRole }: Props) {
         time_end:           allDay ? null : timeEnd,
         instructor:         instructor.trim() || null,
         location:           location.trim()   || null,
+        location_lat:       format !== 'Online' ? locationLat : null,
+        location_lng:       format !== 'Online' ? locationLng : null,
+        online_platform_name: format === 'Online' || format === 'Hybrid' ? onlinePlatformName.trim() || null : null,
+        online_platform_url:  format === 'Online' || format === 'Hybrid' ? onlinePlatformUrl.trim() || null : null,
         description:        description.trim() || null,
         price:              isFree ? 0 : parseFloat(price) || 0,
         is_free:            isFree,
@@ -311,15 +329,57 @@ export default function EventForm({ event, userRole }: Props) {
 
       {/* ── Location ────────────────────────────────────────────────────── */}
       <FormSection title="Location" description="Where the event takes place and who leads it.">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          {/* Instructor — always visible */}
           <div>
             <label className={LABEL}>Instructor</label>
             <input type="text" value={instructor} onChange={e => setInstructor(e.target.value)} className={INPUT} placeholder="Instructor name" />
           </div>
-          <div>
-            <label className={LABEL}>Location</label>
-            <input type="text" value={location} onChange={e => setLocation(e.target.value)} className={INPUT} placeholder="e.g. Online via Zoom or City, Country" />
-          </div>
+
+          {/* In Person / Hybrid: Google Places autocomplete (LOC-03) */}
+          <AnimatedField show={format !== 'Online'}>
+            <div className="pt-1">
+              <label className={LABEL}>Location</label>
+              <GooglePlacesAutocomplete
+                value={location}
+                onChange={setLocation}
+                onPlaceSelect={handlePlaceSelect}
+                className={INPUT}
+                placeholder="Search for a venue or address..."
+              />
+              {locationLat !== null && locationLng !== null && (
+                <p className="text-xs text-foreground-tertiary mt-1">
+                  Coordinates: {locationLat.toFixed(5)}, {locationLng.toFixed(5)}
+                </p>
+              )}
+            </div>
+          </AnimatedField>
+
+          {/* Online / Hybrid: platform name + URL (LOC-02) */}
+          <AnimatedField show={format === 'Online' || format === 'Hybrid'}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div>
+                <label className={LABEL}>Online Platform</label>
+                <input
+                  type="text"
+                  value={onlinePlatformName}
+                  onChange={e => setOnlinePlatformName(e.target.value)}
+                  className={INPUT}
+                  placeholder="e.g. Zoom, Google Meet"
+                />
+              </div>
+              <div>
+                <label className={LABEL}>Platform URL</label>
+                <input
+                  type="url"
+                  value={onlinePlatformUrl}
+                  onChange={e => setOnlinePlatformUrl(e.target.value)}
+                  className={INPUT}
+                  placeholder="https://zoom.us/j/..."
+                />
+              </div>
+            </div>
+          </AnimatedField>
         </div>
       </FormSection>
 
