@@ -3,7 +3,7 @@ title: Users
 audience: ["admin"]
 section: admin
 order: 3
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # Users
@@ -57,18 +57,21 @@ Member types (e.g. **Yoga Teacher**, **Wellness Practitioner**, **Student**) app
 
 ## User Detail Page
 
-Click a user's row to open `/admin/users/[id]`. This page contains multiple tabs covering different aspects of the user's account:
+Click a user's row or the **View** button to open `/admin/users/[id]`. The page is organized into editable info boxes:
 
-- **Profile** — name, email, avatar, member type, subscription status, verification badge
-- **Credits** — a breakdown of the user's credit entries by type, with status indicators (green/yellow/red)
-- **Connections** — any school memberships or connections linked to the account
-- **Impersonation** — admins can use the **Switch To** button to impersonate the user and view the platform from their perspective
+**Profile Info** — Full Name, Username, Role, Member Type, MRN. Click the pencil icon to edit, then Save or Cancel.
 
-The **Switch To** button is also accessible from the user table directly without opening the detail page.
+**Account Status** — Subscription Status (Guest/Member), Verification Status (Unverified/Pending/Verified), Onboarding Status (Incomplete/Completed). Each field has a dropdown in edit mode. The Reset Onboarding button is also available here.
+
+**Contact & Dates** — Email, Member Since, Last Login. Read-only.
+
+**WP Migration Info** — WP Roles and WP User ID. Read-only and collapsible. Only shown for users with WordPress migration data.
+
+Additional tabs: **Connections** (school memberships and user connections) and **Flows** (assigned flow responses).
 
 ## Creating a User
 
-Click the **Create User** button in the top-right corner of the Users page. This opens a form to provision a new account with a name, email, and initial role.
+Click the **Create User** button in the top-right corner of the Users page. A modal opens with fields for First Name, Last Name, Email (required), Role (Student/Teacher/Wellness Practitioner), and an optional Password (auto-generated if left empty). On success, the new user's email is displayed. If the email already exists, an error is shown.
 
 ---
 
