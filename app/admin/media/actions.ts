@@ -74,10 +74,10 @@ export async function getMediaItems(
 
   const supabase = getSupabaseService();
 
-  // Base query with left join to profiles for uploader name
+  // Base query — fetch media_items without join (FK points to auth.users, not profiles)
   let query = supabase
     .from('media_items')
-    .select('*, profiles!media_items_uploaded_by_fkey(full_name)');
+    .select('*');
 
   // ── Folder filter ──────────────────────────────────────────────────────────
   if (folder) {
@@ -166,31 +166,39 @@ export async function getMediaItems(
   const hasMore = rows.length > limit;
   const pageRows = hasMore ? rows.slice(0, limit) : rows;
 
-  // Map joined profiles data into flat uploader_name field
-  const items: MediaItem[] = pageRows.map((row) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const r = row as any;
-    return {
-      id: r.id,
-      bucket: r.bucket,
-      folder: r.folder,
-      file_name: r.file_name,
-      file_path: r.file_path,
-      file_url: r.file_url,
-      file_type: r.file_type,
-      file_size: r.file_size ?? 0,
-      width: r.width,
-      height: r.height,
-      title: r.title,
-      alt_text: r.alt_text,
-      caption: r.caption,
-      uploaded_by: r.uploaded_by,
-      uploaded_by_role: r.uploaded_by_role,
-      created_at: r.created_at,
-      updated_at: r.updated_at,
-      uploader_name: r.profiles?.full_name ?? null,
-    };
-  });
+  // Fetch uploader names separately (FK points to auth.users, not profiles)
+  const uploaderIds = [...new Set(pageRows.map(r => r.uploaded_by).filter(Boolean))] as string[];
+  const nameMap = new Map<string, string>();
+  if (uploaderIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .in('id', uploaderIds);
+    for (const p of profiles ?? []) {
+      if (p.full_name) nameMap.set(p.id, p.full_name);
+    }
+  }
+
+  const items: MediaItem[] = pageRows.map((row) => ({
+    id: row.id,
+    bucket: row.bucket,
+    folder: row.folder,
+    file_name: row.file_name,
+    file_path: row.file_path,
+    file_url: row.file_url,
+    file_type: row.file_type,
+    file_size: row.file_size ?? 0,
+    width: row.width,
+    height: row.height,
+    title: row.title,
+    alt_text: row.alt_text,
+    caption: row.caption,
+    uploaded_by: row.uploaded_by,
+    uploaded_by_role: row.uploaded_by_role,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    uploader_name: (row.uploaded_by && nameMap.get(row.uploaded_by)) ?? null,
+  }));
 
   // Cursor = last item's created_at (only useful for time-based sorts)
   const nextCursor =
