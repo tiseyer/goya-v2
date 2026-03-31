@@ -404,3 +404,176 @@ export async function getFolders(): Promise<MediaFolder[]> {
 
   return data ?? [];
 }
+
+// ── createFolder ──────────────────────────────────────────────────────────────
+
+/**
+ * Creates a new media folder in the specified bucket.
+ * Assigns sort_order = max existing + 1 (within the same bucket + parent scope).
+ */
+export async function createFolder(params: {
+  name: string;
+  bucket: string;
+  parentId?: string | null;
+  createdBy: string;
+}): Promise<{ success: boolean; folder?: MediaFolder; error?: string }> {
+  const supabase = getSupabaseService();
+
+  // Determine next sort_order
+  const { data: existing } = await supabase
+    .from('media_folders')
+    .select('sort_order')
+    .eq('bucket', params.bucket)
+    .is('parent_id', params.parentId ?? null)
+    .order('sort_order', { ascending: false })
+    .limit(1);
+
+  const maxOrder = existing?.[0]?.sort_order ?? 0;
+  const nextOrder = maxOrder + 1;
+
+  const { data, error } = await supabase
+    .from('media_folders')
+    .insert({
+      name: params.name.trim(),
+      bucket: params.bucket,
+      parent_id: params.parentId ?? null,
+      sort_order: nextOrder,
+      created_by: params.createdBy,
+    })
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error('[createFolder] Error:', error.message);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true, folder: data };
+}
+
+// ── updateFolder ──────────────────────────────────────────────────────────────
+
+/**
+ * Renames an existing media folder.
+ */
+export async function updateFolder(
+  id: string,
+  name: string
+): Promise<{ success: boolean; folder?: MediaFolder; error?: string }> {
+  const supabase = getSupabaseService();
+
+  const { data, error } = await supabase
+    .from('media_folders')
+    .update({ name: name.trim() })
+    .eq('id', id)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error('[updateFolder] Error:', error.message);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true, folder: data };
+}
+
+// ── deleteFolder ──────────────────────────────────────────────────────────────
+
+/**
+ * Deletes a media folder. Returns the file count in the folder as a warning
+ * before deletion occurs. If force=false (default) and files exist, returns
+ * a warning without deleting. Pass force=true to delete anyway (files are NOT
+ * deleted — they become unfoldered).
+ *
+ * Admin only — enforced at the UI layer.
+ */
+export async function deleteFolder(
+  id: string,
+  force = false
+): Promise<{ success: boolean; fileCount?: number; warning?: string; error?: string }> {
+  const supabase = getSupabaseService();
+
+  // Count files in this folder
+  const { count, error: countError } = await supabase
+    .from('media_items')
+    .select('id', { count: 'exact', head: true })
+    .eq('folder', id);
+
+  if (countError) {
+    console.error('[deleteFolder] Count error:', countError.message);
+    return { success: false, error: countError.message };
+  }
+
+  const fileCount = count ?? 0;
+
+  if (fileCount > 0 && !force) {
+    return {
+      success: false,
+      fileCount,
+      warning: `This folder contains ${fileCount} file${fileCount === 1 ? '' : 's'}. Deleting it will not remove the files — they will become unfoldered.`,
+    };
+  }
+
+  // Unset folder on any items in this folder
+  if (fileCount > 0) {
+    const { error: unfolderError } = await supabase
+      .from('media_items')
+      .update({ folder: null })
+      .eq('folder', id);
+
+    if (unfolderError) {
+      console.error('[deleteFolder] Unfolder error:', unfolderError.message);
+      return { success: false, error: unfolderError.message };
+    }
+  }
+
+  // Re-parent any child folders to null (top-level)
+  await supabase
+    .from('media_folders')
+    .update({ parent_id: null })
+    .eq('parent_id', id);
+
+  // Delete the folder
+  const { error: deleteError } = await supabase
+    .from('media_folders')
+    .delete()
+    .eq('id', id);
+
+  if (deleteError) {
+    console.error('[deleteFolder] Delete error:', deleteError.message);
+    return { success: false, error: deleteError.message };
+  }
+
+  return { success: true, fileCount };
+}
+
+// ── reorderFolders ────────────────────────────────────────────────────────────
+
+/**
+ * Updates sort_order for a list of folder IDs based on their array index.
+ * Call with the full ordered list of IDs after a drag-and-drop operation.
+ */
+export async function reorderFolders(
+  ids: string[]
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = getSupabaseService();
+
+  // Update each folder's sort_order based on position
+  const updates = ids.map((id, index) =>
+    supabase
+      .from('media_folders')
+      .update({ sort_order: index + 1 })
+      .eq('id', id)
+  );
+
+  const results = await Promise.all(updates);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const firstError = results.find((r: any) => r.error);
+
+  if (firstError?.error) {
+    console.error('[reorderFolders] Error:', firstError.error.message);
+    return { success: false, error: firstError.error.message };
+  }
+
+  return { success: true };
+}
