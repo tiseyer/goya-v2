@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.9
-milestone_name: Member-Events
+milestone: v1.10
+milestone_name: Member-Courses
 status: planning
-stopped_at: Roadmap created — ready to plan Phase 16
+stopped_at: Defining requirements
 last_updated: "2026-03-31"
 last_activity: 2026-03-31
 progress:
-  total_phases: 6
+  total_phases: 0
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 16 — Database Foundation (v1.9 Member Events)
+**Current focus:** Defining requirements for v1.10 Member Courses
 
 ## Current Position
 
-Phase: 16 of 21 (Database Foundation)
+Phase: Not started (defining requirements)
 Plan: —
-Status: Ready to plan
+Status: Defining requirements
 Last activity: 2026-03-31 - Completed quick task 260331-kp2: Fix TypeScript unknown→ReactNode error
 
 Progress: [░░░░░░░░░░] 0%

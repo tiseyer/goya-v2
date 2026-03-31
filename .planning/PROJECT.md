@@ -8,6 +8,18 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
+## Current Milestone: v1.10 Member Courses
+
+**Goal:** Enable teachers, wellness practitioners, and admins to submit courses for admin/moderator review before publication in the Academy.
+
+**Target features:**
+- Database schema: course_type, created_by, status workflow, course_audit_log, RLS policies per role
+- Admin courses list: type column/filter, extended status filter, submitter info, audit history
+- Admin inbox Courses tab: pending review queue with approve/reject workflow
+- User Settings "My Courses" page: course CRUD, status-aware actions, submission flow
+- Public Academy: type filter (All/GOYA/Member)
+- Audit log complete coverage with shared utility
+
 ## Current State
 
 **As of v1.9 (2026-03-31):** Member Events milestone shipped. Teachers, wellness practitioners, and admins can submit events via My Events settings page. Events go through draft→pending_review→published/rejected workflow. Admin inbox has Events tab for approve/reject. Public calendar has GOYA/Member type filter. Full audit logging via shared utility covering all 10 code paths.
@@ -182,4 +194,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-31 after v1.9 Member Events milestone completed*
+*Last updated: 2026-03-31 after v1.10 Member Courses milestone started*
