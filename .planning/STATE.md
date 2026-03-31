@@ -86,9 +86,10 @@ None yet.
 | 260331-mky | Increase hero section height +40px for more breathing room (200→240, 220→260, 240→280) | 2026-03-31 | — | [260331-mky](./quick/260331-mky-increase-hero-section-height-for-more-br/) |
 | 260331-my2 | Fix hero layout on detail pages — left-align, spacing, text-4xl md:text-5xl titles, meta lines | 2026-03-31 | 5bbb045 | [260331-my2](./quick/260331-my2-fix-hero-layout-on-detail-pages-left-ali/) |
 | 260331-n9o | Fix "use server" export error — move MEDIA_BUCKETS const to constants.ts | 2026-03-31 | — | [260331-n9o](./quick/260331-n9o-fix-use-server-export-error-in-admin-med/) |
+| 260331-n6k | Event categories DB + admin CRUD tab + public events format/location filters with Google Places | 2026-03-31 | 1d7180c | [260331-n6k](./quick/260331-n6k-event-categories-db-admin-crud-frontend-/) |
 
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Completed quick task 260331-n9o — fix use server export error in media actions
+Stopped at: Completed quick task 260331-n6k — event categories DB + admin CRUD + format/location filters
 Resume file: None

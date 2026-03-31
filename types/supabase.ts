@@ -743,6 +743,50 @@ export type Database = {
           },
         ]
       }
+      event_categories: {
+        Row: {
+          color: string
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          slug: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          slug: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "event_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
           created_at: string | null
@@ -793,6 +837,8 @@ export type Database = {
           instructor: string | null
           is_free: boolean | null
           location: string | null
+          location_lat: number | null
+          location_lng: number | null
           price: number | null
           rejection_reason: string | null
           spots_remaining: number | null
@@ -817,6 +863,8 @@ export type Database = {
           instructor?: string | null
           is_free?: boolean | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           price?: number | null
           rejection_reason?: string | null
           spots_remaining?: number | null
@@ -841,6 +889,8 @@ export type Database = {
           instructor?: string | null
           is_free?: boolean | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           price?: number | null
           rejection_reason?: string | null
           spots_remaining?: number | null
