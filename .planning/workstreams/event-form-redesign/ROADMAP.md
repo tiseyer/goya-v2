@@ -3,7 +3,7 @@
 ## Phases
 
 - [x] **Phase 1: Database Migrations** - Add all new columns to the events table
-- [ ] **Phase 2: Form UI Redesign + Status** - Modern card-based layout with role-aware status field
+- [x] **Phase 2: Form UI Redesign + Status** - Modern card-based layout with role-aware status field
 - [ ] **Phase 3: Multi-day Events + Registration Toggle** - End date, all-day toggle, registration control
 - [ ] **Phase 4: Google Places Integration** - Format-conditional location with autocomplete
 - [ ] **Phase 5: Organizers System** - Multi-organizer chips with member search
@@ -74,7 +74,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Database Migrations | 1/1 | Complete | 2026-03-31 |
-| 2. Form UI Redesign + Status | 0/0 | Not started | - |
+| 2. Form UI Redesign + Status | 1/1 | Complete | 2026-03-31 |
 | 3. Multi-day Events + Registration Toggle | 0/0 | Not started | - |
 | 4. Google Places Integration | 0/0 | Not started | - |
 | 5. Organizers System | 0/0 | Not started | - |
