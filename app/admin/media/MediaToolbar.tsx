@@ -1,5 +1,7 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 // ── View icons ────────────────────────────────────────────────────────────────
 
 function GridIcon() {
@@ -42,6 +44,8 @@ export interface MediaToolbarProps {
   onByChange: (value: 'all' | 'team' | 'members') => void;
   onSortChange: (value: 'newest' | 'oldest' | 'name' | 'size') => void;
   onViewModeChange: (value: 'grid' | 'list') => void;
+  /** Optional slot for the Upload button (rendered right-aligned) */
+  uploadSlot?: ReactNode;
 }
 
 export default function MediaToolbar({
@@ -57,9 +61,10 @@ export default function MediaToolbar({
   onByChange,
   onSortChange,
   onViewModeChange,
+  uploadSlot,
 }: MediaToolbarProps) {
   return (
-    <div className="h-14 border-b border-slate-200 bg-white flex items-center px-4 gap-2 shrink-0">
+    <div className="h-14 border-b border-slate-200 bg-white flex items-center px-4 gap-2 shrink-0 w-full">
       {/* Search input */}
       <div className="relative flex-1 max-w-xs">
         <svg
@@ -190,6 +195,14 @@ export default function MediaToolbar({
           <ListIcon />
         </button>
       </div>
+
+      {/* Upload button slot — right-aligned */}
+      {uploadSlot && (
+        <>
+          <div className="h-5 w-px bg-slate-200 mx-1 shrink-0" aria-hidden="true" />
+          {uploadSlot}
+        </>
+      )}
     </div>
   );
 }

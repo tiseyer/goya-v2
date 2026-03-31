@@ -6,6 +6,12 @@ import FolderSidebar from './FolderSidebar';
 import MediaToolbar from './MediaToolbar';
 import MediaGrid from './MediaGrid';
 import MediaList from './MediaList';
+import MediaDetailPanel from './MediaDetailPanel';
+import MediaUploader, {
+  UploadProgressCard,
+  type UploadCard,
+  type MediaUploaderHandle,
+} from './MediaUploader';
 import { MEDIA_BUCKETS, getMediaItems, type MediaItem, type MediaFolder } from './actions';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -19,6 +25,9 @@ interface MediaPageClientProps {
   date?: string;
   by?: string;
   sort?: string;
+  isAdmin: boolean;
+  currentUserId: string;
+  currentUserRole: string;
 }
 
 // ── Empty state ───────────────────────────────────────────────────────────────
@@ -80,6 +89,40 @@ function coerceView(v: string | undefined): 'grid' | 'list' {
   return 'grid';
 }
 
+/**
+ * Derives the Supabase Storage bucket name from the active folder selection.
+ */
+function deriveBucket(activeFolder: string | null, folders: MediaFolder[]): string {
+  if (!activeFolder) return 'uploads';
+  const isBucket = MEDIA_BUCKETS.some(b => b.key === activeFolder);
+  if (isBucket) return activeFolder;
+  // UUID — find the folder and use its bucket field
+  const folder = folders.find(f => f.id === activeFolder);
+  if (folder && 'bucket' in folder && typeof folder.bucket === 'string') return folder.bucket;
+  return 'uploads';
+}
+
+// ── Upload button ─────────────────────────────────────────────────────────────
+
+function UploadButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={[
+        'inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium rounded-lg shrink-0',
+        'bg-primary text-white hover:bg-primary/90 transition-colors duration-150 cursor-pointer',
+      ].join(' ')}
+      aria-label="Upload files"
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
+          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+      </svg>
+      Upload
+    </button>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function MediaPageClient({
@@ -91,6 +134,9 @@ export default function MediaPageClient({
   date: dateProp,
   by: byProp,
   sort: sortProp,
+  isAdmin,
+  currentUserId,
+  currentUserRole,
 }: MediaPageClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -113,7 +159,15 @@ export default function MediaPageClient({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
 
+  // ── Upload cards state ─────────────────────────────────────────────────────
+  const [uploadCards, setUploadCards] = useState<UploadCard[]>([]);
+
+  // Ref to the MediaUploader so we can call openFilePicker() from the toolbar
+  const uploaderRef = useRef<MediaUploaderHandle>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Derive bucket from active folder
+  const activeBucket = deriveBucket(activeFolder, initialFolders);
 
   // ── Hydrate localStorage prefs on mount ────────────────────────────────────
   useEffect(() => {
@@ -228,14 +282,13 @@ export default function MediaPageClient({
     return () => observer.disconnect();
   }, [nextCursor, isFetchingMore, isLoading, activeFolder, debouncedQ, type, date, by, sort]);
 
-  // ── Handlers ───────────────────────────────────────────────────────────────
+  // ── Folder handler ─────────────────────────────────────────────────────────
 
-  const handleFolderSelect = useCallback(
-    (folder: string | null) => {
-      setActiveFolder(folder);
-    },
-    []
-  );
+  const handleFolderSelect = useCallback((folder: string | null) => {
+    setActiveFolder(folder);
+  }, []);
+
+  // ── View / sidebar handlers ────────────────────────────────────────────────
 
   function handleViewMode(mode: 'grid' | 'list') {
     setViewMode(mode);
@@ -250,7 +303,45 @@ export default function MediaPageClient({
     });
   }
 
+  // ── Detail panel handlers ──────────────────────────────────────────────────
+
+  const handleUpdate = useCallback((updatedItem: MediaItem) => {
+    setItems(prev => prev.map(i => (i.id === updatedItem.id ? updatedItem : i)));
+    setSelectedItem(updatedItem);
+  }, []);
+
+  const handleDelete = useCallback((id: string) => {
+    setItems(prev => prev.filter(i => i.id !== id));
+    setSelectedItem(null);
+  }, []);
+
+  // ── Upload handlers ────────────────────────────────────────────────────────
+
+  const handleUploadStart = useCallback((fileId: string, fileName: string) => {
+    setUploadCards(prev => [{ fileId, fileName, progress: 0, done: false }, ...prev]);
+  }, []);
+
+  const handleUploadProgress = useCallback((fileId: string, progress: number) => {
+    setUploadCards(prev =>
+      prev.map(c => (c.fileId === fileId ? { ...c, progress } : c))
+    );
+  }, []);
+
+  const handleUploadComplete = useCallback((item: MediaItem) => {
+    // Mark card as done
+    setUploadCards(prev =>
+      prev.map(c => (c.fileId === item.id ? { ...c, done: true, item } : c))
+    );
+    // Clear the card after a brief visible "done" state
+    setTimeout(() => {
+      setUploadCards(prev => prev.filter(c => !c.done));
+    }, 1200);
+    // Prepend to grid
+    setItems(prev => [item, ...prev]);
+  }, []);
+
   const hasFilters = !!(debouncedQ || type !== 'all' || date !== 'all' || by !== 'all');
+  const pendingCards = uploadCards.filter(c => !c.done);
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -267,7 +358,7 @@ export default function MediaPageClient({
 
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Toolbar with search, filters, sort, and view toggle */}
+        {/* Toolbar with search, filters, sort, view toggle, and upload button */}
         <MediaToolbar
           q={q}
           type={type}
@@ -281,52 +372,78 @@ export default function MediaPageClient({
           onByChange={setBy}
           onSortChange={setSort}
           onViewModeChange={handleViewMode}
+          uploadSlot={
+            <UploadButton onClick={() => uploaderRef.current?.openFilePicker()} />
+          }
         />
 
-        {/* Content area */}
-        <div className="flex-1 overflow-y-auto p-6">
-          {isLoading ? (
-            // Grid/list handles its own skeleton
-            viewMode === 'grid' ? (
-              <MediaGrid items={[]} selectedId={null} onSelect={() => {}} isLoading />
+        {/* MediaUploader wraps the content area for drag-drop; upload button is in toolbar */}
+        <MediaUploader
+          ref={uploaderRef}
+          activeFolder={activeFolder}
+          activeBucket={activeBucket}
+          uploadedBy={currentUserId}
+          uploadedByRole={currentUserRole}
+          onUploadComplete={handleUploadComplete}
+          onUploadProgress={handleUploadProgress}
+          onUploadStart={handleUploadStart}
+        >
+          <div className="overflow-y-auto p-6 h-full">
+            {/* Upload progress cards at top of grid while uploading */}
+            {pendingCards.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 mb-4">
+                {pendingCards.map(card => (
+                  <UploadProgressCard key={card.fileId} card={card} />
+                ))}
+              </div>
+            )}
+
+            {isLoading ? (
+              viewMode === 'grid' ? (
+                <MediaGrid items={[]} selectedId={null} onSelect={() => {}} isLoading />
+              ) : (
+                <MediaList items={[]} selectedId={null} onSelect={() => {}} isLoading />
+              )
+            ) : items.length === 0 && pendingCards.length === 0 ? (
+              <EmptyState activeFolder={activeFolder} hasFilters={hasFilters} />
+            ) : viewMode === 'grid' ? (
+              <MediaGrid
+                items={items}
+                selectedId={selectedItem?.id ?? null}
+                onSelect={setSelectedItem}
+                isLoading={false}
+              />
             ) : (
-              <MediaList items={[]} selectedId={null} onSelect={() => {}} isLoading />
-            )
-          ) : items.length === 0 ? (
-            <EmptyState activeFolder={activeFolder} hasFilters={hasFilters} />
-          ) : viewMode === 'grid' ? (
-            <MediaGrid
-              items={items}
-              selectedId={selectedItem?.id ?? null}
-              onSelect={setSelectedItem}
-              isLoading={false}
-            />
-          ) : (
-            <MediaList
-              items={items}
-              selectedId={selectedItem?.id ?? null}
-              onSelect={setSelectedItem}
-              isLoading={false}
-            />
-          )}
+              <MediaList
+                items={items}
+                selectedId={selectedItem?.id ?? null}
+                onSelect={setSelectedItem}
+                isLoading={false}
+              />
+            )}
 
-          {/* Infinite scroll sentinel */}
-          <div ref={sentinelRef} className="h-4" aria-hidden="true" />
+            {/* Infinite scroll sentinel */}
+            <div ref={sentinelRef} className="h-4" aria-hidden="true" />
 
-          {/* Fetch-more indicator */}
-          {isFetchingMore && (
-            <div className="flex justify-center py-4">
-              <div className="w-5 h-5 border-2 border-slate-300 border-t-primary rounded-full animate-spin" aria-label="Loading more" />
-            </div>
-          )}
-        </div>
+            {/* Fetch-more indicator */}
+            {isFetchingMore && (
+              <div className="flex justify-center py-4">
+                <div className="w-5 h-5 border-2 border-slate-300 border-t-primary rounded-full animate-spin" aria-label="Loading more" />
+              </div>
+            )}
+          </div>
+        </MediaUploader>
       </div>
 
-      {/* Detail panel — reserved slot (w-0 → w-[380px] in Plan 02-03) */}
-      {selectedItem ? (
-        <div className="w-[380px] shrink-0 border-l border-slate-200 bg-white overflow-hidden transition-[width] duration-200" />
-      ) : (
-        <div className="w-0 shrink-0 border-l border-slate-200 overflow-hidden transition-[width] duration-200" />
+      {/* Detail panel — 380px push-content (not overlay); renders when an item is selected */}
+      {selectedItem && (
+        <MediaDetailPanel
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+          isAdmin={isAdmin}
+        />
       )}
     </div>
   );
