@@ -5,6 +5,7 @@ import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
 import { getStripe } from '@/lib/stripe/client'
 import { getSupabaseService } from '@/lib/supabase/service'
 import type { SupportTicket, TicketStatus } from '@/lib/chatbot/types'
+import { logAudit } from '@/lib/audit'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -434,4 +435,149 @@ export async function replyToTicket(
       error: err instanceof Error ? err.message : 'Unknown error',
     }
   }
+}
+
+// --- Phase 18 additions: Event Approve/Reject ---
+
+/**
+ * Approve a pending_review event — sets status to 'published' and writes audit log.
+ */
+export async function approveEvent(
+  eventId: string,
+): Promise<{ success: boolean; error?: string }> {
+  // 1. Auth guard — require admin or moderator role
+  const supabase = await createSupabaseServerActionClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  const serviceClient = getSupabaseService()
+  const { data: adminProfile } = await serviceClient
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (
+    !adminProfile ||
+    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+  ) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  // 2. Load event to verify it exists and is pending_review
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: event } = await (serviceClient as any)
+    .from('events')
+    .select('id, status')
+    .eq('id', eventId)
+    .single()
+
+  if (!event || event.status !== 'pending_review') {
+    return { success: false, error: 'Event not found or already reviewed' }
+  }
+
+  // 3. Update status to published
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (serviceClient as any)
+    .from('events')
+    .update({ status: 'published' })
+    .eq('id', eventId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  // 4. Write audit log entry
+  await logAudit({
+    category: 'admin',
+    action: 'event.status_changed',
+    actor_id: user.id,
+    actor_role: adminProfile.role,
+    target_type: 'event',
+    target_id: eventId,
+    description: 'Approved member event — status changed from pending_review to published',
+    metadata: { old_status: 'pending_review', new_status: 'published' },
+  })
+
+  // 5. Revalidate
+  revalidatePath('/admin/inbox')
+  return { success: true }
+}
+
+/**
+ * Reject a pending_review event — sets status to 'rejected', saves reason, writes audit log.
+ */
+export async function rejectEvent(
+  eventId: string,
+  reason: string,
+): Promise<{ success: boolean; error?: string }> {
+  // 1. Auth guard — require admin or moderator role
+  const supabase = await createSupabaseServerActionClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  const serviceClient = getSupabaseService()
+  const { data: adminProfile } = await serviceClient
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (
+    !adminProfile ||
+    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+  ) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  // 2. Validate reason
+  if (!reason || reason.trim().length < 10) {
+    return { success: false, error: 'Rejection reason must be at least 10 characters' }
+  }
+
+  // 3. Load event to verify it exists and is pending_review
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: event } = await (serviceClient as any)
+    .from('events')
+    .select('id, status')
+    .eq('id', eventId)
+    .single()
+
+  if (!event || event.status !== 'pending_review') {
+    return { success: false, error: 'Event not found or already reviewed' }
+  }
+
+  // 4. Update status to rejected with reason
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (serviceClient as any)
+    .from('events')
+    .update({
+      status: 'rejected',
+      rejection_reason: reason.trim(),
+    })
+    .eq('id', eventId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  // 5. Write audit log entry
+  await logAudit({
+    category: 'admin',
+    action: 'event.status_changed',
+    actor_id: user.id,
+    actor_role: adminProfile.role,
+    target_type: 'event',
+    target_id: eventId,
+    description: `Rejected member event — reason: ${reason.trim()}`,
+    metadata: { old_status: 'pending_review', new_status: 'rejected', rejection_reason: reason.trim() },
+  })
+
+  // 6. Revalidate
+  revalidatePath('/admin/inbox')
+  return { success: true }
 }
