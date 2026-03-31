@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabase';
 import type { Event, EventCategory, EventFormat } from '@/lib/types';
 import {
@@ -12,6 +13,8 @@ import {
   deleteMemberEvent,
 } from './actions';
 import { registerMediaItemAction } from '@/app/actions/media';
+
+const GooglePlacesAutocomplete = dynamic(() => import('@/app/components/GooglePlacesAutocomplete'), { ssr: false });
 
 const CATEGORIES: EventCategory[] = ['Workshop', 'Teacher Training', 'Dharma Talk', 'Conference', 'Yoga Sequence', 'Music Playlist', 'Research'];
 const FORMATS: EventFormat[] = ['Online', 'In Person', 'Hybrid'];
@@ -140,6 +143,10 @@ export default function MyEventsClient({ initialEvents }: Props) {
         time_end: formData.all_day ? null : formData.time_end,
         instructor: formData.instructor,
         location: formData.location,
+        location_lat: formData.location_lat,
+        location_lng: formData.location_lng,
+        online_platform_name: formData.online_platform_name,
+        online_platform_url: formData.online_platform_url,
         description: formData.description,
         price: formData.is_free ? 0 : (formData.price ?? 0),
         is_free: formData.is_free,
@@ -400,6 +407,16 @@ export default function MyEventsClient({ initialEvents }: Props) {
 }
 
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function AnimatedField({ show, children }: { show: boolean; children: React.ReactNode }) {
+  return (
+    <div className={`grid transition-all duration-200 ease-in-out ${show ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+      <div className="overflow-hidden">{children}</div>
+    </div>
+  );
+}
+
 // ── Member Event Form ─────────────────────────────────────────────────────────
 
 interface FormValues {
@@ -413,6 +430,10 @@ interface FormValues {
   time_end: string;
   instructor: string;
   location: string;
+  location_lat: number | null;
+  location_lng: number | null;
+  online_platform_name: string | null;
+  online_platform_url: string | null;
   description: string;
   price: number;
   is_free: boolean;
@@ -449,6 +470,10 @@ function MemberEventForm({
   const [timeEnd, setTimeEnd] = useState(event?.time_end?.slice(0, 5) ?? '');
   const [instructor, setInstructor] = useState(event?.instructor ?? '');
   const [location, setLocation] = useState(event?.location ?? '');
+  const [locationLat, setLocationLat] = useState<number | null>(event?.location_lat ?? null);
+  const [locationLng, setLocationLng] = useState<number | null>(event?.location_lng ?? null);
+  const [onlinePlatformName, setOnlinePlatformName] = useState(event?.online_platform_name ?? '');
+  const [onlinePlatformUrl, setOnlinePlatformUrl] = useState(event?.online_platform_url ?? '');
   const [description, setDesc] = useState(event?.description ?? '');
   const [price, setPrice] = useState(String(event?.price ?? '0'));
   const [isFree, setIsFree] = useState(event?.is_free ?? false);
@@ -480,6 +505,12 @@ function MemberEventForm({
     if (fileRef.current) fileRef.current.value = '';
   }
 
+  const handlePlaceSelect = useCallback((place: { name: string; lat: number; lng: number }) => {
+    setLocation(place.name);
+    setLocationLat(place.lat);
+    setLocationLng(place.lng);
+  }, []);
+
   function buildFormValues(): FormValues {
     return {
       title: title.trim(),
@@ -492,6 +523,10 @@ function MemberEventForm({
       time_end: timeEnd,
       instructor: instructor.trim(),
       location: location.trim(),
+      location_lat: format !== 'Online' ? locationLat : null,
+      location_lng: format !== 'Online' ? locationLng : null,
+      online_platform_name: format === 'Online' || format === 'Hybrid' ? onlinePlatformName.trim() || null : null,
+      online_platform_url: format === 'Online' || format === 'Hybrid' ? onlinePlatformUrl.trim() || null : null,
       description: description.trim(),
       price: isFree ? 0 : parseFloat(price) || 0,
       is_free: isFree,
@@ -574,17 +609,56 @@ function MemberEventForm({
           )}
         </div>
 
-        {/* Instructor / Location */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className={LABEL}>Instructor</label>
-            <input type="text" value={instructor} onChange={e => setInstructor(e.target.value)} className={INPUT} placeholder="Instructor name" />
-          </div>
-          <div>
-            <label className={LABEL}>Location</label>
-            <input type="text" value={location} onChange={e => setLocation(e.target.value)} className={INPUT} placeholder="e.g. Online via Zoom or City, Country" />
-          </div>
+        {/* Instructor */}
+        <div>
+          <label className={LABEL}>Instructor</label>
+          <input type="text" value={instructor} onChange={e => setInstructor(e.target.value)} className={INPUT} placeholder="Instructor name" />
         </div>
+
+        {/* In Person / Hybrid: Google Places autocomplete (LOC-03) */}
+        <AnimatedField show={format !== 'Online'}>
+          <div className="pt-1">
+            <label className={LABEL}>Location</label>
+            <GooglePlacesAutocomplete
+              value={location}
+              onChange={setLocation}
+              onPlaceSelect={handlePlaceSelect}
+              className={INPUT}
+              placeholder="Search for a venue or address..."
+            />
+            {locationLat !== null && locationLng !== null && (
+              <p className="text-xs text-[#9CA3AF] mt-1">
+                Coordinates: {locationLat.toFixed(5)}, {locationLng.toFixed(5)}
+              </p>
+            )}
+          </div>
+        </AnimatedField>
+
+        {/* Online / Hybrid: platform name + URL (LOC-02) */}
+        <AnimatedField show={format === 'Online' || format === 'Hybrid'}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div>
+              <label className={LABEL}>Online Platform</label>
+              <input
+                type="text"
+                value={onlinePlatformName}
+                onChange={e => setOnlinePlatformName(e.target.value)}
+                className={INPUT}
+                placeholder="e.g. Zoom, Google Meet"
+              />
+            </div>
+            <div>
+              <label className={LABEL}>Platform URL</label>
+              <input
+                type="url"
+                value={onlinePlatformUrl}
+                onChange={e => setOnlinePlatformUrl(e.target.value)}
+                className={INPUT}
+                placeholder="https://zoom.us/j/..."
+              />
+            </div>
+          </div>
+        </AnimatedField>
 
         {/* Description */}
         <div>
