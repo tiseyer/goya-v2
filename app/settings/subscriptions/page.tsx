@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { fetchSubscriptionsData } from './queries'
 import { PortalButton } from './PortalButton'
 import { DesignationsBox } from './DesignationsBox'
+import SchoolRegistrationCTA from '@/app/components/SchoolRegistrationCTA'
 
 const ROLE_PLAN_NAMES: Record<string, string> = {
   student: 'GOYA Student Membership',
@@ -66,6 +67,14 @@ export default async function SettingsSubscriptionsPage() {
           <PortalButton stripeCustomerId={profile.stripeCustomerId} />
         )}
       </div>
+
+      {/* School Registration CTA — teachers without a school */}
+      {profile.role === 'teacher' && !ownsSchool && (
+        <>
+          <Separator />
+          <SchoolRegistrationCTA variant="callout" />
+        </>
+      )}
 
       {/* Upgrade CTA / Pending State — only for students and wellness practitioners */}
       {isUpgradeEligible && (

@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import PageHero from '@/app/components/PageHero'
+import SchoolRegistrationCTA from '@/app/components/SchoolRegistrationCTA'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -158,6 +159,13 @@ export default async function AddonsPage() {
         title="All Add-Ons & Upgrades"
         subtitle="Enhance your GOYA profile with verified designation badges, continuing education credits, and more."
       />
+
+      {/* School Registration Banner — teachers without a school */}
+      {role === 'teacher' && !isSchoolOwner && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          <SchoolRegistrationCTA variant="banner" />
+        </div>
+      )}
 
       {/* Toolbar */}
       <div className="border-b border-slate-200 bg-white sticky top-16 z-40">
