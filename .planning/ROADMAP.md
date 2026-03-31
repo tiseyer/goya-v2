@@ -145,7 +145,9 @@ Plans:
   1. When an owner adds a faculty member by email who is not a GOYA member, an invitation email is sent via Resend
   2. The invitation email contains a link to /register?school=[slug]&invite=[token]
   3. A new member who registers using a valid invite link is automatically linked to the school's faculty
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 35-01-PLAN.md — Faculty invitation email + registration auto-link
 
 ## Progress
 
@@ -160,4 +162,4 @@ Plans:
 | 32. School Settings | 3/3 | Complete    | 2026-03-31 |
 | 33. Admin School Management | 2/2 | Complete    | 2026-03-31 |
 | 34. Public School Profile | 2/2 | Complete    | 2026-03-31 |
-| 35. Faculty Invitations | 0/TBD | Not started | - |
+| 35. Faculty Invitations | 0/1 | Not started | - |
