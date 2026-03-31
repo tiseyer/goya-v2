@@ -142,6 +142,9 @@ export default function MediaPageClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // ── Folders state (updated via onFoldersChange for immediate sidebar refresh) ─
+  const [folders, setFolders] = useState<MediaFolder[]>(initialFolders);
+
   // ── Filter / search / sort state ───────────────────────────────────────────
   const [activeFolder, setActiveFolder] = useState<string | null>(folderProp ?? null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(coerceView(viewProp));
@@ -168,7 +171,7 @@ export default function MediaPageClient({
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // Derive bucket from active folder
-  const activeBucket = deriveBucket(activeFolder, initialFolders);
+  const activeBucket = deriveBucket(activeFolder, folders);
 
   // ── Hydrate localStorage prefs on mount ────────────────────────────────────
   useEffect(() => {
@@ -350,11 +353,14 @@ export default function MediaPageClient({
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
       {/* Folder sidebar */}
       <FolderSidebar
-        folders={initialFolders}
+        folders={folders}
         activeFolder={activeFolder}
         onFolderSelect={handleFolderSelect}
         collapsed={sidebarCollapsed}
         onCollapse={handleSidebarCollapse}
+        isAdmin={isAdmin}
+        currentUserId={currentUserId}
+        onFoldersChange={setFolders}
       />
 
       {/* Main area */}
