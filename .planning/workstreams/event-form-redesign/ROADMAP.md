@@ -6,7 +6,7 @@
 - [x] **Phase 2: Form UI Redesign + Status** - Modern card-based layout with role-aware status field
 - [x] **Phase 3: Multi-day Events + Registration Toggle** - End date, all-day toggle, registration control
 - [x] **Phase 4: Google Places Integration** - Format-conditional location with autocomplete
-- [ ] **Phase 5: Organizers System** - Multi-organizer chips with member search
+- [x] **Phase 5: Organizers System** - Multi-organizer chips with member search
 
 ## Phase Details
 
@@ -77,7 +77,7 @@
 | 2. Form UI Redesign + Status | 1/1 | Complete | 2026-03-31 |
 | 3. Multi-day Events + Registration Toggle | 1/1 | Complete | 2026-03-31 |
 | 4. Google Places Integration | 1/1 | Complete | 2026-03-31 |
-| 5. Organizers System | 0/0 | Not started | - |
+| 5. Organizers System | 1/1 | Complete | 2026-03-31 |
 
 ## Coverage
 
