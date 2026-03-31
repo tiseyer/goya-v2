@@ -6,5 +6,12 @@ export default async function SettingsLayout({ children }: { children: React.Rea
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/sign-in');
-  return <SettingsShell>{children}</SettingsShell>;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  return <SettingsShell userRole={profile?.role ?? undefined}>{children}</SettingsShell>;
 }
