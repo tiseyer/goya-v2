@@ -14,8 +14,8 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 - [x] **DB-03**: school_faculty table with position, principal_trainer flag, invited_email for non-members
 - [x] **DB-04**: school_verification_documents table with document type, designation link, file storage
 - [x] **DB-05**: Profiles table extended with principal_trainer_school_id and faculty_school_ids
-- [ ] **DB-06**: RLS policies: owner CRUD own school, public SELECT approved, admin/mod full access
-- [ ] **DB-07**: TypeScript types regenerated and tsc --noEmit passes
+- [x] **DB-06**: RLS policies: owner CRUD own school, public SELECT approved, admin/mod full access
+- [x] **DB-07**: TypeScript types regenerated and tsc --noEmit passes
 
 ### Interest & Entry Points
 
@@ -107,8 +107,8 @@ Requirements for School Owner System milestone. Each maps to roadmap phases.
 | DB-03 | Phase 28 | Complete |
 | DB-04 | Phase 28 | Complete |
 | DB-05 | Phase 28 | Complete |
-| DB-06 | Phase 28 | Pending |
-| DB-07 | Phase 28 | Pending |
+| DB-06 | Phase 28 | Complete |
+| DB-07 | Phase 28 | Complete |
 | INT-01 | Phase 29 | Pending |
 | INT-02 | Phase 29 | Pending |
 | INT-03 | Phase 29 | Pending |

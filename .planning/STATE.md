@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.14
 milestone_name: School Owner System
-status: executing
-stopped_at: Completed 28-01-PLAN.md
-last_updated: "2026-03-31T11:52:18.786Z"
+status: verifying
+stopped_at: Completed 28-02-PLAN.md
+last_updated: "2026-03-31T11:59:17.043Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 8
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 
 Phase: 28 (database-foundation) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-31
 
 Progress: [░░░░░░░░░░] 0%
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 28 P01 | 18 | 2 tasks | 3 files |
+| Phase 28 P02 | 3 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - [Phase 28]: Migration timestamp changed 20260370→20260376 to avoid collision with existing member_events_schema.sql
 - [Phase 28]: Used Supabase Management API with SUPABASE_ACCESS_TOKEN for direct SQL execution when CLI migration history was out of sync
 - [Phase 28]: schools status CHECK extended to 5 values: pending, pending_review, approved, rejected, suspended
+- [Phase 28]: Created 20260377_school_rls_policies.sql rather than appending to 20260376 (schema already applied remotely in plan 28-01)
+- [Phase 28]: school_verification_documents has NO public SELECT — private documents visible only to owner and admins
 
 ### Blockers/Concerns
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T11:52:18.783Z
-Stopped at: Completed 28-01-PLAN.md
+Last session: 2026-03-31T11:59:17.041Z
+Stopped at: Completed 28-02-PLAN.md
 Resume file: None

@@ -17,7 +17,7 @@
 
 **Milestone Goal:** Teachers can register their yoga school on GOYA — select designations, pay via Stripe, complete onboarding, get admin-verified, and go live with a public school profile.
 
-- [ ] **Phase 28: Database Foundation** - Extend schools/profiles tables, add school_designations/faculty/documents tables, RLS policies, TypeScript types
+- [x] **Phase 28: Database Foundation** - Extend schools/profiles tables, add school_designations/faculty/documents tables, RLS policies, TypeScript types (completed 2026-03-31)
 - [ ] **Phase 29: Interest & Entry Points** - Dashboard widget, subscriptions callout, add-ons banner for teachers without a school
 - [ ] **Phase 30: School Registration Flow** - Name/slug step, designation selection, Stripe Checkout, post-payment school record creation
 - [ ] **Phase 31: School Onboarding Flow** - 9-step onboarding wizard from welcome through review & submit
@@ -36,10 +36,10 @@
   3. school_faculty table exists with position, principal_trainer flag, and invited_email for non-members
   4. school_verification_documents table exists linked to school and designation with file storage references
   5. Profiles table has principal_trainer_school_id and faculty_school_ids columns; RLS restricts school data by owner/public/admin role; tsc --noEmit passes with no type errors
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 28-01-PLAN.md — Schema migration: extend schools, create 3 new tables, extend profiles
-- [ ] 28-02-PLAN.md — RLS policies for new tables, TypeScript type regeneration, tsc verification
+- [x] 28-02-PLAN.md — RLS policies for new tables, TypeScript type regeneration, tsc verification
 
 ### Phase 29: Interest & Entry Points
 **Goal**: Teachers who do not yet own a school are prompted to register from three distinct surfaces in the platform
@@ -134,7 +134,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 28. Database Foundation | 1/2 | In Progress|  |
+| 28. Database Foundation | 2/2 | Complete   | 2026-03-31 |
 | 29. Interest & Entry Points | 0/TBD | Not started | - |
 | 30. School Registration Flow | 0/TBD | Not started | - |
 | 31. School Onboarding Flow | 0/TBD | Not started | - |
