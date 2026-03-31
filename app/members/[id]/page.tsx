@@ -7,6 +7,14 @@ import PageContainer from '@/app/components/ui/PageContainer';
 
 export const dynamic = 'force-dynamic';
 
+type SchoolInfo = {
+  id: string;
+  name: string;
+  slug: string | null;
+  status: string;
+  logo_url: string | null;
+};
+
 const ROLE_HERO: Record<string, { badge: string }> = {
   teacher: { badge: 'bg-teal-500/20 text-teal-300 border border-teal-500/30' },
   student: { badge: 'bg-blue-500/20 text-blue-300 border border-blue-500/30' },
@@ -33,11 +41,35 @@ export default async function MemberProfilePage({
 
   const { data: profileData } = await serviceClient
     .from('profiles')
-    .select('id, full_name, first_name, last_name, avatar_url, bio, city, country, role, instagram, youtube, website, facebook, created_at')
+    .select('id, full_name, first_name, last_name, avatar_url, bio, city, country, role, instagram, youtube, website, facebook, created_at, principal_trainer_school_id, faculty_school_ids')
     .eq('id', id)
     .single();
 
   if (!profileData) notFound();
+
+  // Fetch affiliated school(s) for approved school links
+  let affiliatedSchools: SchoolInfo[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const serviceAny = serviceClient as any;
+  if (profileData.principal_trainer_school_id) {
+    const { data } = await serviceAny
+      .from('schools')
+      .select('id, name, slug, status, logo_url')
+      .eq('id', profileData.principal_trainer_school_id)
+      .eq('status', 'approved')
+      .maybeSingle();
+    if (data) affiliatedSchools = [data];
+  } else if (
+    Array.isArray(profileData.faculty_school_ids) &&
+    (profileData.faculty_school_ids as string[]).length > 0
+  ) {
+    const { data } = await serviceAny
+      .from('schools')
+      .select('id, name, slug, status, logo_url')
+      .in('id', profileData.faculty_school_ids as string[])
+      .eq('status', 'approved');
+    if (data) affiliatedSchools = data;
+  }
 
   const profile = profileData;
 
@@ -194,6 +226,44 @@ export default async function MemberProfilePage({
                 </div>
               </div>
             )}
+
+            {/* Visit School card(s) — only for Principal Trainers / Faculty of approved schools */}
+            {affiliatedSchools.map(school => (
+              <div key={school.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[#4E87A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  School
+                </h2>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#4E87A0]/10 flex items-center justify-center overflow-hidden shrink-0">
+                    {school.logo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={school.logo_url} alt={school.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-sm font-bold text-[#4E87A0]">{school.name[0]?.toUpperCase() ?? '?'}</span>
+                    )}
+                  </div>
+                  <p className="font-semibold text-slate-800 text-sm leading-tight">{school.name}</p>
+                </div>
+                {school.slug ? (
+                  <Link
+                    href={`/schools/${school.slug}`}
+                    className="block w-full text-center px-4 py-2.5 text-sm font-semibold bg-[#4E87A0] text-white rounded-xl hover:bg-[#3d6f87] transition-colors"
+                  >
+                    Visit School
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/schools/${school.id}`}
+                    className="block w-full text-center px-4 py-2.5 text-sm font-semibold bg-[#4E87A0] text-white rounded-xl hover:bg-[#3d6f87] transition-colors"
+                  >
+                    Visit School
+                  </Link>
+                )}
+              </div>
+            ))}
 
             {/* Member card */}
             <div className="bg-[#1B3A5C] rounded-2xl p-6 relative overflow-hidden">
