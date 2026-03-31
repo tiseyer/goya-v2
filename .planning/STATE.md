@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 Phase: 15
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-03-30 - Completed quick task 260330-prz: Re-run Stripe recon with live key
+Last activity: 2026-03-31 - Completed quick task 260331-ijj: Fix build — commit untracked CreateUserButton.tsx
 
 Progress: [██████████] 100%
 
@@ -124,6 +124,7 @@ None yet.
 | 260330-o9t | Stripe reconciliation analysis for WC users without Stripe sub IDs — script + WC data | 2026-03-30 | 3ab4391 | [260330-o9t](./quick/260330-o9t-stripe-reconciliation-analysis-for-875-w/) |
 | 260330-pwe | Change stripe-events cron schedule back to every 5 minutes | 2026-03-30 | 74cf79c | [260330-pwe](./quick/260330-pwe-change-stripe-events-cron-schedule-back-/) |
 | 260330-prz | Re-run Stripe recon with live key — 807 C2 (customer no subs), 4164 C (no customer) | 2026-03-30 | — | [260330-prz](./quick/260330-prz-re-run-stripe-reconciliation-with-live-k/) |
+| 260331-ijj | Fix build: commit untracked CreateUserButton.tsx to unblock Vercel deploy | 2026-03-31 | 985607b | [260331-ijj](./quick/260331-ijj-fix-build-commit-untracked-createuserbut/) |
 
 ## Session Continuity
 
