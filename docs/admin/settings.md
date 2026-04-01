@@ -3,21 +3,20 @@ title: System Settings
 audience: ["admin"]
 section: admin
 order: 9
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # System Settings
 
 The System Settings page controls platform-wide configuration. Navigate to **Settings > System** in the sidebar or go to `/admin/settings`.
 
-The page has three tabs: **General**, **Health**, and **Maintenance**.
+The page has four tabs: **General**, **Health**, **Maintenance**, and **Deployments**.
 
 ## Table of Contents
 
 - [General Tab](#general-tab)
 - [Health Tab](#health-tab)
 - [Maintenance Tab](#maintenance-tab)
-- [Email Templates](#email-templates)
 
 ---
 
@@ -77,18 +76,6 @@ Toggle **Maintenance Mode Enabled** to off and save. The maintenance page is rem
 
 ---
 
-## Email Templates
+> **Note:** Email Templates have moved to the dedicated **Emails** section. See [Emails](./emails.md).
 
-Navigate to **Settings > Email Templates** or go to `/admin/settings/email-templates`.
-
-This page allows you to view and edit the transactional email templates used for events such as:
-
-- Member verification approval and rejection
-- Teacher upgrade approval and rejection
-- Password reset and welcome emails
-
-Each template has editable subject and body fields with variable placeholders (e.g. `{{firstName}}`). Changes take effect immediately for all future emails of that type.
-
----
-
-**See also:** [Overview](./overview.md) | [Audit Log](./audit-log.md) | [Chatbot](./chatbot.md)
+**See also:** [Overview](./overview.md) | [Audit Log](./audit-log.md) | [Emails](./emails.md)
