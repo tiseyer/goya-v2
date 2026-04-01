@@ -155,7 +155,7 @@ Plans:
 
 </details>
 
-### 🚧 v1.15 Course System Redesign (In Progress)
+### v1.15 Course System Redesign (In Progress)
 
 **Milestone Goal:** Redesign admin course management with categories table, multi-lesson support, drag-and-drop ordering, platform-aware video fields, and modern SaaS UI.
 
@@ -175,7 +175,10 @@ Plans:
   3. The courses table has category_id FK pointing to course_categories, duration_minutes integer column, and the old category text column and vimeo_url column are dropped
   4. RLS on course_categories allows admin/mod full CRUD and public SELECT; RLS on lessons allows admin/mod full CRUD, members SELECT published lessons of published courses, and course creators SELECT their own
   5. npx tsc --noEmit passes with no type errors after types are regenerated
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 36-01-PLAN.md — Schema: create course_categories + lessons tables, migrate courses (category_id FK, duration_minutes, drop legacy columns)
+- [ ] 36-02-PLAN.md — RLS policies for course_categories and lessons, regenerate TypeScript types, fix tsc
 
 ### Phase 37: Admin Courses — Tabs + Categories
 **Goal**: Admins can manage course categories from a dedicated tab on the courses page, with full CRUD and a safe delete guard
@@ -212,7 +215,7 @@ Plans:
   1. The course edit page has a Lessons section; when no lessons exist the section shows "No lessons yet" with a prompt to add the first lesson
   2. Each lesson in the list shows a drag handle, sequential number, title, type badge (Video/Audio/Text), duration, and edit/delete actions
   3. Clicking "Add lesson" or the edit button opens a form with a visual type selector (card-style toggle for Video, Audio, Text)
-  4. The Video lesson form shows a platform toggle (Vimeo/YouTube), URL field, short and long description fields, and a duration slider (1–180 min); the Audio form shows audio URL, featured image upload, descriptions, and duration slider; the Text form shows featured image, descriptions, and duration slider
+  4. The Video lesson form shows a platform toggle (Vimeo/YouTube), URL field, short and long description fields, and a duration slider (1-180 min); the Audio form shows audio URL, featured image upload, descriptions, and duration slider; the Text form shows featured image, descriptions, and duration slider
   5. Dragging a lesson to a new position updates sort_order in the database with a single-row write (float position midpoint); the list reflects the new order immediately without a full page reload
   6. Drag-and-drop works on touch screens (mobile and tablet)
 **Plans**: TBD
@@ -233,7 +236,7 @@ Plans:
 
 ## Progress
 
-**Execution Order:** 36 → 37 → 38 → 39 → 40
+**Execution Order:** 36 -> 37 -> 38 -> 39 -> 40
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -245,7 +248,7 @@ Plans:
 | 33. Admin School Management | 2/2 | Complete | 2026-03-31 |
 | 34. Public School Profile | 2/2 | Complete | 2026-03-31 |
 | 35. Faculty Invitations | 1/1 | Complete | 2026-03-31 |
-| 36. Database Migrations | 0/? | Not started | - |
+| 36. Database Migrations | 0/2 | Not started | - |
 | 37. Admin Courses — Tabs + Categories | 0/? | Not started | - |
 | 38. Course Creation Form — UI Redesign | 0/? | Not started | - |
 | 39. Lesson Management — UI + Logic | 0/? | Not started | - |
