@@ -189,3 +189,21 @@ export interface Message {
   read_at: string | null;
   created_at: string;
 }
+
+export interface Subscription {
+  id: string;
+  user_id: string;
+  stripe_subscription_id: string;
+  stripe_customer_id: string | null;
+  plan_name: string;
+  status: 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'paused' | 'unpaid';
+  amount: number;
+  currency: string;
+  interval: 'month' | 'year';
+  current_period_start: string | null;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  canceled_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
