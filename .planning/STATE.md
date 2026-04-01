@@ -119,6 +119,7 @@ None yet.
 | 260401-f1l | WordPress media library migration script | 2026-04-01 | d64f9b9, cb51c1a | [260401-f1l-wordpress-media-library-migration-script](./quick/260401-f1l-wordpress-media-library-migration-script/) |
 | 260401-hg8 | Fix Vercel build: 4 module-not-found errors | 2026-04-01 | 61a2c5e | [260401-hg8-fix-vercel-build-resolve-4-module-not-fo](./quick/260401-hg8-fix-vercel-build-resolve-4-module-not-fo/) |
 | 260401-hk4 | Add milestone branching rules to CLAUDE.md | 2026-04-01 | 046ed9c | [260401-hk4-add-milestone-branching-rules-to-claude-](./quick/260401-hk4-add-milestone-branching-rules-to-claude-/) |
+| 260401-jqr | Fix Recharts labelFormatter and formatter types | 2026-04-01 | 98eecf6 | [260401-jqr-fix-labelformatter-type-in-usersanalytic](./quick/260401-jqr-fix-labelformatter-type-in-usersanalytic/) |
 
 ## Session Continuity
 
