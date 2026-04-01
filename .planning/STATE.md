@@ -117,6 +117,7 @@ None yet.
 | 260401-9dj | Fix admin users — create user modal, detail boxes, school CTA | 2026-04-01 | a40160a, a7e7085, 2870e63 | — |
 | 260401-dm7 | Remove footer from all pages except landing and legal | 2026-04-01 | — | [260401-dm7-remove-footer-from-all-pages-except-land](./quick/260401-dm7-remove-footer-from-all-pages-except-land/) |
 | 260401-f1l | WordPress media library migration script | 2026-04-01 | d64f9b9, cb51c1a | [260401-f1l-wordpress-media-library-migration-script](./quick/260401-f1l-wordpress-media-library-migration-script/) |
+| 260401-hg8 | Fix Vercel build: 4 module-not-found errors | 2026-04-01 | 61a2c5e | [260401-hg8-fix-vercel-build-resolve-4-module-not-fo](./quick/260401-hg8-fix-vercel-build-resolve-4-module-not-fo/) |
 
 ## Session Continuity
 
