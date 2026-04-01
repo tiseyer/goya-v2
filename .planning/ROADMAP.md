@@ -271,7 +271,9 @@ Plans:
   3. brand_colors saved to site_settings as a JSON value under the key "brand_colors" are reflected as CSS variables after a page reload
   4. role_colors saved to site_settings as a JSON value under the key "role_colors" are reflected as CSS variables after a page reload
   5. maintenance_indicator_color saved to site_settings under the key "maintenance_indicator_color" is reflected as a CSS variable after a page reload
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 41-01-PLAN.md — ThemeColorProvider server component, color defaults/types, layout.tsx integration
 
 ### Phase 42: Admin Colors UI
 **Goal**: Admins can view, edit, preview, save, and reset all brand colors, role colors, and the maintenance indicator color from a dedicated Colors page in Admin Settings
@@ -283,7 +285,9 @@ Plans:
   3. Changing any color updates the CSS variables on the page instantly so the admin can see how the color looks before saving
   4. Clicking "Save" persists all current color values to site_settings; clicking the per-color reset icon restores that single color to its default value
   5. Clicking "Reset All" restores every color across all three sections to its default value
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 41-01-PLAN.md — ThemeColorProvider server component, color defaults/types, layout.tsx integration
 **UI hint**: yes
 
 ## Progress
