@@ -1,6 +1,7 @@
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
 import MemberGrowthChart from './MemberGrowthChart';
+import HealthAlertBanner from './HealthAlertBanner';
 // AnalyticsSection removed — GA4 tracking is handled client-side via AnalyticsProvider
 
 // ─── Stat card ─────────────────────────────────────────────────────────────────
@@ -169,6 +170,9 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-bold text-[#1B3A5C]">Welcome back, {firstName}</h1>
         <p className="text-sm text-[#6B7280] mt-1">{today}</p>
       </div>
+
+      {/* Health alert banner — hidden if all green */}
+      <HealthAlertBanner />
 
       {/* Row 1 — User stats */}
       <div className="mb-8">
