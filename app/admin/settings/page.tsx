@@ -6,6 +6,7 @@ import HealthTab from './components/HealthTab';
 import MaintenanceTab from './components/MaintenanceTab';
 import VersionsTab from './components/VersionsTab';
 import DangerZone from './components/DangerZone';
+import ColorsTab from './components/ColorsTab';
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
 
@@ -134,10 +135,11 @@ function GeneralTab() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-type Tab = 'general' | 'health' | 'maintenance' | 'versions';
+type Tab = 'general' | 'health' | 'maintenance' | 'versions' | 'colors';
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'general',     label: 'General'     },
+  { key: 'colors',      label: 'Colors'      },
   { key: 'health',      label: 'Health'      },
   { key: 'maintenance', label: 'Maintenance' },
   { key: 'versions',    label: 'Versions'    },
@@ -187,9 +189,10 @@ export default function SettingsPage() {
       </div>
 
       {tab === 'general'     && <GeneralTab />}
+      {tab === 'colors'      && <ColorsTab />}
       {tab === 'health'      && <HealthTab />}
       {tab === 'maintenance' && <MaintenanceTab />}
-      {tab === 'versions' && <VersionsTab />}
+      {tab === 'versions'    && <VersionsTab />}
     </div>
   );
 }
