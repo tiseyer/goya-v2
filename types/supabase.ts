@@ -480,16 +480,60 @@ export type Database = {
           },
         ]
       }
+      course_categories: {
+        Row: {
+          color: string
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          slug: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          slug: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "course_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           access: string | null
-          category: string
+          category_id: string | null
           course_type: string
           created_at: string | null
           created_by: string | null
           deleted_at: string | null
           description: string | null
-          duration: string | null
+          duration_minutes: number | null
           gradient_from: string | null
           gradient_to: string | null
           id: string
@@ -501,17 +545,16 @@ export type Database = {
           thumbnail_url: string | null
           title: string
           updated_at: string | null
-          vimeo_url: string | null
         }
         Insert: {
           access?: string | null
-          category: string
+          category_id?: string | null
           course_type?: string
           created_at?: string | null
           created_by?: string | null
           deleted_at?: string | null
           description?: string | null
-          duration?: string | null
+          duration_minutes?: number | null
           gradient_from?: string | null
           gradient_to?: string | null
           id?: string
@@ -523,17 +566,16 @@ export type Database = {
           thumbnail_url?: string | null
           title: string
           updated_at?: string | null
-          vimeo_url?: string | null
         }
         Update: {
           access?: string | null
-          category?: string
+          category_id?: string | null
           course_type?: string
           created_at?: string | null
           created_by?: string | null
           deleted_at?: string | null
           description?: string | null
-          duration?: string | null
+          duration_minutes?: number | null
           gradient_from?: string | null
           gradient_to?: string | null
           id?: string
@@ -545,9 +587,15 @@ export type Database = {
           thumbnail_url?: string | null
           title?: string
           updated_at?: string | null
-          vimeo_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "courses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "course_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "courses_created_by_fkey"
             columns: ["created_by"]
@@ -1307,6 +1355,65 @@ export type Database = {
           started_at?: string | null
         }
         Relationships: []
+      }
+      lessons: {
+        Row: {
+          audio_url: string | null
+          course_id: string
+          created_at: string | null
+          description: string | null
+          duration_minutes: number | null
+          featured_image_url: string | null
+          id: string
+          short_description: string | null
+          sort_order: number
+          title: string
+          type: string
+          updated_at: string | null
+          video_platform: string | null
+          video_url: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          course_id: string
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          featured_image_url?: string | null
+          id?: string
+          short_description?: string | null
+          sort_order?: number
+          title: string
+          type: string
+          updated_at?: string | null
+          video_platform?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          course_id?: string
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          featured_image_url?: string | null
+          id?: string
+          short_description?: string | null
+          sort_order?: number
+          title?: string
+          type?: string
+          updated_at?: string | null
+          video_platform?: string | null
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       media_folders: {
         Row: {
