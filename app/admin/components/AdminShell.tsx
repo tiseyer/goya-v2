@@ -97,6 +97,13 @@ const NAV_ITEMS: NavItem[] = [
       { href: '/admin/shop/coupons', label: 'Coupons', paths: ['M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z'] },
     ],
   },
+  { type: 'divider' },
+  {
+    type: 'link',
+    href: '/admin/emails',
+    label: 'Emails',
+    paths: ['M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
+  },
   {
     type: 'group',
     label: 'Settings',
@@ -105,7 +112,6 @@ const NAV_ITEMS: NavItem[] = [
       'M15 12a3 3 0 11-6 0 3 3 0 016 0z',
     ],
     children: [
-      { href: '/admin/emails', label: 'Emails', paths: ['M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'] },
       { href: '/admin/settings', label: 'System', paths: ['M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'] },
       { href: '/admin/flows', label: 'Flows', paths: ['M6 3v12', 'M18 9a3 3 0 100-6 3 3 0 000 6z', 'M6 21a3 3 0 100-6 3 3 0 000 6z', 'M15 6a9 9 0 00-9 9'] },
       { href: '/admin/chatbot', label: 'Chatbot', paths: ['M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'] },
@@ -204,7 +210,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     });
   }
 
-  function toggleGroup(item: NavGroup) {
+  function expandGroup(item: NavGroup) {
     const firstHref = item.children[0].href;
     setOpenGroups(prev => {
       const next = new Set(prev);
@@ -214,6 +220,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       return next;
     });
     router.push(firstHref);
+  }
+
+  function toggleGroupCollapse(e: React.MouseEvent, item: NavGroup) {
+    e.stopPropagation();
+    setOpenGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(item.label)) {
+        next.delete(item.label);
+      } else {
+        next.add(item.label);
+      }
+      return next;
+    });
   }
 
   return (
@@ -260,27 +279,39 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               });
               return (
                 <div key={item.label}>
-                  <button
-                    onClick={() => toggleGroup(item)}
-                    title={collapsed ? item.label : undefined}
+                  <div
                     className={[
-                      'w-full flex items-center gap-3 px-2 py-2.5 rounded-xl transition-all duration-150 cursor-pointer',
+                      'w-full flex items-center gap-3 px-2 py-2.5 rounded-xl transition-all duration-150',
                       collapsed ? 'justify-center' : '',
                       'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
                     ].join(' ')}
                   >
-                    <div className="relative shrink-0">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        {item.paths.map((d, i) => (
-                          <path key={i} strokeLinecap="round" strokeLinejoin="round" strokeWidth={isAnyChildActive ? 2 : 1.75} d={d} />
-                        ))}
-                      </svg>
-                    </div>
-                    {!collapsed && (
-                      <>
+                    {/* Left area: icon + label — expands group and navigates to first child */}
+                    <button
+                      onClick={() => expandGroup(item)}
+                      title={collapsed ? item.label : undefined}
+                      className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                    >
+                      <div className="relative shrink-0">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          {item.paths.map((d, i) => (
+                            <path key={i} strokeLinecap="round" strokeLinejoin="round" strokeWidth={isAnyChildActive ? 2 : 1.75} d={d} />
+                          ))}
+                        </svg>
+                      </div>
+                      {!collapsed && (
                         <span className="flex-1 text-sm whitespace-nowrap overflow-hidden text-left">
                           {item.label}
                         </span>
+                      )}
+                    </button>
+                    {/* Right area: chevron — only toggles expand/collapse, no navigation */}
+                    {!collapsed && (
+                      <button
+                        onClick={(e) => toggleGroupCollapse(e, item)}
+                        className="shrink-0 flex items-center justify-center w-6 h-full py-0.5 cursor-pointer"
+                        aria-label={isGroupOpen ? `Collapse ${item.label}` : `Expand ${item.label}`}
+                      >
                         <svg
                           className={`w-3.5 h-3.5 transition-transform duration-200 ${isGroupOpen ? 'rotate-180' : ''}`}
                           fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -288,9 +319,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
-                      </>
+                      </button>
                     )}
-                  </button>
+                  </div>
                   {isGroupOpen && !collapsed && (
                     <div className="mt-0.5 space-y-0.5">
                       {item.children.map(child => {
