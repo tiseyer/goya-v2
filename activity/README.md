@@ -13,6 +13,7 @@ One file per milestone. Naming: `vX-X-X_MilestoneName_DD-MM-YYYY.md`
 | v1-10-0_MemberCourses_31-03-2026.md | 1.10.0 | ✅ Done | Mar 2026 |
 | v1-12-0_DocumentationSystem_31-03-2026.md | 1.12.0 | ✅ Done | Mar 2026 |
 | v1-14-0_SchoolOwnerSystem_31-03-2026.md | 1.14.0 | ✅ Done | Mar 2026 |
+| v1.18_AnalyticsTracking_01-04-2026.md | 1.18.0 | ✅ Done | Apr 2026 |
 
 ## Quick Tasks
 One file per task in `activity/quick-tasks/`: `quick-task_TaskName_DD-MM-YYYY.md`
