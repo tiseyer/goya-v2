@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendEmailFromTemplate } from '@/lib/email/send'
+import { logAuditEvent } from '@/lib/audit'
 import type { Database } from '@/types/supabase'
 
 function getSupabase() {
@@ -53,6 +54,13 @@ export async function GET(req: Request) {
       },
     })
   }
+
+  void logAuditEvent({
+    category: 'system',
+    action: 'system.cron_executed',
+    description: `Admin digest cron: sent ${admins?.length ?? 0} emails (${total} pending items)`,
+    metadata: { cron_job: 'admin_digest', emails_sent: admins?.length ?? 0, pending_items: total },
+  })
 
   return NextResponse.json({ ok: true, sent: admins?.length ?? 0 })
 }

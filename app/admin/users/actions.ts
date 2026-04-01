@@ -1,5 +1,6 @@
 'use server'
 import { getSupabaseService } from '@/lib/supabase/service'
+import { logAuditEvent } from '@/lib/audit'
 import type { Database } from '@/types/supabase'
 
 type UserRole = Database['public']['Enums']['user_role']
@@ -60,15 +61,49 @@ export async function createUser(formData: {
     return { success: false, error: `Profile creation failed: ${profileError.message}` }
   }
 
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.user_created',
+    target_type: 'USER',
+    target_id: authData.user.id,
+    target_label: `${formData.firstName} ${formData.lastName}`,
+    description: `Created user ${formData.firstName} ${formData.lastName} (${formData.email}) with role ${formData.role}`,
+    metadata: { role: formData.role, email: formData.email.trim() },
+  })
+
   return { success: true, email: formData.email.trim(), userId: authData.user.id }
 }
 
 export async function updateUserProfile(userId: string, updates: Record<string, unknown>) {
   const supabase = getSupabaseService()
+
+  // Capture old role if role is being changed
+  let oldRole: string | undefined
+  if ('role' in updates) {
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single()
+    oldRole = existing?.role ?? undefined
+  }
+
   const { error } = await supabase
     .from('profiles')
     .update(updates)
     .eq('id', userId)
   if (error) return { success: false, error: error.message }
+
+  if ('role' in updates && oldRole !== updates.role) {
+    void logAuditEvent({
+      category: 'admin',
+      action: 'admin.user_role_changed',
+      target_type: 'USER',
+      target_id: userId,
+      description: `Changed user role from ${oldRole} to ${updates.role}`,
+      metadata: { old_role: oldRole ?? null, new_role: (updates.role as string) ?? null },
+    })
+  }
+
   return { success: true }
 }

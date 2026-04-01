@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
+import { logAuditEvent } from '@/lib/audit'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -71,6 +72,23 @@ export async function GET(request: Request) {
           }
         }
       }
+
+      // Audit: log registration or login via OAuth
+      const isNewUser = role && role !== 'null'
+      void logAuditEvent({
+        category: 'user',
+        action: isNewUser ? 'user.registered' : 'user.login',
+        actor_id: user!.id,
+        actor_name: user!.email ?? undefined,
+        description: isNewUser
+          ? `New user registered via OAuth (role: ${role})`
+          : 'User logged in via OAuth',
+        metadata: {
+          ...(isNewUser && role ? { role } : {}),
+          ...(invite ? { invite_claimed: true } : {}),
+        },
+      })
+
       // Redirect to next param (defaults to /dashboard)
       // Flow player handles onboarding display via login trigger
       return NextResponse.redirect(`${origin}${next}`)

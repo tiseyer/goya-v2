@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseService } from '@/lib/supabase/service'
+import { logAuditEvent } from '@/lib/audit'
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get('authorization')
@@ -48,6 +49,13 @@ export async function GET(req: Request) {
         .eq('id', event.id)
     }
   }
+
+  void logAuditEvent({
+    category: 'system',
+    action: 'system.cron_executed',
+    description: `Stripe events cron: processed ${processed} of ${events.length} pending events`,
+    metadata: { cron_job: 'stripe_events', processed, total_pending: events.length },
+  })
 
   return NextResponse.json({ ok: true, processed })
 }

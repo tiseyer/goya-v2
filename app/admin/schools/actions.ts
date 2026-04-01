@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { sendEmailFromTemplate } from '@/lib/email/send'
+import { logAuditEvent } from '@/lib/audit'
 
 export async function approveSchool(
   schoolId: string
@@ -68,6 +69,17 @@ export async function approveSchool(
         })
       }
     }
+
+    void logAuditEvent({
+      category: 'admin',
+      action: 'admin.school_approved',
+      actor_id: adminUser.id,
+      actor_role: 'admin',
+      target_type: 'SCHOOL',
+      target_id: schoolId,
+      target_label: school?.name ?? undefined,
+      description: `Approved school registration: ${school?.name ?? schoolId}`,
+    })
 
     revalidatePath('/admin/inbox')
     return { success: true }
@@ -138,6 +150,19 @@ export async function rejectSchool(
         })
       }
     }
+
+    void logAuditEvent({
+      category: 'admin',
+      action: 'admin.school_rejected',
+      severity: 'warning',
+      actor_id: adminUser.id,
+      actor_role: 'admin',
+      target_type: 'SCHOOL',
+      target_id: schoolId,
+      target_label: school?.name ?? undefined,
+      description: `Rejected school registration: ${school?.name ?? schoolId}`,
+      metadata: { rejection_reason: reason || 'No reason provided' },
+    })
 
     revalidatePath('/admin/inbox')
     return { success: true }

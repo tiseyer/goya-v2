@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseService } from '@/lib/supabase/service'
+import { logAuditEvent } from '@/lib/audit'
 
 export async function GET(req: Request) {
   // Verify cron secret to prevent unauthorized calls
@@ -67,6 +68,13 @@ export async function GET(req: Request) {
   }
 
   console.log(`[cron] chatbot-cleanup: purged ${sessionIds.length} expired guest sessions`)
+
+  void logAuditEvent({
+    category: 'system',
+    action: 'system.cron_executed',
+    description: `Chatbot cleanup cron: purged ${sessionIds.length} expired guest sessions`,
+    metadata: { cron_job: 'chatbot_cleanup', sessions_deleted: sessionIds.length, retention_days: retentionDays },
+  })
 
   return NextResponse.json({ ok: true, deleted: sessionIds.length })
 }

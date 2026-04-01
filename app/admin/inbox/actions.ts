@@ -7,6 +7,7 @@ import { getSupabaseService } from '@/lib/supabase/service'
 import type { SupportTicket, TicketStatus } from '@/lib/chatbot/types'
 import { writeEventAuditLog } from '@/lib/events/audit'
 import { writeCourseAuditLog } from '@/lib/courses/audit'
+import { logAuditEvent } from '@/lib/audit'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -104,7 +105,20 @@ export async function approveUpgradeRequest(
     actor_id: user.id,
   })
 
-  // 9. Revalidate
+  // 9. Audit
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.user_role_changed',
+    actor_id: user.id,
+    actor_role: 'admin',
+    target_type: 'USER',
+    target_id: request.user_id,
+    target_label: profile.full_name ?? undefined,
+    description: `Approved teacher upgrade for ${profile.full_name ?? request.user_id}`,
+    metadata: { old_role: 'student', new_role: 'teacher', upgrade_request_id: requestId },
+  })
+
+  // 10. Revalidate
   revalidatePath('/admin/inbox')
 
   return { success: true }
@@ -177,7 +191,20 @@ export async function rejectUpgradeRequest(
     actor_id: user.id,
   })
 
-  // 6. Revalidate
+  // 6. Audit
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.user_role_changed',
+    severity: 'warning',
+    actor_id: user.id,
+    actor_role: 'admin',
+    target_type: 'USER',
+    target_id: request.user_id,
+    description: `Rejected teacher upgrade for user ${request.user_id}`,
+    metadata: { rejection_reason: rejectionReason.trim(), upgrade_request_id: requestId },
+  })
+
+  // 7. Revalidate
   revalidatePath('/admin/inbox')
 
   return { success: true }
@@ -215,6 +242,16 @@ export async function approveCreditEntry(
   if (error) {
     return { success: false, error: error.message }
   }
+
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.credit_approved',
+    actor_id: user.id,
+    actor_role: adminProfile.role,
+    target_type: 'CREDIT',
+    target_id: entryId,
+    description: `Approved credit entry ${entryId}`,
+  })
 
   revalidatePath('/admin/inbox')
   return { success: true }
@@ -256,6 +293,18 @@ export async function rejectCreditEntry(
   if (error) {
     return { success: false, error: error.message }
   }
+
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.credit_rejected',
+    severity: 'warning',
+    actor_id: user.id,
+    actor_role: adminProfile.role,
+    target_type: 'CREDIT',
+    target_id: entryId,
+    description: `Rejected credit entry ${entryId}`,
+    metadata: { rejection_reason: reason.trim() },
+  })
 
   revalidatePath('/admin/inbox')
   return { success: true }
@@ -499,6 +548,17 @@ export async function approveEvent(
     changes: { old_status: 'pending_review', new_status: 'published' },
   })
 
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.event_status_changed',
+    actor_id: user.id,
+    actor_role: adminProfile.role,
+    target_type: 'EVENT',
+    target_id: eventId,
+    description: `Approved event ${eventId} (pending_review → published)`,
+    metadata: { old_status: 'pending_review', new_status: 'published' },
+  })
+
   // 5. Revalidate
   revalidatePath('/admin/inbox')
   return { success: true }
@@ -572,6 +632,18 @@ export async function rejectEvent(
     changes: { old_status: 'pending_review', new_status: 'rejected', rejection_reason: reason.trim() },
   })
 
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.event_status_changed',
+    severity: 'warning',
+    actor_id: user.id,
+    actor_role: adminProfile.role,
+    target_type: 'EVENT',
+    target_id: eventId,
+    description: `Rejected event ${eventId} (pending_review → rejected)`,
+    metadata: { old_status: 'pending_review', new_status: 'rejected', rejection_reason: reason.trim() },
+  })
+
   // 6. Revalidate
   revalidatePath('/admin/inbox')
   return { success: true }
@@ -636,6 +708,17 @@ export async function approveCourse(
     performed_by: user.id,
     performed_by_role: adminProfile.role,
     changes: { old_status: 'pending_review', new_status: 'published' },
+  })
+
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.course_status_changed',
+    actor_id: user.id,
+    actor_role: adminProfile.role,
+    target_type: 'COURSE',
+    target_id: courseId,
+    description: `Approved course ${courseId} (pending_review → published)`,
+    metadata: { old_status: 'pending_review', new_status: 'published' },
   })
 
   // 5. Revalidate
@@ -709,6 +792,18 @@ export async function rejectCourse(
     performed_by: user.id,
     performed_by_role: adminProfile.role,
     changes: { old_status: 'pending_review', new_status: 'rejected', rejection_reason: reason.trim() },
+  })
+
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.course_status_changed',
+    severity: 'warning',
+    actor_id: user.id,
+    actor_role: adminProfile.role,
+    target_type: 'COURSE',
+    target_id: courseId,
+    description: `Rejected course ${courseId} (pending_review → rejected)`,
+    metadata: { old_status: 'pending_review', new_status: 'rejected', rejection_reason: reason.trim() },
   })
 
   // 6. Revalidate

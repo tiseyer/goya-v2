@@ -4,6 +4,7 @@ import { createHash, randomBytes } from 'crypto'
 import { revalidatePath } from 'next/cache'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
+import { logAuditEvent } from '@/lib/audit'
 import type { ApiKeyPermission } from '@/lib/api/types'
 
 /**
@@ -44,6 +45,16 @@ export async function createApiKey(
       return { success: false, error: error.message }
     }
 
+    void logAuditEvent({
+      category: 'admin',
+      action: 'admin.api_key_created',
+      actor_id: user?.id ?? undefined,
+      target_type: 'API_KEY',
+      target_label: name,
+      description: `Created API key "${name}" (prefix: ${keyPrefix}...)`,
+      metadata: { key_prefix: keyPrefix, permissions },
+    })
+
     revalidatePath('/admin/api-keys')
     return { success: true, rawKey }
   } catch (err) {
@@ -71,6 +82,14 @@ export async function revokeApiKey(
     if (error) {
       return { success: false, error: error.message }
     }
+
+    void logAuditEvent({
+      category: 'admin',
+      action: 'admin.api_key_revoked',
+      target_type: 'API_KEY',
+      target_id: keyId,
+      description: `Revoked API key ${keyId}`,
+    })
 
     revalidatePath('/admin/api-keys')
     return { success: true }

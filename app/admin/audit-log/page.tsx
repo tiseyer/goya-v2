@@ -46,17 +46,51 @@ function formatDateTime(iso: string): string {
   });
 }
 
+/** Format metadata as readable key-value pairs */
+function MetadataDisplay({ metadata, action }: { metadata: Record<string, unknown>; action: string }) {
+  const entries = Object.entries(metadata);
+  if (entries.length === 0) return null;
+
+  // Special display for status changes
+  const isStatusChange = action.includes('status_changed') || action.includes('role_changed');
+  const oldVal = metadata.old_status ?? metadata.old_role;
+  const newVal = metadata.new_status ?? metadata.new_role;
+
+  return (
+    <div className="mt-2 p-2.5 bg-slate-50 border border-[#E5E7EB] rounded-lg space-y-1 max-w-xs">
+      {isStatusChange && oldVal != null && newVal != null && (
+        <div className="flex items-center gap-1.5 text-xs font-medium text-[#374151] mb-1.5">
+          <code className="px-1.5 py-0.5 bg-red-50 text-red-700 rounded">{String(oldVal)}</code>
+          <span className="text-[#9CA3AF]">&rarr;</span>
+          <code className="px-1.5 py-0.5 bg-green-50 text-green-700 rounded">{String(newVal)}</code>
+        </div>
+      )}
+      {entries
+        .filter(([k]) => !(isStatusChange && (k === 'old_status' || k === 'new_status' || k === 'old_role' || k === 'new_role')))
+        .map(([key, value]) => (
+        <div key={key} className="flex items-start gap-2 text-[11px]">
+          <span className="font-medium text-[#6B7280] shrink-0 min-w-[80px]">{key}:</span>
+          <span className="text-[#374151] break-all">{typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default async function AuditLogPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
 
-  const search   = str(params.search);
-  const category = str(params.category);
-  const severity = str(params.severity);
-  const dateFrom = str(params.from);
-  const dateTo   = str(params.to);
-  const sort     = str(params.sort) || 'newest';
-  const page     = Math.max(1, parseInt(str(params.page) || '1', 10));
-  const pageSize = [25, 50, 100].includes(parseInt(str(params.pageSize), 10))
+  const search     = str(params.search);
+  const category   = str(params.category);
+  const severity   = str(params.severity);
+  const dateFrom   = str(params.from);
+  const dateTo     = str(params.to);
+  const sort       = str(params.sort) || 'newest';
+  const action     = str(params.action);
+  const actorName  = str(params.actor);
+  const targetType = str(params.targetType);
+  const page       = Math.max(1, parseInt(str(params.page) || '1', 10));
+  const pageSize   = [25, 50, 100].includes(parseInt(str(params.pageSize), 10))
     ? parseInt(str(params.pageSize), 10)
     : 25;
 
@@ -76,13 +110,16 @@ export default async function AuditLogPage({ searchParams }: { searchParams: Sea
 
     if (search) {
       query = query.or(
-        `description.ilike.%${search}%,actor_name.ilike.%${search}%,action.ilike.%${search}%,target_label.ilike.%${search}%`
+        `description.ilike.%${search}%,actor_name.ilike.%${search}%,action.ilike.%${search}%,target_label.ilike.%${search}%,target_type.ilike.%${search}%`
       );
     }
-    if (category) query = query.eq('category', category);
-    if (severity) query = query.eq('severity', severity);
-    if (dateFrom) query = query.gte('created_at', dateFrom);
-    if (dateTo)   query = query.lte('created_at', dateTo + 'T23:59:59Z');
+    if (category)   query = query.eq('category', category);
+    if (severity)   query = query.eq('severity', severity);
+    if (action)     query = query.eq('action', action);
+    if (actorName)  query = query.ilike('actor_name', `%${actorName}%`);
+    if (targetType) query = query.eq('target_type', targetType);
+    if (dateFrom)   query = query.gte('created_at', dateFrom);
+    if (dateTo)     query = query.lte('created_at', dateTo + 'T23:59:59Z');
 
     switch (sort) {
       case 'oldest': query = query.order('created_at', { ascending: true }); break;
@@ -131,6 +168,9 @@ export default async function AuditLogPage({ searchParams }: { searchParams: Sea
             initialDateFrom={dateFrom}
             initialDateTo={dateTo}
             initialSort={sort}
+            initialAction={action}
+            initialActor={actorName}
+            initialTargetType={targetType}
             totalCount={totalCount}
           />
         </Suspense>
@@ -245,9 +285,7 @@ export default async function AuditLogPage({ searchParams }: { searchParams: Sea
                             </svg>
                             {Object.keys(row.metadata).length} fields
                           </summary>
-                          <pre className="mt-2 p-2 bg-slate-50 border border-[#E5E7EB] rounded-lg text-[10px] text-[#374151] max-w-xs overflow-auto max-h-48 whitespace-pre-wrap break-all">
-                            {JSON.stringify(row.metadata, null, 2)}
-                          </pre>
+                          <MetadataDisplay metadata={row.metadata} action={row.action} />
                         </details>
                       ) : (
                         <span className="text-sm text-slate-400">—</span>

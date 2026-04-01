@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
+import { logAuditEventAction } from '@/app/actions/audit';
 
 // ─── Shared UI (copied from page.tsx) ────────────────────────────────────────
 
@@ -275,10 +276,13 @@ export default function MaintenanceTab() {
     setMmSaving(false);
 
     if (enabledOverride === true) {
+      void logAuditEventAction({ category: 'admin', action: 'admin.maintenance_mode_enabled', actor_id: user?.id ?? undefined, description: 'Maintenance mode enabled' });
       setToast({ type: 'info', message: 'Maintenance mode is now active. Non-admin users will see the maintenance page.' });
     } else if (enabledOverride === false) {
+      void logAuditEventAction({ category: 'admin', action: 'admin.maintenance_mode_disabled', actor_id: user?.id ?? undefined, description: 'Maintenance mode disabled' });
       setToast({ type: 'success', message: 'Maintenance mode disabled. The site is back online.' });
     } else {
+      void logAuditEventAction({ category: 'admin', action: 'admin.settings_changed', actor_id: user?.id ?? undefined, description: 'Maintenance settings updated', metadata: { setting: 'maintenance_mode', scheduled: String(mmScheduled) } });
       setToast({ type: 'success', message: 'Maintenance settings saved.' });
     }
   }
@@ -310,8 +314,10 @@ export default function MaintenanceTab() {
     }
     setSbSaving(false);
     if (sbEnabled) {
+      void logAuditEventAction({ category: 'admin', action: 'admin.email_sandbox_enabled', actor_id: user?.id ?? undefined, description: `Email sandbox enabled (redirect to ${sbRecipient || 'none'})` });
       setToast({ type: 'info', message: `Email sandbox active — all emails redirected to ${sbRecipient || '(no address set)'}` });
     } else {
+      void logAuditEventAction({ category: 'admin', action: 'admin.email_sandbox_disabled', actor_id: user?.id ?? undefined, description: 'Email sandbox disabled' });
       setToast({ type: 'success', message: 'Email sandbox disabled. Emails sending normally.' });
     }
   }
@@ -329,8 +335,10 @@ export default function MaintenanceTab() {
       );
     setCmSaving(false);
     if (cmEnabled) {
+      void logAuditEventAction({ category: 'admin', action: 'admin.chatbot_sandbox_enabled', actor_id: user?.id ?? undefined, description: 'Chatbot maintenance mode enabled' });
       setToast({ type: 'info', message: 'Chatbot maintenance mode active. Regular users will not see the chat widget.' });
     } else {
+      void logAuditEventAction({ category: 'admin', action: 'admin.chatbot_sandbox_disabled', actor_id: user?.id ?? undefined, description: 'Chatbot maintenance mode disabled' });
       setToast({ type: 'success', message: 'Chatbot maintenance mode disabled. Widget visible to all users.' });
     }
   }
@@ -347,6 +355,7 @@ export default function MaintenanceTab() {
         { onConflict: 'key' }
       );
     setFsSaving(false);
+    void logAuditEventAction({ category: 'admin', action: 'admin.settings_changed', actor_id: user?.id ?? undefined, description: `Flows sandbox ${fsEnabled ? 'enabled' : 'disabled'}`, metadata: { setting: 'flows_sandbox', value: String(fsEnabled) } });
     if (fsEnabled) {
       setToast({ type: 'info', message: 'Flows sandbox active. Flows hidden from regular users.' });
     } else {
@@ -366,6 +375,7 @@ export default function MaintenanceTab() {
         { onConflict: 'key' }
       );
     setChSaving(false);
+    void logAuditEventAction({ category: 'admin', action: 'admin.settings_changed', actor_id: user?.id ?? undefined, description: `Credit Hours sandbox ${chEnabled ? 'enabled' : 'disabled'}`, metadata: { setting: 'credit_hours_sandbox', value: String(chEnabled) } });
     if (chEnabled) {
       setToast({ type: 'info', message: 'Credit Hours sandbox active. Credit submissions hidden from regular users.' });
     } else {
@@ -385,6 +395,7 @@ export default function MaintenanceTab() {
         { onConflict: 'key' }
       );
     setTlSaving(false);
+    void logAuditEventAction({ category: 'admin', action: 'admin.settings_changed', actor_id: user?.id ?? undefined, description: `Theme lock changed to "${themeLock || 'none'}"`, metadata: { setting: 'theme_lock', value: themeLock || 'none' } });
     if (themeLock === 'light') {
       setToast({ type: 'info', message: 'Theme locked to Light Mode for non-admin users.' });
     } else if (themeLock === 'dark') {
@@ -406,6 +417,7 @@ export default function MaintenanceTab() {
         { onConflict: 'key' }
       );
     setPvSaving(false);
+    void logAuditEventAction({ category: 'admin', action: 'admin.settings_changed', actor_id: user?.id ?? undefined, description: 'Page visibility settings updated', metadata: { setting: 'page_visibility' } });
     setToast({ type: 'success', message: 'Page visibility settings saved.' });
   }
 

@@ -5,6 +5,14 @@ import type { Database } from '@/types/supabase'
 import * as React from 'react'
 import { wrapInEmailLayout } from './wrapper'
 import { DEFAULT_TEMPLATES } from './defaults'
+import { logAuditEvent } from '@/lib/audit'
+
+/** Anonymize email: j***@gmail.com */
+function anonymizeEmail(email: string): string {
+  const [local, domain] = email.split('@')
+  if (!domain) return '***'
+  return `${local.slice(0, 1)}***@${domain}`
+}
 
 let _supabaseAdmin: ReturnType<typeof createClient<Database>> | null = null
 function getSupabaseAdmin() {
@@ -200,6 +208,17 @@ export async function sendEmailFromTemplate({
     })
 
     console.log('[email] sent template:', templateKey, 'to', recipient)
+
+    const anonRecipient = Array.isArray(to)
+      ? to.map(anonymizeEmail).join(', ')
+      : anonymizeEmail(to)
+    void logAuditEvent({
+      category: 'system',
+      action: 'system.email_sent',
+      description: `Email sent: ${templateKey} to ${anonRecipient}`,
+      metadata: { template: templateKey, recipient: anonRecipient },
+    })
+
     return { success: true }
   } catch (error) {
     console.error('[email] template send error:', error)
@@ -210,6 +229,17 @@ export async function sendEmailFromTemplate({
       template_name: templateKey,
       status: 'failed',
       error_message: String(error),
+    })
+
+    const anonRecipient = Array.isArray(to)
+      ? to.map(anonymizeEmail).join(', ')
+      : anonymizeEmail(to)
+    void logAuditEvent({
+      category: 'system',
+      action: 'system.email_failed',
+      severity: 'error',
+      description: `Email failed: ${templateKey} to ${anonRecipient}`,
+      metadata: { template: templateKey, recipient: anonRecipient, error: String(error).slice(0, 500) },
     })
 
     return { success: false, error }
