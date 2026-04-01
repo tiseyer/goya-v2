@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.15
 milestone_name: Course System Redesign
-status: executing
-stopped_at: Completed 37-01-PLAN.md — category server actions and type utilities
-last_updated: "2026-04-01T03:17:27.210Z"
+status: verifying
+stopped_at: Completed 37-02-PLAN.md — admin category UI, tab bar, modal, DB-driven filters
+last_updated: "2026-04-01T03:25:02.346Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-01)
 
 Phase: 37 (Admin Courses — Tabs + Categories) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-01
 
 Progress: [░░░░░░░░░░] 0%
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 36-database-migrations P02 | 3 | 2 tasks | 2 files |
 | Phase 36-database-migrations P03 | 5 | 2 tasks | 2 files |
 | Phase 37-admin-courses-tabs-categories P01 | 2 | 2 tasks | 2 files |
+| Phase 37-admin-courses-tabs-categories P02 | 8 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting current work:
 - [Phase 36-database-migrations]: Used DROP POLICY IF EXISTS pattern in 20260382 and 20260383 (not removing inline RLS from predecessors) — keeps earlier migrations unmodified and self-contained
 - [Phase 37-admin-courses-tabs-categories]: Use maybeSingle() for slug uniqueness checks in category actions — returns null instead of error on no-match
 - [Phase 37-admin-courses-tabs-categories]: deleteCategory returns courseCount in all response shapes for consistent caller interface
+- [Phase 37-admin-courses-tabs-categories]: CategoryModal created in Task 1 commit (not Task 2) since AdminCategoriesTab depends on it for compilation
+- [Phase 37-admin-courses-tabs-categories]: AdminCoursesFilters category filter uses c.id (UUID) as option value matching the category_id FK column
 
 ### Codebase Findings (v1.15 pre-flight)
 
@@ -105,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T03:17:27.206Z
-Stopped at: Completed 37-01-PLAN.md — category server actions and type utilities
+Last session: 2026-04-01T03:25:02.343Z
+Stopped at: Completed 37-02-PLAN.md — admin category UI, tab bar, modal, DB-driven filters
 Resume file: None

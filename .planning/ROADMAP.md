@@ -160,7 +160,7 @@ Plans:
 **Milestone Goal:** Redesign admin course management with categories table, multi-lesson support, drag-and-drop ordering, platform-aware video fields, and modern SaaS UI.
 
 - [x] **Phase 36: Database Migrations** - Create course_categories and lessons tables, migrate courses schema, RLS policies, TypeScript types (completed 2026-04-01)
-- [ ] **Phase 37: Admin Courses — Tabs + Categories** - Courses/Categories tab bar, category table, CRUD modal, delete guard
+- [x] **Phase 37: Admin Courses — Tabs + Categories** - Courses/Categories tab bar, category table, CRUD modal, delete guard (completed 2026-04-01)
 - [ ] **Phase 38: Course Creation Form — UI Redesign** - Card-section layout, dynamic category select, duration slider, remove vimeo_url, post-save redirect
 - [ ] **Phase 39: Lesson Management — UI + Logic** - Drag-and-drop lesson list, type-specific forms (Video/Audio/Text), sort_order persistence, mobile touch support
 - [ ] **Phase 40: Wire Lessons to Frontend** - Academy page lesson list, lesson player page by type, category color on course cards, member my-courses lesson management
@@ -191,10 +191,10 @@ Plans:
   3. An admin can open an "Add Category" modal, enter a name (slug auto-generates), optionally set description, parent, and color, and save to the database
   4. An admin can open an existing category in the same modal, edit any field, and save the update
   5. Clicking delete on a category that has courses referencing it shows the course count and blocks deletion; a category with no references is deleted immediately
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 37-01-PLAN.md — Server actions and helpers for category CRUD with delete guard
-- [ ] 37-02-PLAN.md — Tab bar UI, categories table, add/edit modal, DB-driven filters
+- [x] 37-02-PLAN.md — Tab bar UI, categories table, add/edit modal, DB-driven filters
 **UI hint**: yes
 
 ### Phase 38: Course Creation Form — UI Redesign
@@ -253,7 +253,7 @@ Plans:
 | 34. Public School Profile | 2/2 | Complete | 2026-03-31 |
 | 35. Faculty Invitations | 1/1 | Complete | 2026-03-31 |
 | 36. Database Migrations | 3/3 | Complete    | 2026-04-01 |
-| 37. Admin Courses — Tabs + Categories | 1/2 | In Progress|  |
+| 37. Admin Courses — Tabs + Categories | 2/2 | Complete   | 2026-04-01 |
 | 38. Course Creation Form — UI Redesign | 0/? | Not started | - |
 | 39. Lesson Management — UI + Logic | 0/? | Not started | - |
 | 40. Wire Lessons to Frontend | 0/? | Not started | - |

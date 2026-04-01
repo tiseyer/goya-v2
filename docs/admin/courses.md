@@ -3,15 +3,18 @@ title: Courses
 audience: ["admin"]
 section: admin
 order: 5
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # Courses
 
 The Courses page lists all courses on the platform, both GOYA-created and member-submitted. Navigate to **Courses** in the sidebar or go to `/admin/courses`.
 
+The page has two tabs: **Courses** (the default course list) and **Categories** (manage course categories).
+
 ## Table of Contents
 
+- [Tabs](#tabs)
 - [Course Types](#course-types)
 - [Table Columns](#table-columns)
 - [Status Workflow](#status-workflow)
@@ -19,7 +22,19 @@ The Courses page lists all courses on the platform, both GOYA-created and member
 - [Adding a New Course](#adding-a-new-course)
 - [Editing a Course](#editing-a-course)
 - [Soft Delete and Restore](#soft-delete-and-restore)
+- [Managing Categories](#managing-categories)
 - [Role Permissions](#role-permissions)
+
+## Tabs
+
+The Courses page has a tab bar at the top:
+
+| Tab | URL | Description |
+|---|---|---|
+| **Courses** | `/admin/courses` | The course list with filters, table, and pagination |
+| **Categories** | `/admin/courses?tab=categories` | Manage course categories |
+
+Switching tabs updates the URL so the view is bookmarkable and shareable.
 
 ## Course Types
 
@@ -80,7 +95,7 @@ To approve or reject a **pending_review** member course, use the [Inbox Courses 
 | Filter | Options |
 |---|---|
 | **Search** | Searches course titles |
-| **Category** | Workshop, Yoga Sequence, Dharma Talk, Music Playlist, Research |
+| **Category** | Loaded from the database — reflects your current category list |
 | **Access** | Free, Members Only |
 | **Status** | All active, Draft, Pending Review, Published, Rejected, Cancelled, Deleted (admin only) |
 | **Type** | All, GOYA, Member |
@@ -110,6 +125,44 @@ To find deleted courses, apply the **Deleted** status filter. The deletion date 
 
 To restore, open the course detail page and set the status back to `draft` or `published`.
 
+## Managing Categories
+
+Switch to the **Categories** tab (`/admin/courses?tab=categories`) to manage the course category list.
+
+### Categories Table
+
+| Column | Description |
+|---|---|
+| **Color** | Colour swatch for the category |
+| **Name** | Category name |
+| **Slug** | URL-safe identifier (monospace) |
+| **Parent** | Parent category name, or `---` if top-level |
+| **Description** | Truncated description |
+| **Actions** | Edit and delete controls |
+
+### Adding a Category
+
+Click **Add Category** in the top-right corner of the Categories tab. Fill in:
+
+- **Name** (required) — the display name; the slug is auto-generated on blur
+- **Slug** — URL-safe identifier; editable after auto-generation
+- **Description** — optional free-text description
+- **Parent Category** — optional parent for hierarchical organisation
+- **Color** — hex colour code (e.g. `#345c83`) with a live preview swatch
+
+Click **Save Category** to create it. The new category appears at the top of the table.
+
+### Editing a Category
+
+Click **Edit** on any category row. The same modal opens pre-filled with the current values. The parent dropdown excludes the category itself to prevent circular references. Click **Save Category** to update.
+
+### Deleting a Category
+
+Click the trash icon on any category row.
+
+- If the category has **no courses**, it is deleted immediately.
+- If the category is **used by one or more courses**, deletion is blocked. An amber notice shows how many courses reference it, with a Dismiss button. To delete, first reassign or remove the category from those courses.
+
 ## Role Permissions
 
 | Action | Admin | Moderator |
@@ -120,6 +173,9 @@ To restore, open the course detail page and set the status back to `draft` or `p
 | Approve/reject member courses | Yes | Yes |
 | Soft-delete courses | Yes | Yes |
 | Restore deleted courses | Yes | No |
+| View categories | Yes | Yes |
+| Create/edit categories | Yes | Yes |
+| Delete categories | Yes | Yes |
 
 ---
 
