@@ -62,29 +62,29 @@ Requirements for Admin Color Settings milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BRAND-01 | — | Pending |
-| BRAND-02 | — | Pending |
-| BRAND-03 | — | Pending |
-| BRAND-04 | — | Pending |
-| BRAND-05 | — | Pending |
-| ROLE-01 | — | Pending |
-| ROLE-02 | — | Pending |
-| ROLE-03 | — | Pending |
-| MAINT-01 | — | Pending |
-| MAINT-02 | — | Pending |
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| UI-03 | — | Pending |
+| BRAND-01 | Phase 42 | Pending |
+| BRAND-02 | Phase 42 | Pending |
+| BRAND-03 | Phase 42 | Pending |
+| BRAND-04 | Phase 42 | Pending |
+| BRAND-05 | Phase 41 | Pending |
+| ROLE-01 | Phase 42 | Pending |
+| ROLE-02 | Phase 42 | Pending |
+| ROLE-03 | Phase 41 | Pending |
+| MAINT-01 | Phase 42 | Pending |
+| MAINT-02 | Phase 41 | Pending |
+| INFRA-01 | Phase 41 | Pending |
+| INFRA-02 | Phase 41 | Pending |
+| INFRA-03 | Phase 42 | Pending |
+| INFRA-04 | Phase 42 | Pending |
+| INFRA-05 | Phase 42 | Pending |
+| UI-01 | Phase 42 | Pending |
+| UI-02 | Phase 42 | Pending |
+| UI-03 | Phase 42 | Pending |
 
 **Coverage:**
 - v1.16 requirements: 18 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 18
+- Mapped to phases: 18
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-01*

@@ -12,7 +12,8 @@
 - ✅ **v1.9 Member Events** - Phases 16-21 (shipped 2026-03-31)
 - ✅ **v1.10 Member Courses** - Phases 22-27 (shipped 2026-03-31)
 - ✅ **v1.14 School Owner System** - Phases 28-35 (shipped 2026-03-31)
-- 🚧 **v1.15 Course System Redesign** - Phases 36-40 (in progress)
+- ✅ **v1.15 Course System Redesign** - Phases 36-40 (shipped 2026-04-01)
+- 🚧 **v1.16 Admin Color Settings** - Phases 41-42 (in progress)
 
 ## Phases
 
@@ -86,11 +87,11 @@ Plans:
   4. The location step with Google Places autocomplete appears only for in-person or hybrid delivery formats
   5. The owner can upload required documents per designation and search/invite faculty members (GOYA members or non-members by email)
   6. The review step summarises all entered data; submitting sets onboarding_completed=true, status='pending_review', and triggers an admin notification
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 31-01-PLAN.md — Server actions + faculty search API for all onboarding steps
 - [x] 31-02-PLAN.md — Onboarding wizard UI: page wrapper + steps 1-5 (Welcome, Basic Info, Online Presence, Video, Teaching)
-- [ ] 31-03-PLAN.md — Onboarding wizard UI: steps 6-9 (Location, Documents, Faculty, Review & Submit) + visual verification
+- [x] 31-03-PLAN.md — Onboarding wizard UI: steps 6-9 (Location, Documents, Faculty, Review & Submit) + visual verification
 **UI hint**: yes
 
 ### Phase 32: School Settings
@@ -103,11 +104,11 @@ Plans:
   3. General section allows editing name, slug, and bio; changing name or slug triggers a re-review status banner
   4. All other sections (online presence, teaching info, location, faculty, designations, documents, subscription) are fully editable with appropriate controls
   5. When the school is pending_review a visible status banner is shown in the settings area
-**Plans:** 2/3 plans complete
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 32-01-PLAN.md — Settings shell + header dropdown + server actions
 - [x] 32-02-PLAN.md — Settings pages: General, Online Presence, Teaching Info, Location
-- [ ] 32-03-PLAN.md — Settings pages: Faculty, Designations, Documents, Subscription
+- [x] 32-03-PLAN.md — Settings pages: Faculty, Designations, Documents, Subscription
 **UI hint**: yes
 
 ### Phase 33: Admin School Management
@@ -120,10 +121,10 @@ Plans:
   3. Approving a school sets status to 'approved' and sends an approval email to the owner via Resend
   4. Rejecting a school requires a reason; reason is saved, status set to 'rejected', and a rejection email sent via Resend
   5. A "Visit School" button appears on member profile pages for Principal Trainers and Faculty of approved schools
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 33-01-PLAN.md — Server actions (approve/reject with email) + inbox tab update with designations
-- [ ] 33-02-PLAN.md — Admin school detail/review page + member profile Visit School button
+- [x] 33-01-PLAN.md — Server actions (approve/reject with email) + inbox tab update with designations
+- [x] 33-02-PLAN.md — Admin school detail/review page + member profile Visit School button
 **UI hint**: yes
 
 ### Phase 34: Public School Profile
@@ -135,10 +136,10 @@ Plans:
   2. The hero section shows logo, school name, designation badges, and location or "Online School"
   3. The body shows about text, practice styles, programs, languages, lineage, video on the left, and a sidebar with school details and faculty on the right
   4. The member directory has a School filter type; school cards show logo and designation badges
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 34-01-PLAN.md — Public school profile page with hero, body, sidebar, faculty links
-- [ ] 34-02-PLAN.md — Member directory integration: fetchMembers with schools, SchoolCard component
+- [x] 34-01-PLAN.md — Public school profile page with hero, body, sidebar, faculty links
+- [x] 34-02-PLAN.md — Member directory integration: fetchMembers with schools, SchoolCard component
 **UI hint**: yes
 
 ### Phase 35: Faculty Invitations
@@ -155,7 +156,8 @@ Plans:
 
 </details>
 
-### ✅ v1.15 Course System Redesign (Shipped: 2026-04-01)
+<details>
+<summary>✅ v1.15 Course System Redesign (Phases 36-40) - SHIPPED 2026-04-01</summary>
 
 **Milestone Goal:** Redesign admin course management with categories table, multi-lesson support, drag-and-drop ordering, platform-aware video fields, and modern SaaS UI.
 
@@ -225,7 +227,7 @@ Plans:
   4. The Video lesson form shows a platform toggle (Vimeo/YouTube), URL field, short and long description fields, and a duration slider (1-180 min); the Audio form shows audio URL, featured image upload, descriptions, and duration slider; the Text form shows featured image, descriptions, and duration slider
   5. Dragging a lesson to a new position updates sort_order in the database with a single-row write (float position midpoint); the list reflects the new order immediately without a full page reload
   6. Drag-and-drop works on touch screens (mobile and tablet)
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 39-01-PLAN.md — Lesson types, server actions (CRUD + reorder), LessonList with dnd-kit sortable, edit page integration
 - [x] 39-02-PLAN.md — LessonForm with type selector (Video/Audio/Text), type-specific fields, inline form wiring, visual verification
@@ -241,16 +243,52 @@ Plans:
   3. Lessons appear in the order defined by sort_order, not insertion order
   4. Course cards on the academy listing page display a colored badge or border that reflects the category color stored in course_categories
   5. The My Courses settings page for members includes the same lesson management section available to admins (without the category tab)
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
-- [ ] 40-01-PLAN.md — Fix stale column refs, lesson list on course detail, category colors on academy cards
-- [ ] 40-02-PLAN.md — Per-lesson player page with type-specific rendering (Video/Audio/Text)
-- [ ] 40-03-PLAN.md — Member my-courses lesson management, fix my-courses stale refs
+- [x] 40-01-PLAN.md — Fix stale column refs, lesson list on course detail, category colors on academy cards
+- [x] 40-02-PLAN.md — Per-lesson player page with type-specific rendering (Video/Audio/Text)
+- [x] 40-03-PLAN.md — Member my-courses lesson management, fix my-courses stale refs
+**UI hint**: yes
+
+</details>
+
+### 🚧 v1.16 Admin Color Settings (In Progress)
+
+**Milestone Goal:** Admin-controlled color configuration system — brand colors, role colors, and maintenance indicator — stored in site_settings and injected globally via CSS variables.
+
+- [ ] **Phase 41: ThemeProvider Infrastructure** - ThemeProvider component, site_settings storage for brand_colors/role_colors/maintenance_indicator_color, global CSS variable injection
+- [ ] **Phase 42: Admin Colors UI** - Colors page at /admin/settings, 3-section layout, color pickers with hex input, save/reset controls, sidebar nav entry
+
+## Phase Details
+
+### Phase 41: ThemeProvider Infrastructure
+**Goal**: Color settings are stored in site_settings and injected as CSS variables globally so any page can consume them via CSS custom properties
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: INFRA-01, INFRA-02, BRAND-05, ROLE-03, MAINT-02
+**Success Criteria** (what must be TRUE):
+  1. A ThemeProvider component exists that reads brand_colors and role_colors from site_settings and sets CSS variables on the html element at render time
+  2. ThemeProvider is present in layout.tsx so CSS variables are available on every page of the app without any per-page setup
+  3. brand_colors saved to site_settings as a JSON value under the key "brand_colors" are reflected as CSS variables after a page reload
+  4. role_colors saved to site_settings as a JSON value under the key "role_colors" are reflected as CSS variables after a page reload
+  5. maintenance_indicator_color saved to site_settings under the key "maintenance_indicator_color" is reflected as a CSS variable after a page reload
+**Plans**: TBD
+
+### Phase 42: Admin Colors UI
+**Goal**: Admins can view, edit, preview, save, and reset all brand colors, role colors, and the maintenance indicator color from a dedicated Colors page in Admin Settings
+**Depends on**: Phase 41
+**Requirements**: UI-01, UI-02, UI-03, BRAND-01, BRAND-02, BRAND-03, BRAND-04, ROLE-01, ROLE-02, MAINT-01, INFRA-03, INFRA-04, INFRA-05
+**Success Criteria** (what must be TRUE):
+  1. A "Colors" link appears in the admin sidebar under the Settings group and navigates to /admin/settings with the Colors tab active
+  2. The page shows three labeled sections — Brand Colors, Role Colors, and Maintenance Indicator — each with color pickers showing a hex input field and a preview swatch
+  3. Changing any color updates the CSS variables on the page instantly so the admin can see how the color looks before saving
+  4. Clicking "Save" persists all current color values to site_settings; clicking the per-color reset icon restores that single color to its default value
+  5. Clicking "Reset All" restores every color across all three sections to its default value
+**Plans**: TBD
 **UI hint**: yes
 
 ## Progress
 
-**Execution Order:** 36 -> 37 -> 38 -> 39 -> 40
+**Execution Order:** 41 -> 42
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -262,8 +300,10 @@ Plans:
 | 33. Admin School Management | 2/2 | Complete | 2026-03-31 |
 | 34. Public School Profile | 2/2 | Complete | 2026-03-31 |
 | 35. Faculty Invitations | 1/1 | Complete | 2026-03-31 |
-| 36. Database Migrations | 3/3 | Complete    | 2026-04-01 |
-| 37. Admin Courses — Tabs + Categories | 2/2 | Complete    | 2026-04-01 |
-| 38. Course Creation Form — UI Redesign | 2/2 | Complete   | 2026-04-01 |
+| 36. Database Migrations | 3/3 | Complete | 2026-04-01 |
+| 37. Admin Courses — Tabs + Categories | 2/2 | Complete | 2026-04-01 |
+| 38. Course Creation Form — UI Redesign | 2/2 | Complete | 2026-04-01 |
 | 39. Lesson Management — UI + Logic | 2/2 | Complete | 2026-04-01 |
-| 40. Wire Lessons to Frontend | 0/3 | Not started | - |
+| 40. Wire Lessons to Frontend | 3/3 | Complete | 2026-04-01 |
+| 41. ThemeProvider Infrastructure | 0/TBD | Not started | - |
+| 42. Admin Colors UI | 0/TBD | Not started | - |
