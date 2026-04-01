@@ -21,9 +21,9 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 
 - [ ] **ACAT-01**: Admin courses page has Courses/Categories tab bar
 - [ ] **ACAT-02**: Categories tab shows table with color swatch, name, slug, parent, description, actions
-- [ ] **ACAT-03**: Admin can add category via modal with name (auto-generates slug), description, parent dropdown, color picker
-- [ ] **ACAT-04**: Admin can edit existing category
-- [ ] **ACAT-05**: Admin can delete category only if no courses reference it (shows count if blocked)
+- [x] **ACAT-03**: Admin can add category via modal with name (auto-generates slug), description, parent dropdown, color picker
+- [x] **ACAT-04**: Admin can edit existing category
+- [x] **ACAT-05**: Admin can delete category only if no courses reference it (shows count if blocked)
 
 ### Admin Course Form
 
@@ -88,9 +88,9 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 | DB-07 | Phase 36 | Complete |
 | ACAT-01 | Phase 37 | Pending |
 | ACAT-02 | Phase 37 | Pending |
-| ACAT-03 | Phase 37 | Pending |
-| ACAT-04 | Phase 37 | Pending |
-| ACAT-05 | Phase 37 | Pending |
+| ACAT-03 | Phase 37 | Complete |
+| ACAT-04 | Phase 37 | Complete |
+| ACAT-05 | Phase 37 | Complete |
 | ACF-01 | Phase 38 | Pending |
 | ACF-02 | Phase 38 | Pending |
 | ACF-03 | Phase 38 | Pending |

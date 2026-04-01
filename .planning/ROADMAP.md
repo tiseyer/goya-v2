@@ -191,9 +191,9 @@ Plans:
   3. An admin can open an "Add Category" modal, enter a name (slug auto-generates), optionally set description, parent, and color, and save to the database
   4. An admin can open an existing category in the same modal, edit any field, and save the update
   5. Clicking delete on a category that has courses referencing it shows the course count and blocks deletion; a category with no references is deleted immediately
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 37-01-PLAN.md — Server actions and helpers for category CRUD with delete guard
+- [x] 37-01-PLAN.md — Server actions and helpers for category CRUD with delete guard
 - [ ] 37-02-PLAN.md — Tab bar UI, categories table, add/edit modal, DB-driven filters
 **UI hint**: yes
 
@@ -253,7 +253,7 @@ Plans:
 | 34. Public School Profile | 2/2 | Complete | 2026-03-31 |
 | 35. Faculty Invitations | 1/1 | Complete | 2026-03-31 |
 | 36. Database Migrations | 3/3 | Complete    | 2026-04-01 |
-| 37. Admin Courses — Tabs + Categories | 0/2 | Not started | - |
+| 37. Admin Courses — Tabs + Categories | 1/2 | In Progress|  |
 | 38. Course Creation Form — UI Redesign | 0/? | Not started | - |
 | 39. Lesson Management — UI + Logic | 0/? | Not started | - |
 | 40. Wire Lessons to Frontend | 0/? | Not started | - |

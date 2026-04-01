@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.15
 milestone_name: Course System Redesign
-status: verifying
-stopped_at: Completed 36-03-PLAN.md — migration idempotency gap closure
-last_updated: "2026-04-01T02:48:51.325Z"
+status: executing
+stopped_at: Completed 37-01-PLAN.md — category server actions and type utilities
+last_updated: "2026-04-01T03:17:27.210Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-01)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 36 — Database Migrations
+**Current focus:** Phase 37 — Admin Courses — Tabs + Categories
 
 ## Current Position
 
-Phase: 37
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 37 (Admin Courses — Tabs + Categories) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-04-01
 
 Progress: [░░░░░░░░░░] 0%
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 36-database-migrations P01 | 5 | 2 tasks | 4 files |
 | Phase 36-database-migrations P02 | 3 | 2 tasks | 2 files |
 | Phase 36-database-migrations P03 | 5 | 2 tasks | 2 files |
+| Phase 37-admin-courses-tabs-categories P01 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting current work:
 - [Phase 36-database-migrations]: sort_order on lessons uses numeric type for midpoint drag-reorder math (avoids integer-only limitations)
 - [Phase 36-database-migrations]: Plan 01 lessons RLS policies updated to plan-spec: TO authenticated + SELECT-only for member/creator access (not public/ALL)
 - [Phase 36-database-migrations]: Used DROP POLICY IF EXISTS pattern in 20260382 and 20260383 (not removing inline RLS from predecessors) — keeps earlier migrations unmodified and self-contained
+- [Phase 37-admin-courses-tabs-categories]: Use maybeSingle() for slug uniqueness checks in category actions — returns null instead of error on no-match
+- [Phase 37-admin-courses-tabs-categories]: deleteCategory returns courseCount in all response shapes for consistent caller interface
 
 ### Codebase Findings (v1.15 pre-flight)
 
@@ -102,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T02:45:50.273Z
-Stopped at: Completed 36-03-PLAN.md — migration idempotency gap closure
+Last session: 2026-04-01T03:17:27.206Z
+Stopped at: Completed 37-01-PLAN.md — category server actions and type utilities
 Resume file: None
