@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { Suspense, useTransition } from 'react'
 import {
   AreaChart,
   Area,
@@ -96,11 +96,14 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
 
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
 
   function handleRangeChange(key: string) {
     const params = new URLSearchParams(searchParams.toString())
     params.set('range', key)
-    router.push(`?${params.toString()}`)
+    startTransition(() => {
+      router.push(`?${params.toString()}`)
+    })
   }
 
   return (
@@ -111,7 +114,7 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
           <button
             key={r.key}
             onClick={() => handleRangeChange(r.key)}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer ${
               currentRange === r.key
                 ? 'bg-[#1B3A5C] text-white'
                 : 'border border-[#E5E7EB] text-[#374151] hover:bg-slate-50'
@@ -121,6 +124,16 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
           </button>
         ))}
       </div>
+
+      {/* Loading spinner while range change re-fetches */}
+      {isPending && (
+        <div className="flex items-center justify-center py-8">
+          <div className="w-5 h-5 border-2 border-slate-300 border-t-[#345c83] rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Main content — dims while pending */}
+      <div className={`space-y-6 transition-opacity ${isPending ? 'opacity-40 pointer-events-none' : ''}`}>
 
       {/* Stats row */}
       {!overviewAvailable ? (
@@ -357,6 +370,8 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
           </div>
         )}
       </div>
+
+      </div>{/* end pending-dimmed content wrapper */}
     </div>
   )
 }
