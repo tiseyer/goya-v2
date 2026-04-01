@@ -98,6 +98,7 @@ None yet.
 | 260331-sbq | Fix avatar migration script resumability WHERE clause | 2026-03-31 | — | [260331-sbq-fix-avatar-migration-script-resumability](./quick/260331-sbq-fix-avatar-migration-script-resumability/) |
 | 260401-ahn | Media library: fix delete bug, role permissions, move files, resizable panel | 2026-04-01 | 39e969e, b8568a7, e6a2fcb | [260401-ahn-media-library-fix-delete-bug-role-permis](./quick/260401-ahn-media-library-fix-delete-bug-role-permis/) |
 | 260401-9dj | Fix admin users — create user modal, detail boxes, school CTA | 2026-04-01 | a40160a, a7e7085, 2870e63 | — |
+| 260401-dm7 | Remove footer from all pages except landing and legal | 2026-04-01 | — | [260401-dm7-remove-footer-from-all-pages-except-land](./quick/260401-dm7-remove-footer-from-all-pages-except-land/) |
 
 ## Session Continuity
 
