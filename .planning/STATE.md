@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.15
 milestone_name: Course System Redesign
-status: ready_to_plan
-stopped_at: ""
-last_updated: "2026-04-01T00:00:00.000Z"
+status: executing
+stopped_at: Completed 36-01-PLAN.md — course_categories, lessons tables created; courses migrated
+last_updated: "2026-04-01T02:21:32.278Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-01)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 36 — Database Migrations (v1.15 Course System Redesign)
+**Current focus:** Phase 36 — Database Migrations
 
 ## Current Position
 
-Phase: 36 of 40 (Database Migrations)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-01 — Roadmap created for v1.15 Course System Redesign (Phases 36-40)
+Phase: 36 (Database Migrations) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-04-01
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -46,6 +46,7 @@ Progress: [░░░░░░░░░░] 0%
 |-------|-------|-------|----------|
 
 *Updated after each plan completion*
+| Phase 36-database-migrations P01 | 5 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -59,6 +60,8 @@ Recent decisions affecting current work:
 - v1.15: Category FK backfill order is critical — add column, seed categories, UPDATE existing courses, verify zero NULLs, then drop old text column
 - v1.10: Shared audit utility pattern (lib/courses/audit.ts) — reuse for course-related changes
 - event_categories migration is the authoritative schema reference for course_categories
+- [Phase 36-database-migrations]: Applied migrations via Supabase Management API (SUPABASE_ACCESS_TOKEN) — db push blocked by CLI history mismatch; this is the established pattern for this project
+- [Phase 36-database-migrations]: sort_order on lessons uses numeric type for midpoint drag-reorder math (avoids integer-only limitations)
 
 ### Codebase Findings (v1.15 pre-flight)
 
@@ -94,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T00:00:00.000Z
-Stopped at: Roadmap created — Phases 36-40 defined, ready to plan Phase 36
+Last session: 2026-04-01T02:21:32.275Z
+Stopped at: Completed 36-01-PLAN.md — course_categories, lessons tables created; courses migrated
 Resume file: None

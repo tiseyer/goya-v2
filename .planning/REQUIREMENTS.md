@@ -9,10 +9,10 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 
 ### Database Schema
 
-- [ ] **DB-01**: `course_categories` table created with id, name, slug (unique), description, color, parent_id, sort_order, created_at
-- [ ] **DB-02**: `course_categories` seeded with 5 categories: Workshop, Yoga Sequence, Dharma Talk, Music Playlist, Research
-- [ ] **DB-03**: `lessons` table created with id, course_id FK (CASCADE), title, type (video/audio/text), sort_order, short_description, description, video_platform (vimeo/youtube), video_url, audio_url, featured_image_url, duration_minutes, created_at, updated_at
-- [ ] **DB-04**: `courses.category_id` FK added, backfilled from existing `category` string, old `category` + `vimeo_url` columns dropped
+- [x] **DB-01**: `course_categories` table created with id, name, slug (unique), description, color, parent_id, sort_order, created_at
+- [x] **DB-02**: `course_categories` seeded with 5 categories: Workshop, Yoga Sequence, Dharma Talk, Music Playlist, Research
+- [x] **DB-03**: `lessons` table created with id, course_id FK (CASCADE), title, type (video/audio/text), sort_order, short_description, description, video_platform (vimeo/youtube), video_url, audio_url, featured_image_url, duration_minutes, created_at, updated_at
+- [x] **DB-04**: `courses.category_id` FK added, backfilled from existing `category` string, old `category` + `vimeo_url` columns dropped
 - [ ] **DB-05**: RLS policies on `course_categories` — admin/mod full CRUD, public SELECT
 - [ ] **DB-06**: RLS policies on `lessons` — admin/mod full CRUD, members SELECT published lessons of published courses, course creator SELECT own
 - [ ] **DB-07**: Supabase types regenerated and `npx tsc --noEmit` passes
@@ -79,10 +79,10 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | Phase 36 | Pending |
-| DB-02 | Phase 36 | Pending |
-| DB-03 | Phase 36 | Pending |
-| DB-04 | Phase 36 | Pending |
+| DB-01 | Phase 36 | Complete |
+| DB-02 | Phase 36 | Complete |
+| DB-03 | Phase 36 | Complete |
+| DB-04 | Phase 36 | Complete |
 | DB-05 | Phase 36 | Pending |
 | DB-06 | Phase 36 | Pending |
 | DB-07 | Phase 36 | Pending |
