@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: milestone
 status: executing
-stopped_at: Completed 40-01-PLAN.md — wire lessons to academy frontend, fix stale column refs
-last_updated: "2026-04-01T05:34:59.260Z"
-last_activity: 2026-04-01 — Milestone v1.18 initialized
+stopped_at: Completed 03-01-PLAN.md — Visitors Analytics page with GA4 Data API integration
+last_updated: "2026-04-01T06:10:00.000Z"
+last_activity: 2026-04-01 — Completed Phase 03 Plan 01 (Visitors Analytics GA4)
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 1
-  completed_plans: 0
-  percent: 0
+  completed_phases: 3
+  total_plans: 4
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/workstreams/full-analytics/PROJECT.md (updated 2026-04-01)
 
 ## Current Position
 
-Phase: Not started
-Plan: —
-Status: Ready to execute
-Last activity: 2026-04-01 — Milestone v1.18 initialized
+Phase: 03-visitors-analytics
+Plan: 01 (complete)
+Status: Executing
+Last activity: 2026-04-01 — Completed Visitors Analytics GA4 integration
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -48,10 +48,17 @@ Progress: [░░░░░░░░░░] 0%
 - GA4 Property ID from site_settings table
 - Service account key from GOOGLE_SERVICE_ACCOUNT_KEY env var
 - Chart color: GOYA primary blue #345c83
+- [Phase 03-01]: Use BetaAnalyticsDataClient (not AnalyticsDataClient) — it exposes runReport
+- [Phase 03-01]: GA4 bounceRate is 0-1 float; multiply by 100 for display
+- [Phase 03-01]: GA4 date dimension returns YYYYMMDD; convert to YYYY-MM-DD for Date parsing
+- [Phase 03-01]: Wrap VisitorsAnalyticsInner in Suspense so useSearchParams doesn't CSR bail out
+- [Phase 03-01]: Pass boolean *Available props from server so client can show per-section error cards
 - [Phase 40-02]: Per-lesson page uses 'use client' for auth-gated lesson loading matching existing academy pattern
 - [Phase 40-02]: Legacy /academy/[id]/lesson is a server component redirect — no client JS needed for backward compat
 - [Phase 40-wire-lessons-to-frontend]: Lesson type defined inline in lib/courses/lessons.ts — worktree branch predates Phase 36-39 types/supabase.ts
 - [Phase 40-wire-lessons-to-frontend]: CourseWithCategory local type extends Course with _categoryColor for academy listing — avoids polluting shared Course interface
+- [Phase 40]: MemberLessons uses useEffect + fetchLessons (not server-fetched initialLessons) — avoids re-architecting edit view as server component
+- [Phase 40]: next/dynamic ssr:false for LessonList in member my-courses — same pattern as admin LessonSection (dnd-kit fails on SSR)
 
 ### Blockers/Concerns
 
@@ -59,6 +66,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T05:34:59.257Z
-Stopped at: Completed 40-01-PLAN.md — wire lessons to academy frontend, fix stale column refs
+Last session: 2026-04-01T06:10:00.000Z
+Stopped at: Completed 03-01-PLAN.md — Visitors Analytics GA4 integration
 Resume file: None
