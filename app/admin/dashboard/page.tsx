@@ -99,11 +99,10 @@ export default async function DashboardPage() {
     guestsRes,
     fakeUsersRes,
   ] = await Promise.allSettled([
-    // Total real members (all roles except guest, exclude faux/robot)
+    // Total real members (all profiles excluding faux/robot — includes NULL-role migrated users)
     svc
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .in('role', ['student', 'teacher', 'wellness_practitioner', 'moderator', 'admin'])
       .not('wp_roles', 'cs', '{"faux"}')
       .not('wp_roles', 'cs', '{"robot"}'),
 

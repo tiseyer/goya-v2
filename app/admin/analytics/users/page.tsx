@@ -202,11 +202,10 @@ export default async function UsersAnalyticsPage() {
     fakeUsersRes,
     recentSignupsRes,
   ] = await Promise.allSettled([
-    // Real Members (all roles excluding faux/robot)
+    // Real Members (all profiles excluding faux/robot — includes NULL-role migrated users)
     svc
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .in('role', ['student', 'teacher', 'wellness_practitioner', 'moderator', 'admin'])
       .not('wp_roles', 'cs', '{"faux"}')
       .not('wp_roles', 'cs', '{"robot"}'),
 

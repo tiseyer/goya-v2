@@ -22,7 +22,7 @@ const ROLE_FILTERS = [
 ] as const
 
 export default function MemberGrowthChart() {
-  const [range, setRange]           = useState<string>('30D')
+  const [range, setRange]           = useState<string>('All')
   const [roleFilter, setRoleFilter] = useState<string>('all')
   const [data, setData]             = useState<{ date: string; count: number }[]>([])
   const [loading, setLoading]       = useState(true)
