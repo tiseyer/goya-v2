@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useConnections } from '@/app/context/ConnectionsContext';
 import Button from '@/app/components/ui/Button';
+import { Analytics } from '@/lib/analytics/events';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,7 +87,7 @@ export default function ConnectButton({
     return (
       <div className="flex flex-col gap-2">
         <p className="text-xs text-slate-400 text-center mb-1">{firstName} wants to connect</p>
-        <Button variant="primary" className="w-full" onClick={() => acceptRequest(conn.connectionId, memberId)}>
+        <Button variant="primary" className="w-full" onClick={() => { Analytics.connectionAccepted(); acceptRequest(conn.connectionId, memberId); }}>
           Accept Request
         </Button>
         <Button
@@ -130,7 +131,7 @@ export default function ConnectButton({
     <Button
       variant="primary"
       className="w-full"
-      onClick={() => sendRequest(memberId, memberName, memberPhoto, cta.type)}
+      onClick={() => { Analytics.connectionRequested(); sendRequest(memberId, memberName, memberPhoto, cta.type); }}
     >
       {cta.label}
     </Button>

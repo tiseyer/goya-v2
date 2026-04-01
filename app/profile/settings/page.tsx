@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useImpersonation } from '@/app/context/ImpersonationContext';
 import { updateProfile } from './actions';
+import { Analytics } from '@/lib/analytics/events';
 
 const INPUT = 'w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2dd4bf]/40 focus:border-[#2dd4bf] transition-colors placeholder:text-slate-400';
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide';
@@ -182,6 +183,7 @@ export default function ProfileSettingsPage() {
       showToast(error, 'error');
     } else {
       showToast('Profile updated');
+      Analytics.profileUpdated();
       try {
         const { trackProfileUpdated } = await import('@/lib/analytics/tracking');
         trackProfileUpdated();

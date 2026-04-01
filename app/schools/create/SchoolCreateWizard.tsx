@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { generateSlug } from '@/lib/schools/slug'
 import { createSchoolCheckoutSession } from './actions'
+import { Analytics } from '@/lib/analytics/events'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -410,6 +411,11 @@ export default function SchoolCreateWizard({ products }: { products: Product[] }
   const [isLoading, setIsLoading] = useState(false)
   const [paymentError, setPaymentError] = useState<string | null>(null)
 
+  // Track school registration start on wizard mount
+  useEffect(() => {
+    Analytics.schoolRegistrationStarted()
+  }, [])
+
   // Restore draft from localStorage on mount
   useEffect(() => {
     try {
@@ -462,6 +468,7 @@ export default function SchoolCreateWizard({ products }: { products: Product[] }
       if ('url' in result) {
         // Clear draft before redirect
         try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
+        Analytics.schoolRegistrationCompleted(schoolName)
         window.location.href = result.url
       } else {
         setPaymentError(result.error)

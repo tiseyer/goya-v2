@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { Analytics } from '@/lib/analytics/events';
 
 const INPUT = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#345c83]/20 focus:border-[#345c83] transition-colors';
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide';
@@ -25,10 +26,12 @@ export default function SignInPage() {
       setLoading(false);
       return;
     }
+    Analytics.login('email');
     window.location.href = '/dashboard';
   }
 
   async function handleOAuthLogin(provider: 'google' | 'apple') {
+    Analytics.login(provider);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {

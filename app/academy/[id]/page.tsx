@@ -5,6 +5,7 @@ import type { Course, UserCourseProgress } from '@/lib/types';
 import type { Lesson } from '@/lib/courses/lessons';
 import { enrollAndStart } from './actions';
 import CourseEnrollCard from './CourseEnrollCard';
+import CourseViewTracker from './CourseViewTracker';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,6 +80,7 @@ export default async function CourseOverviewPage({
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <CourseViewTracker courseId={id} courseName={course.title} />
       {/* Hero */}
       <div
         className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8"

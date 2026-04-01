@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { Course, UserCourseProgress } from '@/lib/types';
+import { Analytics } from '@/lib/analytics/events';
 
 interface Props {
   course:       Course;
@@ -103,6 +104,7 @@ export default function CourseEnrollCard({ course, userId, progress, enrollActio
             <button
               type="submit"
               onClick={() => {
+                Analytics.courseEnrolled(course.id, course.title);
                 try {
                   import('@/lib/analytics/tracking').then(({ trackCourseStarted }) => {
                     trackCourseStarted(course.title);

@@ -6,6 +6,7 @@ import type {
   FlowBranch,
   FlowStep,
 } from '@/lib/flows/types';
+import { Analytics } from '@/lib/analytics/events';
 import { ElementRenderer } from './elements';
 import FlowProgress from './FlowProgress';
 import FlowNavigation from './FlowNavigation';
@@ -177,6 +178,10 @@ export default function FlowPlayer() {
         setActiveFlow(data);
         setCurrentStepIndex(startIndex);
         setAnswers(loadedAnswers);
+        // Track onboarding start (only on first load, not resume)
+        if (!data.response) {
+          Analytics.onboardingStarted(data.flow.name);
+        }
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Failed to load flow');
@@ -306,6 +311,7 @@ export default function FlowPlayer() {
         credentials: 'include',
       });
 
+      Analytics.onboardingCompleted(activeFlow.flow.name);
       setActiveFlow(null);
     } catch (err) {
       console.error('[FlowPlayer] Flow completion error:', err);

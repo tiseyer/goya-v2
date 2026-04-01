@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart, type CartItem, type SavedOrder } from '@/app/context/CartContext';
 import { ADDONS } from '@/lib/addons-data';
 import GOYABadge from '@/app/components/GOYABadge';
+import { Analytics } from '@/lib/analytics/events';
 
 // ─── Countries ────────────────────────────────────────────────────────────────
 
@@ -88,6 +89,15 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
+  // Track begin_checkout when checkout page mounts with items
+  useEffect(() => {
+    if (items.length > 0) {
+      Analytics.beginCheckout(total, items.map(i => ({ item_id: i.id, item_name: i.name })));
+    }
+    // Only fire once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function update(field: string, value: string) {
     setForm(p => ({ ...p, [field]: value }));
     if (errors[field]) setErrors(p => { const n = { ...p }; delete n[field]; return n; });
@@ -127,7 +137,8 @@ export default function CheckoutPage() {
 
     localStorage.setItem('goya-last-order', JSON.stringify(order));
 
-    // Track purchase conversion + checkout initiated
+    // Track purchase conversion
+    Analytics.purchase(order.orderNumber, total, items.map(i => ({ item_id: i.id, item_name: i.name })));
     try {
       const { trackPurchase, trackCheckoutInitiated } = await import('@/lib/analytics/tracking');
       trackCheckoutInitiated();

@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { Event } from '@/lib/types';
 import { CATEGORY_BADGE } from '@/app/components/ui/Badge';
 import PageContainer from '@/app/components/ui/PageContainer';
+import EventViewTracker from './EventViewTracker';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +42,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <EventViewTracker eventId={ev.id} eventName={ev.title} />
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       {ev.featured_image_url ? (

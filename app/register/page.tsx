@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { Analytics } from '@/lib/analytics/events';
 
 // ─── types & data ──────────────────────────────────────────────────────────────
 
@@ -92,6 +93,7 @@ function RegisterPageInner() {
     form.agreed;
 
   async function handleOAuthLogin(provider: 'google' | 'apple') {
+    Analytics.signUp(provider);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -377,6 +379,7 @@ function RegisterPageInner() {
                           return;
                         }
                         // Track sign_up conversion
+                        Analytics.signUp('email');
                         try {
                           const { trackSignUp } = await import('@/lib/analytics/tracking');
                           trackSignUp();
