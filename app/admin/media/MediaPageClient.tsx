@@ -181,6 +181,38 @@ export default function MediaPageClient({
   // ── POLISH-04: Mobile folder dropdown ─────────────────────────────────────
   // On mobile (< md) FolderSidebar is hidden; a <select> dropdown is shown above toolbar.
 
+  // ── Resizable detail panel ─────────────────────────────────────────────────
+  const PANEL_MIN = 200;
+  const PANEL_MAX = 600;
+  const [panelWidth, setPanelWidth] = useState(380);
+  const panelWidthRef = useRef(380);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handlePanelDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    const startX = e.clientX;
+    const startWidth = panelWidthRef.current;
+
+    const handleMouseMove = (ev: MouseEvent) => {
+      // Panel is on the right side — dragging left increases width
+      const delta = startX - ev.clientX;
+      const newWidth = Math.min(PANEL_MAX, Math.max(PANEL_MIN, startWidth + delta));
+      panelWidthRef.current = newWidth;
+      setPanelWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      localStorage.setItem('media-panel-width', String(panelWidthRef.current));
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, []);
+
   // Ref to the MediaUploader so we can call openFilePicker() from the toolbar
   const uploaderRef = useRef<MediaUploaderHandle>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -197,6 +229,14 @@ export default function MediaPageClient({
     const storedCollapsed = localStorage.getItem('media-sidebar-collapsed');
     if (storedCollapsed !== null) {
       setSidebarCollapsed(storedCollapsed === 'true');
+    }
+    const storedPanelWidth = localStorage.getItem('media-panel-width');
+    if (storedPanelWidth) {
+      const parsed = parseInt(storedPanelWidth, 10);
+      if (parsed >= PANEL_MIN && parsed <= PANEL_MAX) {
+        setPanelWidth(parsed);
+        panelWidthRef.current = parsed;
+      }
     }
   }, [viewProp]);
 
@@ -416,7 +456,7 @@ export default function MediaPageClient({
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+    <div className={['flex h-[calc(100vh-4rem)] overflow-hidden', isDragging ? 'select-none' : ''].join(' ')}>
       {/* POLISH-04: Folder sidebar — hidden on mobile, visible md+ */}
       <div className="hidden md:flex">
         <FolderSidebar
@@ -581,8 +621,18 @@ export default function MediaPageClient({
               asSheet
             />
           </div>
-          {/* Desktop side panel */}
-          <div className="hidden md:block overflow-hidden shrink-0">
+          {/* Desktop side panel — resizable via drag handle */}
+          <div
+            className="hidden md:flex overflow-hidden shrink-0"
+            style={{ width: panelWidth }}
+          >
+            {/* Drag handle on the left edge of the panel */}
+            <div
+              onMouseDown={handlePanelDragStart}
+              className="w-1 cursor-col-resize hover:bg-primary/20 active:bg-primary/30 transition-colors shrink-0"
+              title="Drag to resize panel"
+              aria-hidden="true"
+            />
             <MediaDetailPanel
               item={panelItem}
               onClose={handlePanelClose}

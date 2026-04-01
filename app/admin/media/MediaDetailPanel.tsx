@@ -271,8 +271,8 @@ export default function MediaDetailPanel({
         isClosing ? 'translate-y-full' : 'translate-y-0',
       ].join(' ')
     : [
-        // Side panel: slides in from right on desktop
-        'w-[380px] shrink-0 flex flex-col border-l border-slate-200 bg-white overflow-y-auto overflow-x-hidden',
+        // Side panel: width controlled by parent wrapper (resizable via drag handle)
+        'flex-1 flex flex-col border-l border-slate-200 bg-white overflow-y-auto overflow-x-hidden',
         'transition-transform duration-200 ease-in-out',
         isClosing ? 'translate-x-full' : 'translate-x-0',
       ].join(' ');
