@@ -123,8 +123,10 @@ export interface Course {
   short_description: string | null;
   description: string | null;
   category_id: string | null;
+  category?: string | null; // resolved from category_id join or legacy field
   instructor: string | null;
   duration_minutes: number | null;
+  duration?: string | null; // display format (e.g. "60 min")
   level: CourseLevel | null;
   access: CourseAccess;
   thumbnail_url: string | null;
