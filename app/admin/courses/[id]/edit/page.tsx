@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
 import type { Course } from '@/lib/types';
 import CourseForm from '../../components/CourseForm';
+import { fetchCategories } from '../../category-actions';
 
 interface AuditEntry {
   id: string;
@@ -51,6 +52,8 @@ export default async function EditCoursePage({
 
   if (error || !data) notFound();
 
+  const { data: categories } = await fetchCategories();
+
   // Check user role for audit visibility
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profileRow } = await supabase
@@ -80,7 +83,7 @@ export default async function EditCoursePage({
         <h1 className="text-2xl font-bold text-[#1B3A5C]">Edit Course</h1>
         <p className="text-sm text-[#6B7280] mt-0.5 truncate max-w-md">{(data as Course).title}</p>
       </div>
-      <CourseForm course={data as Course} />
+      <CourseForm course={data as Course} categories={categories} />
 
       {/* Audit History -- Admin only */}
       {isAdmin && auditEntries.length > 0 && (

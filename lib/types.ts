@@ -17,6 +17,7 @@ export interface EventCategoryRow {
 }
 export type EventFormat = 'Online' | 'In Person' | 'Hybrid';
 export type EventStatus = 'published' | 'draft' | 'pending_review' | 'rejected' | 'cancelled' | 'deleted';
+/** @deprecated Use CourseCategory from lib/courses/categories.ts instead */
 export type CourseCategory = 'Workshop' | 'Yoga Sequence' | 'Dharma Talk' | 'Music Playlist' | 'Research';
 export type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced' | 'All Levels';
 export type CourseAccess = 'members_only' | 'free';
@@ -121,15 +122,14 @@ export interface Course {
   title: string;
   short_description: string | null;
   description: string | null;
-  category: CourseCategory;
+  category_id: string | null;
   instructor: string | null;
-  duration: string | null;
+  duration_minutes: number | null;
   level: CourseLevel | null;
   access: CourseAccess;
-  vimeo_url: string | null;
   thumbnail_url: string | null;
-  gradient_from: string;
-  gradient_to: string;
+  gradient_from: string | null;
+  gradient_to: string | null;
   status: CourseStatus;
   course_type: 'goya' | 'member';
   created_by: string | null;
