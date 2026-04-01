@@ -46,6 +46,19 @@ interface MonitorLogEntry {
   overall_status: 'healthy' | 'degraded' | 'critical'
   alert_sent: boolean
   alert_type: string | null
+  failed_services: string[] | null
+  latency_ms: number | null
+  metadata: Record<string, unknown> | null
+}
+
+interface MaintenanceSettings {
+  maintenance_mode_enabled?: string
+  email_sandbox_enabled?: string
+  chatbot_maintenance_mode?: string
+  flows_sandbox?: string
+  credit_hours_sandbox?: string
+  theme_lock?: string
+  page_visibility?: string
 }
 
 interface HealthData {
@@ -58,6 +71,7 @@ interface HealthData {
   buildInfo: BuildInfo
   traffic: TrafficSnapshot
   monitorLog: MonitorLogEntry[]
+  maintenanceSettings: MaintenanceSettings
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -154,6 +168,31 @@ export default function HealthTab() {
     data.overallStatus === 'degraded' ? 'Degraded Performance' :
     'Critical — Action Required'
 
+  // Compute maintenance state
+  const ms = data.maintenanceSettings ?? {}
+  const mmActive = ms.maintenance_mode_enabled === 'true'
+  const sandboxes = [
+    { key: 'email_sandbox_enabled', label: 'Email Sandbox' },
+    { key: 'chatbot_maintenance_mode', label: 'Chatbot Maintenance' },
+    { key: 'flows_sandbox', label: 'Flows Sandbox' },
+    { key: 'credit_hours_sandbox', label: 'Credit Hours Sandbox' },
+  ].filter(s => ms[s.key as keyof MaintenanceSettings] === 'true')
+
+  const themeLockActive = !!(ms.theme_lock && ms.theme_lock !== '')
+  let pageDisabledList: string[] = []
+  if (ms.page_visibility) {
+    try {
+      const pv = JSON.parse(ms.page_visibility)
+      pageDisabledList = Object.entries(pv)
+        .filter(([, v]: [string, unknown]) => (v as { enabled?: boolean })?.enabled === false)
+        .map(([path]) => path)
+    } catch {
+      // ignore parse errors
+    }
+  }
+
+  const hasRestrictions = sandboxes.length > 0 || themeLockActive || pageDisabledList.length > 0
+
   return (
     <div className="space-y-5">
       {/* Header with refresh */}
@@ -178,6 +217,14 @@ export default function HealthTab() {
         <span className="text-lg font-bold">{overallIcon}</span>
         <span className="font-semibold text-sm">{overallLabel}</span>
       </div>
+
+      {/* Maintenance mode warning banner */}
+      {mmActive && (
+        <div className="flex items-center gap-3 px-5 py-3 rounded-xl border bg-red-50 border-red-200 text-red-700 text-sm">
+          <span className="text-base">🔧</span>
+          <span className="font-medium">Maintenance mode is active — site is in restricted access</span>
+        </div>
+      )}
 
       {/* Cards grid */}
       <div className="grid grid-cols-1 gap-5">
@@ -233,6 +280,41 @@ export default function HealthTab() {
               ))}
             </tbody>
           </table>
+        </Card>
+
+        {/* Maintenance Status — between Services and Database */}
+        <Card title="Maintenance Status">
+          <div className="space-y-3">
+            {mmActive ? (
+              <>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                  Maintenance Mode Active
+                </span>
+                <p className="text-xs text-[#6B7280]">Non-admin users see the maintenance page.</p>
+              </>
+            ) : hasRestrictions ? (
+              <>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                  Partial Restrictions Active
+                </span>
+                <ul className="space-y-1 mt-1">
+                  {sandboxes.map(s => (
+                    <li key={s.key} className="text-xs text-[#6B7280]">• {s.label} is enabled</li>
+                  ))}
+                  {themeLockActive && (
+                    <li className="text-xs text-[#6B7280]">• Theme lock is active</li>
+                  )}
+                  {pageDisabledList.map(path => (
+                    <li key={path} className="text-xs text-[#6B7280]">• Page disabled: <span className="font-mono">{path}</span></li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                All Systems Normal
+              </span>
+            )}
+          </div>
         </Card>
 
         {/* Database */}
@@ -307,14 +389,16 @@ export default function HealthTab() {
         {/* Monitor Log */}
         <Card title="Monitor Log">
           {data.monitorLog.length === 0 ? (
-            <p className="text-xs text-[#6B7280]">No monitoring data yet. Configure the external cron to start collecting.</p>
+            <p className="text-xs text-[#6B7280]">No monitoring data yet. Vercel cron runs /api/monitor every minute.</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-[#6B7280] border-b border-[#E5E7EB]">
                   <th className="text-left pb-2 font-medium">Time</th>
                   <th className="text-left pb-2 font-medium">Status</th>
-                  <th className="text-left pb-2 font-medium">Alert Sent</th>
+                  <th className="text-left pb-2 font-medium">Failed Services</th>
+                  <th className="text-left pb-2 font-medium">Latency</th>
+                  <th className="text-left pb-2 font-medium">Alert</th>
                 </tr>
               </thead>
               <tbody>
@@ -326,6 +410,16 @@ export default function HealthTab() {
                         <StatusDotColor status={entry.overall_status} />
                         <span className="text-xs capitalize">{entry.overall_status}</span>
                       </span>
+                    </td>
+                    <td className="py-2 text-xs text-[#6B7280]">
+                      {entry.failed_services && entry.failed_services.length > 0
+                        ? entry.failed_services.join(', ')
+                        : '—'}
+                    </td>
+                    <td className="py-2">
+                      {entry.latency_ms !== null && entry.latency_ms !== undefined
+                        ? <LatencyBadge ms={entry.latency_ms} />
+                        : <span className="text-xs text-[#6B7280]">—</span>}
                     </td>
                     <td className="py-2 text-xs">
                       {entry.alert_sent ? (
@@ -340,17 +434,6 @@ export default function HealthTab() {
             </table>
           )}
         </Card>
-
-        {/* Monitoring Setup Info */}
-        <div className="bg-slate-50 rounded-xl border border-[#E5E7EB] px-5 py-4">
-          <h3 className="text-sm font-semibold text-[#1B3A5C] mb-2">Monitoring Setup</h3>
-          <div className="text-xs text-[#6B7280] space-y-1.5">
-            <p>This health check is called every 10 minutes by an external cron at <span className="font-mono">cron-job.org</span>.</p>
-            <p>Endpoint: <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">GET /api/monitor</span></p>
-            <p>Auth: <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">Bearer [MONITOR_SECRET]</span></p>
-            <p>Alert emails sent to: <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">{process.env.NEXT_PUBLIC_MONITOR_ALERT_EMAIL ?? 'MONITOR_ALERT_EMAIL'}</span></p>
-          </div>
-        </div>
       </div>
     </div>
   )
