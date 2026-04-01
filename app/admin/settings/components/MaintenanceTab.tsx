@@ -428,10 +428,34 @@ export default function MaintenanceTab() {
     }));
   }
 
+  // Combined save: Maintenance Mode + Chatbot
+  const [box1Saving, setBox1Saving] = useState(false);
+  async function saveBox1() {
+    setBox1Saving(true);
+    await saveMmSettings();
+    await saveCmSettings();
+    setBox1Saving(false);
+  }
+
+  // Combined save: All sandboxes
+  const [box2Saving, setBox2Saving] = useState(false);
+  async function saveBox2() {
+    setBox2Saving(true);
+    await saveSbSettings();
+    await saveFsSettings();
+    await saveChSettings();
+    setBox2Saving(false);
+  }
+
+  // Sandbox active count for header badge
+  const sandboxActiveCount = [sbEnabled, fsEnabled, chEnabled].filter(Boolean).length;
+
+  const isAnyLoading = mmLoading || sbLoading || cmLoading || fsLoading || chLoading;
+
   return (
     <div className="space-y-6">
 
-      {/* ── Maintenance Mode ─────────────────────────────────────────── */}
+      {/* ══════ BOX 1: Maintenance Mode + Chatbot ══════ */}
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
           <h2 className="text-base font-semibold text-[#1B3A5C]">Maintenance Mode</h2>
@@ -441,12 +465,13 @@ export default function MaintenanceTab() {
           </span>
         </div>
 
-        {mmLoading ? (
+        {isAnyLoading ? (
           <div className="px-6 py-10 flex justify-center">
             <div className="w-6 h-6 border-2 border-[#00B5A3] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="px-6 py-5 space-y-5">
+            {/* Site maintenance toggle */}
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-[#374151]">Enable Maintenance Mode</p>
@@ -466,88 +491,110 @@ export default function MaintenanceTab() {
               </div>
             )}
 
-            <div className="border-t border-[#E5E7EB] pt-5 space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-[#374151] mb-1.5">Maintenance Message</label>
-                <textarea
-                  value={mmMessage}
-                  onChange={e => setMmMessage(e.target.value)}
-                  rows={3}
-                  placeholder="We are currently performing scheduled maintenance. We will be back online shortly."
-                  className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] resize-none transition-colors"
-                />
-                <p className="mt-1.5 text-xs text-[#6B7280]">Shown to visitors on the maintenance page.</p>
-              </div>
+            {/* Maintenance message */}
+            <div>
+              <label className="block text-sm font-medium text-[#374151] mb-1.5">Maintenance Message</label>
+              <textarea
+                value={mmMessage}
+                onChange={e => setMmMessage(e.target.value)}
+                rows={3}
+                placeholder="We are currently performing scheduled maintenance. We will be back online shortly."
+                className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] resize-none transition-colors"
+              />
+              <p className="mt-1.5 text-xs text-[#6B7280]">Shown to visitors on the maintenance page.</p>
+            </div>
 
+            {/* Scheduled window */}
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-[#374151]">Scheduled Window</p>
+                <p className="text-xs text-[#6B7280] mt-0.5">
+                  Automatically activate maintenance during a specific time range.
+                </p>
+              </div>
+              <Toggle checked={mmScheduled} onChange={setMmScheduled} />
+            </div>
+
+            {mmScheduled && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-[#374151] mb-1.5">Start (local time)</label>
+                  <input
+                    type="datetime-local"
+                    value={mmStart}
+                    onChange={e => setMmStart(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#374151] mb-1.5">End (local time)</label>
+                  <input
+                    type="datetime-local"
+                    value={mmEnd}
+                    onChange={e => setMmEnd(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] transition-colors"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Divider — Chatbot Maintenance */}
+            <div className="border-t border-[#E5E7EB] pt-5 space-y-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-medium text-[#374151]">Scheduled Window</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">
-                    Automatically activate maintenance during a specific time range.
+                  <p className="text-sm font-medium text-[#374151]">Chatbot Maintenance Mode</p>
+                  <p className="text-xs text-[#6B7280] mt-1">
+                    Hide the chat widget from regular users. Admins will still see it with a maintenance badge.
                   </p>
                 </div>
-                <Toggle checked={mmScheduled} onChange={setMmScheduled} />
+                <Toggle checked={cmEnabled} onChange={setCmEnabled} />
               </div>
 
-              {mmScheduled && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-[#374151] mb-1.5">Start (local time)</label>
-                    <input
-                      type="datetime-local"
-                      value={mmStart}
-                      onChange={e => setMmStart(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#374151] mb-1.5">End (local time)</label>
-                    <input
-                      type="datetime-local"
-                      value={mmEnd}
-                      onChange={e => setMmEnd(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B5A3]/30 focus:border-[#00B5A3] transition-colors"
-                    />
-                  </div>
+              {cmEnabled && (
+                <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+                  <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <p className="text-xs font-medium text-amber-800">Chatbot is hidden from regular users. Admin users can still see and test the widget.</p>
                 </div>
               )}
+            </div>
 
-              <SaveButton saving={mmSaving} onClick={() => saveMmSettings()} />
+            <div className="border-t border-[#E5E7EB] pt-5">
+              <SaveButton saving={box1Saving || mmSaving} onClick={saveBox1} />
             </div>
           </div>
         )}
       </div>
 
-      {/* ── Email Sandbox ────────────────────────────────────────────── */}
+      {/* ══════ BOX 2: Sandboxes ══════ */}
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-          <h2 className="text-base font-semibold text-[#1B3A5C]">Email Sandbox</h2>
-          {!sbLoading && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium">
-              {sbEnabled ? (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-yellow-400" />
-                  <span className="text-yellow-700">Sandbox active — all emails → {sbRecipient || '(no address)'}</span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-emerald-700">Emails sending normally</span>
-                </>
-              )}
-            </span>
-          )}
+        <div className="px-6 py-4 border-b border-[#E5E7EB]">
+          <div className="flex items-center gap-3">
+            <h2 className="text-base font-semibold text-[#1B3A5C]">Sandboxes</h2>
+            {!isAnyLoading && (
+              <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${
+                sandboxActiveCount > 0
+                  ? 'bg-amber-100 text-amber-700 border-amber-200'
+                  : 'bg-emerald-100 text-emerald-700 border-emerald-200'
+              }`}>
+                {sandboxActiveCount > 0 ? `${sandboxActiveCount} active` : 'All inactive'}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-[#6B7280] mt-0.5">Sandbox modes restrict features to admins only for testing.</p>
         </div>
 
-        {sbLoading ? (
+        {isAnyLoading ? (
           <div className="px-6 py-10 flex justify-center">
             <div className="w-6 h-6 border-2 border-[#00B5A3] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="px-6 py-5 space-y-5">
+            {/* Email Sandbox */}
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-[#374151]">Enable Email Sandbox</p>
+                <p className="text-sm font-medium text-[#374151]">Email Sandbox</p>
                 <p className="text-xs text-[#6B7280] mt-1">
                   Redirect all outgoing emails to a single address instead of the real recipients.
                 </p>
@@ -556,16 +603,13 @@ export default function MaintenanceTab() {
             </div>
 
             {sbEnabled && (
-              <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
-                <svg className="w-4 h-4 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                <p className="text-xs font-medium text-yellow-800">Sandbox is active. No real users will receive emails until this is disabled.</p>
-              </div>
-            )}
-
-            <div className="border-t border-[#E5E7EB] pt-5 space-y-5">
-              {sbEnabled && (
+              <>
+                <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
+                  <svg className="w-4 h-4 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <p className="text-xs font-medium text-yellow-800">Sandbox is active. No real users will receive emails until this is disabled.</p>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-[#374151] mb-1.5">Redirect all emails to</label>
                   <input
@@ -577,173 +621,61 @@ export default function MaintenanceTab() {
                   />
                   <p className="mt-1.5 text-xs text-[#6B7280]">All outgoing emails will be delivered to this address instead.</p>
                 </div>
-              )}
-              <SaveButton saving={sbSaving} onClick={saveSbSettings} />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── Chatbot Maintenance ──────────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-          <h2 className="text-base font-semibold text-[#1B3A5C]">Chatbot Maintenance</h2>
-          {!cmLoading && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium">
-              {cmEnabled ? (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  <span className="text-amber-700">Widget hidden from regular users</span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-emerald-700">Widget visible normally</span>
-                </>
-              )}
-            </span>
-          )}
-        </div>
-
-        {cmLoading ? (
-          <div className="px-6 py-10 flex justify-center">
-            <div className="w-6 h-6 border-2 border-[#00B5A3] border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <div className="px-6 py-5 space-y-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-[#374151]">Enable Chatbot Maintenance Mode</p>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  Hide the chat widget from regular users. Admins will still see it with a maintenance badge.
-                </p>
-              </div>
-              <Toggle checked={cmEnabled} onChange={setCmEnabled} />
-            </div>
-
-            {cmEnabled && (
-              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-                <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                <p className="text-xs font-medium text-amber-800">Chatbot is hidden from regular users. Admin users can still see and test the widget.</p>
-              </div>
+              </>
             )}
 
-            <div className="border-t border-[#E5E7EB] pt-5">
-              <SaveButton saving={cmSaving} onClick={saveCmSettings} />
-            </div>
-          </div>
-        )}
-      </div>
+            {/* Divider — Flows Sandbox */}
+            <div className="border-t border-[#E5E7EB] pt-5 space-y-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-[#374151]">Flows Sandbox</p>
+                  <p className="text-xs text-[#6B7280] mt-1">
+                    Hide flows from regular users. Admins can still see and test all flows.
+                  </p>
+                </div>
+                <Toggle checked={fsEnabled} onChange={setFsEnabled} />
+              </div>
 
-      {/* ── Flows Sandbox ───────────────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-          <h2 className="text-base font-semibold text-[#1B3A5C]">Flows Sandbox</h2>
-          {!fsLoading && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium">
-              {fsEnabled ? (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  <span className="text-amber-700">Flows hidden from regular users</span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-emerald-700">Flows visible normally</span>
-                </>
+              {fsEnabled && (
+                <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+                  <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <p className="text-xs font-medium text-amber-800">Flows are hidden from regular users. Admin users can still see and test.</p>
+                </div>
               )}
-            </span>
-          )}
-        </div>
-
-        {fsLoading ? (
-          <div className="px-6 py-10 flex justify-center">
-            <div className="w-6 h-6 border-2 border-[#00B5A3] border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <div className="px-6 py-5 space-y-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-[#374151]">Enable Flows Sandbox Mode</p>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  Hide flows from regular users. Admins can still see and test all flows.
-                </p>
-              </div>
-              <Toggle checked={fsEnabled} onChange={setFsEnabled} />
             </div>
 
-            {fsEnabled && (
-              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-                <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                <p className="text-xs font-medium text-amber-800">Flows are hidden from regular users. Admin users can still see and test.</p>
+            {/* Divider — Credit Hours Sandbox */}
+            <div className="border-t border-[#E5E7EB] pt-5 space-y-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-[#374151]">Credit Hours Sandbox</p>
+                  <p className="text-xs text-[#6B7280] mt-1">
+                    Hide credit hour submissions from regular users. Admins can still access.
+                  </p>
+                </div>
+                <Toggle checked={chEnabled} onChange={setChEnabled} />
               </div>
-            )}
 
-            <div className="border-t border-[#E5E7EB] pt-5">
-              <SaveButton saving={fsSaving} onClick={saveFsSettings} />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── Credit Hours Sandbox ─────────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-          <h2 className="text-base font-semibold text-[#1B3A5C]">Credit Hours Sandbox</h2>
-          {!chLoading && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium">
-              {chEnabled ? (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  <span className="text-amber-700">Credit Hours hidden from regular users</span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-emerald-700">Credit Hours visible normally</span>
-                </>
+              {chEnabled && (
+                <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+                  <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <p className="text-xs font-medium text-amber-800">Credit Hours are hidden from regular users.</p>
+                </div>
               )}
-            </span>
-          )}
-        </div>
-
-        {chLoading ? (
-          <div className="px-6 py-10 flex justify-center">
-            <div className="w-6 h-6 border-2 border-[#00B5A3] border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <div className="px-6 py-5 space-y-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-[#374151]">Enable Credit Hours Sandbox Mode</p>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  Hide credit hour submissions from regular users. Admins can still access.
-                </p>
-              </div>
-              <Toggle checked={chEnabled} onChange={setChEnabled} />
             </div>
 
-            {chEnabled && (
-              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-                <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                <p className="text-xs font-medium text-amber-800">Credit Hours are hidden from regular users.</p>
-              </div>
-            )}
-
             <div className="border-t border-[#E5E7EB] pt-5">
-              <SaveButton saving={chSaving} onClick={saveChSettings} />
+              <SaveButton saving={box2Saving || sbSaving} onClick={saveBox2} />
             </div>
           </div>
         )}
       </div>
 
-      {/* ── Theme Lock ───────────────────────────────────────────────── */}
+      {/* ══════ BOX 3: Theme Lock ══════ */}
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
           <h2 className="text-base font-semibold text-[#1B3A5C]">Theme Lock</h2>
@@ -789,7 +721,7 @@ export default function MaintenanceTab() {
         )}
       </div>
 
-      {/* ── Page Visibility ──────────────────────────────────────────── */}
+      {/* ══════ BOX 4: Page Visibility ══════ */}
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-[#E5E7EB]">
           <h2 className="text-base font-semibold text-[#1B3A5C]">Page Visibility</h2>
