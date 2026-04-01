@@ -162,7 +162,7 @@ Plans:
 - [x] **Phase 36: Database Migrations** - Create course_categories and lessons tables, migrate courses schema, RLS policies, TypeScript types (completed 2026-04-01)
 - [x] **Phase 37: Admin Courses — Tabs + Categories** - Courses/Categories tab bar, category table, CRUD modal, delete guard (completed 2026-04-01)
 - [x] **Phase 38: Course Creation Form — UI Redesign** - Card-section layout, dynamic category select, duration slider, remove vimeo_url, post-save redirect (completed 2026-04-01)
-- [ ] **Phase 39: Lesson Management — UI + Logic** - Drag-and-drop lesson list, type-specific forms (Video/Audio/Text), sort_order persistence, mobile touch support
+- [x] **Phase 39: Lesson Management — UI + Logic** - Drag-and-drop lesson list, type-specific forms (Video/Audio/Text), sort_order persistence, mobile touch support
 - [ ] **Phase 40: Wire Lessons to Frontend** - Academy page lesson list, lesson player page by type, category color on course cards, member my-courses lesson management
 
 ### Phase 36: Database Migrations
@@ -227,8 +227,8 @@ Plans:
   6. Drag-and-drop works on touch screens (mobile and tablet)
 **Plans:** 2 plans
 Plans:
-- [ ] 39-01-PLAN.md — Lesson types, server actions (CRUD + reorder), LessonList with dnd-kit sortable, edit page integration
-- [ ] 39-02-PLAN.md — LessonForm with type selector (Video/Audio/Text), type-specific fields, inline form wiring, visual verification
+- [x] 39-01-PLAN.md — Lesson types, server actions (CRUD + reorder), LessonList with dnd-kit sortable, edit page integration
+- [x] 39-02-PLAN.md — LessonForm with type selector (Video/Audio/Text), type-specific fields, inline form wiring, visual verification
 **UI hint**: yes
 
 ### Phase 40: Wire Lessons to Frontend

@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.15
 milestone_name: Course System Redesign
 status: verifying
-stopped_at: Completed 39-01-PLAN.md — Lesson data layer and LessonList component
-last_updated: "2026-04-01T04:21:57.083Z"
+stopped_at: Completed 39-02-PLAN.md — LessonForm component and inline integration
+last_updated: "2026-04-01T05:10:00.000Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 5
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-01)
 
 Phase: 39 (Lesson Management — UI + Logic) — EXECUTING
 Plan: 2 of 2
-Status: Plan 01 complete — ready for Plan 02
+Status: Phase complete — both plans done, ready for Phase 40
 Last activity: 2026-04-01
 
 Progress: [░░░░░░░░░░] 0%
@@ -53,6 +53,8 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 37-admin-courses-tabs-categories P02 | 8 | 2 tasks | 4 files |
 | Phase 38-course-creation-form-ui-redesign P01 | 45 | 2 tasks | 4 files |
 | Phase 38-course-creation-form-ui-redesign P02 | 10 | 2 tasks | 1 files |
+| Phase 39-lesson-management-ui-logic P01 | 4m | 2 tasks | 7 files |
+| Phase 39-lesson-management-ui-logic P02 | 8m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -79,6 +81,8 @@ Recent decisions affecting current work:
 - [Phase 38-course-creation-form-ui-redesign]: Card-section form layout (border border-border rounded-xl p-6 bg-card) established for CourseForm — three sections: Basic Info, Content, Settings
 - [Phase 38-course-creation-form-ui-redesign]: New admin courses auto-set course_type=goya and redirect to edit?tab=lessons after creation
 - [Phase 38-course-creation-form-ui-redesign]: Button row uses flex-col sm:flex-row — Submit button becomes w-full on mobile for large touch target
+- [Phase 39-02]: LessonList owns formMode state internally — keeps edit page as server component without callback drilling
+- [Phase 39-02]: LessonForm nullifies type-irrelevant fields on submit — video type nulls audio_url, audio/text types null video_platform and video_url
 
 ### Codebase Findings (v1.15 pre-flight)
 
@@ -117,5 +121,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-04-01T04:21:57.080Z
-Stopped at: Completed 38-02-PLAN.md — Mobile responsiveness polish for CourseForm
+Stopped at: Completed 39-02-PLAN.md — LessonForm component and inline integration
 Resume file: None

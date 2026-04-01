@@ -136,12 +136,32 @@ Below the course edit form is a **Lessons** card that lists all lessons attached
 | **Title** | Lesson title |
 | **Type badge** | Video (blue), Audio (amber), or Text (emerald) |
 | **Duration** | Duration in minutes (e.g. "30m"), or `--` if not set |
-| **Edit** | Opens the lesson editor (pencil icon) |
+| **Edit** | Opens the inline lesson form pre-filled with existing data (pencil icon) |
 | **Delete** | Removes the lesson after confirmation (trash icon) |
 
 When no lessons have been added yet, the section shows an empty state: "No lessons yet. Add your first lesson below."
 
-Click **+ Add Lesson** to create a new lesson.
+Click **+ Add Lesson** to open the inline lesson form below the list.
+
+### Adding and Editing Lessons
+
+The lesson form appears inline below the lesson list. It has three steps:
+
+**1. Lesson Type** — Select one of three cards:
+
+| Card | Fields shown |
+|---|---|
+| **Video** | Platform toggle (Vimeo / YouTube), Video URL, descriptions, duration slider |
+| **Audio** | Audio URL, Featured Image URL (optional), descriptions, duration slider |
+| **Text** | Featured Image URL (optional), descriptions (larger text area), duration slider |
+
+**2. Common fields** — All lesson types share:
+- **Title** (required)
+- **Short Description** — shown on the lesson card, max 200 characters
+- **Full Description** — shown on the lesson detail page
+- **Duration slider** — 1 to 180 minutes in 1-minute steps, displayed as "Xh Ym" or "Ym"
+
+**3. Save or Cancel** — Click **Add Lesson** (or **Save Changes** when editing) to submit. The lesson list updates immediately without a page reload. Click **Cancel** to discard changes and close the form.
 
 ## Soft Delete and Restore
 
