@@ -1,9 +1,9 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
-
-const CATEGORIES = ['Workshop', 'Yoga Sequence', 'Dharma Talk', 'Music Playlist', 'Research'];
+import { useCallback, useEffect, useState } from 'react';
+import { fetchCategories } from './category-actions';
+import type { CourseCategory } from '@/lib/courses/categories';
 const BASE_STATUSES: Array<{ value: string; label: string }> = [
   { value: 'published',      label: 'Published'      },
   { value: 'draft',          label: 'Draft'           },
@@ -33,12 +33,17 @@ export default function AdminCoursesFilters({ userRole }: Props) {
   const router       = useRouter();
   const searchParams = useSearchParams();
 
-  const [search,     setSearch]     = useState(searchParams.get('search')   ?? '');
-  const [category,   setCategory]   = useState(searchParams.get('category') ?? '');
-  const [access,     setAccess]     = useState(searchParams.get('access')   ?? '');
-  const [status,     setStatus]     = useState(searchParams.get('status')   ?? '');
-  const [courseType,  setCourseType] = useState(searchParams.get('type')     ?? '');
-  const [sort,       setSort]       = useState(searchParams.get('sort')     ?? 'created_at_desc');
+  const [search,       setSearch]       = useState(searchParams.get('search')   ?? '');
+  const [category,     setCategory]     = useState(searchParams.get('category') ?? '');
+  const [access,       setAccess]       = useState(searchParams.get('access')   ?? '');
+  const [status,       setStatus]       = useState(searchParams.get('status')   ?? '');
+  const [courseType,   setCourseType]   = useState(searchParams.get('type')     ?? '');
+  const [sort,         setSort]         = useState(searchParams.get('sort')     ?? 'created_at_desc');
+  const [dbCategories, setDbCategories] = useState<CourseCategory[]>([]);
+
+  useEffect(() => {
+    fetchCategories().then(({ data }) => setDbCategories(data));
+  }, []);
 
   const isAdmin = userRole === 'admin';
 
@@ -74,7 +79,7 @@ export default function AdminCoursesFilters({ userRole }: Props) {
       {/* Category */}
       <select value={category} onChange={e => { setCategory(e.target.value); apply({ category: e.target.value }); }} className={SEL}>
         <option value="">All Categories</option>
-        {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+        {dbCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
       </select>
 
       {/* Access */}
