@@ -2,8 +2,8 @@
 workstream: media-library-restructure
 milestone: v1.16
 milestone_name: Media Library Restructure
-status: defining_requirements
-stopped_at: ""
+status: planning
+stopped_at: "Roadmap approved — ready to plan phases"
 last_updated: "2026-04-01"
 last_activity: 2026-04-01
 progress:
