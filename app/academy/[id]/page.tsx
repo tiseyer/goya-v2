@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { Course, UserCourseProgress } from '@/lib/types';
+import type { Lesson } from '@/lib/courses/lessons';
 import { enrollAndStart } from './actions';
 import CourseEnrollCard from './CourseEnrollCard';
 
@@ -14,13 +15,20 @@ const LEVEL_COLORS: Record<string, string> = {
   'All Levels': 'text-slate-600 bg-slate-100 border-slate-200',
 };
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Workshop:         'text-teal-700 bg-teal-50 border-teal-200',
-  'Yoga Sequence':  'text-green-700 bg-green-50 border-green-200',
-  'Dharma Talk':    'text-blue-700 bg-blue-50 border-blue-200',
-  'Music Playlist': 'text-pink-700 bg-pink-50 border-pink-200',
-  Research:         'text-slate-600 bg-slate-100 border-slate-200',
+const TYPE_ICONS: Record<string, string> = {
+  video: '\uD83C\uDFAC',
+  audio: '\uD83C\uDFB5',
+  text:  '\uD83D\uDCDD',
 };
+
+function formatDuration(minutes: number | null): string | null {
+  if (!minutes) return null;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
+}
 
 export default async function CourseOverviewPage({
   params,
@@ -30,15 +38,26 @@ export default async function CourseOverviewPage({
   const { id } = await params;
   const supabase = await createSupabaseServerClient();
 
-  // Fetch course
+  // Fetch course with category join
   const { data: courseData } = await supabase
     .from('courses')
-    .select('*')
+    .select('*, course_categories(name, color)')
     .eq('id', id)
     .single();
 
   if (!courseData) notFound();
   const course = courseData as Course;
+
+  const categoryName  = (courseData as any)?.course_categories?.name ?? null;
+  const categoryColor = (courseData as any)?.course_categories?.color ?? null;
+
+  // Fetch lessons ordered by sort_order
+  const { data: lessonsData } = await supabase
+    .from('lessons')
+    .select('id, title, type, duration_minutes, sort_order')
+    .eq('course_id', id)
+    .order('sort_order', { ascending: true });
+  const lessons = (lessonsData ?? []) as Pick<Lesson, 'id' | 'title' | 'type' | 'duration_minutes' | 'sort_order'>[];
 
   // Auth + progress
   const { data: { user } } = await supabase.auth.getUser();
@@ -53,10 +72,7 @@ export default async function CourseOverviewPage({
     progress = (data as UserCourseProgress | null) ?? null;
   }
 
-  const isEnrolled   = !!progress;
-  const isCompleted  = progress?.status === 'completed';
-  const isInProgress = progress?.status === 'in_progress';
-  const lessonTitle  = `Video – ${course.title}`;
+  const isEnrolled = !!progress;
 
   // Bind server action to this course id
   const boundEnroll = enrollAndStart.bind(null, id);
@@ -81,9 +97,18 @@ export default async function CourseOverviewPage({
 
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${CATEGORY_COLORS[course.category] ?? 'text-slate-600 bg-slate-100 border-slate-200'}`}>
-              {course.category}
-            </span>
+            {categoryName && (
+              <span
+                className="text-xs font-semibold px-2.5 py-0.5 rounded-full border"
+                style={{
+                  color: categoryColor ?? '#64748B',
+                  backgroundColor: categoryColor ? `${categoryColor}15` : '#f1f5f9',
+                  borderColor: categoryColor ? `${categoryColor}40` : '#e2e8f0',
+                }}
+              >
+                {categoryName}
+              </span>
+            )}
             <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
               course.access === 'free'
                 ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
@@ -113,19 +138,19 @@ export default async function CourseOverviewPage({
                 {course.instructor}
               </span>
             )}
-            {course.duration && (
+            {formatDuration(course.duration_minutes) && (
               <span className="flex items-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {course.duration}
+                {formatDuration(course.duration_minutes)}
               </span>
             )}
             <span className="flex items-center gap-1.5">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
               </svg>
-              1 Lesson
+              {lessons.length} Lesson{lessons.length !== 1 ? 's' : ''}
             </span>
           </div>
         </div>
@@ -153,71 +178,56 @@ export default async function CourseOverviewPage({
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-[#1B3A5C]">Course Content</h2>
-                <span className="text-xs text-slate-400 font-medium">1 lesson{course.duration ? ` · ${course.duration}` : ''}</span>
+                <span className="text-xs text-slate-400 font-medium">
+                  {lessons.length} lesson{lessons.length !== 1 ? 's' : ''}
+                  {course.duration_minutes ? ` \u00B7 ${formatDuration(course.duration_minutes)}` : ''}
+                </span>
               </div>
 
-              {/* Lesson row */}
-              <div className={`border border-slate-100 rounded-xl overflow-hidden ${!isEnrolled ? 'opacity-90' : ''}`}>
-                {isEnrolled ? (
-                  <Link
-                    href={`/academy/${id}/lesson`}
-                    className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors group"
-                  >
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-                      isCompleted
-                        ? 'bg-green-500 border-green-500'
-                        : 'border-[#4E87A0]'
-                    }`}>
-                      {isCompleted && (
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                      {isInProgress && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#4E87A0]" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="text-sm font-medium text-[#1B3A5C] group-hover:text-[#4E87A0] transition-colors truncate">
-                          {lessonTitle}
-                        </span>
+              {lessons.length === 0 ? (
+                <p className="text-sm text-slate-400 py-4">No lessons available yet.</p>
+              ) : (
+                <div className="space-y-1">
+                  {lessons.map((lesson, index) => {
+                    const lessonLink = isEnrolled ? `/academy/${id}/lesson/${lesson.id}` : null;
+                    return (
+                      <div key={lesson.id} className={`border border-slate-100 rounded-xl overflow-hidden ${!isEnrolled ? 'opacity-90' : ''}`}>
+                        {lessonLink ? (
+                          <Link href={lessonLink} className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors group">
+                            <span className="text-base shrink-0">{TYPE_ICONS[lesson.type] ?? '\uD83D\uDCDD'}</span>
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm font-medium text-[#1B3A5C] group-hover:text-[#4E87A0] transition-colors truncate block">
+                                {index + 1}. {lesson.title}
+                              </span>
+                            </div>
+                            {lesson.duration_minutes && (
+                              <span className="text-xs text-slate-400 shrink-0">{formatDuration(lesson.duration_minutes)}</span>
+                            )}
+                            <svg className="w-4 h-4 text-slate-300 shrink-0 group-hover:text-[#4E87A0] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </Link>
+                        ) : (
+                          <div className="flex items-center gap-4 p-4">
+                            <span className="text-base shrink-0 opacity-50">{TYPE_ICONS[lesson.type] ?? '\uD83D\uDCDD'}</span>
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm text-slate-400 truncate block">{index + 1}. {lesson.title}</span>
+                            </div>
+                            {lesson.duration_minutes && (
+                              <span className="text-xs text-slate-300 shrink-0">{formatDuration(lesson.duration_minutes)}</span>
+                            )}
+                            <svg className="w-4 h-4 text-slate-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    {course.duration && (
-                      <span className="text-xs text-slate-400 shrink-0">{course.duration}</span>
-                    )}
-                    <svg className="w-4 h-4 text-slate-300 shrink-0 group-hover:text-[#4E87A0] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
-                ) : (
-                  <div className="flex items-center gap-4 p-4">
-                    <div className="w-6 h-6 rounded-full border-2 border-slate-200 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="text-sm text-slate-400 truncate">{lessonTitle}</span>
-                      </div>
-                    </div>
-                    {course.duration && (
-                      <span className="text-xs text-slate-300 shrink-0">{course.duration}</span>
-                    )}
-                    <svg className="w-4 h-4 text-slate-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                )}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
 
-              {!isEnrolled && (
+              {!isEnrolled && lessons.length > 0 && (
                 <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
