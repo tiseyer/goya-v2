@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { getResend, FROM_ADDRESS } from '@/lib/email/client'
 import { runAllChecks, type OverallStatus, type HealthCheckResult } from '@/lib/health-checks'
+import { logAuditEvent } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -10,12 +11,11 @@ const ALERT_EMAIL = process.env.MONITOR_ALERT_EMAIL ?? 'till@seyer-marketing.de'
 const ADMIN_URL = 'https://goya-v2.vercel.app/admin/settings'
 
 function validateAuth(request: Request): boolean {
-  const secret = process.env.MONITOR_SECRET
-  if (!secret) return false
-  const auth = request.headers.get('authorization')
-  if (!auth) return false
-  const token = auth.replace(/^Bearer\s+/i, '')
-  return token === secret
+  const authHeader = request.headers.get('authorization')
+  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return false
+  }
+  return true
 }
 
 function buildAlertSubject(status: OverallStatus, changes: string[]): string {
@@ -89,7 +89,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const baseUrl = `${url.protocol}//${url.host}`
 
-  const result = await runAllChecks(baseUrl)
+  const result = await runAllChecks(baseUrl, process.env.MONITOR_SECRET)
   const sb = getSupabaseService()
 
   // Get last log entry to compare
@@ -182,6 +182,35 @@ export async function GET(request: Request) {
   const shouldAlert = changes.length > 0
   let alertSent = false
 
+  // Audit log on status change only
+  if (shouldAlert) {
+    const failedServices = result.services.filter(s => s.status === 'down').map(s => s.name)
+    if (result.overallStatus === 'critical' || result.overallStatus === 'degraded') {
+      await logAuditEvent({
+        category: 'system',
+        severity: 'error',
+        action: 'system.health_check_failed',
+        description: changes.join('; '),
+        metadata: {
+          overall_status: result.overallStatus,
+          failed_services: failedServices,
+          changes,
+        },
+      })
+    } else if (result.overallStatus === 'healthy') {
+      await logAuditEvent({
+        category: 'system',
+        severity: 'info',
+        action: 'system.health_check_recovered',
+        description: 'All systems recovered: ' + changes.join('; '),
+        metadata: {
+          overall_status: 'healthy',
+          changes,
+        },
+      })
+    }
+  }
+
   if (shouldAlert) {
     try {
       const resend = getResend()
@@ -197,7 +226,7 @@ export async function GET(request: Request) {
     }
   }
 
-  // Insert log
+  // Insert log with new columns
   await (sb as any).from('health_monitor_log').insert({
     overall_status: result.overallStatus,
     checks: {
@@ -210,6 +239,12 @@ export async function GET(request: Request) {
     alert_type: shouldAlert
       ? (isHourlyReminder ? 'reminder' : result.overallStatus === 'healthy' ? 'recovery' : result.overallStatus)
       : null,
+    failed_services: result.services.filter(s => s.status === 'down').map(s => s.name),
+    latency_ms: result.database.queryLatencyMs,
+    metadata: {
+      services: result.services.map(s => ({ name: s.name, status: s.status, latencyMs: s.latencyMs })),
+      endpoints: result.endpoints.map(e => ({ url: e.url, status: e.status, statusCode: e.statusCode })),
+    },
   })
 
   // Cleanup: delete rows older than 7 days
