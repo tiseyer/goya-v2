@@ -3,7 +3,7 @@ title: Architecture
 audience: ["developer"]
 section: developer
 order: 2
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # Architecture
@@ -273,6 +273,46 @@ Access control happens at two layers:
 - `app/settings/layout.tsx` verifies auth, then renders `<SettingsShell userRole={...}>{children}</SettingsShell>`
 
 To add a new admin section: create the page under `app/admin/your-section/page.tsx`, then add the nav link inside `AdminShell.tsx`.
+
+---
+
+---
+
+## Analytics & Event Tracking
+
+Client-side GA4 event tracking is centralised in `lib/analytics/`:
+
+| File | Purpose |
+|---|---|
+| `lib/analytics/events.ts` | `Analytics` object with 22 predefined GA4 events. Import and call directly in client components. |
+| `lib/analytics/tracking.ts` | Legacy tracking helpers and Clarity integration. Still used; new code should prefer `events.ts`. |
+| `lib/analytics/ga4.ts` | Server-side GA4 Data API queries (used by admin Visitors analytics). |
+
+**Pattern for Server Component pages:**
+
+Server Component pages cannot fire client-side events directly. Use a thin no-render client component:
+
+```tsx
+// app/your-page/PageViewTracker.tsx
+'use client';
+import { useEffect } from 'react';
+import { Analytics } from '@/lib/analytics/events';
+
+export default function PageViewTracker({ id, name }: { id: string; name: string }) {
+  useEffect(() => { Analytics.eventViewed(id, name); }, [id, name]);
+  return null;
+}
+```
+
+Then render it inside the Server Component's JSX:
+
+```tsx
+// app/your-page/page.tsx (Server Component)
+import PageViewTracker from './PageViewTracker';
+return <div><PageViewTracker id={item.id} name={item.title} />...</div>;
+```
+
+**All `Analytics.*` calls are safe to call unconditionally** — they no-op silently when `window.gtag` is not loaded (SSR context, consent not given, ad blocker).
 
 ---
 
