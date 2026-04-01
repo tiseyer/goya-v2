@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import { getEffectiveUserId } from '@/lib/supabase/getEffectiveUserId';
+import { getSupabaseService } from '@/lib/supabase/service';
 import type { Course, UserCourseProgress } from '@/lib/types';
 import type { Lesson } from '@/lib/courses/lessons';
 import { enrollAndStart } from './actions';
@@ -60,14 +62,17 @@ export default async function CourseOverviewPage({
     .order('sort_order', { ascending: true });
   const lessons = (lessonsData ?? []) as Pick<Lesson, 'id' | 'title' | 'type' | 'duration_minutes' | 'sort_order'>[];
 
-  // Auth + progress
+  // Auth + progress — use effective user ID (impersonated or real)
   const { data: { user } } = await supabase.auth.getUser();
+  let effectiveUserId: string | null = null;
+  try { effectiveUserId = await getEffectiveUserId(); } catch { /* not authenticated */ }
   let progress: UserCourseProgress | null = null;
-  if (user) {
-    const { data } = await supabase
+  if (effectiveUserId) {
+    const svc = getSupabaseService();
+    const { data } = await (svc as any)
       .from('user_course_progress')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', effectiveUserId)
       .eq('course_id', id)
       .maybeSingle();
     progress = (data as UserCourseProgress | null) ?? null;
@@ -245,7 +250,7 @@ export default async function CourseOverviewPage({
             <div className="sticky top-24">
               <CourseEnrollCard
                 course={course}
-                userId={user?.id ?? null}
+                userId={effectiveUserId ?? user?.id ?? null}
                 progress={progress}
                 enrollAction={boundEnroll}
               />

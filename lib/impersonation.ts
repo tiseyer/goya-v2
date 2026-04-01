@@ -8,7 +8,7 @@ export const IMPERSONATION_LOG_COOKIE = 'goya_impersonation_log_id'
 export interface ImpersonationState {
   isImpersonating: boolean
   targetUserId: string | null
-  targetProfile: { id: string; full_name: string | null; email: string | null; mrn: string | null; role: string | null; member_type: string | null } | null
+  targetProfile: { id: string; full_name: string | null; email: string | null; mrn: string | null; role: string | null; member_type: string | null; avatar_url: string | null } | null
   adminId: string | null
   adminProfile: { id: string; full_name: string | null; role: string | null } | null
 }
@@ -35,7 +35,7 @@ export async function getImpersonationState(): Promise<ImpersonationState> {
   // Fetch both profiles using service client (to bypass RLS for any role)
   const [{ data: adminProfile }, { data: targetProfile }] = await Promise.all([
     svc().from('profiles').select('id, full_name, role').eq('id', user.id).single(),
-    svc().from('profiles').select('id, full_name, role, member_type, mrn').eq('id', targetUserId).single(),
+    svc().from('profiles').select('id, full_name, role, member_type, mrn, avatar_url').eq('id', targetUserId).single(),
   ])
 
   // Also get target user's email from auth.users via service client

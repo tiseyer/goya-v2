@@ -416,11 +416,13 @@ function UserMenu({
   userId,
   userMemberType,
   userSchoolId,
+  avatarUrl,
   onLogout,
   isImpersonating,
   adminName,
   impersonatedName,
   impersonatedInitials,
+  impersonatedAvatarUrl,
 }: {
   userName: string;
   userMrn: string;
@@ -429,11 +431,13 @@ function UserMenu({
   userId?: string;
   userMemberType?: string;
   userSchoolId?: string;
+  avatarUrl?: string | null;
   onLogout: () => void;
   isImpersonating?: boolean;
   adminName?: string;
   impersonatedName?: string;
   impersonatedInitials?: string;
+  impersonatedAvatarUrl?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -441,6 +445,7 @@ function UserMenu({
 
   const displayName = isImpersonating && impersonatedName ? impersonatedName : userName;
   const displayInitials = isImpersonating && impersonatedInitials ? impersonatedInitials : userInitials;
+  const displayAvatar = isImpersonating ? impersonatedAvatarUrl : avatarUrl;
 
   const menuItems = [
     { label: 'My Profile',      href: userId ? `/members/${userId}` : '#', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
@@ -459,9 +464,13 @@ function UserMenu({
         aria-label="User menu"
       >
         {/* Avatar */}
-        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
-          <span className="text-white text-[10px] font-black">{displayInitials}</span>
-        </div>
+        {displayAvatar ? (
+          <img src={displayAvatar} alt="" className={`w-7 h-7 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : ''}`} />
+        ) : (
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+            <span className="text-white text-[10px] font-black">{displayInitials}</span>
+          </div>
+        )}
         <span className="text-sm font-medium text-[#1B3A5C] hidden lg:block">{displayName}</span>
         <svg className={`w-3.5 h-3.5 text-[#6B7280] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -472,18 +481,16 @@ function UserMenu({
         <Dropdown>
           {/* User header */}
           <div className="px-4 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
-              <span className="text-white text-xs font-black">{displayInitials}</span>
-            </div>
+            {displayAvatar ? (
+              <img src={displayAvatar} alt="" className={`w-10 h-10 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : ''}`} />
+            ) : (
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+                <span className="text-white text-xs font-black">{displayInitials}</span>
+              </div>
+            )}
             <div>
               <p className="text-sm font-semibold text-[#1B3A5C]">{displayName}</p>
-              {isImpersonating ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full mt-0.5">
-                  Viewing as — admin: {adminName ?? 'Admin'}
-                </span>
-              ) : (
-                userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>
-              )}
+              {!isImpersonating && userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>}
             </div>
           </div>
 
@@ -578,9 +585,20 @@ function UserMenu({
             </div>
           )}
 
-          {/* Switch Back — only shown when impersonating */}
+          {/* Settings + Switch Back — shown when impersonating */}
           {isImpersonating && (
             <div className="border-t border-[#E5E7EB] py-1.5">
+              <Link
+                href="/settings"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+              >
+                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Settings
+              </Link>
               <form action={endImpersonation}>
                 <button
                   type="submit"
@@ -945,11 +963,13 @@ export default function Header() {
                   userId={isImpersonating && targetProfile ? targetProfile.id : profile?.id}
                   userMemberType={isImpersonating && targetProfile ? (targetProfile.member_type ?? undefined) : profile?.member_type}
                   userSchoolId={schoolSlug ?? undefined}
+                  avatarUrl={profile?.avatar_url}
                   onLogout={handleLogout}
                   isImpersonating={isImpersonating}
                   adminName={adminProfile?.full_name ?? 'Admin'}
                   impersonatedName={impersonatedName}
                   impersonatedInitials={impersonatedInitials}
+                  impersonatedAvatarUrl={targetProfile?.avatar_url}
                 />
               </>
             ) : (

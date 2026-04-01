@@ -12,6 +12,7 @@ import {
   getOrCreateConversation,
   searchProfiles,
 } from '@/lib/messaging';
+import { sendMessageAction } from '@/app/actions/messaging';
 import type { ConversationRow, Message } from '@/lib/types';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -365,7 +366,12 @@ function MessagesPageInner() {
 
     setSending(true);
     try {
-      await sendMessage(activeConvId, userId, content, userName);
+      if (isImpersonating) {
+        const result = await sendMessageAction(activeConvId, content, userName);
+        if (!result.success) throw new Error(result.error);
+      } else {
+        await sendMessage(activeConvId, userId, content, userName);
+      }
       // Track message_sent engagement event
       try {
         const { trackMessageSent } = await import('@/lib/analytics/tracking');
