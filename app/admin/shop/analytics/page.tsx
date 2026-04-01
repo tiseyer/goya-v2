@@ -170,8 +170,10 @@ export default async function AnalyticsPage({
   return (
     <div className="p-6 lg:p-8">
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-[#1B3A5C]">Analytics</h1>
+        {/* Page header */}
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B3A5C]">Shop Analytics</h1>
+          <p className="text-sm text-slate-500 mt-1">Revenue, subscriptions, and order trends.</p>
         </div>
 
         {fetchError && (
@@ -192,10 +194,10 @@ export default async function AnalyticsPage({
         {/* Funnel Metrics Section */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-[#1B3A5C]">User Funnel</h2>
+            <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">User Funnel</h2>
             <CsvExportButton data={funnelCsvData} filename="funnel-metrics.csv" />
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <AnalyticsMetricCard
               label="New Registrations"
               value={funnel.newRegistrations}
@@ -237,10 +239,10 @@ export default async function AnalyticsPage({
         {/* Revenue Metrics Section */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-[#1B3A5C]">Revenue</h2>
+            <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">Revenue</h2>
             <CsvExportButton data={revenueCsvData} filename="revenue-metrics.csv" />
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <AnalyticsMetricCard
               label="ARR Total"
               value={
@@ -278,7 +280,7 @@ export default async function AnalyticsPage({
         {/* Charts Section */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-[#1B3A5C]">Trends</h2>
+            <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">Trends</h2>
             <CsvExportButton data={chartCsvData} filename="analytics-trends.csv" />
           </div>
           <AnalyticsCharts chartData={chartData} />

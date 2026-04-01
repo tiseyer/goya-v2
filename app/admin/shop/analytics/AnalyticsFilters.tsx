@@ -10,6 +10,21 @@ interface Props {
   initialDateTo?: string
 }
 
+const TIME_RANGES = [
+  { key: '30d', label: '30D' },
+  { key: '3mo', label: '3M' },
+  { key: '6mo', label: '6M' },
+  { key: 'custom', label: 'Custom' },
+] as const
+
+const ROLE_FILTERS = [
+  { key: 'all',                   label: 'All'       },
+  { key: 'student',               label: 'Student'   },
+  { key: 'teacher',               label: 'Teacher'   },
+  { key: 'wellness_practitioner', label: 'Wellness'  },
+  { key: 'school',                label: 'School'    },
+] as const
+
 export default function AnalyticsFilters({
   initialRange,
   initialRole,
@@ -32,55 +47,58 @@ export default function AnalyticsFilters({
     })
   }
 
-  const selectClass =
-    'rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white text-[#374151] focus:outline-none focus:ring-1 focus:ring-[#00B5A3] focus:border-[#00B5A3] cursor-pointer'
+  const pillBase = 'px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors'
+  const pillActive = 'bg-[#1B3A5C] text-white'
+  const pillInactive = 'border border-[#E5E7EB] text-[#374151] hover:bg-slate-50'
 
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-6">
-      {/* Time range select */}
-      <select
-        defaultValue={initialRange}
-        onChange={(e) => updateParam('range', e.target.value)}
-        className={selectClass}
-      >
-        <option value="30d">Last 30 days</option>
-        <option value="3mo">Last 3 months</option>
-        <option value="6mo">Last 6 months</option>
-        <option value="custom">Custom range</option>
-      </select>
+    <div className="space-y-3">
+      {/* Time range pills */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {TIME_RANGES.map((r) => (
+          <button
+            key={r.key}
+            onClick={() => updateParam('range', r.key)}
+            className={`${pillBase} ${initialRange === r.key ? pillActive : pillInactive}`}
+          >
+            {r.label}
+          </button>
+        ))}
 
-      {/* Role select */}
-      <select
-        defaultValue={initialRole}
-        onChange={(e) => updateParam('role', e.target.value)}
-        className={selectClass}
-      >
-        <option value="all">All roles</option>
-        <option value="student">Student</option>
-        <option value="teacher">Teacher</option>
-        <option value="wellness_practitioner">Wellness Practitioner</option>
-        <option value="school">School</option>
-      </select>
+        {/* Custom date inputs — inline when custom selected */}
+        {initialRange === 'custom' && (
+          <div className="flex items-center gap-2 ml-2">
+            <input
+              type="date"
+              defaultValue={initialDateFrom}
+              onChange={(e) => updateParam('dateFrom', e.target.value)}
+              className="rounded-md border border-[#E5E7EB] px-3 py-1 text-xs bg-white text-[#6B7280] focus:outline-none focus:ring-1 focus:ring-[#00B5A3] focus:border-[#00B5A3] cursor-pointer"
+              title="Date from"
+            />
+            <span className="text-xs text-[#6B7280]">to</span>
+            <input
+              type="date"
+              defaultValue={initialDateTo}
+              onChange={(e) => updateParam('dateTo', e.target.value)}
+              className="rounded-md border border-[#E5E7EB] px-3 py-1 text-xs bg-white text-[#6B7280] focus:outline-none focus:ring-1 focus:ring-[#00B5A3] focus:border-[#00B5A3] cursor-pointer"
+              title="Date to"
+            />
+          </div>
+        )}
+      </div>
 
-      {/* Custom date inputs — only shown when range='custom' */}
-      {initialRange === 'custom' && (
-        <>
-          <input
-            type="date"
-            defaultValue={initialDateFrom}
-            onChange={(e) => updateParam('dateFrom', e.target.value)}
-            className={`${selectClass} text-[#6B7280]`}
-            title="Date from"
-          />
-          <input
-            type="date"
-            defaultValue={initialDateTo}
-            onChange={(e) => updateParam('dateTo', e.target.value)}
-            className={`${selectClass} text-[#6B7280]`}
-            title="Date to"
-          />
-        </>
-      )}
+      {/* Role filter pills */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {ROLE_FILTERS.map((f) => (
+          <button
+            key={f.key}
+            onClick={() => updateParam('role', f.key)}
+            className={`${pillBase} ${initialRole === f.key ? pillActive : pillInactive}`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
