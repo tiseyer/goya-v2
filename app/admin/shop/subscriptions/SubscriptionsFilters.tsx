@@ -92,10 +92,10 @@ export default function SubscriptionsFilters({
       >
         <option value="all">All Status</option>
         <option value="active">Active</option>
-        <option value="trialing">Trialing</option>
+        <option value="canceled">Cancelled</option>
+        <option value="incomplete">Pending</option>
         <option value="past_due">Past Due</option>
-        <option value="canceled">Canceled</option>
-        <option value="incomplete">Incomplete</option>
+        <option value="trialing">Trialing</option>
         <option value="paused">Paused</option>
         <option value="unpaid">Unpaid</option>
       </select>
