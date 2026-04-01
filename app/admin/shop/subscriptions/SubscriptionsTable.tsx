@@ -1,9 +1,11 @@
 'use client';
 
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 export type SubscriptionRow = {
   id: string;
+  userId: string | null;
   stripeSubscriptionId: string;
   customerName: string | null;
   customerEmail: string | null;
@@ -21,10 +23,10 @@ export type SubscriptionRow = {
 const STATUS_PILL: Record<string, string> = {
   active:     'bg-emerald-100 text-emerald-700',
   trialing:   'bg-blue-100 text-blue-700',
-  past_due:   'bg-amber-100 text-amber-700',
-  canceled:   'bg-slate-100 text-slate-600',
-  incomplete: 'bg-red-100 text-red-700',
-  paused:     'bg-gray-100 text-gray-500',
+  past_due:   'bg-red-100 text-red-700',
+  canceled:   'bg-red-100 text-red-700',
+  incomplete: 'bg-yellow-100 text-yellow-700',
+  paused:     'bg-amber-100 text-amber-700',
   unpaid:     'bg-red-100 text-red-700',
 };
 
@@ -100,9 +102,18 @@ export default function SubscriptionsTable({
                 <tr key={sub.id} className="hover:bg-slate-50 transition-colors">
                   {/* Customer */}
                   <td className="px-4 py-3">
-                    <p className="text-sm font-medium text-[#1B3A5C] truncate max-w-[160px]">
-                      {sub.customerName ?? 'Unknown'}
-                    </p>
+                    {sub.userId ? (
+                      <Link
+                        href={`/admin/users/${sub.userId}`}
+                        className="text-sm font-medium text-[#1B3A5C] hover:underline truncate max-w-[160px] block"
+                      >
+                        {sub.customerName ?? 'Unknown'}
+                      </Link>
+                    ) : (
+                      <p className="text-sm font-medium text-[#1B3A5C] truncate max-w-[160px]">
+                        {sub.customerName ?? 'Unknown'}
+                      </p>
+                    )}
                     {sub.customerEmail && (
                       <p className="text-xs text-[#6B7280] truncate max-w-[160px]">
                         {sub.customerEmail}
@@ -130,7 +141,7 @@ export default function SubscriptionsTable({
                   {/* Amount */}
                   <td className="px-4 py-3">
                     <span className="text-sm font-medium text-[#374151]">
-                      {formatCurrency(sub.amount, sub.currency)}
+                      {formatCurrency(sub.amount, sub.currency)}/{sub.interval}
                     </span>
                   </td>
 
@@ -160,7 +171,10 @@ export default function SubscriptionsTable({
                       rel="noopener noreferrer"
                       className="text-sm font-mono text-[#1B3A5C] hover:underline"
                     >
-                      {sub.stripeSubscriptionId.slice(0, 8)}
+                      {(() => {
+                        const sid = sub.stripeSubscriptionId;
+                        return sid.length > 15 ? sid.slice(0, 8) + '...' + sid.slice(-3) : sid;
+                      })()}
                     </a>
                   </td>
                 </tr>

@@ -3,6 +3,7 @@ import { getSupabaseService } from '@/lib/supabase/service';
 
 type RawSubscription = {
   id: string;
+  user_id: string | null;
   stripe_subscription_id: string;
   stripe_customer_id: string | null;
   plan_name: string;
@@ -20,6 +21,7 @@ type RawSubscription = {
 
 export type SubscriptionRow = {
   id: string;
+  userId: string | null;
   stripeSubscriptionId: string;
   customerName: string | null;
   customerEmail: string | null;
@@ -82,16 +84,50 @@ export async function GET(req: NextRequest) {
         .filter((id): id is string => !!id),
     )];
 
-    const profileMap = new Map<string, { full_name: string | null; email: string | null }>();
+    // Also collect user_ids for subs without stripe_customer_id
+    const userIdsForFallback: string[] = [...new Set(
+      rawSubs
+        .filter((s) => !s.stripe_customer_id && s.user_id)
+        .map((s) => s.user_id as string),
+    )];
+
+    // profileMap keyed by stripe_customer_id OR user_id
+    const profileMap = new Map<string, { id: string | null; full_name: string | null; email: string | null }>();
+
     if (customerIds.length > 0) {
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('stripe_customer_id, full_name, email')
+        .select('id, stripe_customer_id, full_name, email')
         .in('stripe_customer_id', customerIds);
 
       for (const p of profiles ?? []) {
         if (p.stripe_customer_id) {
           profileMap.set(p.stripe_customer_id, {
+            id: p.id ?? null,
+            full_name: p.full_name ?? null,
+            email: p.email ?? null,
+          });
+        }
+        if (p.id) {
+          profileMap.set(p.id, {
+            id: p.id ?? null,
+            full_name: p.full_name ?? null,
+            email: p.email ?? null,
+          });
+        }
+      }
+    }
+
+    if (userIdsForFallback.length > 0) {
+      const { data: fallbackProfiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIdsForFallback);
+
+      for (const p of fallbackProfiles ?? []) {
+        if (p.id && !profileMap.has(p.id)) {
+          profileMap.set(p.id, {
+            id: p.id ?? null,
             full_name: p.full_name ?? null,
             email: p.email ?? null,
           });
@@ -100,9 +136,12 @@ export async function GET(req: NextRequest) {
     }
 
     let rows: SubscriptionRow[] = rawSubs.map((s) => {
-      const profile = s.stripe_customer_id ? profileMap.get(s.stripe_customer_id) : undefined;
+      const profileKey = s.stripe_customer_id ?? s.user_id ?? '';
+      const profile = profileKey ? profileMap.get(profileKey) : undefined;
+      const resolvedUserId = profile?.id ?? s.user_id ?? null;
       return {
         id:                   s.id,
+        userId:               resolvedUserId,
         stripeSubscriptionId: s.stripe_subscription_id,
         customerName:         profile?.full_name ?? null,
         customerEmail:        profile?.email ?? null,
