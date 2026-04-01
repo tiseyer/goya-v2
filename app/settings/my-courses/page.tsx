@@ -25,13 +25,24 @@ export default async function MyCoursesPage() {
     redirect('/settings');
   }
 
-  const { data: courses } = await supabase
-    .from('courses')
-    .select('*')
-    .eq('created_by', user.id)
-    .eq('course_type', 'member')
-    .neq('status', 'deleted')
-    .order('created_at', { ascending: false });
+  const [{ data: courses }, { data: categories }] = await Promise.all([
+    supabase
+      .from('courses')
+      .select('*')
+      .eq('created_by', user.id)
+      .eq('course_type', 'member')
+      .neq('status', 'deleted')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('course_categories')
+      .select('id, name')
+      .order('sort_order', { ascending: true }),
+  ]);
 
-  return <MyCoursesClient initialCourses={(courses ?? []) as Course[]} />;
+  return (
+    <MyCoursesClient
+      initialCourses={(courses ?? []) as Course[]}
+      categories={categories ?? []}
+    />
+  );
 }

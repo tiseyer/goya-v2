@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import type { Course, CourseCategory, CourseLevel, CourseAccess } from '@/lib/types';
+import dynamic from 'next/dynamic';
+import type { Course, CourseLevel, CourseAccess } from '@/lib/types';
+import type { Lesson } from '@/lib/courses/lessons';
+import { fetchLessons } from '@/app/admin/courses/lesson-actions';
 import {
   createMemberCourse,
   updateMemberCourse,
@@ -11,7 +14,21 @@ import {
   deleteMemberCourse,
 } from './actions';
 
-const CATEGORIES: CourseCategory[] = ['Workshop', 'Yoga Sequence', 'Dharma Talk', 'Music Playlist', 'Research'];
+// Dynamically import LessonList with SSR disabled (dnd-kit uses browser APIs)
+const LessonList = dynamic(
+  () => import('@/app/admin/courses/components/LessonList'),
+  { ssr: false }
+);
+
+function formatDuration(minutes: number | null): string | null {
+  if (!minutes) return null;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
+}
+
 const LEVELS: CourseLevel[] = ['Beginner', 'Intermediate', 'Advanced', 'All Levels'];
 
 const INPUT = 'w-full px-3 py-2.5 rounded-lg border border-[#E5E7EB] text-sm text-[#374151] bg-white focus:outline-none focus:ring-1 focus:ring-[#4E87A0] focus:border-[#4E87A0] transition-colors';
@@ -34,9 +51,10 @@ const STATUS_LABEL: Record<string, string> = {
 
 interface Props {
   initialCourses: Course[];
+  categories: { id: string; name: string }[];
 }
 
-export default function MyCoursesClient({ initialCourses }: Props) {
+export default function MyCoursesClient({ initialCourses, categories }: Props) {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list');
@@ -104,14 +122,13 @@ export default function MyCoursesClient({ initialCourses }: Props) {
     try {
       const payload = {
         title: formData.title,
-        category: formData.category,
+        category_id: formData.category_id,
         level: formData.level,
         access: formData.access,
         instructor: formData.instructor,
-        duration: formData.duration,
+        duration_minutes: formData.duration_minutes,
         short_description: formData.short_description,
         description: formData.description,
-        vimeo_url: formData.vimeo_url,
         thumbnail_url: formData.thumbnail_url,
         gradient_from: formData.gradient_from,
         gradient_to: formData.gradient_to,
@@ -176,10 +193,16 @@ export default function MyCoursesClient({ initialCourses }: Props) {
         )}
         <MemberCourseForm
           course={editingCourse ?? undefined}
+          categories={categories}
           busy={busy}
           onSubmit={handleFormSubmit}
           onCancel={handleCancel}
         />
+        {view === 'edit' && editingCourse && (
+          <div className="mt-6">
+            <MemberLessons courseId={editingCourse.id} />
+          </div>
+        )}
       </div>
     );
   }
@@ -240,12 +263,12 @@ export default function MyCoursesClient({ initialCourses }: Props) {
                     {STATUS_LABEL[course.status] ?? course.status}
                   </span>
                   <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                    {course.category}
+                    {categories.find(c => c.id === course.category_id)?.name ?? 'Uncategorized'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 mt-1">
                   {course.level && `${course.level} · `}
-                  {course.duration ?? 'No duration set'}
+                  {formatDuration(course.duration_minutes) ?? 'No duration set'}
                   {course.instructor && ` · ${course.instructor}`}
                 </p>
               </div>
@@ -371,14 +394,13 @@ export default function MyCoursesClient({ initialCourses }: Props) {
 
 interface FormValues {
   title: string;
-  category: string;
+  category_id: string | null;
   level: string | null;
   access: string;
   instructor: string;
-  duration: string;
+  duration_minutes: number;
   short_description: string;
   description: string;
-  vimeo_url: string;
   thumbnail_url: string;
   gradient_from: string;
   gradient_to: string;
@@ -386,27 +408,27 @@ interface FormValues {
 
 function MemberCourseForm({
   course,
+  categories,
   busy,
   onSubmit,
   onCancel,
 }: {
   course?: Course;
+  categories: { id: string; name: string }[];
   busy: boolean;
   onSubmit: (data: FormValues, status: 'draft' | 'pending_review') => void;
   onCancel: () => void;
 }) {
-  const isEdit = !!course;
   const isResubmit = course?.status === 'rejected';
 
   const [title, setTitle] = useState(course?.title ?? '');
-  const [category, setCategory] = useState<CourseCategory>(course?.category ?? 'Workshop');
+  const [categoryId, setCategoryId] = useState(course?.category_id ?? '');
   const [level, setLevel] = useState<CourseLevel>(course?.level ?? 'All Levels');
   const [access, setAccess] = useState<CourseAccess>(course?.access ?? 'members_only');
   const [instructor, setInstructor] = useState(course?.instructor ?? '');
-  const [duration, setDuration] = useState(course?.duration ?? '');
+  const [durationMinutes, setDurationMinutes] = useState(course?.duration_minutes ?? 0);
   const [shortDesc, setShortDesc] = useState(course?.short_description ?? '');
   const [description, setDescription] = useState(course?.description ?? '');
-  const [vimeoUrl, setVimeoUrl] = useState(course?.vimeo_url ?? '');
   const [thumbnailUrl, setThumbnailUrl] = useState(course?.thumbnail_url ?? '');
   const [gradientFrom, setGradientFrom] = useState(course?.gradient_from ?? '#0f766e');
   const [gradientTo, setGradientTo] = useState(course?.gradient_to ?? '#134e4a');
@@ -414,14 +436,13 @@ function MemberCourseForm({
   function buildFormValues(): FormValues {
     return {
       title: title.trim(),
-      category,
+      category_id: categoryId || null,
       level,
       access,
       instructor: instructor.trim(),
-      duration: duration.trim(),
+      duration_minutes: durationMinutes,
       short_description: shortDesc.trim(),
       description: description.trim(),
-      vimeo_url: vimeoUrl.trim(),
       thumbnail_url: thumbnailUrl.trim(),
       gradient_from: gradientFrom,
       gradient_to: gradientTo,
@@ -442,8 +463,11 @@ function MemberCourseForm({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className={LABEL}>Category *</label>
-            <select value={category} onChange={e => setCategory(e.target.value as CourseCategory)} className={SELECT}>
-              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+            <select value={categoryId} onChange={e => setCategoryId(e.target.value)} className={SELECT}>
+              <option value="">Select category</option>
+              {categories.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
             </select>
           </div>
           <div>
@@ -469,7 +493,17 @@ function MemberCourseForm({
           </div>
           <div>
             <label className={LABEL}>Duration</label>
-            <input type="text" value={duration} onChange={e => setDuration(e.target.value)} className={INPUT} placeholder="e.g. 4h 30m" />
+            <div className="flex items-center gap-3">
+              <input
+                type="range" min={0} max={600} step={5}
+                value={durationMinutes}
+                onChange={e => setDurationMinutes(Number(e.target.value))}
+                className="flex-1 accent-[#4E87A0]"
+              />
+              <span className="text-sm font-medium text-[#374151] w-16 text-right">
+                {durationMinutes > 0 ? formatDuration(durationMinutes) : 'None'}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -494,21 +528,9 @@ function MemberCourseForm({
           />
         </div>
 
-        {/* Vimeo URL */}
-        <div>
-          <label className={LABEL}>Vimeo URL</label>
-          <input
-            type="url" value={vimeoUrl} onChange={e => setVimeoUrl(e.target.value)}
-            className={INPUT} placeholder="https://vimeo.com/123456789"
-          />
-          <p className="text-xs text-[#9CA3AF] mt-1.5">
-            Paste the full Vimeo video URL. The video must be publicly accessible or unlisted.
-          </p>
-        </div>
-
         {/* Thumbnail URL */}
         <div>
-          <label className={LABEL}>Thumbnail URL <span className="normal-case text-[#9CA3AF] font-normal">(optional, used if no Vimeo)</span></label>
+          <label className={LABEL}>Thumbnail URL <span className="normal-case text-[#9CA3AF] font-normal">(optional)</span></label>
           <input
             type="url" value={thumbnailUrl} onChange={e => setThumbnailUrl(e.target.value)}
             className={INPUT} placeholder="https://example.com/thumbnail.jpg"
@@ -570,6 +592,34 @@ function MemberCourseForm({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+
+// ── Member Lessons Section ────────────────────────────────────────────────────
+
+function MemberLessons({ courseId }: { courseId: string }) {
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLessons(courseId).then(result => {
+      if (result.data) setLessons(result.data);
+      setLoading(false);
+    });
+  }, [courseId]);
+
+  if (loading) return (
+    <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6">
+      <div className="animate-pulse h-4 w-32 bg-slate-200 rounded" />
+    </div>
+  );
+
+  return (
+    <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6">
+      <h3 className="text-sm font-semibold text-[#1B3A5C] mb-4">Lessons</h3>
+      <LessonList courseId={courseId} initialLessons={lessons} />
     </div>
   );
 }
