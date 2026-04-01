@@ -29,6 +29,8 @@ interface MediaPageClientProps {
   isAdmin: boolean;
   currentUserId: string;
   currentUserRole: string;
+  currentUserEmail?: string;
+  currentUserName?: string;
 }
 
 // ── Empty state ───────────────────────────────────────────────────────────────
@@ -138,6 +140,8 @@ export default function MediaPageClient({
   isAdmin,
   currentUserId,
   currentUserRole,
+  currentUserEmail = '',
+  currentUserName = '',
 }: MediaPageClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -350,6 +354,17 @@ export default function MediaPageClient({
     lastPanelItemRef.current = null;
   }, []);
 
+  const handleMove = useCallback((id: string, folderId: string | null) => {
+    // Update the item's folder in the grid
+    setItems(prev => prev.map(i => (i.id === id ? { ...i, folder: folderId } : i)));
+    // Update selectedItem so the detail panel dropdown reflects the new folder
+    setSelectedItem(prev => prev && prev.id === id ? { ...prev, folder: folderId } : prev);
+    // Keep lastPanelItemRef in sync so the panel shows the right folder during close animation
+    if (lastPanelItemRef.current && lastPanelItemRef.current.id === id) {
+      lastPanelItemRef.current = { ...lastPanelItemRef.current, folder: folderId };
+    }
+  }, []);
+
   // POLISH-03: Animate panel out before clearing selectedItem
   const handlePanelClose = useCallback(() => {
     setIsPanelClosing(true);
@@ -412,6 +427,9 @@ export default function MediaPageClient({
           onCollapse={handleSidebarCollapse}
           isAdmin={isAdmin}
           currentUserId={currentUserId}
+          currentUserRole={currentUserRole}
+          currentUserEmail={currentUserEmail}
+          currentUserName={currentUserName}
           onFoldersChange={setFolders}
         />
       </div>
@@ -554,7 +572,11 @@ export default function MediaPageClient({
               onClose={handlePanelClose}
               onUpdate={handleUpdate}
               onDelete={handleDelete}
+              onMove={handleMove}
               isAdmin={isAdmin}
+              currentUserRole={currentUserRole}
+              currentUserEmail={currentUserEmail}
+              folders={folders}
               isClosing={isPanelClosing}
               asSheet
             />
@@ -566,7 +588,11 @@ export default function MediaPageClient({
               onClose={handlePanelClose}
               onUpdate={handleUpdate}
               onDelete={handleDelete}
+              onMove={handleMove}
               isAdmin={isAdmin}
+              currentUserRole={currentUserRole}
+              currentUserEmail={currentUserEmail}
+              folders={folders}
               isClosing={isPanelClosing}
             />
           </div>

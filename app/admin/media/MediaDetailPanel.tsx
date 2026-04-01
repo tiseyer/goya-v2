@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import type { MediaItem } from './actions';
-import { updateMediaItem, deleteMediaItem } from './actions';
+import { updateMediaItem, deleteMediaItem, verifyAdminPassword } from './actions';
 import { getFileTypeColor, getFileTypeLabel, formatFileSize } from './mediaUtils';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -13,6 +13,10 @@ export interface MediaDetailPanelProps {
   onUpdate: (updatedItem: MediaItem) => void;
   onDelete: (id: string) => void;
   isAdmin: boolean;
+  currentUserRole?: string;
+  currentUserEmail?: string;
+  folders?: import('./actions').MediaFolder[];
+  onMove?: (id: string, folderId: string | null) => void;
   /** When true the panel animates out (slide right). Parent controls this before unmounting. */
   isClosing?: boolean;
   /** Render as a bottom sheet (mobile) instead of a side panel (desktop default). */
@@ -145,6 +149,10 @@ export default function MediaDetailPanel({
   onUpdate,
   onDelete,
   isAdmin,
+  currentUserRole,
+  currentUserEmail = '',
+  folders = [],
+  onMove,
   isClosing = false,
   asSheet = false,
 }: MediaDetailPanelProps) {
@@ -173,6 +181,18 @@ export default function MediaDetailPanel({
   const [showConfirm, setShowConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Password confirmation for admin file deletion
+  const [deletePassword, setDeletePassword] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  // Move to folder state
+  const [selectedFolderId, setSelectedFolderId] = useState<string>(item.folder ?? '');
+  const [isMoving, setIsMoving] = useState(false);
+  const [moveError, setMoveError] = useState<string | null>(null);
+  const [moveSuccess, setMoveSuccess] = useState(false);
+
+  const isMoveChanged = selectedFolderId !== (item.folder ?? '');
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
@@ -203,6 +223,18 @@ export default function MediaDetailPanel({
   const handleDelete = useCallback(async () => {
     setIsDeleting(true);
     setDeleteError(null);
+    setPasswordError(null);
+
+    // Admins must verify password before deleting
+    if (currentUserRole === 'admin' && currentUserEmail) {
+      const verify = await verifyAdminPassword({ email: currentUserEmail, password: deletePassword });
+      if (!verify.success) {
+        setPasswordError('Invalid password. Please try again.');
+        setIsDeleting(false);
+        return;
+      }
+    }
+
     const result = await deleteMediaItem(item.id);
     setIsDeleting(false);
     if (!result.success) {
@@ -210,7 +242,24 @@ export default function MediaDetailPanel({
       return;
     }
     onDelete(item.id);
-  }, [item.id, onDelete]);
+  }, [item.id, onDelete, currentUserRole, currentUserEmail, deletePassword]);
+
+  const handleMove = useCallback(async () => {
+    setIsMoving(true);
+    setMoveError(null);
+    setMoveSuccess(false);
+    const { moveMediaItem } = await import('./actions');
+    const folderId = selectedFolderId || null;
+    const result = await moveMediaItem(item.id, folderId);
+    setIsMoving(false);
+    if (!result.success) {
+      setMoveError(result.error ?? 'Move failed. Please try again.');
+      return;
+    }
+    setMoveSuccess(true);
+    setTimeout(() => setMoveSuccess(false), 2000);
+    if (onMove) onMove(item.id, folderId);
+  }, [item.id, selectedFolderId, onMove]);
 
   // ── POLISH-03: Slide-in/out animation & POLISH-04: bottom sheet on mobile ────
   const panelCls = asSheet
@@ -336,21 +385,68 @@ export default function MediaDetailPanel({
         </div>
       </div>
 
-      {/* ── Delete section (admin only) ── */}
-      {isAdmin && (
+      {/* ── Move to folder section ── */}
+      {onMove && folders.length > 0 && (
+        <div className="px-4 py-4 border-b border-slate-100 space-y-2">
+          <label className="block text-xs font-medium text-slate-600">Move to folder</label>
+          <select
+            value={selectedFolderId}
+            onChange={(e) => setSelectedFolderId(e.target.value)}
+            className="w-full h-8 pl-3 pr-8 text-xs text-slate-700 bg-white border border-slate-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          >
+            <option value="">No folder</option>
+            {Object.entries(
+              folders.reduce<Record<string, typeof folders>>((acc, f) => {
+                acc[f.bucket] = acc[f.bucket] ?? [];
+                acc[f.bucket].push(f);
+                return acc;
+              }, {})
+            ).map(([bucket, bucketFolders]) => (
+              <optgroup key={bucket} label={bucket}>
+                {bucketFolders.map(f => (
+                  <option key={f.id} value={f.id}>{f.name}</option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          {moveError && <p className="text-xs text-red-500">{moveError}</p>}
+          {moveSuccess && <p className="text-xs text-emerald-600">File moved successfully.</p>}
+          <button
+            onClick={handleMove}
+            disabled={isMoving || !isMoveChanged}
+            className={[
+              'w-full py-1.5 text-xs font-medium rounded-lg transition-colors duration-150',
+              isMoveChanged && !isMoving
+                ? 'bg-primary text-white hover:bg-primary/90 cursor-pointer'
+                : 'bg-slate-100 text-slate-400 cursor-not-allowed',
+            ].join(' ')}
+          >
+            {isMoving ? 'Moving…' : 'Move'}
+          </button>
+        </div>
+      )}
+
+      {/* ── Delete section (admin only, password-gated) ── */}
+      {currentUserRole === 'admin' && (
         <div className="px-4 py-4 mt-auto relative">
           {showConfirm ? (
-            /* Confirmation state */
+            /* Confirmation state with password */
             <div className="space-y-3">
               <p className="text-xs text-slate-600">
-                Are you sure? This will permanently delete the file from storage and cannot be undone.
+                Re-enter your password to permanently delete this file from storage.
               </p>
-              {deleteError && (
-                <p className="text-xs text-red-500">{deleteError}</p>
-              )}
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Enter your password"
+                className="w-full h-8 px-3 text-xs text-slate-800 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+              />
+              {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
+              {deleteError && <p className="text-xs text-red-500">{deleteError}</p>}
               <div className="flex gap-2">
                 <button
-                  onClick={() => { setShowConfirm(false); setDeleteError(null); }}
+                  onClick={() => { setShowConfirm(false); setDeleteError(null); setPasswordError(null); setDeletePassword(''); }}
                   disabled={isDeleting}
                   className="flex-1 py-1.5 text-xs font-medium border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors duration-150 cursor-pointer disabled:opacity-50"
                 >
@@ -358,7 +454,7 @@ export default function MediaDetailPanel({
                 </button>
                 <button
                   onClick={handleDelete}
-                  disabled={isDeleting}
+                  disabled={isDeleting || !deletePassword}
                   className="flex-1 py-1.5 text-xs font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-150 cursor-pointer disabled:opacity-50"
                 >
                   {isDeleting ? 'Deleting…' : 'Delete permanently'}

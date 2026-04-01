@@ -30,12 +30,14 @@ export default async function AdminMediaPage({
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user?.id ?? '')
     .single();
 
   const currentUserId = user?.id ?? '';
   const currentUserRole = profile?.role ?? 'moderator';
+  const currentUserEmail = user?.email ?? '';
+  const currentUserName = profile?.full_name ?? '';
   const isAdmin = currentUserRole === 'admin';
 
   return (
@@ -51,6 +53,8 @@ export default async function AdminMediaPage({
       isAdmin={isAdmin}
       currentUserId={currentUserId}
       currentUserRole={currentUserRole}
+      currentUserEmail={currentUserEmail}
+      currentUserName={currentUserName}
     />
   );
 }

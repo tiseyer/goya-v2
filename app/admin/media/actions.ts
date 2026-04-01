@@ -562,6 +562,126 @@ export async function deleteFolder(
   return { success: true, fileCount };
 }
 
+// ── requestFolderDeletion ─────────────────────────────────────────────────────
+
+/**
+ * Creates a notification for all admins when a moderator requests folder deletion.
+ * Does NOT delete anything — only sends notifications.
+ */
+export async function requestFolderDeletion(params: {
+  folderId: string;
+  folderName: string;
+  requestedBy: string;
+  requestedByName: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const supabase = getSupabaseService();
+
+  // Find all admin users
+  const { data: admins, error: adminsError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('role', 'admin');
+
+  if (adminsError) {
+    console.error('[requestFolderDeletion] Error fetching admins:', adminsError.message);
+    return { success: false, error: adminsError.message };
+  }
+
+  if (!admins || admins.length === 0) {
+    return { success: true }; // No admins to notify — still a success
+  }
+
+  const notifications = admins.map(admin => ({
+    user_id: admin.id,
+    type: 'folder_deletion_request',
+    title: 'Folder deletion requested',
+    body: `${params.requestedByName} requested deletion of folder "${params.folderName}" (ID: ${params.folderId})`,
+    link: '/admin/media',
+    actor_id: params.requestedBy,
+  }));
+
+  const { error: insertError } = await (supabase as any).from('notifications').insert(notifications);
+
+  if (insertError) {
+    console.error('[requestFolderDeletion] Error inserting notifications:', insertError.message);
+    return { success: false, error: insertError.message };
+  }
+
+  return { success: true };
+}
+
+// ── verifyAdminPassword ───────────────────────────────────────────────────────
+
+/**
+ * Verifies an admin's password without affecting their current session.
+ * Uses a standalone Supabase client to call signInWithPassword.
+ */
+export async function verifyAdminPassword(params: {
+  email: string;
+  password: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const { createClient } = await import('@supabase/supabase-js');
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey) {
+    return { success: false, error: 'Missing Supabase configuration' };
+  }
+
+  const tempClient = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  const { error } = await tempClient.auth.signInWithPassword({
+    email: params.email,
+    password: params.password,
+  });
+
+  if (error) {
+    return { success: false, error: 'Invalid password' };
+  }
+
+  return { success: true };
+}
+
+// ── moveMediaItem ─────────────────────────────────────────────────────────────
+
+/**
+ * Moves a media item to a different folder (or removes it from any folder when folderId is null).
+ * Updates the folder column on the media_items row.
+ */
+export async function moveMediaItem(
+  itemId: string,
+  folderId: string | null
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = getSupabaseService();
+
+  // If moving to a folder, verify the folder exists
+  if (folderId !== null) {
+    const { data: folder, error: folderError } = await supabase
+      .from('media_folders')
+      .select('id')
+      .eq('id', folderId)
+      .single();
+
+    if (folderError || !folder) {
+      return { success: false, error: 'Target folder not found' };
+    }
+  }
+
+  const { error } = await supabase
+    .from('media_items')
+    .update({ folder: folderId, updated_at: new Date().toISOString() })
+    .eq('id', itemId);
+
+  if (error) {
+    console.error('[moveMediaItem] Error:', error.message);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
 // ── reorderFolders ────────────────────────────────────────────────────────────
 
 /**

@@ -20,7 +20,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { MEDIA_BUCKETS } from './constants';
 import type { MediaFolder } from './actions';
-import { updateFolder, deleteFolder, reorderFolders } from './actions';
+import { updateFolder, deleteFolder, reorderFolders, requestFolderDeletion, verifyAdminPassword } from './actions';
 import CreateFolderModal from './components/CreateFolderModal';
 
 interface FolderSidebarProps {
@@ -31,6 +31,9 @@ interface FolderSidebarProps {
   onCollapse: () => void;
   isAdmin: boolean;
   currentUserId: string;
+  currentUserRole: string;
+  currentUserEmail?: string;
+  currentUserName?: string;
   onFoldersChange: (folders: MediaFolder[]) => void;
 }
 
@@ -82,6 +85,14 @@ function GripIcon() {
       <circle cx="9" cy="7" r="1.5" /><circle cx="15" cy="7" r="1.5" />
       <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
       <circle cx="9" cy="17" r="1.5" /><circle cx="15" cy="17" r="1.5" />
+    </svg>
+  );
+}
+
+function FlagIcon() {
+  return (
+    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 21V4m0 0l18 6-18 6" />
     </svg>
   );
 }
@@ -153,6 +164,147 @@ function DeleteConfirmDialog({ folder, fileCount, loading, onConfirm, onCancel }
   );
 }
 
+// ── Request deletion dialog (moderator) ───────────────────────────────────────
+
+interface RequestDeletionDialogProps {
+  folder: MediaFolder;
+  loading: boolean;
+  submitted: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function RequestDeletionDialog({ folder, loading, submitted, onConfirm, onCancel }: RequestDeletionDialogProps) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="request-deletion-title"
+    >
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
+        <h2 id="request-deletion-title" className="text-base font-semibold text-primary-dark mb-2">
+          Request deletion of &ldquo;{folder.name}&rdquo;?
+        </h2>
+        {submitted ? (
+          <p className="mb-4 text-sm text-emerald-600">
+            Deletion request submitted. Admins have been notified.
+          </p>
+        ) : (
+          <p className="mb-4 text-sm text-slate-500">
+            You don&rsquo;t have permission to delete folders directly. Submitting this request will notify all admins.
+          </p>
+        )}
+        <div className="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="h-9 px-4 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
+          >
+            {submitted ? 'Close' : 'Cancel'}
+          </button>
+          {!submitted && (
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={loading}
+              className="h-9 px-4 text-sm font-medium text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer disabled:opacity-50"
+            >
+              {loading ? 'Submitting…' : 'Submit Request'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Password confirm dialog (admin) ───────────────────────────────────────────
+
+interface PasswordConfirmDialogProps {
+  folder: MediaFolder;
+  fileCount: number | null;
+  email: string;
+  loading: boolean;
+  error: string | null;
+  onConfirm: (password: string) => void;
+  onCancel: () => void;
+}
+
+function PasswordConfirmDialog({ folder, fileCount, email, loading, error, onConfirm, onCancel }: PasswordConfirmDialogProps) {
+  const [password, setPassword] = useState('');
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="password-confirm-title"
+    >
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
+        <h2 id="password-confirm-title" className="text-base font-semibold text-primary-dark mb-2">
+          Delete &ldquo;{folder.name}&rdquo;?
+        </h2>
+
+        {fileCount !== null && fileCount > 0 && (
+          <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+            This folder contains <strong>{fileCount} file{fileCount === 1 ? '' : 's'}</strong>. Deleting the folder will <strong>not</strong> delete the files — they will become unfoldered.
+          </div>
+        )}
+
+        <p className="mb-3 text-sm text-slate-500">Re-enter your password to confirm deletion.</p>
+
+        <div className="space-y-2 mb-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              readOnly
+              className="w-full h-8 px-3 text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && password) onConfirm(password); }}
+              placeholder="Enter your password"
+              autoFocus
+              className="w-full h-8 px-3 text-sm text-slate-800 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            />
+          </div>
+        </div>
+
+        {error && <p className="mb-3 text-xs text-red-500">{error}</p>}
+
+        <div className="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={loading}
+            className="h-9 px-4 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => onConfirm(password)}
+            disabled={loading || !password}
+            className="h-9 px-4 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors cursor-pointer disabled:opacity-50"
+          >
+            {loading ? 'Verifying…' : 'Delete folder'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── SortableFolderItem ────────────────────────────────────────────────────────
 
 interface SortableFolderItemProps {
@@ -161,6 +313,7 @@ interface SortableFolderItemProps {
   collapsed: boolean;
   isActive: boolean;
   isAdmin: boolean;
+  currentUserRole: string;
   onSelect: () => void;
   onRename: (id: string, newName: string) => void;
   onDeleteRequest: (folder: MediaFolder) => void;
@@ -172,6 +325,7 @@ function SortableFolderItem({
   collapsed,
   isActive,
   isAdmin,
+  currentUserRole,
   onSelect,
   onRename,
   onDeleteRequest,
@@ -285,8 +439,8 @@ function SortableFolderItem({
         )}
       </button>
 
-      {/* Delete button (admin only, visible on hover) */}
-      {isAdmin && (
+      {/* Delete/request button (role-based, visible on hover) */}
+      {currentUserRole === 'admin' && (
         <button
           onClick={(e) => { e.stopPropagation(); onDeleteRequest(folder); }}
           title={`Delete ${folder.name}`}
@@ -294,6 +448,16 @@ function SortableFolderItem({
           aria-label={`Delete folder ${folder.name}`}
         >
           <TrashIcon />
+        </button>
+      )}
+      {currentUserRole === 'moderator' && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onDeleteRequest(folder); }}
+          title={`Request deletion of ${folder.name}`}
+          className="shrink-0 p-1 rounded text-slate-300 hover:text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          aria-label={`Request deletion of folder ${folder.name}`}
+        >
+          <FlagIcon />
         </button>
       )}
     </div>
@@ -310,6 +474,9 @@ export default function FolderSidebar({
   onCollapse,
   isAdmin,
   currentUserId,
+  currentUserRole,
+  currentUserEmail = '',
+  currentUserName = '',
   onFoldersChange,
 }: FolderSidebarProps) {
   const allMediaActive = activeFolder === null;
@@ -319,11 +486,17 @@ export default function FolderSidebar({
   // The bucket context for the create modal (from which bucket's (+) was clicked)
   const [createBucket, setCreateBucket] = useState<string>('uploads');
 
-  // ── Delete state ───────────────────────────────────────────────────────────
+  // ── Delete state (admin path — password-gated) ─────────────────────────────
   const [deleteTarget, setDeleteTarget] = useState<MediaFolder | null>(null);
   const [deleteFileCount, setDeleteFileCount] = useState<number | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteForce, setDeleteForce] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  // ── Request deletion state (moderator path) ────────────────────────────────
+  const [requestTarget, setRequestTarget] = useState<MediaFolder | null>(null);
+  const [requestLoading, setRequestLoading] = useState(false);
+  const [requestSubmitted, setRequestSubmitted] = useState(false);
 
   // ── DnD sensors ───────────────────────────────────────────────────────────
   const sensors = useSensors(
@@ -345,19 +518,48 @@ export default function FolderSidebar({
 
   // ── Delete handlers ────────────────────────────────────────────────────────
   const handleDeleteRequest = useCallback(async (folder: MediaFolder) => {
+    if (currentUserRole === 'moderator') {
+      // Moderator: show request dialog, no file count needed
+      setRequestTarget(folder);
+      setRequestSubmitted(false);
+      return;
+    }
+
+    // Admin: show password-gated delete dialog
     setDeleteTarget(folder);
     setDeleteForce(false);
+    setPasswordError(null);
 
     // Pre-fetch file count — force=false ALWAYS returns without deleting (just returns count).
-    // Always show the confirmation dialog regardless of file count.
     const result = await deleteFolder(folder.id, false);
     setDeleteFileCount(result.fileCount ?? 0);
-    // deleteTarget is already set above; dialog renders via {deleteTarget && ...}
-  }, []);
+  }, [currentUserRole]);
 
-  const handleDeleteConfirm = useCallback(async () => {
+  const handleRequestSubmit = useCallback(async () => {
+    if (!requestTarget) return;
+    setRequestLoading(true);
+    await requestFolderDeletion({
+      folderId: requestTarget.id,
+      folderName: requestTarget.name,
+      requestedBy: currentUserId,
+      requestedByName: currentUserName || 'A moderator',
+    });
+    setRequestLoading(false);
+    setRequestSubmitted(true);
+  }, [requestTarget, currentUserId, currentUserName]);
+
+  const handleDeleteConfirm = useCallback(async (password: string) => {
     if (!deleteTarget) return;
     setDeleteLoading(true);
+    setPasswordError(null);
+
+    // Verify admin password first
+    const verify = await verifyAdminPassword({ email: currentUserEmail, password });
+    if (!verify.success) {
+      setPasswordError('Invalid password. Please try again.');
+      setDeleteLoading(false);
+      return;
+    }
 
     const result = await deleteFolder(deleteTarget.id, true);
 
@@ -370,8 +572,9 @@ export default function FolderSidebar({
       }
       setDeleteTarget(null);
       setDeleteFileCount(null);
+      setPasswordError(null);
     }
-  }, [deleteTarget, folders, onFoldersChange, activeFolder, onFolderSelect]);
+  }, [deleteTarget, folders, onFoldersChange, activeFolder, onFolderSelect, currentUserEmail]);
 
   // ── DnD reorder handler ────────────────────────────────────────────────────
   const handleDragEnd = useCallback(async (event: DragEndEvent, bucketKey: string) => {
@@ -407,6 +610,7 @@ export default function FolderSidebar({
         collapsed={collapsed}
         isActive={activeFolder === folder.id}
         isAdmin={isAdmin}
+        currentUserRole={currentUserRole}
         onSelect={() => onFolderSelect(folder.id)}
         onRename={handleRename}
         onDeleteRequest={handleDeleteRequest}
@@ -565,17 +769,34 @@ export default function FolderSidebar({
         />
       )}
 
-      {/* Delete confirmation dialog */}
+      {/* Admin: password-gated delete dialog */}
       {deleteTarget && (
-        <DeleteConfirmDialog
+        <PasswordConfirmDialog
           folder={deleteTarget}
           fileCount={deleteFileCount}
+          email={currentUserEmail}
           loading={deleteLoading}
+          error={passwordError}
           onConfirm={handleDeleteConfirm}
           onCancel={() => {
             setDeleteTarget(null);
             setDeleteFileCount(null);
             setDeleteForce(false);
+            setPasswordError(null);
+          }}
+        />
+      )}
+
+      {/* Moderator: request deletion dialog */}
+      {requestTarget && (
+        <RequestDeletionDialog
+          folder={requestTarget}
+          loading={requestLoading}
+          submitted={requestSubmitted}
+          onConfirm={handleRequestSubmit}
+          onCancel={() => {
+            setRequestTarget(null);
+            setRequestSubmitted(false);
           }}
         />
       )}
