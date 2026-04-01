@@ -13,7 +13,6 @@ import {
   type MemberRole,
 } from '@/lib/members-data';
 import { fetchSchoolMembers } from '@/lib/members-actions';
-import { Analytics } from '@/lib/analytics/events';
 
 const MapPanel = dynamic(() => import('./MapPanel'), { ssr: false });
 
@@ -453,15 +452,6 @@ export default function MembersPage() {
     }
     return true;
   }), [allMembers, roleFilter, countryFilter, designationFilter, styleFilter, search]);
-
-  // Track search queries (debounced — only fires after user stops typing)
-  useEffect(() => {
-    if (!search) return;
-    const timer = setTimeout(() => {
-      Analytics.search(search, filtered.length);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [search, filtered.length]);
 
   const handleSelect = useCallback((id: string) => {
     setHighlightedId(prev => prev === id ? null : id);

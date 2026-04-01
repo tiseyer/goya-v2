@@ -37,64 +37,6 @@ export default function MapPanel({ allMembers, filteredMembers, highlightedId, o
 
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-  const applyGoyaStyle = useCallback((map: mapboxgl.Map) => {
-    const isDark = document.documentElement.classList.contains('dark');
-    // Water
-    if (map.getLayer('water')) {
-      map.setPaintProperty('water', 'fill-color', isDark ? '#1e3a52' : '#d6e7f1');
-    }
-    // Land
-    if (map.getLayer('land')) {
-      map.setPaintProperty('land', 'background-color', isDark ? '#0F1117' : '#f5f4f2');
-    }
-    // Landuse/landcover
-    ['landuse', 'landcover'].forEach(id => {
-      if (map.getLayer(id)) {
-        map.setPaintProperty(id, 'fill-color', isDark ? '#1A1D27' : '#eef4f9');
-        map.setPaintProperty(id, 'fill-opacity', 0.5);
-      }
-    });
-    // Admin boundary backgrounds
-    if (map.getLayer('admin-0-boundary-bg')) {
-      map.setPaintProperty('admin-0-boundary-bg', 'line-color', isDark ? '#345c83' : '#afd0e4');
-      map.setPaintProperty('admin-0-boundary-bg', 'line-opacity', 0.3);
-    }
-    // Country borders
-    ['admin-0-boundary', 'admin-0-boundary-disputed'].forEach(id => {
-      if (map.getLayer(id)) {
-        map.setPaintProperty(id, 'line-color', isDark ? '#345c83' : '#afd0e4');
-        map.setPaintProperty(id, 'line-opacity', 0.4);
-      }
-    });
-    // State borders
-    if (map.getLayer('admin-1-boundary')) {
-      map.setPaintProperty('admin-1-boundary', 'line-color', isDark ? '#1e3a52' : '#d6e7f1');
-      map.setPaintProperty('admin-1-boundary', 'line-opacity', 0.3);
-    }
-    // Country labels
-    if (map.getLayer('country-label')) {
-      map.setPaintProperty('country-label', 'text-color', isDark ? '#afd0e4' : '#1e3a52');
-      map.setPaintProperty('country-label', 'text-opacity', 0.7);
-    }
-    // State labels
-    if (map.getLayer('state-label')) {
-      map.setPaintProperty('state-label', 'text-color', isDark ? '#5B9ABF' : '#4e87a0');
-      map.setPaintProperty('state-label', 'text-opacity', 0.5);
-    }
-    // Hide noisy layers
-    ['poi-label', 'transit-label', 'road-label', 'road-minor', 'road-street', 'road-secondary-tertiary', 'road-primary', 'road-motorway-trunk'].forEach(id => {
-      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
-    });
-    // Globe atmosphere
-    map.setFog({
-      color: isDark ? '#0F1117' : '#eef4f9',
-      'high-color': isDark ? '#1e3a52' : '#afd0e4',
-      'horizon-blend': 0.02,
-      'space-color': isDark ? '#050508' : '#1e3a52',
-      'star-intensity': isDark ? 0.3 : 0.15,
-    });
-  }, []);
-
   const buildGeojson = useCallback((memberList: Member[]): GeoJSON.FeatureCollection => ({
     type: 'FeatureCollection',
     features: memberList.map(m => ({
@@ -131,7 +73,7 @@ export default function MapPanel({ allMembers, filteredMembers, highlightedId, o
     if (!map) return;
     const zoom = map.getZoom();
 
-    if (zoom < 6) {
+    if (zoom < 7) {
       markersRef.current.forEach(m => m.remove());
       markersRef.current.clear();
       return;
@@ -191,7 +133,7 @@ export default function MapPanel({ allMembers, filteredMembers, highlightedId, o
       type: 'geojson',
       data: buildGeojson(filteredRef.current),
       cluster: true,
-      clusterMaxZoom: 7,
+      clusterMaxZoom: 6,
       clusterRadius: 50,
     });
 
@@ -209,10 +151,9 @@ export default function MapPanel({ allMembers, filteredMembers, highlightedId, o
         'circle-radius': [
           'interpolate', ['linear'], ['zoom'],
           0, ['step', ['get', 'point_count'], 18, 10, 24, 50, 30, 200, 36],
-          2, ['step', ['get', 'point_count'], 18, 10, 24, 50, 30, 200, 36],
-          3, ['step', ['get', 'point_count'], 16, 10, 20, 50, 26, 200, 32],
-          5, ['step', ['get', 'point_count'], 14, 10, 18, 50, 22, 200, 28],
-          7, ['step', ['get', 'point_count'], 12, 10, 16, 50, 20, 200, 24],
+          3, ['step', ['get', 'point_count'], 18, 10, 24, 50, 30, 200, 36],
+          4, ['step', ['get', 'point_count'], 14, 10, 18, 50, 22, 200, 28],
+          6, ['step', ['get', 'point_count'], 14, 10, 18, 50, 22, 200, 28],
         ],
         'circle-stroke-width': 2,
         'circle-stroke-color': '#ffffff',
@@ -229,7 +170,7 @@ export default function MapPanel({ allMembers, filteredMembers, highlightedId, o
       layout: {
         'text-field': ['get', 'point_count_abbreviated'],
         'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-        'text-size': ['interpolate', ['linear'], ['zoom'], 0, 13, 3, 12, 5, 11, 7, 10],
+        'text-size': ['interpolate', ['linear'], ['zoom'], 0, 13, 4, 11],
       },
       paint: { 'text-color': '#ffffff' },
     });
@@ -240,7 +181,7 @@ export default function MapPanel({ allMembers, filteredMembers, highlightedId, o
       type: 'circle',
       source: 'members',
       filter: ['!', ['has', 'point_count']],
-      maxzoom: 6,
+      maxzoom: 7,
       paint: {
         'circle-color': '#6b7280',
         'circle-radius': 6,
@@ -271,8 +212,6 @@ export default function MapPanel({ allMembers, filteredMembers, highlightedId, o
 
     map.on('load', () => {
       requestAnimationFrame(() => map.resize());
-
-      applyGoyaStyle(map);
       setupSourceAndLayers();
       initialLoadDone.current = true;
 
@@ -308,7 +247,6 @@ export default function MapPanel({ allMembers, filteredMembers, highlightedId, o
     // Re-add source and layers after style change (dark mode)
     map.on('style.load', () => {
       if (initialLoadDone.current) {
-        applyGoyaStyle(map);
         setupSourceAndLayers();
         updateMarkers();
       }
