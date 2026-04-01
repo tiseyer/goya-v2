@@ -121,7 +121,7 @@ export default function CourseForm({ course, categories }: Props) {
       )}
 
       {/* Section 1: Basic Info */}
-      <div className="border border-border rounded-xl p-6 space-y-4 bg-card">
+      <div className="border border-border rounded-xl p-4 sm:p-6 space-y-4 bg-card transition-all duration-200">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Basic Info</h2>
           <p className="text-sm text-muted-foreground mt-0.5">Core course details</p>
@@ -187,7 +187,7 @@ export default function CourseForm({ course, categories }: Props) {
       </div>
 
       {/* Section 2: Content */}
-      <div className="border border-border rounded-xl p-6 space-y-4 bg-card">
+      <div className="border border-border rounded-xl p-4 sm:p-6 space-y-4 bg-card transition-all duration-200">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Content</h2>
           <p className="text-sm text-muted-foreground mt-0.5">Descriptions and visual appearance</p>
@@ -201,7 +201,7 @@ export default function CourseForm({ course, categories }: Props) {
           </label>
           <textarea
             value={shortDesc} onChange={e => setShortDesc(e.target.value)}
-            rows={3} maxLength={200} className={`${INPUT} resize-y`}
+            rows={3} maxLength={200} className={`${INPUT} resize-y min-h-[80px]`}
             placeholder="Brief summary shown on the course card…"
           />
           <p className="text-xs text-muted-foreground mt-1">{shortDesc.length}/200 characters</p>
@@ -215,7 +215,7 @@ export default function CourseForm({ course, categories }: Props) {
           </label>
           <textarea
             value={description} onChange={e => setDescription(e.target.value)}
-            rows={6} className={`${INPUT} resize-y`}
+            rows={6} className={`${INPUT} resize-y min-h-[80px]`}
             placeholder="Full course description…"
           />
         </div>
@@ -259,7 +259,7 @@ export default function CourseForm({ course, categories }: Props) {
       </div>
 
       {/* Section 3: Settings */}
-      <div className="border border-border rounded-xl p-6 space-y-4 bg-card">
+      <div className="border border-border rounded-xl p-4 sm:p-6 space-y-4 bg-card transition-all duration-200">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Settings</h2>
           <p className="text-sm text-muted-foreground mt-0.5">Publishing and duration</p>
@@ -285,7 +285,7 @@ export default function CourseForm({ course, categories }: Props) {
               min={5} max={600} step={5}
               value={durationMinutes}
               onChange={e => setDurationMinutes(Number(e.target.value))}
-              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-[#4E87A0]"
+              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-[#4E87A0] [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5"
             />
             <div className="flex justify-between text-xs text-muted-foreground mt-1">
               <span>5m</span>
@@ -296,10 +296,10 @@ export default function CourseForm({ course, categories }: Props) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-3 pt-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-4">
         <button
           type="submit" disabled={saving}
-          className="px-6 py-2.5 bg-[#4E87A0] text-white text-sm font-semibold rounded-lg hover:bg-[#3A7190] transition-colors disabled:opacity-60 shadow-sm"
+          className="w-full sm:w-auto px-6 py-2.5 bg-[#4E87A0] text-white text-sm font-semibold rounded-lg hover:bg-[#3A7190] transition-colors disabled:opacity-60 shadow-sm"
         >
           {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Course'}
         </button>
