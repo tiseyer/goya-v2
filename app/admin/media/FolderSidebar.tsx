@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import { Image, Award, User, ChevronDown, ChevronRight } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -18,13 +19,15 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MEDIA_BUCKETS } from './constants';
+import { SIDEBAR_SECTIONS, type SidebarSectionKey } from './constants';
 import type { MediaFolder } from './actions';
 import { updateFolder, deleteFolder, reorderFolders, requestFolderDeletion, verifyAdminPassword } from './actions';
 import CreateFolderModal from './components/CreateFolderModal';
 
 interface FolderSidebarProps {
   folders: MediaFolder[];
+  activeBucket: SidebarSectionKey | null;
+  onBucketSelect: (bucket: SidebarSectionKey) => void;
   activeFolder: string | null;
   onFolderSelect: (folder: string | null) => void;
   collapsed: boolean;
@@ -97,14 +100,12 @@ function FlagIcon() {
   );
 }
 
-// ── Bucket dot colors ─────────────────────────────────────────────────────────
+// ── Section icon map ──────────────────────────────────────────────────────────
 
-const BUCKET_DOT_COLORS: Record<string, string> = {
-  'avatars':              'bg-violet-400',
-  'event-images':         'bg-blue-400',
-  'school-logos':         'bg-emerald-400',
-  'upgrade-certificates': 'bg-amber-400',
-  'uploads':              'bg-slate-400',
+const SECTION_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  Image,
+  Award,
+  User,
 };
 
 // ── Delete confirmation dialog ────────────────────────────────────────────────
@@ -464,10 +465,52 @@ function SortableFolderItem({
   );
 }
 
+// ── System folder item (Certificates — immutable, no DnD) ─────────────────────
+
+interface SystemFolderItemProps {
+  folder: MediaFolder;
+  collapsed: boolean;
+  isActive: boolean;
+  onSelect: () => void;
+}
+
+function SystemFolderItem({ folder, collapsed, isActive, onSelect }: SystemFolderItemProps) {
+  if (collapsed) {
+    return (
+      <button
+        onClick={onSelect}
+        title={folder.name}
+        className={[
+          'w-full flex items-center justify-center px-2 py-2 rounded-lg transition-colors duration-150 cursor-pointer',
+          isActive ? 'bg-primary/10 text-primary' : 'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
+        ].join(' ')}
+      >
+        <FolderIcon className="w-4 h-4 shrink-0" />
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={onSelect}
+      title={folder.name}
+      className={[
+        'w-full flex items-center gap-2 pl-6 pr-2 py-1.5 rounded-lg transition-colors duration-150 cursor-pointer',
+        isActive ? 'bg-primary/10 text-primary font-semibold' : 'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
+      ].join(' ')}
+    >
+      <FolderIcon className="w-4 h-4 shrink-0" />
+      <span className="text-sm truncate text-left">{folder.name}</span>
+    </button>
+  );
+}
+
 // ── Main FolderSidebar ────────────────────────────────────────────────────────
 
 export default function FolderSidebar({
   folders,
+  activeBucket,
+  onBucketSelect,
   activeFolder,
   onFolderSelect,
   collapsed,
@@ -479,18 +522,15 @@ export default function FolderSidebar({
   currentUserName = '',
   onFoldersChange,
 }: FolderSidebarProps) {
-  const allMediaActive = activeFolder === null;
 
   // ── Create modal state ─────────────────────────────────────────────────────
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  // The bucket context for the create modal (from which bucket's (+) was clicked)
-  const [createBucket, setCreateBucket] = useState<string>('uploads');
+  const [createBucket, setCreateBucket] = useState<string>('media');
 
   // ── Delete state (admin path — password-gated) ─────────────────────────────
   const [deleteTarget, setDeleteTarget] = useState<MediaFolder | null>(null);
   const [deleteFileCount, setDeleteFileCount] = useState<number | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleteForce, setDeleteForce] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // ── Request deletion state (moderator path) ────────────────────────────────
@@ -519,7 +559,6 @@ export default function FolderSidebar({
   // ── Delete handlers ────────────────────────────────────────────────────────
   const handleDeleteRequest = useCallback(async (folder: MediaFolder) => {
     if (currentUserRole === 'moderator') {
-      // Moderator: show request dialog, no file count needed
       setRequestTarget(folder);
       setRequestSubmitted(false);
       return;
@@ -527,10 +566,8 @@ export default function FolderSidebar({
 
     // Admin: show password-gated delete dialog
     setDeleteTarget(folder);
-    setDeleteForce(false);
     setPasswordError(null);
 
-    // Pre-fetch file count — force=false ALWAYS returns without deleting (just returns count).
     const result = await deleteFolder(folder.id, false);
     setDeleteFileCount(result.fileCount ?? 0);
   }, [currentUserRole]);
@@ -553,7 +590,6 @@ export default function FolderSidebar({
     setDeleteLoading(true);
     setPasswordError(null);
 
-    // Verify admin password first
     const verify = await verifyAdminPassword({ email: currentUserEmail, password });
     if (!verify.success) {
       setPasswordError('Invalid password. Please try again.');
@@ -576,47 +612,25 @@ export default function FolderSidebar({
     }
   }, [deleteTarget, folders, onFoldersChange, activeFolder, onFolderSelect, currentUserEmail]);
 
-  // ── DnD reorder handler ────────────────────────────────────────────────────
-  const handleDragEnd = useCallback(async (event: DragEndEvent, bucketKey: string) => {
+  // ── DnD reorder handler (All Media user folders only) ─────────────────────
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    const bucketFolders = folders.filter(
-      f => f.bucket === bucketKey && !f.parent_id
-    );
-    const oldIndex = bucketFolders.findIndex(f => f.id === active.id);
-    const newIndex = bucketFolders.findIndex(f => f.id === over.id);
+    // Only user-created folders in the 'media' bucket are sortable
+    const mediaFolders = folders.filter(f => f.bucket === 'media' && !f.is_system && !f.parent_id);
+    const oldIndex = mediaFolders.findIndex(f => f.id === active.id);
+    const newIndex = mediaFolders.findIndex(f => f.id === over.id);
     if (oldIndex === -1 || newIndex === -1) return;
 
-    const reordered = arrayMove(bucketFolders, oldIndex, newIndex);
-    const otherFolders = folders.filter(
-      f => !(f.bucket === bucketKey && !f.parent_id)
-    );
+    const reordered = arrayMove(mediaFolders, oldIndex, newIndex);
+    const otherFolders = folders.filter(f => !(f.bucket === 'media' && !f.is_system && !f.parent_id));
 
-    // Optimistic update
     onFoldersChange([...otherFolders, ...reordered]);
-
-    // Persist
     await reorderFolders(reordered.map(f => f.id));
   }, [folders, onFoldersChange]);
 
-  // ── Render folder item via SortableFolderItem ──────────────────────────────
-  function renderSortableFolder(folder: MediaFolder, indent: boolean) {
-    return (
-      <SortableFolderItem
-        key={folder.id}
-        folder={folder}
-        indent={indent}
-        collapsed={collapsed}
-        isActive={activeFolder === folder.id}
-        isAdmin={isAdmin}
-        currentUserRole={currentUserRole}
-        onSelect={() => onFolderSelect(folder.id)}
-        onRename={handleRename}
-        onDeleteRequest={handleDeleteRequest}
-      />
-    );
-  }
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <>
@@ -635,119 +649,168 @@ export default function FolderSidebar({
           </button>
           {!collapsed && (
             <span className="ml-2 text-sm font-semibold text-primary-dark whitespace-nowrap overflow-hidden flex-1">
-              Folders
+              Library
             </span>
           )}
         </div>
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-          {/* All Media */}
-          <button
-            onClick={() => onFolderSelect(null)}
-            title={collapsed ? 'All Media' : undefined}
-            className={[
-              'w-full flex items-center gap-2 rounded-lg transition-colors duration-150 cursor-pointer',
-              collapsed ? 'justify-center px-2 py-2' : 'px-2 py-2',
-              allMediaActive
-                ? 'bg-primary/10 text-primary font-semibold'
-                : 'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
-            ].join(' ')}
-          >
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={allMediaActive ? 2 : 1.75} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            {!collapsed && (
-              <span className="text-sm font-medium">All Media</span>
-            )}
-          </button>
+          {SIDEBAR_SECTIONS.map(section => {
+            const SectionIcon = SECTION_ICONS[section.icon];
+            const isSectionActive = activeBucket === section.key;
+            // Section is "expanded" when it's the active bucket
+            const isExpanded = isSectionActive;
+            // A child subfolder is selected under this section
+            const hasActiveChild = activeFolder !== null && isSectionActive;
 
-          {/* Divider */}
-          <div className="my-2 mx-1 border-t border-slate-100" />
+            // Get folders for this section
+            const sectionFolders = section.hasFolders
+              ? folders.filter(f => {
+                  if (section.key === 'media') {
+                    return f.bucket === 'media' && f.is_system === false && !f.parent_id;
+                  }
+                  if (section.key === 'certificates') {
+                    return f.bucket === 'certificates' && f.is_system === true && !f.parent_id;
+                  }
+                  return false;
+                })
+              : [];
 
-          {/* Bucket sections */}
-          {MEDIA_BUCKETS.map(bucket => {
-            const bucketActive = activeFolder === bucket.key;
-            const topLevelFolders = folders.filter(
-              f => f.bucket === bucket.key && !f.parent_id
-            );
+            if (collapsed) {
+              return (
+                <button
+                  key={section.key}
+                  onClick={() => onBucketSelect(section.key)}
+                  title={section.label}
+                  className={[
+                    'w-full flex items-center justify-center px-2 py-2 rounded-lg transition-colors duration-150 cursor-pointer',
+                    isSectionActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
+                  ].join(' ')}
+                >
+                  {SectionIcon && <SectionIcon size={16} />}
+                </button>
+              );
+            }
 
             return (
-              <div key={bucket.key} className="space-y-0.5">
-                {/* Bucket row */}
-                {collapsed ? (
+              <div key={section.key} className="space-y-0.5">
+                {/* Section header row */}
+                <div className="flex items-center group/section">
                   <button
-                    onClick={() => onFolderSelect(bucket.key)}
-                    title={bucket.label}
+                    onClick={() => onBucketSelect(section.key)}
                     className={[
-                      'w-full flex items-center justify-center px-2 py-2 rounded-lg transition-colors duration-150 cursor-pointer',
-                      bucketActive ? 'bg-primary/10' : 'hover:bg-primary-50',
+                      'flex-1 flex items-center gap-2 px-2 py-2 rounded-lg transition-colors duration-150 cursor-pointer min-w-0',
+                      isSectionActive
+                        ? 'bg-primary/10 text-primary font-semibold'
+                        : 'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
                     ].join(' ')}
                   >
-                    <span
-                      className={`w-2 h-2 rounded-full shrink-0 ${BUCKET_DOT_COLORS[bucket.key] ?? 'bg-slate-400'}`}
-                    />
-                  </button>
-                ) : (
-                  <div className="flex items-center group/bucket">
-                    <button
-                      onClick={() => onFolderSelect(bucket.key)}
-                      className={[
-                        'flex-1 flex items-center px-2 py-1 rounded-lg transition-colors duration-150 cursor-pointer',
-                        bucketActive ? 'bg-primary/10 text-primary' : 'hover:bg-primary-50',
-                      ].join(' ')}
-                    >
-                      <span
-                        className={[
-                          'text-xs font-semibold uppercase tracking-wide',
-                          bucketActive ? 'text-primary' : 'text-slate-400 group-hover/bucket:text-primary-dark',
-                        ].join(' ')}
-                      >
-                        {bucket.label}
+                    {SectionIcon && (
+                      <SectionIcon
+                        size={16}
+                        className="shrink-0"
+                      />
+                    )}
+                    <span className="text-sm truncate text-left flex-1">{section.label}</span>
+                    {section.hasFolders && (
+                      <span className="shrink-0 ml-auto">
+                        {isExpanded
+                          ? <ChevronDown size={14} />
+                          : <ChevronRight size={14} />
+                        }
                       </span>
-                    </button>
+                    )}
+                  </button>
 
-                    {/* (+) create folder button */}
+                  {/* (+) add folder — only for All Media when expanded */}
+                  {section.key === 'media' && isSectionActive && (
                     <button
                       onClick={() => {
-                        setCreateBucket(bucket.key);
+                        setCreateBucket('media');
                         setCreateModalOpen(true);
                       }}
-                      title={`New folder in ${bucket.label}`}
-                      className="shrink-0 w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-primary hover:bg-primary-50 opacity-0 group-hover/bucket:opacity-100 transition-opacity cursor-pointer mr-1"
-                      aria-label={`New folder in ${bucket.label}`}
+                      title="New folder"
+                      className="shrink-0 w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-primary hover:bg-primary-50 opacity-0 group-hover/section:opacity-100 transition-opacity cursor-pointer ml-1"
+                      aria-label="New folder in All Media"
                     >
                       <PlusIcon />
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
 
-                {/* Sortable top-level folders */}
-                {topLevelFolders.length > 0 && (
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={(event) => handleDragEnd(event, bucket.key)}
-                  >
-                    <SortableContext
-                      items={topLevelFolders.map(f => f.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      {topLevelFolders.map(folder => (
-                        <div key={folder.id} className="space-y-0.5">
-                          {renderSortableFolder(folder, !collapsed)}
-                          {/* Sub-folders (not sortable independently for simplicity) */}
-                          {folders
-                            .filter(f => f.parent_id === folder.id)
-                            .map(sub => (
-                              <div key={sub.id} className={collapsed ? '' : 'pl-4'}>
-                                {renderSortableFolder(sub, !collapsed)}
+                {/* Subfolder list — shown when section is active and has folders */}
+                {isExpanded && section.hasFolders && (
+                  <div className="space-y-0.5">
+                    {section.key === 'media' ? (
+                      // All Media: user-created folders with DnD
+                      sectionFolders.length > 0 ? (
+                        <DndContext
+                          sensors={sensors}
+                          collisionDetection={closestCenter}
+                          onDragEnd={handleDragEnd}
+                        >
+                          <SortableContext
+                            items={sectionFolders.map(f => f.id)}
+                            strategy={verticalListSortingStrategy}
+                          >
+                            {sectionFolders.map(folder => (
+                              <div key={folder.id} className="space-y-0.5">
+                                <SortableFolderItem
+                                  folder={folder}
+                                  indent={true}
+                                  collapsed={false}
+                                  isActive={activeFolder === folder.id}
+                                  isAdmin={isAdmin}
+                                  currentUserRole={currentUserRole}
+                                  onSelect={() => onFolderSelect(folder.id)}
+                                  onRename={handleRename}
+                                  onDeleteRequest={handleDeleteRequest}
+                                />
+                                {/* Sub-folders */}
+                                {folders
+                                  .filter(f => f.parent_id === folder.id)
+                                  .map(sub => (
+                                    <div key={sub.id} className="pl-4">
+                                      <SortableFolderItem
+                                        folder={sub}
+                                        indent={true}
+                                        collapsed={false}
+                                        isActive={activeFolder === sub.id}
+                                        isAdmin={isAdmin}
+                                        currentUserRole={currentUserRole}
+                                        onSelect={() => onFolderSelect(sub.id)}
+                                        onRename={handleRename}
+                                        onDeleteRequest={handleDeleteRequest}
+                                      />
+                                    </div>
+                                  ))}
                               </div>
                             ))}
-                        </div>
-                      ))}
-                    </SortableContext>
-                  </DndContext>
+                          </SortableContext>
+                        </DndContext>
+                      ) : (
+                        <p className="pl-8 py-1.5 text-xs text-slate-400 italic">No folders yet</p>
+                      )
+                    ) : (
+                      // Certificates: system subfolders (immutable)
+                      sectionFolders.length > 0 ? (
+                        sectionFolders.map(folder => (
+                          <SystemFolderItem
+                            key={folder.id}
+                            folder={folder}
+                            collapsed={false}
+                            isActive={activeFolder === folder.id}
+                            onSelect={() => onFolderSelect(folder.id)}
+                          />
+                        ))
+                      ) : (
+                        <p className="pl-8 py-1.5 text-xs text-slate-400 italic">No subfolders</p>
+                      )
+                    )}
+                  </div>
                 )}
               </div>
             );
@@ -781,7 +844,6 @@ export default function FolderSidebar({
           onCancel={() => {
             setDeleteTarget(null);
             setDeleteFileCount(null);
-            setDeleteForce(false);
             setPasswordError(null);
           }}
         />

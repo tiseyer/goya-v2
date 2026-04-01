@@ -12,7 +12,7 @@ import MediaUploader, {
   type UploadCard,
   type MediaUploaderHandle,
 } from './MediaUploader';
-import { MEDIA_BUCKETS } from './constants';
+import { SIDEBAR_SECTIONS, getSectionByKey, type SidebarSectionKey } from './constants';
 import { getMediaItems, type MediaItem, type MediaFolder } from './actions';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -20,6 +20,7 @@ import { getMediaItems, type MediaItem, type MediaFolder } from './actions';
 interface MediaPageClientProps {
   initialFolders: MediaFolder[];
   folder?: string;
+  bucket?: string;
   view?: string;
   q?: string;
   type?: string;
@@ -35,7 +36,15 @@ interface MediaPageClientProps {
 
 // ── Empty state ───────────────────────────────────────────────────────────────
 
-function EmptyState({ activeFolder, hasFilters }: { activeFolder: string | null; hasFilters: boolean }) {
+function EmptyState({
+  activeBucket,
+  activeFolder,
+  hasFilters,
+}: {
+  activeBucket: SidebarSectionKey | null;
+  activeFolder: string | null;
+  hasFilters: boolean;
+}) {
   if (hasFilters) {
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[320px] text-center px-4">
@@ -48,14 +57,14 @@ function EmptyState({ activeFolder, hasFilters }: { activeFolder: string | null;
     );
   }
 
-  const isBucket = activeFolder !== null && MEDIA_BUCKETS.some(b => b.key === activeFolder);
   let message: string;
-  if (activeFolder === null) {
-    message = 'No media files yet. Files uploaded across the platform will appear here.';
-  } else if (isBucket) {
-    message = 'No files in this bucket yet.';
-  } else {
+  if (activeFolder !== null) {
     message = 'This folder is empty.';
+  } else if (activeBucket !== null) {
+    const section = getSectionByKey(activeBucket);
+    message = `No files in ${section?.label ?? 'this section'} yet.`;
+  } else {
+    message = 'No media files yet. Files uploaded across the platform will appear here.';
   }
 
   return (
@@ -93,15 +102,25 @@ function coerceView(v: string | undefined): 'grid' | 'list' {
 }
 
 /**
- * Derives the Supabase Storage bucket name from the active folder selection.
+ * Derives the Supabase Storage bucket name for uploads.
+ * When a subfolder is active, use the folder's own bucket field.
+ * When a section is active (no subfolder), use the section's first storageBucket.
  */
-function deriveBucket(activeFolder: string | null, folders: MediaFolder[]): string {
-  if (!activeFolder) return 'uploads';
-  const isBucket = MEDIA_BUCKETS.some(b => b.key === activeFolder);
-  if (isBucket) return activeFolder;
-  // UUID — find the folder and use its bucket field
-  const folder = folders.find(f => f.id === activeFolder);
-  if (folder && 'bucket' in folder && typeof folder.bucket === 'string') return folder.bucket;
+function deriveBucket(
+  activeBucket: SidebarSectionKey | null,
+  activeFolder: string | null,
+  folders: MediaFolder[]
+): string {
+  // UUID subfolder selected — use the folder's bucket field
+  if (activeFolder) {
+    const folder = folders.find(f => f.id === activeFolder);
+    if (folder && typeof folder.bucket === 'string') return folder.bucket;
+  }
+  // Section selected — use first storage bucket
+  if (activeBucket) {
+    const section = getSectionByKey(activeBucket);
+    if (section) return section.storageBuckets[0];
+  }
   return 'uploads';
 }
 
@@ -128,9 +147,15 @@ function UploadButton({ onClick }: { onClick: () => void }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
+function coerceBucket(v: string | undefined): SidebarSectionKey {
+  if (v === 'certificates' || v === 'avatars') return v;
+  return 'media';
+}
+
 export default function MediaPageClient({
   initialFolders,
   folder: folderProp,
+  bucket: bucketProp,
   view: viewProp,
   q: qProp,
   type: typeProp,
@@ -148,6 +173,11 @@ export default function MediaPageClient({
 
   // ── Folders state (updated via onFoldersChange for immediate sidebar refresh) ─
   const [folders, setFolders] = useState<MediaFolder[]>(initialFolders);
+
+  // ── Active bucket section state ────────────────────────────────────────────
+  const [activeBucketSection, setActiveBucketSection] = useState<SidebarSectionKey>(
+    coerceBucket(bucketProp)
+  );
 
   // ── Filter / search / sort state ───────────────────────────────────────────
   const [activeFolder, setActiveFolder] = useState<string | null>(folderProp ?? null);
@@ -217,8 +247,11 @@ export default function MediaPageClient({
   const uploaderRef = useRef<MediaUploaderHandle>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  // Derive bucket from active folder
-  const activeBucket = deriveBucket(activeFolder, folders);
+  // Derive storage bucket for uploads
+  const activeBucket = deriveBucket(activeBucketSection, activeFolder, folders);
+
+  // The query folder param: UUID subfolder takes priority, otherwise use section key
+  const queryFolder = activeFolder ?? activeBucketSection;
 
   // ── Hydrate localStorage prefs on mount ────────────────────────────────────
   useEffect(() => {
@@ -277,7 +310,7 @@ export default function MediaPageClient({
       const timeout = setTimeout(() => controller.abort(), 15_000);
       const result = await Promise.race([
         getMediaItems({
-          folder: activeFolder,
+          folder: queryFolder,
           q: debouncedQ || undefined,
           type,
           date,
@@ -303,7 +336,7 @@ export default function MediaPageClient({
     } finally {
       setIsLoading(false);
     }
-  }, [activeFolder, debouncedQ, type, date, by, sort]);
+  }, [queryFolder, debouncedQ, type, date, by, sort]);
 
   useEffect(() => {
     loadItems();
@@ -312,6 +345,7 @@ export default function MediaPageClient({
   // ── Update URL params when filters change (after debounce) ─────────────────
   useEffect(() => {
     const qs = buildParams({
+      bucket: activeBucketSection !== 'media' ? activeBucketSection : null,
       folder: activeFolder,
       q: debouncedQ || null,
       type: type !== 'all' ? type : null,
@@ -322,7 +356,7 @@ export default function MediaPageClient({
     });
     router.replace(`/admin/media${qs ? `?${qs}` : ''}`, { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFolder, debouncedQ, type, date, by, sort, viewMode]);
+  }, [activeBucketSection, activeFolder, debouncedQ, type, date, by, sort, viewMode]);
 
   // ── Infinite scroll ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -336,7 +370,7 @@ export default function MediaPageClient({
           setIsFetchingMore(true);
           try {
             const result = await getMediaItems({
-              folder: activeFolder,
+              folder: queryFolder,
               q: debouncedQ || undefined,
               type,
               date,
@@ -358,12 +392,18 @@ export default function MediaPageClient({
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [nextCursor, isFetchingMore, isLoading, activeFolder, debouncedQ, type, date, by, sort]);
+  }, [nextCursor, isFetchingMore, isLoading, queryFolder, debouncedQ, type, date, by, sort]);
 
-  // ── Folder handler ─────────────────────────────────────────────────────────
+  // ── Bucket / folder handlers ───────────────────────────────────────────────
+
+  const handleBucketSelect = useCallback((bucket: SidebarSectionKey) => {
+    setActiveBucketSection(bucket);
+    setActiveFolder(null); // clear subfolder when switching sections
+  }, []);
 
   const handleFolderSelect = useCallback((folder: string | null) => {
     setActiveFolder(folder);
+    // activeBucketSection stays unchanged — subfolder keeps parent section highlighted
   }, []);
 
   // ── View / sidebar handlers ────────────────────────────────────────────────
@@ -445,9 +485,16 @@ export default function MediaPageClient({
 
   // ── POLISH-04: Build mobile folder options list ────────────────────────────
   const mobileFolderOptions: { value: string; label: string }[] = [
-    { value: '', label: 'All Media' },
-    ...MEDIA_BUCKETS.map(b => ({ value: b.key, label: b.label })),
-    ...folders.map(f => ({ value: f.id, label: `  ${f.name}` })),
+    ...SIDEBAR_SECTIONS.flatMap(section => {
+      const sectionOption = { value: section.key, label: section.label };
+      if (!section.hasFolders) return [sectionOption];
+      const sectionFolders = folders.filter(f => {
+        if (section.key === 'media') return f.bucket === 'media' && !f.is_system;
+        if (section.key === 'certificates') return f.bucket === 'certificates' && f.is_system;
+        return false;
+      });
+      return [sectionOption, ...sectionFolders.map(f => ({ value: f.id, label: `  ${f.name}` }))];
+    }),
   ];
 
   // The item to show in the panel (keep last item during closing animation)
@@ -461,6 +508,8 @@ export default function MediaPageClient({
       <div className="hidden md:flex">
         <FolderSidebar
           folders={folders}
+          activeBucket={activeBucketSection}
+          onBucketSelect={handleBucketSelect}
           activeFolder={activeFolder}
           onFolderSelect={handleFolderSelect}
           collapsed={sidebarCollapsed}
@@ -480,8 +529,16 @@ export default function MediaPageClient({
         <div className="md:hidden border-b border-slate-200 bg-white px-3 py-2 shrink-0">
           <div className="relative">
             <select
-              value={activeFolder ?? ''}
-              onChange={(e) => handleFolderSelect(e.target.value || null)}
+              value={activeFolder ?? activeBucketSection}
+              onChange={(e) => {
+                const val = e.target.value;
+                const section = SIDEBAR_SECTIONS.find(s => s.key === val);
+                if (section) {
+                  handleBucketSelect(section.key);
+                } else {
+                  handleFolderSelect(val || null);
+                }
+              }}
               aria-label="Select folder"
               className="w-full h-8 pl-3 pr-8 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors duration-150"
             >
@@ -558,7 +615,7 @@ export default function MediaPageClient({
                 </button>
               </div>
             ) : items.length === 0 && pendingCards.length === 0 ? (
-              <EmptyState activeFolder={activeFolder} hasFilters={hasFilters} />
+              <EmptyState activeBucket={activeBucketSection} activeFolder={activeFolder} hasFilters={hasFilters} />
             ) : viewMode === 'grid' ? (
               <MediaGrid
                 items={items}
