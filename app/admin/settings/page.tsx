@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import HealthTab from './components/HealthTab';
 import MaintenanceTab from './components/MaintenanceTab';
-import DeploymentsSection from '../dashboard/DeploymentsSection';
+import VersionsTab from './components/VersionsTab';
 import DangerZone from './components/DangerZone';
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
@@ -134,13 +134,13 @@ function GeneralTab() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-type Tab = 'general' | 'health' | 'maintenance' | 'deployments';
+type Tab = 'general' | 'health' | 'maintenance' | 'versions';
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'general',     label: 'General'     },
   { key: 'health',      label: 'Health'      },
   { key: 'maintenance', label: 'Maintenance' },
-  { key: 'deployments', label: 'Deployments' },
+  { key: 'versions',    label: 'Versions'    },
 ];
 
 function isValidTab(value: string | null): value is Tab {
@@ -189,7 +189,7 @@ export default function SettingsPage() {
       {tab === 'general'     && <GeneralTab />}
       {tab === 'health'      && <HealthTab />}
       {tab === 'maintenance' && <MaintenanceTab />}
-      {tab === 'deployments' && <DeploymentsSection />}
+      {tab === 'versions' && <VersionsTab />}
     </div>
   );
 }

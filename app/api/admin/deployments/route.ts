@@ -76,7 +76,7 @@ export async function GET() {
 
   try {
     const res = await fetch(
-      `https://api.vercel.com/v6/deployments?projectId=${projectId}&limit=10&state=READY`,
+      `https://api.vercel.com/v6/deployments?projectId=${projectId}&limit=50&state=READY`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
