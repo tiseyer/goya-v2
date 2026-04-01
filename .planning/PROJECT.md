@@ -8,6 +8,17 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
+## Current Milestone: v1.15 Course System Redesign
+
+**Goal:** Redesign admin course management with categories table, multi-lesson support, drag-and-drop ordering, platform-aware video fields, and modern SaaS UI.
+
+**Target features:**
+- `course_categories` and `lessons` tables with RLS policies
+- Admin courses page with Courses/Categories tabs and category CRUD
+- Premium SaaS course creation/edit form (card sections, duration slider, conditional fields)
+- Lesson management with drag-and-drop reordering, type-specific forms (Video/Audio/Text)
+- Frontend lesson rendering (Vimeo/YouTube embed, audio player, formatted text)
+
 ## Current State
 
 **As of v1.14 (2026-03-31):** School Owner System milestone shipped. Teachers can register their yoga school on GOYA: select designations → pay via Stripe (€40/year + €99 signup per designation) → complete 9-step onboarding → admin review → public school profile. Schools have a dedicated settings area, admin inbox approve/reject workflow with Resend emails, public profile at /schools/[slug] with designation badges, and faculty invitation system with auto-link on registration.
@@ -237,4 +248,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-31 after v1.14 School Owner System milestone shipped*
+*Last updated: 2026-04-01 after v1.15 Course System Redesign milestone started*
