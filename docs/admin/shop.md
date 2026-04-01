@@ -3,17 +3,18 @@ title: Shop
 audience: ["admin"]
 section: admin
 order: 7
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # Shop
 
-The Shop section covers all commerce-related management: products for sale, customer orders, and discount coupons. Expand the **Shop** group in the sidebar to access its three sub-sections.
+The Shop section covers all commerce-related management: products for sale, customer orders, subscriptions, and discount coupons. Expand the **Shop** group in the sidebar to access its sub-sections.
 
 ## Table of Contents
 
 - [Products](#products)
 - [Orders](#orders)
+- [Subscriptions](#subscriptions)
 - [Coupons](#coupons)
 
 ---
@@ -107,6 +108,57 @@ From the order detail page:
 - **Cancel subscription** — schedules or immediately cancels a recurring subscription
 
 Both actions update the order status and are recorded in the event timeline.
+
+---
+
+## Subscriptions
+
+Navigate to **Shop > Subscriptions** or go to `/admin/shop/subscriptions`.
+
+### Subscription list
+
+The table shows all subscriptions ordered newest first. Each row shows the customer name and email, plan name, billing interval, status, amount, the period start date, and the next payment date (or cancellation date if the subscription is ending at period end).
+
+### Table columns
+
+| Column | Description |
+|---|---|
+| **Customer** | Name and email of the subscriber |
+| **Plan** | Plan name plus Monthly/Yearly badge |
+| **Status** | Subscription status pill (see below) |
+| **Amount** | Billing amount in cents, displayed in dollars |
+| **Started** | Current period start date (falls back to created date) |
+| **Next Payment** | Next billing date, or "Cancels [date]" if ending at period end |
+| **Stripe ID** | First 8 characters of the Stripe subscription ID, linked to the Stripe dashboard |
+
+### Status badges
+
+| Status | Color | Meaning |
+|---|---|---|
+| **active** | Green | Subscription is active and billing normally |
+| **trialing** | Blue | Customer is in a free trial period |
+| **past_due** | Amber | Payment failed but subscription not yet canceled |
+| **canceled** | Gray | Subscription has been canceled |
+| **incomplete** | Red | Initial payment failed |
+| **paused** | Gray | Billing paused |
+| **unpaid** | Red | Invoice unpaid after retries |
+
+### Filters
+
+| Filter | Options |
+|---|---|
+| **Search** | Matches customer name or email |
+| **Status** | All, Active, Trialing, Past Due, Canceled, Incomplete, Paused, Unpaid |
+| **Date range** | From and To date pickers |
+| **Sort** | Newest (default), Oldest, Amount high to low, Amount low to high |
+
+### Empty state
+
+When no subscriptions are found (either no data exists yet, or filters return no results), the table shows:
+
+> "No subscriptions found. Subscriptions will appear here once imported or created via Stripe."
+
+Subscriptions are created via Stripe webhooks or manual import — there is no create form in the admin UI.
 
 ---
 
