@@ -21,6 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import type { Lesson } from '@/lib/courses/lessons';
 import { deleteLesson, reorderLesson } from '@/app/admin/courses/lesson-actions';
+import LessonForm from './LessonForm';
 
 // ---- Type badge ----
 
@@ -130,17 +131,12 @@ function SortableLessonRow({
 interface LessonListProps {
   courseId: string;
   initialLessons: Lesson[];
-  onAddLesson: () => void;
-  onEditLesson: (lesson: Lesson) => void;
 }
 
-export default function LessonList({
-  courseId,
-  initialLessons,
-  onAddLesson,
-  onEditLesson,
-}: LessonListProps) {
+export default function LessonList({ courseId, initialLessons }: LessonListProps) {
   const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
+  const [formMode, setFormMode] = useState<'closed' | 'add' | 'edit'>('closed');
+  const [editingLesson, setEditingLesson] = useState<Lesson | undefined>(undefined);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -197,6 +193,26 @@ export default function LessonList({
     }
   }
 
+  function handleEditClick(lesson: Lesson) {
+    setEditingLesson(lesson);
+    setFormMode('edit');
+  }
+
+  function handleSave(savedLesson: Lesson) {
+    if (formMode === 'add') {
+      setLessons((prev) => [...prev, savedLesson]);
+    } else if (formMode === 'edit') {
+      setLessons((prev) => prev.map((l) => (l.id === savedLesson.id ? savedLesson : l)));
+    }
+    setFormMode('closed');
+    setEditingLesson(undefined);
+  }
+
+  function handleCancel() {
+    setFormMode('closed');
+    setEditingLesson(undefined);
+  }
+
   return (
     <div className="border border-border rounded-xl p-4 sm:p-6 bg-card transition-all duration-200">
       {/* Header */}
@@ -208,7 +224,7 @@ export default function LessonList({
           </p>
         </div>
         <button
-          onClick={onAddLesson}
+          onClick={() => { setFormMode('add'); setEditingLesson(undefined); }}
           className="px-4 py-2 bg-[#4E87A0] text-white text-sm font-semibold rounded-lg hover:bg-[#3A7190] transition-colors"
         >
           + Add Lesson
@@ -216,11 +232,11 @@ export default function LessonList({
       </div>
 
       {/* Empty state */}
-      {lessons.length === 0 ? (
+      {lessons.length === 0 && formMode === 'closed' ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground text-sm">No lessons yet. Add your first lesson below.</p>
         </div>
-      ) : (
+      ) : lessons.length > 0 ? (
         /* Lesson list */
         <div className="border border-[#E5E7EB] rounded-lg overflow-hidden">
           <DndContext
@@ -237,13 +253,23 @@ export default function LessonList({
                   key={lesson.id}
                   lesson={lesson}
                   index={index}
-                  onEdit={onEditLesson}
+                  onEdit={handleEditClick}
                   onDelete={handleDelete}
                 />
               ))}
             </SortableContext>
           </DndContext>
         </div>
+      ) : null}
+
+      {/* Inline form */}
+      {formMode !== 'closed' && (
+        <LessonForm
+          courseId={courseId}
+          lesson={editingLesson}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
       )}
     </div>
   );

@@ -17,24 +17,15 @@ interface LessonSectionProps {
 
 /**
  * Client wrapper for LessonList.
- * Handles add/edit state for Plan 01 — placeholder handlers will be replaced
- * by a full lesson form modal in Plan 02.
+ * Uses next/dynamic ssr:false to keep the edit page as a server component
+ * while preventing dnd-kit browser API errors during SSR.
+ * LessonList manages add/edit/delete form state internally.
  */
 export default function LessonSection({ courseId, initialLessons }: LessonSectionProps) {
-  function handleAddLesson() {
-    // Plan 02 will open the LessonFormModal here
-  }
-
-  function handleEditLesson(_lesson: Lesson) {
-    // Plan 02 will open the LessonFormModal with the lesson data here
-  }
-
   return (
     <LessonList
       courseId={courseId}
       initialLessons={initialLessons}
-      onAddLesson={handleAddLesson}
-      onEditLesson={handleEditLesson}
     />
   );
 }
