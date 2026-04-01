@@ -6,7 +6,7 @@
 
 import { getSupabaseService } from '@/lib/supabase/service'
 import type { Database } from '@/types/supabase'
-import { MEDIA_BUCKETS } from './constants';
+import { MEDIA_BUCKETS, SIDEBAR_SECTIONS, getSectionByKey } from './constants';
 
 export type MediaFolder = Database['public']['Tables']['media_folders']['Row'];
 
@@ -81,12 +81,24 @@ export async function getMediaItems(
 
   // ── Folder filter ──────────────────────────────────────────────────────────
   if (folder) {
-    const isBucket = MEDIA_BUCKETS.some(b => b.key === folder);
-    if (isBucket) {
-      query = query.eq('bucket', folder);
+    const section = getSectionByKey(folder);
+    if (section) {
+      // Sidebar section key — filter by bucket(s)
+      const buckets = section.storageBuckets as readonly string[];
+      if (buckets.length === 1) {
+        query = query.eq('bucket', buckets[0]);
+      } else {
+        query = query.in('bucket', [...buckets]);
+      }
     } else {
-      // UUID — filter by folder column
-      query = query.eq('folder', folder);
+      // Check backward compat: old MEDIA_BUCKETS key (e.g. 'uploads', 'upgrade-certificates')
+      const isLegacyBucket = MEDIA_BUCKETS.some(b => b.key === folder);
+      if (isLegacyBucket) {
+        query = query.eq('bucket', folder);
+      } else {
+        // UUID — filter by folder column
+        query = query.eq('folder', folder);
+      }
     }
   }
 
