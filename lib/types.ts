@@ -134,6 +134,8 @@ export interface Course {
   course_type: 'goya' | 'member';
   created_by: string | null;
   rejection_reason: string | null;
+  video_url: string | null;
+  video_platform: string | null;
   deleted_at: string | null;
   created_at: string;
   updated_at: string;

@@ -80,7 +80,7 @@ export default function LessonPage() {
 
   const isCompleted = progress.status === 'completed';
   const lessonTitle = `Video – ${course.title}`;
-  const vimeoId     = course.vimeo_url ? extractVimeoId(course.vimeo_url) : null;
+  const vimeoId     = course.video_url ? extractVimeoId(course.video_url) : null;
 
   return (
     <div className="min-h-screen bg-slate-50">
