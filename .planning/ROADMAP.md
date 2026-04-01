@@ -159,7 +159,7 @@ Plans:
 
 **Milestone Goal:** Redesign admin course management with categories table, multi-lesson support, drag-and-drop ordering, platform-aware video fields, and modern SaaS UI.
 
-- [ ] **Phase 36: Database Migrations** - Create course_categories and lessons tables, migrate courses schema, RLS policies, TypeScript types
+- [x] **Phase 36: Database Migrations** - Create course_categories and lessons tables, migrate courses schema, RLS policies, TypeScript types (completed 2026-04-01)
 - [ ] **Phase 37: Admin Courses — Tabs + Categories** - Courses/Categories tab bar, category table, CRUD modal, delete guard
 - [ ] **Phase 38: Course Creation Form — UI Redesign** - Card-section layout, dynamic category select, duration slider, remove vimeo_url, post-save redirect
 - [ ] **Phase 39: Lesson Management — UI + Logic** - Drag-and-drop lesson list, type-specific forms (Video/Audio/Text), sort_order persistence, mobile touch support
@@ -175,10 +175,10 @@ Plans:
   3. The courses table has category_id FK pointing to course_categories, duration_minutes integer column, and the old category text column and vimeo_url column are dropped
   4. RLS on course_categories allows admin/mod full CRUD and public SELECT; RLS on lessons allows admin/mod full CRUD, members SELECT published lessons of published courses, and course creators SELECT their own
   5. npx tsc --noEmit passes with no type errors after types are regenerated
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 36-01-PLAN.md — Schema: create course_categories + lessons tables, migrate courses (category_id FK, duration_minutes, drop legacy columns)
-- [ ] 36-02-PLAN.md — RLS policies for course_categories and lessons, regenerate TypeScript types, fix tsc
+- [x] 36-02-PLAN.md — RLS policies for course_categories and lessons, regenerate TypeScript types, fix tsc
 
 ### Phase 37: Admin Courses — Tabs + Categories
 **Goal**: Admins can manage course categories from a dedicated tab on the courses page, with full CRUD and a safe delete guard
@@ -248,7 +248,7 @@ Plans:
 | 33. Admin School Management | 2/2 | Complete | 2026-03-31 |
 | 34. Public School Profile | 2/2 | Complete | 2026-03-31 |
 | 35. Faculty Invitations | 1/1 | Complete | 2026-03-31 |
-| 36. Database Migrations | 1/2 | In Progress|  |
+| 36. Database Migrations | 2/2 | Complete   | 2026-04-01 |
 | 37. Admin Courses — Tabs + Categories | 0/? | Not started | - |
 | 38. Course Creation Form — UI Redesign | 0/? | Not started | - |
 | 39. Lesson Management — UI + Logic | 0/? | Not started | - |

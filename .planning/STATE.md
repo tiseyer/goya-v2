@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.15
 milestone_name: Course System Redesign
-status: executing
-stopped_at: Completed 36-01-PLAN.md — course_categories, lessons tables created; courses migrated
-last_updated: "2026-04-01T02:21:32.278Z"
+status: verifying
+stopped_at: Completed 36-02-PLAN.md — RLS policies on course_categories and lessons; tsc passes
+last_updated: "2026-04-01T02:26:46.532Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-01)
 
 Phase: 36 (Database Migrations) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-01
 
 Progress: [░░░░░░░░░░] 0%
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 36-database-migrations P01 | 5 | 2 tasks | 4 files |
+| Phase 36-database-migrations P02 | 3 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,7 @@ Recent decisions affecting current work:
 - event_categories migration is the authoritative schema reference for course_categories
 - [Phase 36-database-migrations]: Applied migrations via Supabase Management API (SUPABASE_ACCESS_TOKEN) — db push blocked by CLI history mismatch; this is the established pattern for this project
 - [Phase 36-database-migrations]: sort_order on lessons uses numeric type for midpoint drag-reorder math (avoids integer-only limitations)
+- [Phase 36-database-migrations]: Plan 01 lessons RLS policies updated to plan-spec: TO authenticated + SELECT-only for member/creator access (not public/ALL)
 
 ### Codebase Findings (v1.15 pre-flight)
 
@@ -97,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T02:21:32.275Z
-Stopped at: Completed 36-01-PLAN.md — course_categories, lessons tables created; courses migrated
+Last session: 2026-04-01T02:26:46.528Z
+Stopped at: Completed 36-02-PLAN.md — RLS policies on course_categories and lessons; tsc passes
 Resume file: None

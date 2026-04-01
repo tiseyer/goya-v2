@@ -13,9 +13,9 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 - [x] **DB-02**: `course_categories` seeded with 5 categories: Workshop, Yoga Sequence, Dharma Talk, Music Playlist, Research
 - [x] **DB-03**: `lessons` table created with id, course_id FK (CASCADE), title, type (video/audio/text), sort_order, short_description, description, video_platform (vimeo/youtube), video_url, audio_url, featured_image_url, duration_minutes, created_at, updated_at
 - [x] **DB-04**: `courses.category_id` FK added, backfilled from existing `category` string, old `category` + `vimeo_url` columns dropped
-- [ ] **DB-05**: RLS policies on `course_categories` — admin/mod full CRUD, public SELECT
-- [ ] **DB-06**: RLS policies on `lessons` — admin/mod full CRUD, members SELECT published lessons of published courses, course creator SELECT own
-- [ ] **DB-07**: Supabase types regenerated and `npx tsc --noEmit` passes
+- [x] **DB-05**: RLS policies on `course_categories` — admin/mod full CRUD, public SELECT
+- [x] **DB-06**: RLS policies on `lessons` — admin/mod full CRUD, members SELECT published lessons of published courses, course creator SELECT own
+- [x] **DB-07**: Supabase types regenerated and `npx tsc --noEmit` passes
 
 ### Admin Categories
 
@@ -83,9 +83,9 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 | DB-02 | Phase 36 | Complete |
 | DB-03 | Phase 36 | Complete |
 | DB-04 | Phase 36 | Complete |
-| DB-05 | Phase 36 | Pending |
-| DB-06 | Phase 36 | Pending |
-| DB-07 | Phase 36 | Pending |
+| DB-05 | Phase 36 | Complete |
+| DB-06 | Phase 36 | Complete |
+| DB-07 | Phase 36 | Complete |
 | ACAT-01 | Phase 37 | Pending |
 | ACAT-02 | Phase 37 | Pending |
 | ACAT-03 | Phase 37 | Pending |
