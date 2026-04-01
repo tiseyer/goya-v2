@@ -17,6 +17,7 @@ interface BranchGroup {
   latestDeployment: Deployment
   deploymentCount: number
   isCurrent: boolean
+  target: 'production' | 'preview'
 }
 
 function timeAgo(isoDate: string): string {
@@ -98,12 +99,18 @@ export default function VersionsTab() {
     }
 
     return Array.from(groups.entries())
-      .map(([branch, group]) => ({
-        branch,
-        latestDeployment: group.deployments[0],
-        deploymentCount: group.deployments.length,
-        isCurrent: branch === data.current.branch,
-      }))
+      .map(([branch, group]) => {
+        // For each branch, prefer the production deployment as representative (if any)
+        const productionDep = group.deployments.find((d) => d.target === 'production')
+        const latestDeployment = productionDep ?? group.deployments[0]
+        return {
+          branch,
+          latestDeployment,
+          deploymentCount: group.deployments.length,
+          isCurrent: branch === data.current.branch,
+          target: latestDeployment.target,
+        }
+      })
       .sort((a, b) => {
         // Current branch first, then by latest deployment time
         if (a.isCurrent) return -1
@@ -222,6 +229,11 @@ export default function VersionsTab() {
                 }`}>
                   {b.branch}
                 </span>
+                {b.target === 'production' ? (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-700 shrink-0">production</span>
+                ) : (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700 shrink-0">preview</span>
+                )}
                 <span className="flex-1 text-sm text-[#374151] truncate" title={b.latestDeployment.commitMessage}>
                   {truncate(b.latestDeployment.commitMessage, 50)}
                 </span>
@@ -287,6 +299,11 @@ export default function VersionsTab() {
                 }`}>
                   {dep.branch}
                 </span>
+                {dep.target === 'production' ? (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-700 shrink-0">production</span>
+                ) : (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700 shrink-0">preview</span>
+                )}
                 <span className="flex-1 text-sm text-[#1B3A5C] truncate" title={dep.commitMessage}>
                   {truncate(dep.commitMessage, 60)}
                 </span>
