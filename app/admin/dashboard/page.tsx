@@ -1,5 +1,4 @@
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
-import DeploymentsSection from './DeploymentsSection';
 // AnalyticsSection removed — GA4 tracking is handled client-side via AnalyticsProvider
 
 // ─── Stat card ─────────────────────────────────────────────────────────────────
@@ -106,10 +105,6 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Row 5 — Deployments */}
-      <div className="mt-8">
-        <DeploymentsSection />
-      </div>
     </div>
   );
 }
