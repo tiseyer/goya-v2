@@ -13,7 +13,7 @@
 - ✅ **v1.10 Member Courses** - Phases 22-27 (shipped 2026-03-31)
 - ✅ **v1.14 School Owner System** - Phases 28-35 (shipped 2026-03-31)
 - ✅ **v1.15 Course System Redesign** - Phases 36-40 (shipped 2026-04-01)
-- 🚧 **v1.16 Admin Color Settings** - Phases 41-42 (in progress)
+- ✅ **v1.16 Admin Color Settings** - Phases 41-42 (shipped 2026-04-01)
 
 ## Phases
 
@@ -252,12 +252,12 @@ Plans:
 
 </details>
 
-### v1.16 Admin Color Settings (In Progress)
+### ✅ v1.16 Admin Color Settings (Completed 2026-04-01)
 
 **Milestone Goal:** Admin-controlled color configuration system — brand colors, role colors, and maintenance indicator — stored in site_settings and injected globally via CSS variables.
 
 - [x] **Phase 41: ThemeProvider Infrastructure** - ThemeProvider component, site_settings storage for brand_colors/role_colors/maintenance_indicator_color, global CSS variable injection (completed 2026-04-01)
-- [ ] **Phase 42: Admin Colors UI** - Colors page at /admin/settings, 3-section layout, color pickers with hex input, save/reset controls, sidebar nav entry
+- [x] **Phase 42: Admin Colors UI** - Colors page at /admin/settings, 3-section layout, color pickers with hex input, save/reset controls, sidebar nav entry (completed 2026-04-01)
 
 ## Phase Details
 
@@ -287,7 +287,7 @@ Plans:
   5. Clicking "Reset All" restores every color across all three sections to its default value
 **Plans:** 1 plan
 Plans:
-- [ ] 42-01-PLAN.md — ColorsTab component with color pickers, live preview, save/reset + settings page tab + sidebar entry
+- [x] 42-01-PLAN.md — ColorsTab component with color pickers, live preview, save/reset + settings page tab + sidebar entry
 **UI hint**: yes
 
 ## Progress
@@ -310,4 +310,4 @@ Plans:
 | 39. Lesson Management — UI + Logic | 2/2 | Complete | 2026-04-01 |
 | 40. Wire Lessons to Frontend | 3/3 | Complete | 2026-04-01 |
 | 41. ThemeProvider Infrastructure | 1/1 | Complete | 2026-04-01 |
-| 42. Admin Colors UI | 0/1 | Not started | - |
+| 42. Admin Colors UI | 1/1 | Complete | 2026-04-01 |
