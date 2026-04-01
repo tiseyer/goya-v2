@@ -256,7 +256,7 @@ Plans:
 
 **Milestone Goal:** Admin-controlled color configuration system — brand colors, role colors, and maintenance indicator — stored in site_settings and injected globally via CSS variables.
 
-- [ ] **Phase 41: ThemeProvider Infrastructure** - ThemeProvider component, site_settings storage for brand_colors/role_colors/maintenance_indicator_color, global CSS variable injection
+- [x] **Phase 41: ThemeProvider Infrastructure** - ThemeProvider component, site_settings storage for brand_colors/role_colors/maintenance_indicator_color, global CSS variable injection (completed 2026-04-01)
 - [ ] **Phase 42: Admin Colors UI** - Colors page at /admin/settings, 3-section layout, color pickers with hex input, save/reset controls, sidebar nav entry
 
 ## Phase Details
@@ -271,9 +271,9 @@ Plans:
   3. brand_colors saved to site_settings as a JSON value under the key "brand_colors" are reflected as CSS variables after a page reload
   4. role_colors saved to site_settings as a JSON value under the key "role_colors" are reflected as CSS variables after a page reload
   5. maintenance_indicator_color saved to site_settings under the key "maintenance_indicator_color" is reflected as a CSS variable after a page reload
-**Plans**: 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 41-01-PLAN.md — ThemeColorProvider server component, color defaults/types, layout.tsx integration
+- [x] 41-01-PLAN.md — Color defaults/types module + ThemeColorProvider server component + layout.tsx integration
 
 ### Phase 42: Admin Colors UI
 **Goal**: Admins can view, edit, preview, save, and reset all brand colors, role colors, and the maintenance indicator color from a dedicated Colors page in Admin Settings
@@ -309,5 +309,5 @@ Plans:
 | 38. Course Creation Form — UI Redesign | 2/2 | Complete | 2026-04-01 |
 | 39. Lesson Management — UI + Logic | 2/2 | Complete | 2026-04-01 |
 | 40. Wire Lessons to Frontend | 3/3 | Complete | 2026-04-01 |
-| 41. ThemeProvider Infrastructure | 0/TBD | Not started | - |
+| 41. ThemeProvider Infrastructure | 1/1 | Complete | 2026-04-01 |
 | 42. Admin Colors UI | 0/TBD | Not started | - |
