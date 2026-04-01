@@ -133,6 +133,7 @@ None yet.
 | 260401-nh4 | Rename Deployments to Versions tab, add branches section | 2026-04-01 | — | [260401-nh4-rename-deployments-to-versions-tab-add-b](./quick/260401-nh4-rename-deployments-to-versions-tab-add-b/) |
 | 260401-o8m | Fix Stripe health check: show actual error, remove retry, fix http client | 2026-04-01 | c391de3 | [260401-o8m-fix-stripe-health-check-show-actual-erro](./quick/260401-o8m-fix-stripe-health-check-show-actual-erro/) |
 | 260401-oa7 | Fix Versions tab: show all branches including main/production | 2026-04-01 | 406ad9f, a85c9fa | [260401-oa7-fix-versions-tab-to-show-all-branches-in](./quick/260401-oa7-fix-versions-tab-to-show-all-branches-in/) |
+| 260401-ovu | Fix chatbot maintenance indicators: yellow icon, help sidebar ring | 2026-04-01 | 55657ff | [260401-ovu-fix-chatbot-maintenance-indicators-yello](./quick/260401-ovu-fix-chatbot-maintenance-indicators-yello/) |
 
 ## Session Continuity
 
