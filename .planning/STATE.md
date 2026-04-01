@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-01)
 
 ## Current Position
 
-Phase: 40 (Wire Lessons to Frontend) — EXECUTING
-Plan: 2 of 3
-Status: Plan 02 complete — per-lesson player page built, Plan 03 next
+Phase: 40 (Wire Lessons to Frontend) — COMPLETE
+Plan: 3 of 3
+Status: Plan 03 complete — member my-courses lesson management with LessonList reuse and stale column fixes
 Last activity: 2026-04-01
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 

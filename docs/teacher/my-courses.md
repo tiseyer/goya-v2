@@ -3,7 +3,7 @@ title: Submitting and Managing Courses
 audience: ["teacher"]
 section: teacher
 order: 4
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # Submitting and Managing Courses
@@ -15,6 +15,7 @@ last_updated: "2026-03-31"
 - [Creating a new course](#creating-a-new-course)
 - [Course form fields](#course-form-fields)
 - [Saving versus submitting](#saving-versus-submitting)
+- [Managing lessons](#managing-lessons)
 - [Status reference and available actions](#status-reference-and-available-actions)
   - [Draft](#draft)
   - [Pending Review](#pending-review)
@@ -62,18 +63,19 @@ You control the transition from **Draft** to **Pending Review** by clicking **Su
 | Field | Required | Notes |
 |---|---|---|
 | **Title** | Yes | The name of your course |
-| **Category** | Yes | Workshop, Yoga Sequence, Dharma Talk, Music Playlist, or Research |
+| **Category** | Yes | Select from the available GOYA course categories |
 | **Level** | No | Beginner, Intermediate, Advanced, or All Levels |
 | **Access** | Yes | **Members Only** (visible to GOYA members) or **Free** (visible to everyone) |
 | **Instructor** | No | Name of the instructor if different from you |
-| **Duration** | No | Total course length, e.g. "4h 30m" |
+| **Duration** | No | Total course length set via a slider (0–600 minutes) |
 | **Short Description** | No | Brief summary shown on the course card, up to 200 characters |
 | **Full Description** | No | Full course description shown on the course detail page |
-| **Vimeo URL** | No | Full Vimeo video URL (e.g. https://vimeo.com/123456789). The video must be publicly accessible or unlisted |
-| **Thumbnail URL** | No | Image URL used as the course thumbnail if no Vimeo video is attached |
+| **Thumbnail URL** | No | Image URL used as the course thumbnail |
 | **Card Gradient** | No | Two color pickers that control the gradient shown on the course card when no thumbnail is present. A live preview is shown beneath the pickers |
 
 The form only requires a **Title** for the save and submit buttons to become active. Fill in as many fields as possible to give reviewers the full picture.
+
+Video content is added per-lesson (see [Managing lessons](#managing-lessons)) rather than on the course itself.
 
 ---
 
@@ -81,6 +83,40 @@ The form only requires a **Title** for the save and submit buttons to become act
 
 - **Save as Draft** — saves your course in **Draft** status. You can return to edit it at any time before submitting. Drafts are not visible in the Academy.
 - **Submit for Review** — saves and submits your course. It moves to **Pending Review** and enters the GOYA review queue.
+
+---
+
+## Managing lessons
+
+When editing a course, a **Lessons** section appears below the course form. Here you can build the full lesson list for your course.
+
+### Adding a lesson
+
+1. Click **+ Add Lesson** in the Lessons section.
+2. Fill in the lesson form:
+   - **Title** (required)
+   - **Type**: Video, Audio, or Text
+   - **Duration** (minutes)
+   - **Video URL** and **Platform** (for video lessons — Vimeo or YouTube)
+   - **Audio URL** (for audio lessons)
+   - **Description** (optional, supports plain text)
+3. Click **Save Lesson** to add it to the list.
+
+### Editing and deleting lessons
+
+Each lesson row has an **edit** (pencil) and **delete** (trash) button on the right side.
+
+### Reordering lessons
+
+Drag the handle icon (six dots) on the left of any lesson row to change its position. The order is saved immediately after dragging.
+
+### Lesson types
+
+| Type | When to use |
+|---|---|
+| **Video** | Link to a Vimeo or YouTube video |
+| **Audio** | Link to an audio file URL |
+| **Text** | Written content with optional featured image |
 
 ---
 
