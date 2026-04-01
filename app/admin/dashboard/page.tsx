@@ -161,7 +161,6 @@ export default async function DashboardPage() {
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'Admin';
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-  const environment = process.env.NODE_ENV === 'production' ? 'Production' : 'Development';
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl">
@@ -191,29 +190,6 @@ export default async function DashboardPage() {
         <MemberGrowthChart />
       </div>
 
-      {/* Row 3 — Platform info */}
-      <div className="mb-8">
-        <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest mb-3">Platform</h2>
-        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-4">
-          <div className="flex items-center divide-x divide-[#E5E7EB]">
-            <div className="flex-1 text-center px-4">
-              <div className="text-2xl font-bold text-[#1B3A5C]">v2.0.0</div>
-              <div className="text-xs text-[#6B7280] mt-0.5">App Version</div>
-            </div>
-            <div className="flex-1 text-center px-4">
-              <div className="text-2xl font-bold text-[#1B3A5C]">{environment}</div>
-              <div className="text-xs text-[#6B7280] mt-0.5">Environment</div>
-            </div>
-            <div className="flex-1 text-center px-4">
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                <span className="text-2xl font-bold text-[#1B3A5C]">OK</span>
-              </div>
-              <div className="text-xs text-[#6B7280] mt-0.5">Status</div>
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
   );
