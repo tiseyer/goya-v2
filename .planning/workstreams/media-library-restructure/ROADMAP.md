@@ -12,8 +12,13 @@
 
 **Requirements:** SCHEMA-01, SCHEMA-02, SCHEMA-03
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 01-01-PLAN.md — Add is_system column, set bucket default, regen types
+
 **Success Criteria:**
-1. Migration file creates `bucket` (text, default 'media') and `is_system` (boolean, default false) columns on media_folders
+1. Migration file creates `bucket` default ('media') and `is_system` (boolean, default false) columns on media_folders
 2. Migration applied to remote Supabase
 3. TypeScript types regenerated and committed
 4. Existing folders default to bucket='media', is_system=false
