@@ -33,7 +33,7 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 - [x] **ACF-04**: `vimeo_url` removed from course form (moved to lessons)
 - [ ] **ACF-05**: After saving new course, redirects to edit page for lesson management
 - [x] **ACF-06**: Course type set automatically (admin=goya, member=member)
-- [ ] **ACF-07**: Form is mobile responsive with smooth transitions
+- [x] **ACF-07**: Form is mobile responsive with smooth transitions
 
 ### Lesson Management
 
@@ -97,7 +97,7 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 | ACF-04 | Phase 38 | Complete |
 | ACF-05 | Phase 38 | Pending |
 | ACF-06 | Phase 38 | Complete |
-| ACF-07 | Phase 38 | Pending |
+| ACF-07 | Phase 38 | Complete |
 | LM-01 | Phase 39 | Pending |
 | LM-02 | Phase 39 | Pending |
 | LM-03 | Phase 39 | Pending |

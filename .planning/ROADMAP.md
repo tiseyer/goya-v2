@@ -161,7 +161,7 @@ Plans:
 
 - [x] **Phase 36: Database Migrations** - Create course_categories and lessons tables, migrate courses schema, RLS policies, TypeScript types (completed 2026-04-01)
 - [x] **Phase 37: Admin Courses — Tabs + Categories** - Courses/Categories tab bar, category table, CRUD modal, delete guard (completed 2026-04-01)
-- [ ] **Phase 38: Course Creation Form — UI Redesign** - Card-section layout, dynamic category select, duration slider, remove vimeo_url, post-save redirect
+- [x] **Phase 38: Course Creation Form — UI Redesign** - Card-section layout, dynamic category select, duration slider, remove vimeo_url, post-save redirect (completed 2026-04-01)
 - [ ] **Phase 39: Lesson Management — UI + Logic** - Drag-and-drop lesson list, type-specific forms (Video/Audio/Text), sort_order persistence, mobile touch support
 - [ ] **Phase 40: Wire Lessons to Frontend** - Academy page lesson list, lesson player page by type, category color on course cards, member my-courses lesson management
 
@@ -208,10 +208,10 @@ Plans:
   4. The vimeo_url field is absent from the form; no reference to it appears in the UI
   5. After saving a new course, the admin is redirected to the course edit page where they can immediately add lessons
   6. The form renders correctly on mobile screens with no overflow or truncated controls
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 38-01-PLAN.md — Update Course type, redesign CourseForm with card sections, DB categories, duration slider, remove vimeo_url, auto course_type, post-save redirect
-- [ ] 38-02-PLAN.md — Mobile responsiveness audit and visual verification checkpoint
+- [x] 38-02-PLAN.md — Mobile responsiveness audit and visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 39: Lesson Management — UI + Logic
@@ -257,6 +257,6 @@ Plans:
 | 35. Faculty Invitations | 1/1 | Complete | 2026-03-31 |
 | 36. Database Migrations | 3/3 | Complete    | 2026-04-01 |
 | 37. Admin Courses — Tabs + Categories | 2/2 | Complete    | 2026-04-01 |
-| 38. Course Creation Form — UI Redesign | 1/2 | In Progress|  |
+| 38. Course Creation Form — UI Redesign | 2/2 | Complete   | 2026-04-01 |
 | 39. Lesson Management — UI + Logic | 0/? | Not started | - |
 | 40. Wire Lessons to Frontend | 0/? | Not started | - |
