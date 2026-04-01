@@ -104,7 +104,7 @@ interface StagingRow {
   migration_notes: string
 }
 
-// ─── Step 1: WooCommerce ──────────────────────────────────────────────────────
+// ─── Step 1: WooCommerce (subscription-first) ───────────────────────────────
 
 async function fetchWooPage<T>(endpoint: string, page: number): Promise<T[]> {
   const url = `${WOO_BASE}${endpoint}${endpoint.includes('?') ? '&' : '?'}per_page=100&page=${page}`
@@ -135,37 +135,84 @@ function getMetaValue(meta: Array<{ key: string; value: string }> | undefined, k
   return meta?.find(m => m.key === key)?.value ?? null
 }
 
-async function fetchWooCustomers(): Promise<CustomerRecord[]> {
-  console.log('Step 1: Fetching WooCommerce customers...')
-  const customers = await fetchAllWooPages<WooCustomer>('/customers')
-  console.log(`  Found ${customers.length} WooCommerce customers`)
+interface WooSubscriptionWithCustomer extends WooSubscription {
+  customer_id: number
+}
 
+async function fetchWooCustomers(): Promise<CustomerRecord[]> {
+  console.log('Step 1: Fetching ALL WooCommerce subscriptions (subscription-first strategy)...')
+
+  // Fetch all subscriptions across all statuses
+  const statuses = ['active', 'cancelled', 'expired', 'on-hold', 'pending']
+  const allSubs: WooSubscriptionWithCustomer[] = []
+
+  for (const status of statuses) {
+    const subs = await fetchAllWooPages<WooSubscriptionWithCustomer>(`/subscriptions?status=${status}`)
+    console.log(`  ${status}: ${subs.length} subscriptions`)
+    allSubs.push(...subs)
+  }
+  console.log(`  Total subscriptions fetched: ${allSubs.length}`)
+
+  // Group subscriptions by customer_id
+  const subsByCustomer = new Map<number, WooSubscriptionWithCustomer[]>()
+  for (const sub of allSubs) {
+    if (!sub.customer_id) continue
+    const existing = subsByCustomer.get(sub.customer_id)
+    if (existing) {
+      existing.push(sub)
+    } else {
+      subsByCustomer.set(sub.customer_id, [sub])
+    }
+  }
+  console.log(`  Unique customers from subscriptions: ${subsByCustomer.size}`)
+
+  // Fetch customer details with caching
+  const customerCache = new Map<number, WooCustomer>()
   const records: CustomerRecord[] = []
   let fetched = 0
+  const totalCustomers = subsByCustomer.size
 
-  for (const cust of customers) {
+  for (const [customerId, subs] of subsByCustomer) {
     fetched++
-    if (fetched % 50 === 0) console.log(`  Fetching subscriptions: ${fetched}/${customers.length}`)
+    if (fetched % 100 === 0) console.log(`  Fetching customer details: ${fetched}/${totalCustomers}`)
 
-    let subs: WooSubscription[] = []
-    try {
-      subs = await fetchWooPage<WooSubscription>(`/subscriptions?customer=${cust.id}`, 1)
-    } catch (err) {
-      console.warn(`  Failed to fetch subs for customer ${cust.id}: ${err instanceof Error ? err.message : 'unknown'}`)
-    }
+    let customer: WooCustomer | null = customerCache.get(customerId) ?? null
 
-    const wp_roles: string[] = [cust.role]
-    const rolesFromMeta = getMetaValue(cust.meta_data, 'wp_capabilities')
-    if (rolesFromMeta) {
+    if (!customer) {
       try {
-        const parsed = JSON.parse(rolesFromMeta)
-        if (typeof parsed === 'object') wp_roles.push(...Object.keys(parsed))
-      } catch { /* ignore */ }
+        const url = `${WOO_BASE}/customers/${customerId}`
+        const auth = Buffer.from(`${wooKey}:${wooSecret}`).toString('base64')
+        const response = await fetch(url, { headers: { Authorization: `Basic ${auth}` } })
+        if (response.ok) {
+          customer = await response.json() as WooCustomer
+          customerCache.set(customerId, customer)
+        } else {
+          console.warn(`  Failed to fetch customer ${customerId}: ${response.status}`)
+        }
+      } catch (err) {
+        console.warn(`  Failed to fetch customer ${customerId}: ${err instanceof Error ? err.message : 'unknown'}`)
+      }
+      await sleep(200)
     }
+
+    // Extract roles
+    const wp_roles: string[] = []
+    if (customer) {
+      if (customer.role) wp_roles.push(customer.role)
+      const rolesFromMeta = getMetaValue(customer.meta_data, 'wp_capabilities')
+      if (rolesFromMeta) {
+        try {
+          const parsed = JSON.parse(rolesFromMeta)
+          if (typeof parsed === 'object') wp_roles.push(...Object.keys(parsed))
+        } catch { /* ignore */ }
+      }
+    }
+
+    const email = customer?.email?.toLowerCase().trim() ?? ''
 
     records.push({
-      woo_customer_id: cust.id,
-      email: cust.email?.toLowerCase().trim() ?? '',
+      woo_customer_id: customerId,
+      email,
       wp_roles: [...new Set(wp_roles.filter(Boolean))],
       subscriptions: subs.map(s => ({
         id: s.id,
@@ -177,11 +224,9 @@ async function fetchWooCustomers(): Promise<CustomerRecord[]> {
         end_date: s.date_end,
       })),
     })
-
-    await sleep(200)
   }
 
-  console.log(`  Processed ${records.length} customers with subscriptions`)
+  console.log(`  Processed ${records.length} customers from ${allSubs.length} subscriptions`)
   return records
 }
 
