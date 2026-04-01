@@ -107,15 +107,10 @@ export default function ChatWidget() {
 
   return (
     <>
-      <FloatingButton onClick={toggleChat} isOpen={isOpen} />
+      <FloatingButton onClick={toggleChat} isOpen={isOpen} maintenance={badge === 'maintenance'} />
       {!isOpen && badge === 'preview' && (
         <span className="fixed bottom-16 right-4 z-50 text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full font-medium leading-none pointer-events-none">
           Preview
-        </span>
-      )}
-      {!isOpen && badge === 'maintenance' && (
-        <span className="fixed bottom-16 right-4 z-50 text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-medium leading-none pointer-events-none">
-          Maintenance
         </span>
       )}
       <ChatPanel

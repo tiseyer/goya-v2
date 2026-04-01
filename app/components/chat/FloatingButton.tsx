@@ -5,9 +5,10 @@ import { MessageCircle, X } from 'lucide-react'
 interface FloatingButtonProps {
   onClick: () => void
   isOpen?: boolean
+  maintenance?: boolean
 }
 
-export default function FloatingButton({ onClick, isOpen = false }: FloatingButtonProps) {
+export default function FloatingButton({ onClick, isOpen = false, maintenance = false }: FloatingButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -17,7 +18,7 @@ export default function FloatingButton({ onClick, isOpen = false }: FloatingButt
       {isOpen ? (
         <X size={24} className="text-white" />
       ) : (
-        <MessageCircle size={24} className="text-white" />
+        <MessageCircle size={24} className={maintenance ? 'text-amber-300' : 'text-white'} />
       )}
     </button>
   )

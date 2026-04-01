@@ -76,11 +76,23 @@ const NAV_ITEMS: NavItem[] = [
 export default function SettingsShell({ children, userRole }: { children: React.ReactNode; userRole?: string }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [chatbotMaintenance, setChatbotMaintenance] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem('settings-sidebar-collapsed');
     if (stored !== null) setCollapsed(stored === 'true');
   }, []);
+
+  // Fetch chatbot maintenance mode status for Help item indicator
+  useEffect(() => {
+    if (userRole !== 'admin' && userRole !== 'moderator') return;
+    fetch('/api/chatbot/config')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.chatbot_maintenance_mode) setChatbotMaintenance(true);
+      })
+      .catch(() => {});
+  }, [userRole]);
 
   function toggle() {
     setCollapsed(prev => {
@@ -125,6 +137,7 @@ export default function SettingsShell({ children, userRole }: { children: React.
             const isActive = item.href === '/settings'
               ? pathname === '/settings'
               : pathname.startsWith(item.href);
+            const isHelpMaintenance = item.label === 'Help' && chatbotMaintenance;
             return (
               <Link
                 key={item.href}
@@ -136,6 +149,7 @@ export default function SettingsShell({ children, userRole }: { children: React.
                   isActive
                     ? 'bg-primary/10 text-primary font-semibold'
                     : 'text-slate-500 hover:text-primary-dark hover:bg-primary-50',
+                  isHelpMaintenance ? 'ring-2 ring-amber-400' : '',
                 ].join(' ')}
               >
                 <div className="relative shrink-0">
