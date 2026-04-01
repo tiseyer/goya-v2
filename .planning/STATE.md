@@ -5,7 +5,7 @@ milestone_name: Course System Redesign
 status: verifying
 stopped_at: Completed 40-02-PLAN.md — per-lesson player page with type-specific rendering and prev/next navigation
 last_updated: "2026-04-01T06:00:00.000Z"
-last_activity: 2026-04-01 - Completed quick task 260401-hk4: Add milestone branching rules to CLAUDE.md
+last_activity: 2026-04-01 - Completed quick task 260401-hg8: Fix Vercel build — 4 module-not-found errors
 progress:
   total_phases: 5
   completed_phases: 3
