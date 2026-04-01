@@ -9,7 +9,7 @@ export default function ImpersonationBanner({ state }: { state: ImpersonationSta
   const targetEmail = state.targetProfile.email || ''
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] bg-amber-400 border-b-2 border-amber-500">
+    <div className="fixed top-0 left-0 right-0 z-[9990] bg-amber-400 border-b-2 border-amber-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 min-w-0">
           <svg className="w-4 h-4 text-amber-900 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
