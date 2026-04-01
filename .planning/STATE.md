@@ -5,7 +5,7 @@ milestone_name: Course System Redesign
 status: verifying
 stopped_at: Completed 40-02-PLAN.md — per-lesson player page with type-specific rendering and prev/next navigation
 last_updated: "2026-04-01T06:00:00.000Z"
-last_activity: 2026-04-01 - Completed quick task 260401-m3q: Admin subscriptions table refinements
+last_activity: 2026-04-01 - Completed quick task 260401-mlw: Health tab improvements
 progress:
   total_phases: 5
   completed_phases: 3
@@ -129,6 +129,7 @@ None yet.
 | 260401-maf | Refactor maintenance tab into grouped content boxes | 2026-04-01 | d33483d | [260401-maf-refactor-maintenance-tab-into-grouped-co](./quick/260401-maf-refactor-maintenance-tab-into-grouped-co/) |
 | 260401-mib | Danger zone with cache clear and session invalidation | 2026-04-01 | — | [260401-mib-danger-zone-with-cache-clear-and-session](./quick/260401-mib-danger-zone-with-cache-clear-and-session/) |
 | 260401-mod | Health tab improvements, Vercel cron, audit log, maintenance status | 2026-04-01 | — | [260401-mod-health-tab-improvements-vercel-cron-audi](./quick/260401-mod-health-tab-improvements-vercel-cron-audi/) |
+| 260401-mlw | Health tab: cron auth, audit logging, maintenance status card, monitor log UI | 2026-04-01 | 6b39cc6, d1ebce9 | [260401-mlw-health-tab-improvements-fix-401-vercel-c](./quick/260401-mlw-health-tab-improvements-fix-401-vercel-c/) |
 
 ## Session Continuity
 
