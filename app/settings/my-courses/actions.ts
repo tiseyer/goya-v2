@@ -27,14 +27,13 @@ async function getAuthenticatedUser() {
 
 export interface MemberCourseFormData {
   title: string;
-  category: string;
+  category_id: string | null;
   level: string | null;
   access: string;
   instructor?: string;
-  duration?: string;
+  duration_minutes?: number | null;
   short_description?: string;
   description?: string;
-  vimeo_url?: string;
   thumbnail_url?: string;
   gradient_from?: string;
   gradient_to?: string;
@@ -47,14 +46,13 @@ export async function createMemberCourse(formData: MemberCourseFormData) {
 
   const { data, error } = await service.from('courses').insert({
     title: formData.title,
-    category: formData.category,
+    category_id: formData.category_id || null,
     level: formData.level || null,
     access: formData.access,
     instructor: formData.instructor || null,
-    duration: formData.duration || null,
+    duration_minutes: formData.duration_minutes || null,
     short_description: formData.short_description || null,
     description: formData.description || null,
-    vimeo_url: formData.vimeo_url || null,
     thumbnail_url: formData.thumbnail_url || null,
     gradient_from: formData.gradient_from || '#0f766e',
     gradient_to: formData.gradient_to || '#134e4a',
@@ -96,14 +94,13 @@ export async function updateMemberCourse(courseId: string, formData: MemberCours
 
   const updatePayload: Record<string, unknown> = {
     title: formData.title,
-    category: formData.category,
+    category_id: formData.category_id || null,
     level: formData.level || null,
     access: formData.access,
     instructor: formData.instructor || null,
-    duration: formData.duration || null,
+    duration_minutes: formData.duration_minutes || null,
     short_description: formData.short_description || null,
     description: formData.description || null,
-    vimeo_url: formData.vimeo_url || null,
     thumbnail_url: formData.thumbnail_url || null,
     gradient_from: formData.gradient_from || '#0f766e',
     gradient_to: formData.gradient_to || '#134e4a',
