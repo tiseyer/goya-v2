@@ -5,7 +5,7 @@ milestone_name: Course System Redesign
 status: verifying
 stopped_at: Completed 40-02-PLAN.md — per-lesson player page with type-specific rendering and prev/next navigation
 last_updated: "2026-04-01T06:00:00.000Z"
-last_activity: 2026-04-01
+last_activity: 2026-04-01 - Completed quick task 260401-hk4: Add milestone branching rules to CLAUDE.md
 progress:
   total_phases: 5
   completed_phases: 3
@@ -118,6 +118,7 @@ None yet.
 | 260401-dm7 | Remove footer from all pages except landing and legal | 2026-04-01 | — | [260401-dm7-remove-footer-from-all-pages-except-land](./quick/260401-dm7-remove-footer-from-all-pages-except-land/) |
 | 260401-f1l | WordPress media library migration script | 2026-04-01 | d64f9b9, cb51c1a | [260401-f1l-wordpress-media-library-migration-script](./quick/260401-f1l-wordpress-media-library-migration-script/) |
 | 260401-hg8 | Fix Vercel build: 4 module-not-found errors | 2026-04-01 | 61a2c5e | [260401-hg8-fix-vercel-build-resolve-4-module-not-fo](./quick/260401-hg8-fix-vercel-build-resolve-4-module-not-fo/) |
+| 260401-hk4 | Add milestone branching rules to CLAUDE.md | 2026-04-01 | 046ed9c | [260401-hk4-add-milestone-branching-rules-to-claude-](./quick/260401-hk4-add-milestone-branching-rules-to-claude-/) |
 
 ## Session Continuity
 
