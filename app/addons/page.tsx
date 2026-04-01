@@ -160,13 +160,6 @@ export default async function AddonsPage() {
         subtitle="Enhance your GOYA profile with verified designation badges, continuing education credits, and more."
       />
 
-      {/* School Registration Banner — teachers without a school */}
-      {(role === 'teacher' || role === 'admin') && !isSchoolOwner && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-          <SchoolRegistrationCTA variant="banner" />
-        </div>
-      )}
-
       {/* Toolbar */}
       <div className="border-b border-slate-200 bg-white sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -199,6 +192,13 @@ export default async function AddonsPage() {
           </div>
         )}
       </div>
+
+      {/* School Registration Banner — teachers without a school */}
+      {(role === 'teacher' || role === 'admin') && !isSchoolOwner && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+          <SchoolRegistrationCTA variant="banner" />
+        </div>
+      )}
     </div>
   )
 }

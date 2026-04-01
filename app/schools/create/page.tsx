@@ -27,7 +27,7 @@ export default async function SchoolCreatePage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || profile.role !== 'teacher') {
+  if (!profile || (profile.role !== 'teacher' && profile.role !== 'admin')) {
     redirect('/dashboard')
   }
 
