@@ -517,11 +517,15 @@ export async function deleteFolder(
 
   const fileCount = count ?? 0;
 
-  if (fileCount > 0 && !force) {
+  // When force=false, ALWAYS return without deleting — just report the file count.
+  // This allows the UI to always show a confirmation dialog, regardless of file count.
+  if (!force) {
     return {
       success: false,
       fileCount,
-      warning: `This folder contains ${fileCount} file${fileCount === 1 ? '' : 's'}. Deleting it will not remove the files — they will become unfoldered.`,
+      warning: fileCount > 0
+        ? `This folder contains ${fileCount} file${fileCount === 1 ? '' : 's'}. Deleting it will not remove the files — they will become unfoldered.`
+        : 'This action cannot be undone.',
     };
   }
 

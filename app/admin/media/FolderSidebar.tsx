@@ -348,21 +348,12 @@ export default function FolderSidebar({
     setDeleteTarget(folder);
     setDeleteForce(false);
 
-    // Pre-fetch file count — call with force=false just to get the count
+    // Pre-fetch file count — force=false ALWAYS returns without deleting (just returns count).
+    // Always show the confirmation dialog regardless of file count.
     const result = await deleteFolder(folder.id, false);
-    if (!result.success && result.fileCount !== undefined) {
-      setDeleteFileCount(result.fileCount);
-    } else {
-      // Either success (0 files) or an error — show count as 0
-      setDeleteFileCount(result.fileCount ?? 0);
-      if (result.success) {
-        // folder had 0 files and was already deleted — unlikely path, but handle it
-        onFoldersChange(folders.filter(f => f.id !== folder.id));
-        setDeleteTarget(null);
-        return;
-      }
-    }
-  }, [folders, onFoldersChange]);
+    setDeleteFileCount(result.fileCount ?? 0);
+    // deleteTarget is already set above; dialog renders via {deleteTarget && ...}
+  }, []);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deleteTarget) return;
