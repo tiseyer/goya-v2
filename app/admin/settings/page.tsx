@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import HealthTab from './components/HealthTab';
 import MaintenanceTab from './components/MaintenanceTab';
 import DeploymentsSection from '../dashboard/DeploymentsSection';
+import DangerZone from './components/DangerZone';
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
 
@@ -126,16 +127,7 @@ function GeneralTab() {
 
       <DeployEnvironmentCard />
 
-      <div className="rounded-xl border-2 border-red-200 overflow-hidden">
-        <div className="px-6 py-4 bg-red-50 border-b border-red-200">
-          <h2 className="text-base font-semibold text-red-700">Danger Zone</h2>
-        </div>
-        <div className="px-6 py-5 bg-white">
-          <p className="text-sm text-[#374151]">
-            Database operations, cache clearing, and other destructive actions will be available here.
-          </p>
-        </div>
-      </div>
+      <DangerZone />
     </div>
   );
 }

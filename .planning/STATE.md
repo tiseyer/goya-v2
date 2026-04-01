@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-01)
 Phase: 40 (Wire Lessons to Frontend) — COMPLETE
 Plan: 3 of 3
 Status: Plan 03 complete — member my-courses lesson management with LessonList reuse and stale column fixes
-Last activity: 2026-04-01 - Completed quick task 260401-maf: Refactor maintenance tab into grouped content boxes
+Last activity: 2026-04-01 - Completed quick task 260401-mib: Danger zone with cache clear and session invalidation
 
 Progress: [███░░░░░░░] 33%
 
@@ -127,9 +127,10 @@ None yet.
 | 260401-lv2 | Admin subscriptions page with filters, table, and sidebar nav | 2026-04-01 | fec21bc, 0924b1d, c6e612f | [260401-lv2-admin-subscriptions-page-with-filters-ta](./quick/260401-lv2-admin-subscriptions-page-with-filters-ta/) |
 | 260401-m3q | Admin subscriptions table refinements (links, formatting, badges) | 2026-04-01 | 16d13d0, 7c370f9 | [260401-m3q-admin-subscriptions-page-with-filters-an](./quick/260401-m3q-admin-subscriptions-page-with-filters-an/) |
 | 260401-maf | Refactor maintenance tab into grouped content boxes | 2026-04-01 | d33483d | [260401-maf-refactor-maintenance-tab-into-grouped-co](./quick/260401-maf-refactor-maintenance-tab-into-grouped-co/) |
+| 260401-mib | Danger zone with cache clear and session invalidation | 2026-04-01 | — | [260401-mib-danger-zone-with-cache-clear-and-session](./quick/260401-mib-danger-zone-with-cache-clear-and-session/) |
 
 ## Session Continuity
 
-Last session: 2026-04-01T09:02:54.910Z
-Stopped at: Completed quick task 260401-maf: Refactor maintenance tab into grouped content boxes
+Last session: 2026-04-01T09:12:22.315Z
+Stopped at: Completed quick task 260401-mib: Danger zone with cache clear and session invalidation
 Resume file: None
