@@ -253,7 +253,7 @@ Plans:
 | 34. Public School Profile | 2/2 | Complete | 2026-03-31 |
 | 35. Faculty Invitations | 1/1 | Complete | 2026-03-31 |
 | 36. Database Migrations | 3/3 | Complete    | 2026-04-01 |
-| 37. Admin Courses — Tabs + Categories | 2/2 | Complete   | 2026-04-01 |
+| 37. Admin Courses — Tabs + Categories | 2/2 | Complete    | 2026-04-01 |
 | 38. Course Creation Form — UI Redesign | 0/? | Not started | - |
 | 39. Lesson Management — UI + Logic | 0/? | Not started | - |
 | 40. Wire Lessons to Frontend | 0/? | Not started | - |
