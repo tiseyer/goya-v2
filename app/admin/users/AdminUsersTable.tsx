@@ -144,10 +144,17 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-[#00B5A3] flex items-center justify-center text-white text-[10px] font-black shrink-0 overflow-hidden">
+                      <div className="group/avatar relative w-8 h-8 rounded-full bg-[#00B5A3] flex items-center justify-center text-white text-[10px] font-black shrink-0 overflow-hidden">
                         {user.avatar_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                          <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                            {/* Hover preview */}
+                            <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[120px] h-[120px] rounded-xl overflow-hidden shadow-xl border border-slate-200 bg-white opacity-0 scale-95 transition-all duration-200 group-hover/avatar:opacity-100 group-hover/avatar:scale-100 z-50">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                            </div>
+                          </>
                         ) : (
                           getInitials(user.full_name, user.email)
                         )}

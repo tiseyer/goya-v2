@@ -54,7 +54,7 @@ export default function NotFound() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-gradient-to-b from-primary-50 via-white to-primary-50/30">
+    <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-background">
       <div className="text-center max-w-xl">
         {/* Lotus illustration */}
         <div className="flex justify-center mb-2">
@@ -62,17 +62,17 @@ export default function NotFound() {
         </div>
 
         {/* 404 number */}
-        <h1 className="text-8xl sm:text-9xl font-bold tracking-tighter text-primary-200 select-none leading-none mb-6">
+        <h1 className="text-8xl sm:text-9xl font-bold tracking-tighter text-primary/20 select-none leading-none mb-6">
           404
         </h1>
 
         {/* Headline */}
-        <p className="text-lg sm:text-xl text-primary-dark font-medium leading-relaxed mb-3 min-h-[3.5rem] italic">
+        <p className="text-lg sm:text-xl text-foreground font-medium leading-relaxed mb-3 min-h-[3.5rem] italic">
           &ldquo;{headline}&rdquo;
         </p>
 
         {/* Subtitle */}
-        <p className="text-sm text-primary-light/80 mb-10">
+        <p className="text-sm text-foreground-secondary mb-10">
           Let&apos;s guide you back to your practice.
         </p>
 

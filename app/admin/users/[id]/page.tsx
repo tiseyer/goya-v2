@@ -31,8 +31,9 @@ export default async function AdminUserDetailPage({
 
   const currentUserIsAdmin = adminProfile?.role === 'admin';
 
-  // Fetch the target user's profile
-  const { data: profile } = await supabase
+  // Fetch the target user's profile (service role bypasses RLS for reliable admin access)
+  const serviceClient = getSupabaseService();
+  const { data: profile } = await serviceClient
     .from('profiles')
     .select('id, email, full_name, first_name, last_name, username, role, member_type, subscription_status, is_verified, verification_status, onboarding_completed, created_at, avatar_url, mrn, last_login_at, wp_user_id, wp_roles')
     .eq('id', id)
