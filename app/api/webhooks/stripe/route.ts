@@ -25,24 +25,32 @@ export async function POST(request: Request) {
     )
   }
 
-  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+  // Try both Live and Sandbox webhook secrets — use whichever verifies
+  const secrets = [
+    process.env.STRIPE_WEBHOOK_SECRET,
+    process.env.STRIPE_WEBHOOK_SECRET_SANDBOX,
+  ].filter(Boolean) as string[]
+
+  if (secrets.length === 0) {
     return NextResponse.json(
-      { error: 'STRIPE_WEBHOOK_SECRET not configured' },
+      { error: 'No Stripe webhook secrets configured' },
       { status: 500 }
     )
   }
 
-  let event: Stripe.Event
-  try {
-    event = getStripe().webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET
-    )
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
+  let event: Stripe.Event | null = null
+  for (const secret of secrets) {
+    try {
+      event = getStripe().webhooks.constructEvent(body, signature, secret)
+      break
+    } catch {
+      // Try next secret
+    }
+  }
+
+  if (!event) {
     return NextResponse.json(
-      { error: `Webhook signature verification failed: ${message}` },
+      { error: 'Webhook signature verification failed against all configured secrets' },
       { status: 400 }
     )
   }
