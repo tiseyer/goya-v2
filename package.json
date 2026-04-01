@@ -11,6 +11,7 @@
     "prebuild": "tsx scripts/generate-docs-index.ts",
     "media:backfill": "tsx scripts/backfill-media-items.ts",
     "avatars:migrate": "tsx scripts/migrate-wp-avatars.ts",
+    "media:migrate-wp": "tsx scripts/migrate-wp-media.ts",
     "buckets:ensure": "tsx scripts/ensure-buckets.ts"
   },
   "dependencies": {
