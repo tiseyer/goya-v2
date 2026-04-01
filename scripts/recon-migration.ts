@@ -4,6 +4,8 @@
  * Collects data from WooCommerce API + Stripe Live API, cross-references with
  * Supabase profiles, and categorizes every user into migration groups A/B/C/D.
  *
+ * Supports resume: if interrupted, re-run and it will pick up where it left off.
+ *
  * Usage: npm run migration:recon
  *
  * Required env vars:
@@ -14,7 +16,8 @@
 
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
-import { mkdirSync, writeFileSync } from 'fs'
+import { mkdirSync, writeFileSync, readFileSync, existsSync, unlinkSync } from 'fs'
+import * as readline from 'readline'
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -24,6 +27,8 @@ const WOO_SECRET = process.env.WOO_CONSUMER_SECRET
 const STRIPE_LIVE_KEY = process.env.STRIPE_SECRET_KEY_LIVE
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+const PROGRESS_FILE = '.migration-state/progress.json'
 
 function requireEnv(name: string, value: string | undefined): string {
   if (!value) { console.error(`Missing env var: ${name}`); process.exit(1) }
@@ -104,6 +109,74 @@ interface StagingRow {
   migration_notes: string
 }
 
+interface Progress {
+  lastProcessedSubscriptionId: number
+  processedCount: number
+  totalCount: number
+  startedAt: string
+  updatedAt: string
+}
+
+// ─── Progress & Resume ───────────────────────────────────────────────────────
+
+function loadProgress(): Progress | null {
+  if (!existsSync(PROGRESS_FILE)) return null
+  try {
+    return JSON.parse(readFileSync(PROGRESS_FILE, 'utf-8')) as Progress
+  } catch {
+    return null
+  }
+}
+
+function saveProgress(progress: Progress): void {
+  mkdirSync('.migration-state', { recursive: true })
+  writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2))
+}
+
+function clearProgress(): void {
+  if (existsSync(PROGRESS_FILE)) unlinkSync(PROGRESS_FILE)
+}
+
+function askQuestion(question: string): Promise<string> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+  return new Promise(resolve => {
+    rl.question(question, answer => {
+      rl.close()
+      resolve(answer.trim().toLowerCase())
+    })
+  })
+}
+
+function formatElapsed(ms: number): string {
+  const totalSec = Math.floor(ms / 1000)
+  const m = Math.floor(totalSec / 60)
+  const s = totalSec % 60
+  return `${m}m ${s.toString().padStart(2, '0')}s`
+}
+
+// ─── Chunked Supabase Write ──────────────────────────────────────────────────
+
+async function upsertChunk(rows: StagingRow[]): Promise<void> {
+  const { error } = await supabase.from('migration_staging').upsert(
+    rows.map(r => ({
+      email: r.email,
+      woo_customer_id: r.woo_customer_id,
+      supabase_profile_id: r.supabase_profile_id,
+      stripe_customer_id: r.stripe_customer_id,
+      stripe_subscription_id: r.stripe_subscription_id,
+      stripe_subscription_status: r.stripe_subscription_status,
+      woo_subscription_status: r.woo_subscription_status,
+      woo_subscription_total: r.woo_subscription_total,
+      wp_roles: r.wp_roles,
+      migration_group: r.migration_group,
+      migration_notes: r.migration_notes,
+      updated_at: new Date().toISOString(),
+    })),
+    { onConflict: 'email' },
+  )
+  if (error) console.error(`  Upsert error: ${error.message}`)
+}
+
 // ─── Step 1: WooCommerce (subscription-first) ───────────────────────────────
 
 async function fetchWooPage<T>(endpoint: string, page: number): Promise<T[]> {
@@ -139,95 +212,77 @@ interface WooSubscriptionWithCustomer extends WooSubscription {
   customer_id: number
 }
 
-async function fetchWooCustomers(): Promise<CustomerRecord[]> {
-  console.log('Step 1: Fetching ALL WooCommerce subscriptions (subscription-first strategy)...')
+function categorizeCustomer(
+  cust: CustomerRecord,
+  stripeData: { byEmail: Map<string, StripeData>; byCustomerId: Map<string, StripeData> },
+  profileByEmail: Map<string, string>,
+): StagingRow | null {
+  if (!cust.email) return null
 
-  // Fetch all subscriptions across all statuses
-  const statuses = ['active', 'cancelled', 'expired', 'on-hold', 'pending']
-  const allSubs: WooSubscriptionWithCustomer[] = []
+  const supabaseId = profileByEmail.get(cust.email) ?? null
+  const isFake = cust.wp_roles.some(r => /faux|robot/i.test(r))
 
-  for (const status of statuses) {
-    const subs = await fetchAllWooPages<WooSubscriptionWithCustomer>(`/subscriptions?status=${status}`)
-    console.log(`  ${status}: ${subs.length} subscriptions`)
-    allSubs.push(...subs)
+  const bestSub = cust.subscriptions
+    .sort((a, b) => {
+      if (a.status === 'active' && b.status !== 'active') return -1
+      if (b.status === 'active' && a.status !== 'active') return 1
+      return new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
+    })[0] ?? null
+
+  let stripeMatch: StripeData | null = null
+  let matchSource = ''
+
+  if (bestSub?.stripe_customer_id) {
+    stripeMatch = stripeData.byCustomerId.get(bestSub.stripe_customer_id) ?? null
+    if (stripeMatch) matchSource = 'woo_meta'
   }
-  console.log(`  Total subscriptions fetched: ${allSubs.length}`)
 
-  // Group subscriptions by customer_id
-  const subsByCustomer = new Map<number, WooSubscriptionWithCustomer[]>()
-  for (const sub of allSubs) {
-    if (!sub.customer_id) continue
-    const existing = subsByCustomer.get(sub.customer_id)
-    if (existing) {
-      existing.push(sub)
+  if (!stripeMatch) {
+    stripeMatch = stripeData.byEmail.get(cust.email) ?? null
+    if (stripeMatch) matchSource = 'email_lookup'
+  }
+
+  const stripeActiveSub = stripeMatch?.subscriptions.find(s => s.status === 'active')
+  const stripeAnySub = stripeMatch?.subscriptions[0]
+
+  let group: MigrationGroup
+  let notes = ''
+
+  if (isFake || (bestSub && bestSub.total === 0 && !bestSub.stripe_customer_id)) {
+    group = 'B'
+    notes = `Fake/test user. Roles: ${cust.wp_roles.join(', ')}`
+  } else if (stripeMatch) {
+    group = 'A'
+    notes = `Stripe match via ${matchSource}. Customer: ${stripeMatch.customer_id}`
+  } else if (bestSub && bestSub.total > 0) {
+    if (bestSub.status === 'active' || bestSub.status === 'on-hold' || bestSub.status === 'pending') {
+      group = 'C'
+      notes = `Real sub (${bestSub.status}, $${bestSub.total}) but no Stripe ID or email match`
     } else {
-      subsByCustomer.set(sub.customer_id, [sub])
+      group = 'D'
+      notes = `Former member. Sub status: ${bestSub.status}, total: $${bestSub.total}`
     }
-  }
-  console.log(`  Unique customers from subscriptions: ${subsByCustomer.size}`)
-
-  // Fetch customer details with caching
-  const customerCache = new Map<number, WooCustomer>()
-  const records: CustomerRecord[] = []
-  let fetched = 0
-  const totalCustomers = subsByCustomer.size
-
-  for (const [customerId, subs] of subsByCustomer) {
-    fetched++
-    if (fetched % 100 === 0) console.log(`  Fetching customer details: ${fetched}/${totalCustomers}`)
-
-    let customer: WooCustomer | null = customerCache.get(customerId) ?? null
-
-    if (!customer) {
-      try {
-        const url = `${WOO_BASE}/customers/${customerId}`
-        const auth = Buffer.from(`${wooKey}:${wooSecret}`).toString('base64')
-        const response = await fetch(url, { headers: { Authorization: `Basic ${auth}` } })
-        if (response.ok) {
-          customer = await response.json() as WooCustomer
-          customerCache.set(customerId, customer)
-        } else {
-          console.warn(`  Failed to fetch customer ${customerId}: ${response.status}`)
-        }
-      } catch (err) {
-        console.warn(`  Failed to fetch customer ${customerId}: ${err instanceof Error ? err.message : 'unknown'}`)
-      }
-      await sleep(200)
-    }
-
-    // Extract roles
-    const wp_roles: string[] = []
-    if (customer) {
-      if (customer.role) wp_roles.push(customer.role)
-      const rolesFromMeta = getMetaValue(customer.meta_data, 'wp_capabilities')
-      if (rolesFromMeta) {
-        try {
-          const parsed = JSON.parse(rolesFromMeta)
-          if (typeof parsed === 'object') wp_roles.push(...Object.keys(parsed))
-        } catch { /* ignore */ }
-      }
-    }
-
-    const email = customer?.email?.toLowerCase().trim() ?? ''
-
-    records.push({
-      woo_customer_id: customerId,
-      email,
-      wp_roles: [...new Set(wp_roles.filter(Boolean))],
-      subscriptions: subs.map(s => ({
-        id: s.id,
-        status: s.status,
-        total: parseFloat(s.total) || 0,
-        stripe_customer_id: getMetaValue(s.meta_data, '_stripe_customer_id'),
-        stripe_subscription_id: getMetaValue(s.meta_data, '_stripe_subscription_id'),
-        start_date: s.date_created,
-        end_date: s.date_end,
-      })),
-    })
+  } else if (bestSub && (bestSub.status === 'cancelled' || bestSub.status === 'expired')) {
+    group = 'D'
+    notes = `Former member. Sub status: ${bestSub.status}`
+  } else {
+    group = 'D'
+    notes = 'No WooCommerce subscription found'
   }
 
-  console.log(`  Processed ${records.length} customers from ${allSubs.length} subscriptions`)
-  return records
+  return {
+    email: cust.email,
+    woo_customer_id: cust.woo_customer_id,
+    supabase_profile_id: supabaseId,
+    stripe_customer_id: stripeMatch?.customer_id ?? null,
+    stripe_subscription_id: stripeActiveSub?.id ?? stripeAnySub?.id ?? null,
+    stripe_subscription_status: stripeActiveSub?.status ?? stripeAnySub?.status ?? null,
+    woo_subscription_status: bestSub?.status ?? null,
+    woo_subscription_total: bestSub?.total ?? null,
+    wp_roles: cust.wp_roles,
+    migration_group: group,
+    migration_notes: notes,
+  }
 }
 
 // ─── Step 2: Stripe Live ──────────────────────────────────────────────────────
@@ -241,7 +296,6 @@ async function fetchStripeLiveData(): Promise<{
   const byEmail = new Map<string, StripeData>()
   const byCustomerId = new Map<string, StripeData>()
 
-  // Fetch all customers
   let customerCount = 0
   for await (const customer of stripe.customers.list({ limit: 100 })) {
     customerCount++
@@ -255,7 +309,6 @@ async function fetchStripeLiveData(): Promise<{
   }
   console.log(`  Found ${customerCount} Stripe customers`)
 
-  // Fetch all subscriptions and attach to customers
   let subCount = 0
   for await (const sub of stripe.subscriptions.list({ limit: 100, status: 'all' })) {
     subCount++
@@ -272,142 +325,6 @@ async function fetchStripeLiveData(): Promise<{
   console.log(`  Found ${subCount} Stripe subscriptions`)
 
   return { byEmail, byCustomerId }
-}
-
-// ─── Step 3 & 4: Cross-reference and categorize ──────────────────────────────
-
-async function crossReferenceAndCategorize(
-  wooCustomers: CustomerRecord[],
-  stripeData: { byEmail: Map<string, StripeData>; byCustomerId: Map<string, StripeData> },
-): Promise<StagingRow[]> {
-  console.log('Step 3: Cross-referencing with Supabase profiles...')
-
-  // Fetch all Supabase profiles for email matching
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('id, email')
-
-  const profileByEmail = new Map<string, string>()
-  for (const p of profiles ?? []) {
-    if (p.email) profileByEmail.set(p.email.toLowerCase().trim(), p.id)
-  }
-  console.log(`  Found ${profileByEmail.size} Supabase profiles`)
-
-  console.log('Step 4: Categorizing users...')
-  const rows: StagingRow[] = []
-
-  for (const cust of wooCustomers) {
-    if (!cust.email) continue
-
-    const supabaseId = profileByEmail.get(cust.email) ?? null
-    const isFake = cust.wp_roles.some(r => /faux|robot/i.test(r))
-
-    // Find best subscription (prefer active, then most recent)
-    const bestSub = cust.subscriptions
-      .sort((a, b) => {
-        if (a.status === 'active' && b.status !== 'active') return -1
-        if (b.status === 'active' && a.status !== 'active') return 1
-        return new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
-      })[0] ?? null
-
-    // Find Stripe data
-    let stripeMatch: StripeData | null = null
-    let matchSource = ''
-
-    // Try WooCommerce subscription metadata first
-    if (bestSub?.stripe_customer_id) {
-      stripeMatch = stripeData.byCustomerId.get(bestSub.stripe_customer_id) ?? null
-      if (stripeMatch) matchSource = 'woo_meta'
-    }
-
-    // Fallback: email lookup
-    if (!stripeMatch) {
-      stripeMatch = stripeData.byEmail.get(cust.email) ?? null
-      if (stripeMatch) matchSource = 'email_lookup'
-    }
-
-    const stripeActiveSub = stripeMatch?.subscriptions.find(s => s.status === 'active')
-    const stripeAnySub = stripeMatch?.subscriptions[0]
-
-    // Categorize
-    let group: MigrationGroup
-    let notes = ''
-
-    if (isFake || (bestSub && bestSub.total === 0 && !bestSub.stripe_customer_id)) {
-      group = 'B'
-      notes = `Fake/test user. Roles: ${cust.wp_roles.join(', ')}`
-    } else if (stripeMatch) {
-      group = 'A'
-      notes = `Stripe match via ${matchSource}. Customer: ${stripeMatch.customer_id}`
-    } else if (bestSub && bestSub.total > 0) {
-      // Has a real paid subscription but no Stripe match
-      if (bestSub.status === 'active' || bestSub.status === 'on-hold' || bestSub.status === 'pending') {
-        group = 'C'
-        notes = `Real sub (${bestSub.status}, $${bestSub.total}) but no Stripe ID or email match`
-      } else {
-        group = 'D'
-        notes = `Former member. Sub status: ${bestSub.status}, total: $${bestSub.total}`
-      }
-    } else if (bestSub && (bestSub.status === 'cancelled' || bestSub.status === 'expired')) {
-      group = 'D'
-      notes = `Former member. Sub status: ${bestSub.status}`
-    } else {
-      // No subscription at all — treat as former/inactive
-      group = 'D'
-      notes = 'No WooCommerce subscription found'
-    }
-
-    rows.push({
-      email: cust.email,
-      woo_customer_id: cust.woo_customer_id,
-      supabase_profile_id: supabaseId,
-      stripe_customer_id: stripeMatch?.customer_id ?? null,
-      stripe_subscription_id: stripeActiveSub?.id ?? stripeAnySub?.id ?? null,
-      stripe_subscription_status: stripeActiveSub?.status ?? stripeAnySub?.status ?? null,
-      woo_subscription_status: bestSub?.status ?? null,
-      woo_subscription_total: bestSub?.total ?? null,
-      wp_roles: cust.wp_roles,
-      migration_group: group,
-      migration_notes: notes,
-    })
-  }
-
-  return rows
-}
-
-// ─── Step 5: Store in Supabase ────────────────────────────────────────────────
-
-async function storeResults(rows: StagingRow[]): Promise<void> {
-  console.log(`Step 5: Storing ${rows.length} rows in migration_staging...`)
-
-  // Clear existing data for fresh run
-  await supabase.from('migration_staging').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-
-  // Batch upsert in chunks of 50
-  const chunkSize = 50
-  for (let i = 0; i < rows.length; i += chunkSize) {
-    const chunk = rows.slice(i, i + chunkSize)
-    const { error } = await supabase.from('migration_staging').upsert(
-      chunk.map(r => ({
-        email: r.email,
-        woo_customer_id: r.woo_customer_id,
-        supabase_profile_id: r.supabase_profile_id,
-        stripe_customer_id: r.stripe_customer_id,
-        stripe_subscription_id: r.stripe_subscription_id,
-        stripe_subscription_status: r.stripe_subscription_status,
-        woo_subscription_status: r.woo_subscription_status,
-        woo_subscription_total: r.woo_subscription_total,
-        wp_roles: r.wp_roles,
-        migration_group: r.migration_group,
-        migration_notes: r.migration_notes,
-        updated_at: new Date().toISOString(),
-      })),
-      { onConflict: 'email' },
-    )
-    if (error) console.error(`  Upsert error at chunk ${i}:`, error.message)
-  }
-
-  console.log('  Done')
 }
 
 // ─── Step 6: Report ───────────────────────────────────────────────────────────
@@ -466,19 +383,216 @@ async function main() {
   console.log('=== MIGRATION RECON SCRIPT ===\n')
   console.log('Mode: READ ONLY (Stripe + WooCommerce), write to migration_staging only\n')
 
-  const wooCustomers = await fetchWooCustomers()
+  mkdirSync('.migration-state', { recursive: true })
+
+  // ── Check for resume ──
+  let resumeFromId: number | null = null
+  let resumeProcessedCount = 0
+  const existingProgress = loadProgress()
+
+  if (existingProgress) {
+    const answer = await askQuestion(
+      `Resume from subscription #${existingProgress.processedCount}/${existingProgress.totalCount}? (y/n) `,
+    )
+    if (answer === 'y' || answer === 'yes') {
+      resumeFromId = existingProgress.lastProcessedSubscriptionId
+      resumeProcessedCount = existingProgress.processedCount
+      console.log(`  Resuming from after subscription ID ${resumeFromId} (${resumeProcessedCount} already processed)\n`)
+    } else {
+      console.log('  Starting fresh run...\n')
+      clearProgress()
+      // Clear existing staging data for fresh run
+      await supabase.from('migration_staging').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    }
+  } else {
+    // Fresh run — clear staging
+    await supabase.from('migration_staging').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+  }
+
+  // ── Step 1: Fetch all subscriptions ──
+  console.log('Step 1: Fetching ALL WooCommerce subscriptions (subscription-first strategy)...')
+
+  const statuses = ['active', 'cancelled', 'expired', 'on-hold', 'pending']
+  const allSubs: WooSubscriptionWithCustomer[] = []
+
+  for (const status of statuses) {
+    const subs = await fetchAllWooPages<WooSubscriptionWithCustomer>(`/subscriptions?status=${status}`)
+    console.log(`  ${status}: ${subs.length} subscriptions`)
+    allSubs.push(...subs)
+  }
+  console.log(`  Total subscriptions fetched: ${allSubs.length}`)
+
+  // Group subscriptions by customer_id
+  const subsByCustomer = new Map<number, WooSubscriptionWithCustomer[]>()
+  for (const sub of allSubs) {
+    if (!sub.customer_id) continue
+    const existing = subsByCustomer.get(sub.customer_id)
+    if (existing) {
+      existing.push(sub)
+    } else {
+      subsByCustomer.set(sub.customer_id, [sub])
+    }
+  }
+
+  const totalCustomers = subsByCustomer.size
+  console.log(`  Unique customers from subscriptions: ${totalCustomers}`)
+
+  // ── Step 2: Stripe ──
   const stripeData = await fetchStripeLiveData()
-  const rows = await crossReferenceAndCategorize(wooCustomers, stripeData)
-  await storeResults(rows)
 
-  const report = generateReport(rows)
+  // ── Step 3: Fetch Supabase profiles ──
+  console.log('Step 3: Cross-referencing with Supabase profiles...')
+  const { data: profiles } = await supabase.from('profiles').select('id, email')
+  const profileByEmail = new Map<string, string>()
+  for (const p of profiles ?? []) {
+    if (p.email) profileByEmail.set(p.email.toLowerCase().trim(), p.id)
+  }
+  console.log(`  Found ${profileByEmail.size} Supabase profiles`)
 
-  // Print to console
+  // ── Step 4: Process each customer, categorize, and write in chunks ──
+  console.log('Step 4: Processing customers, categorizing, and writing to Supabase...')
+
+  // Build ordered list of customer entries to process
+  const customerEntries = [...subsByCustomer.entries()]
+
+  // If resuming, find where to continue
+  let startIndex = 0
+  if (resumeFromId !== null) {
+    // Find the last processed subscription's customer and skip past it
+    const processedCustomerIds = new Set<number>()
+    for (const sub of allSubs) {
+      if (sub.id === resumeFromId) break
+      if (sub.customer_id) processedCustomerIds.add(sub.customer_id)
+    }
+    // Also add the customer that owns the last processed subscription
+    const lastSub = allSubs.find(s => s.id === resumeFromId)
+    if (lastSub) processedCustomerIds.add(lastSub.customer_id)
+
+    startIndex = 0
+    for (let i = 0; i < customerEntries.length; i++) {
+      if (!processedCustomerIds.has(customerEntries[i][0])) {
+        startIndex = i
+        break
+      }
+      startIndex = i + 1
+    }
+    console.log(`  Skipping ${startIndex} already-processed customers`)
+  }
+
+  const customerCache = new Map<number, WooCustomer>()
+  const allRows: StagingRow[] = []
+  const pendingChunk: StagingRow[] = []
+  let processedCount = resumeProcessedCount
+  const startTime = existingProgress?.startedAt
+    ? new Date(existingProgress.startedAt).getTime()
+    : Date.now()
+  let lastSubId = resumeFromId ?? 0
+
+  for (let i = startIndex; i < customerEntries.length; i++) {
+    const [customerId, subs] = customerEntries[i]
+
+    // Fetch customer details
+    let customer: WooCustomer | null = customerCache.get(customerId) ?? null
+    if (!customer) {
+      try {
+        const url = `${WOO_BASE}/customers/${customerId}`
+        const auth = Buffer.from(`${wooKey}:${wooSecret}`).toString('base64')
+        const response = await fetch(url, { headers: { Authorization: `Basic ${auth}` } })
+        if (response.ok) {
+          customer = await response.json() as WooCustomer
+          customerCache.set(customerId, customer)
+        } else {
+          console.warn(`  Failed to fetch customer ${customerId}: ${response.status}`)
+        }
+      } catch (err) {
+        console.warn(`  Failed to fetch customer ${customerId}: ${err instanceof Error ? err.message : 'unknown'}`)
+      }
+      await sleep(200)
+    }
+
+    // Extract roles
+    const wp_roles: string[] = []
+    if (customer) {
+      if (customer.role) wp_roles.push(customer.role)
+      const rolesFromMeta = getMetaValue(customer.meta_data, 'wp_capabilities')
+      if (rolesFromMeta) {
+        try {
+          const parsed = JSON.parse(rolesFromMeta)
+          if (typeof parsed === 'object') wp_roles.push(...Object.keys(parsed))
+        } catch { /* ignore */ }
+      }
+    }
+
+    const email = customer?.email?.toLowerCase().trim() ?? ''
+
+    const record: CustomerRecord = {
+      woo_customer_id: customerId,
+      email,
+      wp_roles: [...new Set(wp_roles.filter(Boolean))],
+      subscriptions: subs.map(s => ({
+        id: s.id,
+        status: s.status,
+        total: parseFloat(s.total) || 0,
+        stripe_customer_id: getMetaValue(s.meta_data, '_stripe_customer_id'),
+        stripe_subscription_id: getMetaValue(s.meta_data, '_stripe_subscription_id'),
+        start_date: s.date_created,
+        end_date: s.date_end,
+      })),
+    }
+
+    const row = categorizeCustomer(record, stripeData, profileByEmail)
+    if (row) {
+      allRows.push(row)
+      pendingChunk.push(row)
+    }
+
+    // Track last subscription ID for progress
+    const maxSubId = Math.max(...subs.map(s => s.id))
+    if (maxSubId > lastSubId) lastSubId = maxSubId
+    processedCount++
+
+    // Write chunk to Supabase every 50 rows
+    if (pendingChunk.length >= 50) {
+      await upsertChunk(pendingChunk)
+      pendingChunk.length = 0
+    }
+
+    // Save progress after each customer
+    saveProgress({
+      lastProcessedSubscriptionId: lastSubId,
+      processedCount,
+      totalCount: totalCustomers,
+      startedAt: new Date(startTime).toISOString(),
+      updatedAt: new Date().toISOString(),
+    })
+
+    // Progress output every 25 customers
+    if (processedCount % 25 === 0) {
+      const elapsed = Date.now() - startTime
+      const pct = ((processedCount / totalCustomers) * 100).toFixed(1)
+      const rate = processedCount / (elapsed / 1000)
+      const remaining = (totalCustomers - processedCount) / rate
+      console.log(
+        `  Progress: ${processedCount}/${totalCustomers} subscriptions (${pct}%) — elapsed: ${formatElapsed(elapsed)} — est. remaining: ${formatElapsed(remaining * 1000)}`,
+      )
+    }
+  }
+
+  // Flush remaining chunk
+  if (pendingChunk.length > 0) {
+    await upsertChunk(pendingChunk)
+  }
+
+  console.log(`  Processed ${processedCount} customers from ${allSubs.length} subscriptions`)
+
+  // Clear progress file on successful completion
+  clearProgress()
+
+  // ── Step 6: Report ──
+  const report = generateReport(allRows)
   console.log('\n' + report)
 
-  // Save to file
   const date = new Date().toISOString().slice(0, 10)
-  mkdirSync('.migration-state', { recursive: true })
   writeFileSync(`.migration-state/recon-report-${date}.md`, report)
   console.log(`Report saved to .migration-state/recon-report-${date}.md`)
 
