@@ -252,7 +252,7 @@ Plans:
 
 </details>
 
-### 🚧 v1.16 Admin Color Settings (In Progress)
+### v1.16 Admin Color Settings (In Progress)
 
 **Milestone Goal:** Admin-controlled color configuration system — brand colors, role colors, and maintenance indicator — stored in site_settings and injected globally via CSS variables.
 
@@ -285,9 +285,9 @@ Plans:
   3. Changing any color updates the CSS variables on the page instantly so the admin can see how the color looks before saving
   4. Clicking "Save" persists all current color values to site_settings; clicking the per-color reset icon restores that single color to its default value
   5. Clicking "Reset All" restores every color across all three sections to its default value
-**Plans**: 1 plan
+**Plans:** 1 plan
 Plans:
-- [ ] 41-01-PLAN.md — ThemeColorProvider server component, color defaults/types, layout.tsx integration
+- [ ] 42-01-PLAN.md — ColorsTab component with color pickers, live preview, save/reset + settings page tab + sidebar entry
 **UI hint**: yes
 
 ## Progress
@@ -310,4 +310,4 @@ Plans:
 | 39. Lesson Management — UI + Logic | 2/2 | Complete | 2026-04-01 |
 | 40. Wire Lessons to Frontend | 3/3 | Complete | 2026-04-01 |
 | 41. ThemeProvider Infrastructure | 1/1 | Complete | 2026-04-01 |
-| 42. Admin Colors UI | 0/TBD | Not started | - |
+| 42. Admin Colors UI | 0/1 | Not started | - |
