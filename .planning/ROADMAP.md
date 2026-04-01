@@ -155,15 +155,15 @@ Plans:
 
 </details>
 
-### v1.15 Course System Redesign (In Progress)
+### ✅ v1.15 Course System Redesign (Shipped: 2026-04-01)
 
 **Milestone Goal:** Redesign admin course management with categories table, multi-lesson support, drag-and-drop ordering, platform-aware video fields, and modern SaaS UI.
 
 - [x] **Phase 36: Database Migrations** - Create course_categories and lessons tables, migrate courses schema, RLS policies, TypeScript types (completed 2026-04-01)
 - [x] **Phase 37: Admin Courses — Tabs + Categories** - Courses/Categories tab bar, category table, CRUD modal, delete guard (completed 2026-04-01)
 - [x] **Phase 38: Course Creation Form — UI Redesign** - Card-section layout, dynamic category select, duration slider, remove vimeo_url, post-save redirect (completed 2026-04-01)
-- [x] **Phase 39: Lesson Management — UI + Logic** - Drag-and-drop lesson list, type-specific forms (Video/Audio/Text), sort_order persistence, mobile touch support
-- [ ] **Phase 40: Wire Lessons to Frontend** - Academy page lesson list, lesson player page by type, category color on course cards, member my-courses lesson management
+- [x] **Phase 39: Lesson Management — UI + Logic** - Drag-and-drop lesson list, type-specific forms (Video/Audio/Text), sort_order persistence, mobile touch support (completed 2026-04-01)
+- [x] **Phase 40: Wire Lessons to Frontend** - Academy page lesson list, lesson player page by type, category color on course cards, member my-courses lesson management (completed 2026-04-01)
 
 ### Phase 36: Database Migrations
 **Goal**: The database fully supports the course system redesign — course_categories and lessons tables exist, courses schema updated, RLS policies enforced, and TypeScript types pass
