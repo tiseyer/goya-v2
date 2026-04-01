@@ -1314,15 +1314,17 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          is_system: boolean
           name: string
           parent_id: string | null
           sort_order: number
         }
         Insert: {
-          bucket: string
+          bucket?: string
           created_at?: string
           created_by?: string | null
           id?: string
+          is_system?: boolean
           name: string
           parent_id?: string | null
           sort_order?: number
@@ -1332,6 +1334,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          is_system?: boolean
           name?: string
           parent_id?: string | null
           sort_order?: number
