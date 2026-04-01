@@ -161,6 +161,7 @@ export async function getSecret(
         description: row.description,
         category: row.category,
         updated_at: row.updated_at,
+        has_value: true,
         value,
       },
     }
