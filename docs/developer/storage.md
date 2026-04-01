@@ -3,7 +3,7 @@ title: Storage
 audience: ["developer"]
 section: developer
 order: 6
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # Storage
@@ -38,6 +38,7 @@ GOYA v2 uses Supabase Storage for all user-uploaded and admin-uploaded files. Ea
 | `post-videos` | Yes | Videos attached to community feed posts |
 | `post-audio` | Yes | Audio files attached to community feed posts |
 | `migration-uploads` | No | Temporary WP export JSON staging (admin only) |
+| `media` | Yes | Migrated WordPress media library files |
 
 All buckets are defined via SQL migrations in `supabase/migrations/`. RLS policies on `storage.objects` control who can read, insert, update, and delete.
 
@@ -144,6 +145,32 @@ npm run media:backfill
 ```
 
 Source: `scripts/backfill-media-items.ts`. The script is **idempotent** — safe to re-run; it skips files already registered in `media_items`. New file uploads after the initial backfill are registered automatically via `lib/media/register.ts`.
+
+### WordPress Media Migration Script
+
+Migrates all media from the WordPress media library (`/wp-json/wp/v2/media`) into Supabase Storage (`media` bucket) and registers each file in `media_items`.
+
+```bash
+npm run media:migrate-wp               # full run
+npm run media:migrate-wp -- --dry-run  # simulate, no writes
+npm run media:migrate-wp -- --resume   # continue from last completed page
+```
+
+Source: `scripts/migrate-wp-media.ts`.
+
+**What it does:**
+
+- Paginates the WP REST API (100 items/page) with Basic Auth
+- Skips files under `wp-content/uploads/avatars/` (handled by `avatars:migrate`)
+- Downloads each file and uploads to the `media` bucket at `wp-media/{subfolder}/{wp_media_id}_{filename}`
+  - Subfolders: `images/`, `videos/`, `audio/`, `documents/`, `other/`
+- Upserts a `media_items` row with deduplication via `wp_media_id` (unique partial index)
+- Matches WP authors to Supabase profiles by email; sets `uploaded_by` or null
+- Retries downloads up to 3 times with exponential backoff (1 s / 2 s / 4 s)
+- Writes progress to `.migration-state/wp-media-progress.json` after each page
+- Writes failures to `.migration-state/wp-media-failures.json`
+
+The `media_items.wp_media_id` column (integer, nullable, partial unique index) was added in migration `20260401_add_wp_media_id_to_media_items.sql`.
 
 See [database-schema.md](./database-schema.md) for the `media_items` and `media_folders` table schemas.
 
