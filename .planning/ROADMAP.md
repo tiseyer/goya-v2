@@ -208,7 +208,10 @@ Plans:
   4. The vimeo_url field is absent from the form; no reference to it appears in the UI
   5. After saving a new course, the admin is redirected to the course edit page where they can immediately add lessons
   6. The form renders correctly on mobile screens with no overflow or truncated controls
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 38-01-PLAN.md — Update Course type, redesign CourseForm with card sections, DB categories, duration slider, remove vimeo_url, auto course_type, post-save redirect
+- [ ] 38-02-PLAN.md — Mobile responsiveness audit and visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 39: Lesson Management — UI + Logic
@@ -254,6 +257,6 @@ Plans:
 | 35. Faculty Invitations | 1/1 | Complete | 2026-03-31 |
 | 36. Database Migrations | 3/3 | Complete    | 2026-04-01 |
 | 37. Admin Courses — Tabs + Categories | 2/2 | Complete    | 2026-04-01 |
-| 38. Course Creation Form — UI Redesign | 0/? | Not started | - |
+| 38. Course Creation Form — UI Redesign | 0/2 | Not started | - |
 | 39. Lesson Management — UI + Logic | 0/? | Not started | - |
 | 40. Wire Lessons to Frontend | 0/? | Not started | - |
