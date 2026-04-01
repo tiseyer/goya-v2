@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { logAuditEventAction } from '@/app/actions/audit';
 
 interface Props {
   userId: string;
@@ -48,6 +49,19 @@ export default function VerificationActions({ userId, certificateUrl }: Props) {
         }).catch(() => {})
       }
     }
+
+    void logAuditEventAction({
+      category: 'admin',
+      action: action === 'approve' ? 'admin.verification_approved' : 'admin.verification_rejected',
+      severity: action === 'reject' ? 'warning' : 'info',
+      target_type: 'USER',
+      target_id: userId,
+      target_label: prof?.full_name ?? undefined,
+      description: action === 'approve'
+        ? `Approved verification for ${prof?.full_name ?? userId}`
+        : `Rejected verification for ${prof?.full_name ?? userId}`,
+      metadata: action === 'reject' && rejectReason ? { rejection_reason: rejectReason } : undefined,
+    })
 
     setBusy(null);
     setShowRejectInput(false);

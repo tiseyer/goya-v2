@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { IMPERSONATION_COOKIE, IMPERSONATION_LOG_COOKIE } from '@/lib/impersonation'
+import { logAuditEvent } from '@/lib/audit'
 
 const COOKIE_MAX_AGE = 60 * 60 * 2 // 2 hours
 
@@ -56,6 +57,30 @@ export async function startImpersonation(targetUserId: string) {
   }
   cookieStore.set(IMPERSONATION_COOKIE, targetUserId, cookieOpts)
   cookieStore.set(IMPERSONATION_LOG_COOKIE, logEntry?.id ?? '', cookieOpts)
+
+  // Fetch admin + target names for audit
+  const { data: adminP } = await svc()
+    .from('profiles')
+    .select('full_name')
+    .eq('id', user.id)
+    .single() as { data: { full_name: string | null } | null }
+  const { data: targetP } = await svc()
+    .from('profiles')
+    .select('full_name')
+    .eq('id', targetUserId)
+    .single() as { data: { full_name: string | null } | null }
+
+  void logAuditEvent({
+    category: 'admin',
+    action: 'admin.user_impersonated',
+    actor_id: user.id,
+    actor_name: adminP?.full_name ?? undefined,
+    actor_role: 'admin',
+    target_type: 'USER',
+    target_id: targetUserId,
+    target_label: targetP?.full_name ?? undefined,
+    description: `Admin impersonated user ${targetP?.full_name ?? targetUserId}`,
+  })
 
   redirect('/dashboard')
 }

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
+import { logAuditEventAction } from '@/app/actions/audit';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -168,6 +169,17 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
           type,
         },
       }));
+
+      void logAuditEventAction({
+        category: 'user',
+        action: 'user.connection_requested',
+        actor_id: supabaseUserId,
+        target_type: 'USER',
+        target_id: recipientId,
+        target_label: name,
+        description: `Connection request sent to ${name} (type: ${type})`,
+        metadata: { connection_type: type },
+      });
     }
   }, [supabaseUserId]);
 
@@ -187,6 +199,14 @@ export function ConnectionsProvider({ children }: { children: ReactNode }) {
       setNotifications(prev =>
         prev.map(n => n.connectionId === connectionId ? { ...n, read: true } : n)
       );
+
+      void logAuditEventAction({
+        category: 'user',
+        action: 'user.connection_accepted',
+        target_type: 'USER',
+        target_id: fromUserId,
+        description: `Accepted connection request from ${fromUserId}`,
+      });
     }
   }, []);
 
