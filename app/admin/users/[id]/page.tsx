@@ -122,7 +122,7 @@ export default async function AdminUserDetailPage({
         <UserDetailClient
           profile={{
             id: profile.id,
-            email: profile.email,
+            email: profile.email ?? '',
             full_name: profile.full_name ?? null,
             first_name: profile.first_name ?? null,
             last_name: profile.last_name ?? null,
@@ -136,7 +136,7 @@ export default async function AdminUserDetailPage({
             created_at: profile.created_at,
             last_login_at: profile.updated_at ?? null,
             wp_user_id: profile.wp_user_id ?? null,
-            wp_roles: profile.wp_roles ?? null,
+            wp_roles: (profile.wp_roles as string[] | null) ?? null,
           }}
           isAdmin={currentUserIsAdmin}
         />
