@@ -182,12 +182,21 @@ export async function checkStripe(): Promise<ServiceCheck> {
       notes: 'Connected',
     }
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Connection failed'
+    let notes = 'Connection failed'
+    if (err && typeof err === 'object') {
+      const e = err as Record<string, unknown>
+      const parts: string[] = []
+      if (e.type) parts.push(`type=${e.type}`)
+      if (e.code) parts.push(`code=${e.code}`)
+      if (e.message) parts.push(String(e.message))
+      else if (err instanceof Error) parts.push(err.message)
+      notes = parts.join(' | ') || 'Unknown error'
+    }
     return {
       name: 'Stripe',
-      status: 'down',
+      status: 'degraded',
       latencyMs: 0,
-      notes: msg.length > 100 ? msg.slice(0, 100) + '...' : msg,
+      notes,
     }
   }
 }

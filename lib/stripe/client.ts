@@ -10,8 +10,9 @@ export function getStripe(): Stripe {
       throw new Error('STRIPE_SECRET_KEY or STRIPE_RESTRICTED_KEY_V1 is not set')
     }
     _stripe = new Stripe(key, {
-      maxNetworkRetries: 3,
+      maxNetworkRetries: 0,
       timeout: 10000,
+      httpClient: Stripe.createFetchHttpClient(),
     })
   }
   return _stripe
