@@ -5,10 +5,11 @@ let _stripe: Stripe | null = null
 
 export function getStripe(): Stripe {
   if (!_stripe) {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      throw new Error('STRIPE_SECRET_KEY is not set')
+    const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_RESTRICTED_KEY_V1
+    if (!key) {
+      throw new Error('STRIPE_SECRET_KEY or STRIPE_RESTRICTED_KEY_V1 is not set')
     }
-    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    _stripe = new Stripe(key, {
       maxNetworkRetries: 3,
       timeout: 10000,
     })
