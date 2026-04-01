@@ -131,6 +131,7 @@ None yet.
 | 260401-mod | Health tab improvements, Vercel cron, audit log, maintenance status | 2026-04-01 | — | [260401-mod-health-tab-improvements-vercel-cron-audi](./quick/260401-mod-health-tab-improvements-vercel-cron-audi/) |
 | 260401-mlw | Health tab: cron auth, audit logging, maintenance status card, monitor log UI | 2026-04-01 | 6b39cc6, d1ebce9 | [260401-mlw-health-tab-improvements-fix-401-vercel-c](./quick/260401-mlw-health-tab-improvements-fix-401-vercel-c/) |
 | 260401-nh4 | Rename Deployments to Versions tab, add branches section | 2026-04-01 | — | [260401-nh4-rename-deployments-to-versions-tab-add-b](./quick/260401-nh4-rename-deployments-to-versions-tab-add-b/) |
+| 260401-o8m | Fix Stripe health check: show actual error, remove retry, fix http client | 2026-04-01 | c391de3 | [260401-o8m-fix-stripe-health-check-show-actual-erro](./quick/260401-o8m-fix-stripe-health-check-show-actual-erro/) |
 
 ## Session Continuity
 
