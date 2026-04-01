@@ -12,6 +12,7 @@ import ConsentGatedScripts from "./components/ConsentGatedScripts";
 import CookieConsent from "./components/CookieConsent";
 import ChatWidgetLoader from "./components/chat/ChatWidgetLoader";
 import { getImpersonationState } from "@/lib/impersonation";
+import ThemeColorProvider from "@/app/components/ThemeColorProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,6 +82,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <ThemeColorProvider />
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-background text-foreground flex flex-col`}
       >
