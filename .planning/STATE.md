@@ -124,6 +124,7 @@ None yet.
 | 260401-kfs | Fix admin analytics: user data, visitors UX, shop redesign | 2026-04-01 | 7c4a7a1, 2e569b7, 87e9814 | [260401-kfs-fix-admin-analytics-user-data-visitors-u](./quick/260401-kfs-fix-admin-analytics-user-data-visitors-u/) |
 | 260401-l88 | Fix admin nav: email position, tab styling, group nav, active state | 2026-04-01 | 1bdcac4, c964378 | [260401-l88-fix-admin-nav-email-position-tab-styling](./quick/260401-l88-fix-admin-nav-email-position-tab-styling/) |
 | 260401-llt | Fix sidebar: divider, emails position, split chevron toggle | 2026-04-01 | 2945a2b | [260401-llt-fix-sidebar-divider-emails-position-spli](./quick/260401-llt-fix-sidebar-divider-emails-position-spli/) |
+| 260401-lv2 | Admin subscriptions page with filters, table, and sidebar nav | 2026-04-01 | fec21bc, 0924b1d, c6e612f | [260401-lv2-admin-subscriptions-page-with-filters-ta](./quick/260401-lv2-admin-subscriptions-page-with-filters-ta/) |
 
 ## Session Continuity
 
