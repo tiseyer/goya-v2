@@ -5,14 +5,6 @@ import type { Course } from '@/lib/types';
 import AdminCourseActions from './AdminCourseActions';
 import AdminCoursesFilters from './AdminCoursesFilters';
 
-const CATEGORY_BADGE: Record<string, string> = {
-  Workshop:         'bg-teal-50 text-teal-700',
-  'Yoga Sequence':  'bg-green-50 text-green-700',
-  'Dharma Talk':    'bg-blue-50 text-blue-700',
-  'Music Playlist': 'bg-pink-50 text-pink-700',
-  Research:         'bg-slate-100 text-slate-600',
-};
-
 const ACCESS_BADGE: Record<string, string> = {
   free:         'bg-emerald-50 text-emerald-700',
   members_only: 'bg-[#4E87A0]/10 text-[#4E87A0]',
@@ -32,6 +24,15 @@ const LEVEL_BADGE: Record<string, string> = {
 
 const PAGE_SIZE = 25;
 
+function formatDuration(minutes: number | null): string | null {
+  if (!minutes) return null;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
+}
+
 export default async function AdminCoursesPage({
   searchParams,
 }: {
@@ -47,10 +48,12 @@ export default async function AdminCoursesPage({
 
   const supabase = await createSupabaseServerClient();
 
-  let query = supabase.from('courses').select('*', { count: 'exact' });
+  let query = supabase
+    .from('courses')
+    .select('*, profiles!created_by(full_name, email), course_categories(name, color)', { count: 'exact' });
 
   if (status)   query = query.eq('status', status);
-  if (category) query = query.eq('category', category);
+  if (category) query = query.eq('category_id', category);
   if (access)   query = query.eq('access', access);
   if (search)   query = query.ilike('title', `%${search}%`);
 
@@ -123,40 +126,52 @@ export default async function AdminCoursesPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5E7EB]">
-                {courses.map(course => (
-                  <tr key={course.id} className="hover:bg-slate-50 transition-colors">
-                    {/* Course title + badges */}
-                    <td className="px-4 py-3 max-w-xs">
-                      <p className="font-medium text-[#1B3A5C] truncate">{course.title}</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${CATEGORY_BADGE[course.category] ?? 'bg-slate-100 text-slate-600'}`}>
-                          {course.category}
+                {courses.map(course => {
+                  const categoryName  = (course as any).course_categories?.name ?? null;
+                  const categoryColor = (course as any).course_categories?.color ?? null;
+                  return (
+                    <tr key={course.id} className="hover:bg-slate-50 transition-colors">
+                      {/* Course title + badges */}
+                      <td className="px-4 py-3 max-w-xs">
+                        <p className="font-medium text-[#1B3A5C] truncate">{course.title}</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {categoryName && (
+                            <span
+                              className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                              style={categoryColor ? {
+                                color: categoryColor,
+                                backgroundColor: `${categoryColor}18`,
+                              } : { backgroundColor: '#f1f5f9', color: '#475569' }}
+                            >
+                              {categoryName}
+                            </span>
+                          )}
+                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${ACCESS_BADGE[course.access] ?? 'bg-slate-100 text-slate-600'}`}>
+                            {course.access === 'free' ? 'Free' : 'Members Only'}
+                          </span>
+                        </div>
+                      </td>
+                      {/* Instructor */}
+                      <td className="px-4 py-3 text-[#374151] hidden md:table-cell">{course.instructor ?? '—'}</td>
+                      {/* Level */}
+                      <td className={`px-4 py-3 font-medium hidden lg:table-cell ${course.level ? LEVEL_BADGE[course.level] : 'text-slate-400'}`}>
+                        {course.level ?? '—'}
+                      </td>
+                      {/* Duration */}
+                      <td className="px-4 py-3 text-[#374151] hidden lg:table-cell">{formatDuration(course.duration_minutes) ?? '—'}</td>
+                      {/* Status */}
+                      <td className="px-4 py-3">
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${STATUS_BADGE[course.status] ?? 'bg-slate-100 text-slate-600'}`}>
+                          {course.status}
                         </span>
-                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${ACCESS_BADGE[course.access] ?? 'bg-slate-100 text-slate-600'}`}>
-                          {course.access === 'free' ? 'Free' : 'Members Only'}
-                        </span>
-                      </div>
-                    </td>
-                    {/* Instructor */}
-                    <td className="px-4 py-3 text-[#374151] hidden md:table-cell">{course.instructor ?? '—'}</td>
-                    {/* Level */}
-                    <td className={`px-4 py-3 font-medium hidden lg:table-cell ${course.level ? LEVEL_BADGE[course.level] : 'text-slate-400'}`}>
-                      {course.level ?? '—'}
-                    </td>
-                    {/* Duration */}
-                    <td className="px-4 py-3 text-[#374151] hidden lg:table-cell">{course.duration ?? '—'}</td>
-                    {/* Status */}
-                    <td className="px-4 py-3">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${STATUS_BADGE[course.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                        {course.status}
-                      </span>
-                    </td>
-                    {/* Actions */}
-                    <td className="px-4 py-3">
-                      <AdminCourseActions courseId={course.id} />
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      {/* Actions */}
+                      <td className="px-4 py-3">
+                        <AdminCourseActions courseId={course.id} />
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

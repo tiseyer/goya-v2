@@ -97,12 +97,16 @@ export interface Course {
   title: string;
   short_description: string | null;
   description: string | null;
-  category: CourseCategory;
+  category: CourseCategory | null;
+  category_id: string | null;
   instructor: string | null;
   duration: string | null;
+  duration_minutes: number | null;
   level: CourseLevel | null;
   access: CourseAccess;
   vimeo_url: string | null;
+  video_url: string | null;
+  video_platform: string | null;
   thumbnail_url: string | null;
   gradient_from: string;
   gradient_to: string;
