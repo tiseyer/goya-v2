@@ -1,0 +1,98 @@
+# Requirements: GOYA v2 — API Settings Page
+
+**Defined:** 2026-03-27
+**Core Value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
+
+## v1.7 Requirements
+
+Requirements for the API Settings Page milestone. Each maps to roadmap phases.
+
+### Tab Structure
+
+- [ ] **TABS-01**: Admin can navigate between Own Keys, Third Party Keys, and Endpoints tabs at `/admin/api-keys`
+- [ ] **TABS-02**: Tab navigation matches existing admin design patterns and tokens
+
+### Own Keys
+
+- [ ] **KEYS-01**: Existing API key create/list/revoke functionality works within the Own Keys tab
+- [ ] **KEYS-02**: No regression in existing API key management behavior
+
+### Secrets Management
+
+- [x] **SECR-01**: Admin can view a list of stored third-party secrets showing name, category, description, and last updated — never raw values
+- [x] **SECR-02**: Admin can create a new secret with name, value, category, and description via modal
+- [x] **SECR-03**: Admin can edit an existing secret with pre-filled fields and masked value with option to update
+- [x] **SECR-04**: Admin can delete a secret with confirmation dialog
+- [x] **SECR-05**: Admin can filter secrets by category (Auth, Analytics, Payments, AI, Other)
+- [x] **SECR-06**: Admin can search secrets by name
+- [x] **SECR-07**: Secrets are encrypted at rest using AES-256 with SECRETS_MASTER_KEY
+- [x] **SECR-08**: Supabase migration creates secrets table with admin-only RLS
+- [x] **SECR-09**: Raw decrypted values only returned on explicit single-key fetch, never in bulk list
+- [x] **SECR-10**: SECRETS_MASTER_KEY added to .env.local.example with generation instructions
+- [x] **SECR-11**: Pre-populated category structure with placeholder entries for known keys (Google OAuth, GA4, Clarity, Meta Pixel, Anthropic, etc.)
+
+### Endpoints Documentation
+
+- [ ] **ENDP-01**: Endpoints tab auto-scans `/app/api/**` and displays all discovered routes (~49 endpoints)
+- [ ] **ENDP-02**: Each endpoint shows method, path, auth type, and description
+- [ ] **ENDP-03**: Endpoints are grouped by domain category (Auth, Users, Events, Courses, Credits, Shop, Admin, Webhooks, External API)
+- [ ] **ENDP-04**: Admin can search and filter endpoints by name, path, or category
+
+## Future Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Secrets Enhancements
+
+- **SECR-F01**: Secret rotation reminders and expiry tracking
+- **SECR-F02**: Audit log for secret access and modifications
+- **SECR-F03**: Secret versioning and rollback
+
+### Endpoints Enhancements
+
+- **ENDP-F01**: Interactive API playground (try endpoints from the UI)
+- **ENDP-F02**: Request/response schema documentation per endpoint
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Moving Stripe keys from .env to secrets table | Stripe keys deeply integrated via existing env vars — noted in UI |
+| Secret sharing between team members | Single-admin system, not needed |
+| API endpoint testing/playground | Complexity — deferred to future milestone |
+| Webhook management UI | Separate concern from API settings |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| TABS-01 | Phase 9 | Pending |
+| TABS-02 | Phase 9 | Pending |
+| KEYS-01 | Phase 9 | Pending |
+| KEYS-02 | Phase 9 | Pending |
+| SECR-01 | Phase 10 | Complete |
+| SECR-02 | Phase 10 | Complete |
+| SECR-03 | Phase 10 | Complete |
+| SECR-04 | Phase 10 | Complete |
+| SECR-05 | Phase 10 | Complete |
+| SECR-06 | Phase 10 | Complete |
+| SECR-07 | Phase 10 | Complete |
+| SECR-08 | Phase 10 | Complete |
+| SECR-09 | Phase 10 | Complete |
+| SECR-10 | Phase 10 | Complete |
+| SECR-11 | Phase 10 | Complete |
+| ENDP-01 | Phase 11 | Pending |
+| ENDP-02 | Phase 11 | Pending |
+| ENDP-03 | Phase 11 | Pending |
+| ENDP-04 | Phase 11 | Pending |
+
+**Coverage:**
+- v1.7 requirements: 19 total
+- Mapped to phases: 19
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-03-27*
+*Last updated: 2026-03-27 after roadmap creation*
