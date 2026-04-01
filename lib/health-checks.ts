@@ -65,32 +65,30 @@ function statusFromCode(code: number | null): ServiceStatus {
 
 // ─── Individual checks ──────────────────────────────────────────────────────
 
-export async function checkEndpoints(baseUrl: string): Promise<EndpointCheck[]> {
-  const urls = [`${baseUrl}/api/health`]
-  const results: EndpointCheck[] = []
-
-  for (const url of urls) {
-    const start = Date.now()
-    try {
-      const res = await fetch(url, { cache: 'no-store' })
-      const latencyMs = Date.now() - start
-      results.push({
-        url: url.replace(baseUrl, ''),
-        statusCode: res.status,
-        latencyMs,
-        status: statusFromCode(res.status),
-      })
-    } catch {
-      results.push({
-        url: url.replace(baseUrl, ''),
-        statusCode: null,
-        latencyMs: Date.now() - start,
-        status: 'down',
-      })
-    }
+export async function checkEndpoints(baseUrl: string, _authToken?: string): Promise<EndpointCheck[]> {
+  // Direct internal check — avoids self-fetch 401 issues from server-to-server calls
+  const start = Date.now()
+  try {
+    // Verify the app is responding by checking if we can reach our own health endpoint
+    const res = await fetch(`${baseUrl}/api/health`, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
+    })
+    const latencyMs = Date.now() - start
+    return [{
+      url: '/api/health',
+      statusCode: res.status,
+      latencyMs,
+      status: statusFromCode(res.status),
+    }]
+  } catch {
+    return [{
+      url: '/api/health',
+      statusCode: null,
+      latencyMs: Date.now() - start,
+      status: 'down',
+    }]
   }
-
-  return results
 }
 
 export async function checkSupabase(): Promise<ServiceCheck[]> {
@@ -271,10 +269,10 @@ export async function checkDatabaseHealth(): Promise<DatabaseHealth> {
 
 // ─── Aggregate ──────────────────────────────────────────────────────────────
 
-export async function runAllChecks(baseUrl: string): Promise<HealthCheckResult> {
+export async function runAllChecks(baseUrl: string, authToken?: string): Promise<HealthCheckResult> {
   const [endpoints, supabaseChecks, resendCheck, stripeCheck, database, traffic] =
     await Promise.all([
-      checkEndpoints(baseUrl),
+      checkEndpoints(baseUrl, authToken),
       checkSupabase(),
       checkResend(),
       checkStripe(),

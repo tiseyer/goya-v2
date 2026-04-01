@@ -24,7 +24,7 @@ export async function approveUpgradeRequest(
   const serviceClient = getSupabaseService()
   const { data: adminProfile } = await serviceClient
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
 
@@ -138,7 +138,7 @@ export async function rejectUpgradeRequest(
   const serviceClient = getSupabaseService()
   const { data: adminProfile } = await serviceClient
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
 
@@ -222,7 +222,7 @@ export async function approveCreditEntry(
   const serviceClient = getSupabaseService()
   const { data: adminProfile } = await serviceClient
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
 
@@ -270,7 +270,7 @@ export async function rejectCreditEntry(
   const serviceClient = getSupabaseService()
   const { data: adminProfile } = await serviceClient
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
 
@@ -505,7 +505,7 @@ export async function approveEvent(
   const serviceClient = getSupabaseService()
   const { data: adminProfile } = await serviceClient
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
 
@@ -581,7 +581,7 @@ export async function rejectEvent(
   const serviceClient = getSupabaseService()
   const { data: adminProfile } = await serviceClient
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
 
@@ -667,7 +667,7 @@ export async function approveCourse(
   const serviceClient = getSupabaseService()
   const { data: adminProfile } = await serviceClient
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
 
@@ -743,7 +743,7 @@ export async function rejectCourse(
   const serviceClient = getSupabaseService()
   const { data: adminProfile } = await serviceClient
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
 

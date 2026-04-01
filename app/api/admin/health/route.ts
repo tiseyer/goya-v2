@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { runAllChecks } from '@/lib/health-checks'
-import { headers } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -48,13 +47,30 @@ export async function GET(request: Request) {
 
   const result = await runAllChecks(baseUrl)
 
-  // Also fetch monitor log
   const sb = getSupabaseService()
-  const { data: monitorLog } = await (sb as any)
-    .from('health_monitor_log')
-    .select('*')
-    .order('checked_at', { ascending: false })
-    .limit(10)
 
-  return NextResponse.json({ ...result, monitorLog: monitorLog ?? [] })
+  // Fetch monitor log and maintenance settings in parallel
+  const [{ data: monitorLog }, { data: maintenanceRows }] = await Promise.all([
+    (sb as any)
+      .from('health_monitor_log')
+      .select('*')
+      .order('checked_at', { ascending: false })
+      .limit(10),
+    (sb as any)
+      .from('site_settings')
+      .select('key, value')
+      .in('key', [
+        'maintenance_mode_enabled', 'email_sandbox_enabled', 'chatbot_maintenance_mode',
+        'flows_sandbox', 'credit_hours_sandbox', 'theme_lock', 'page_visibility',
+      ]),
+  ])
+
+  const maintenanceSettings: Record<string, string> = {}
+  if (maintenanceRows) {
+    for (const row of maintenanceRows as Array<{ key: string; value: string }>) {
+      maintenanceSettings[row.key] = row.value ?? ''
+    }
+  }
+
+  return NextResponse.json({ ...result, monitorLog: monitorLog ?? [], maintenanceSettings })
 }
