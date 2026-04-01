@@ -303,6 +303,7 @@ export default function EventsPage() {
     const entry = getCatDbEntry(catName);
     if (!entry) return null;
     const hex = entry.color;
+    if (!hex) return null;
     return {
       backgroundColor: `${hex}15`,
       color: hex,

@@ -139,8 +139,8 @@ export default function CategoryManager({ initialCategories }: Props) {
                     <td className="px-4 py-3">
                       <span
                         className="inline-block w-5 h-5 rounded-full border border-white shadow-sm"
-                        style={{ backgroundColor: cat.color }}
-                        title={cat.color}
+                        style={{ backgroundColor: cat.color ?? undefined }}
+                        title={cat.color ?? undefined}
                       />
                     </td>
                     <td className="px-4 py-3 font-medium text-[#1B3A5C]">{cat.name}</td>

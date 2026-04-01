@@ -15,7 +15,8 @@ interface GtagEventParams {
 
 declare global {
   interface Window {
-    gtag?: (command: GtagCommand, targetOrAction: string, params?: GtagEventParams) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    gtag?: (...args: any[]) => void;
     clarity?: (command: string, ...args: (string | boolean)[]) => void;
   }
 }

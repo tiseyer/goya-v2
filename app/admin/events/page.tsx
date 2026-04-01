@@ -243,7 +243,7 @@ export default async function AdminEventsPage({
                       </td>
                       {/* Type */}
                       <td className="px-4 py-3">
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full uppercase ${TYPE_BADGE[ev.event_type] ?? 'bg-slate-100 text-slate-600'}`}>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full uppercase ${TYPE_BADGE[ev.event_type ?? ''] ?? 'bg-slate-100 text-slate-600'}`}>
                           {ev.event_type === 'member' ? 'Member' : 'GOYA'}
                         </span>
                       </td>

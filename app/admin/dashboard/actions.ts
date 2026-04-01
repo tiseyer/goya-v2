@@ -35,7 +35,7 @@ export async function getMemberGrowthData(
       .select('*', { count: 'exact', head: true })
       .lt('created_at', startDate.toISOString())
 
-    return buildCumulative(data ?? [], baseCount ?? 0)
+    return buildCumulative((data ?? []).filter((r): r is { created_at: string } => r.created_at !== null), baseCount ?? 0)
   }
 
   // ── Profiles branch ────────────────────────────────────────────────────────

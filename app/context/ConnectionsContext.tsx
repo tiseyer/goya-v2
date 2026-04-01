@@ -28,7 +28,7 @@ export interface NotifRecord {
   createdAt: string;
 }
 
-interface ConnectionsContextType {
+export interface ConnectionsContextType {
   connections: Record<string, ConnRecord>; // keyed by UUID
   notifications: NotifRecord[];
   unreadCount: number;

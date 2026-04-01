@@ -4,11 +4,11 @@ export type MemberType = 'student' | 'teacher' | 'wellness_practitioner';
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
 export type EventCategory = 'Workshop' | 'Teacher Training' | 'Dharma Talk' | 'Conference' | 'Yoga Sequence' | 'Music Playlist' | 'Research';
 export type EventFormat = 'Online' | 'In Person' | 'Hybrid';
-export type EventStatus = 'published' | 'draft' | 'cancelled' | 'deleted';
+export type EventStatus = 'published' | 'draft' | 'cancelled' | 'deleted' | 'pending_review' | 'rejected';
 export type CourseCategory = 'Workshop' | 'Yoga Sequence' | 'Dharma Talk' | 'Music Playlist' | 'Research';
 export type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced' | 'All Levels';
 export type CourseAccess = 'members_only' | 'free';
-export type CourseStatus = 'published' | 'draft';
+export type CourseStatus = 'published' | 'draft' | 'deleted' | 'pending_review' | 'rejected';
 export type ProgressStatus = 'in_progress' | 'completed';
 
 export interface Profile {
@@ -79,7 +79,18 @@ export interface Event {
   date: string;
   time_start: string;
   time_end: string;
+  end_date: string | null;
+  all_day: boolean;
+  event_type: string | null;
   location: string | null;
+  location_lat: number | null;
+  location_lng: number | null;
+  online_platform_name: string | null;
+  online_platform_url: string | null;
+  registration_required: boolean;
+  website_url: string | null;
+  organizer_ids: string[];
+  rejection_reason: string | null;
   instructor: string | null;
   price: number;
   is_free: boolean;
@@ -110,6 +121,8 @@ export interface Course {
   thumbnail_url: string | null;
   gradient_from: string;
   gradient_to: string;
+  rejection_reason: string | null;
+  course_type: string | null;
   status: CourseStatus;
   created_at: string;
   updated_at: string;
@@ -122,4 +135,57 @@ export interface UserCourseProgress {
   status: ProgressStatus;
   enrolled_at: string;
   completed_at: string | null;
+}
+
+export interface EventCategoryRow {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  color: string | null;
+  parent_id: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface AppNotification {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  read_at: string | null;
+  created_at: string;
+  actor?: {
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
+}
+
+export interface ConversationRow {
+  id: string;
+  participant_1: string;
+  participant_2: string;
+  last_message_at: string | null;
+  last_message: string | null;
+  last_message_sender_id: string | null;
+  unread_count: number;
+  other_participant: {
+    id: string;
+    full_name: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+  } | null;
+  created_at: string;
+}
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  read_at: string | null;
+  created_at: string;
 }

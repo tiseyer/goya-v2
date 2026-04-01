@@ -92,7 +92,7 @@ export default async function AdminCoursesPage({
       {/* Filters */}
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-4 mb-6">
         <Suspense>
-          <AdminCoursesFilters />
+          <AdminCoursesFilters userRole="admin" />
         </Suspense>
       </div>
 
@@ -167,7 +167,7 @@ export default async function AdminCoursesPage({
                       </td>
                       {/* Actions */}
                       <td className="px-4 py-3">
-                        <AdminCourseActions courseId={course.id} />
+                        <AdminCourseActions courseId={course.id} isDeleted={course.status === 'deleted'} userRole="admin" />
                       </td>
                     </tr>
                   );

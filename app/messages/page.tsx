@@ -96,7 +96,7 @@ function ConvItem({
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
           <span className="font-semibold text-[13px] text-slate-900 truncate">{name}</span>
-          <span className="text-[10px] text-slate-400 shrink-0">{formatRelative(conv.last_message_at)}</span>
+          <span className="text-[10px] text-slate-400 shrink-0">{conv.last_message_at ? formatRelative(conv.last_message_at) : ''}</span>
         </div>
         <div className="flex items-center justify-between gap-2 mt-0.5">
           <span className="text-xs text-slate-500 truncate">{preview}</span>
