@@ -122,6 +122,7 @@ None yet.
 | 260401-jqr | Fix Recharts labelFormatter and formatter types | 2026-04-01 | 98eecf6 | [260401-jqr-fix-labelformatter-type-in-usersanalytic](./quick/260401-jqr-fix-labelformatter-type-in-usersanalytic/) |
 | 260401-jv9 | Fix all TypeScript errors for clean Vercel build | 2026-04-01 | cf8b5c2 | [260401-jv9-fix-all-typescript-errors-for-clean-verc](./quick/260401-jv9-fix-all-typescript-errors-for-clean-verc/) |
 | 260401-kfs | Fix admin analytics: user data, visitors UX, shop redesign | 2026-04-01 | 7c4a7a1, 2e569b7, 87e9814 | [260401-kfs-fix-admin-analytics-user-data-visitors-u](./quick/260401-kfs-fix-admin-analytics-user-data-visitors-u/) |
+| 260401-l88 | Fix admin nav: email position, tab styling, group nav, active state | 2026-04-01 | 1bdcac4, c964378 | [260401-l88-fix-admin-nav-email-position-tab-styling](./quick/260401-l88-fix-admin-nav-email-position-tab-styling/) |
 
 ## Session Continuity
 
