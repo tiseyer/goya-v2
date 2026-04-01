@@ -8,16 +8,17 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: v1.15 Course System Redesign
+## Current Milestone: v1.16 Admin Color Settings
 
-**Goal:** Redesign admin course management with categories table, multi-lesson support, drag-and-drop ordering, platform-aware video fields, and modern SaaS UI.
+**Goal:** Admin-controlled color configuration system — brand colors, role colors, and maintenance indicator — stored in site_settings and injected globally via CSS variables.
 
 **Target features:**
-- `course_categories` and `lessons` tables with RLS policies
-- Admin courses page with Courses/Categories tabs and category CRUD
-- Premium SaaS course creation/edit form (card sections, duration slider, conditional fields)
-- Lesson management with drag-and-drop reordering, type-specific forms (Video/Audio/Text)
-- Frontend lesson rendering (Vimeo/YouTube embed, audio player, formatted text)
+- Colors settings page in admin with 3 sections: Brand Colors, Role Colors, Maintenance Indicator
+- Color picker UI with hex input, preview swatch, per-color reset, instant preview
+- Persistence to site_settings as JSON keys (brand_colors, role_colors, maintenance_indicator_color)
+- ThemeProvider component in layout.tsx injecting CSS variables globally from stored settings
+- Save/Reset All controls with instant preview before save
+- Sidebar nav: "Colors" under Settings group
 
 ## Current State
 
@@ -248,4 +249,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-01 after v1.15 Course System Redesign milestone started*
+*Last updated: 2026-04-01 after v1.16 Admin Color Settings milestone started*

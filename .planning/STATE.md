@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.15
-milestone_name: Course System Redesign
-status: verifying
-stopped_at: Completed 40-02-PLAN.md — per-lesson player page with type-specific rendering and prev/next navigation
-last_updated: "2026-04-01T06:00:00.000Z"
-last_activity: 2026-04-01 - Completed quick task 260401-mlw: Health tab improvements
+milestone: v1.16
+milestone_name: Admin Color Settings
+status: defining_requirements
+stopped_at: null
+last_updated: "2026-04-01T11:00:00.000Z"
+last_activity: 2026-04-01 - Milestone v1.16 started
 progress:
-  total_phases: 5
-  completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 0
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-01)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Phase 38 — Course Creation Form — UI Redesign
+**Current focus:** v1.16 — Admin Color Settings
 
 ## Current Position
 
-Phase: 40 (Wire Lessons to Frontend) — COMPLETE
-Plan: 3 of 3
-Status: Plan 03 complete — member my-courses lesson management with LessonList reuse and stale column fixes
-Last activity: 2026-04-01 - Completed quick task 260401-mib: Danger zone with cache clear and session invalidation
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-01 — Milestone v1.16 started
 
-Progress: [███░░░░░░░] 33%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
