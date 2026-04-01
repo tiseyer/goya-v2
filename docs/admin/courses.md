@@ -55,7 +55,7 @@ Member courses show "Submitted by [name/email]" beneath the course title.
 | **Type** | GOYA or Member badge |
 | **Instructor** | Instructor name if set |
 | **Level** | Beginner (emerald), Intermediate (amber), Advanced (rose), All Levels (slate) |
-| **Duration** | Duration string (e.g. "6 weeks") |
+| **Duration** | Duration in hours and minutes (e.g. "1h 30m") |
 | **Status** | Current status badge |
 | **Actions** | Edit, delete, or restore controls |
 
@@ -107,7 +107,13 @@ When viewing deleted courses, the table background becomes red-tinted.
 
 ## Adding a New Course
 
-Click **Add New Course** in the top-right corner to open `/admin/courses/new`. Fill in the title, category, level, instructor, duration, and access settings. GOYA courses do not go through the review queue.
+Click **Add New Course** in the top-right corner to open `/admin/courses/new`. The form is divided into three sections:
+
+- **Basic Info** — Title (required), Category (dropdown from the database, with a colour indicator), Level, Access, and Instructor.
+- **Content** — Short description (200-char limit with counter), full description, thumbnail URL, and card gradient pickers with a live preview.
+- **Settings** — Status (Published/Draft) and a Duration slider from 5 minutes to 10 hours in 5-minute steps, displayed as "Xh Ym".
+
+GOYA courses do not go through the review queue. After saving a new course, you are taken directly to the **Lessons** tab of the edit page to begin adding lesson content.
 
 ## Editing a Course
 

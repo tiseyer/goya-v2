@@ -27,12 +27,12 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 
 ### Admin Course Form
 
-- [ ] **ACF-01**: Course form redesigned with card-section layout, modern SaaS aesthetic
-- [ ] **ACF-02**: Category field uses dynamic dropdown from `course_categories` table
-- [ ] **ACF-03**: Duration field is a slider (5–600 min, step 5, displays "Xh Ym")
-- [ ] **ACF-04**: `vimeo_url` removed from course form (moved to lessons)
+- [x] **ACF-01**: Course form redesigned with card-section layout, modern SaaS aesthetic
+- [x] **ACF-02**: Category field uses dynamic dropdown from `course_categories` table
+- [x] **ACF-03**: Duration field is a slider (5–600 min, step 5, displays "Xh Ym")
+- [x] **ACF-04**: `vimeo_url` removed from course form (moved to lessons)
 - [ ] **ACF-05**: After saving new course, redirects to edit page for lesson management
-- [ ] **ACF-06**: Course type set automatically (admin=goya, member=member)
+- [x] **ACF-06**: Course type set automatically (admin=goya, member=member)
 - [ ] **ACF-07**: Form is mobile responsive with smooth transitions
 
 ### Lesson Management
@@ -91,12 +91,12 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 | ACAT-03 | Phase 37 | Complete |
 | ACAT-04 | Phase 37 | Complete |
 | ACAT-05 | Phase 37 | Complete |
-| ACF-01 | Phase 38 | Pending |
-| ACF-02 | Phase 38 | Pending |
-| ACF-03 | Phase 38 | Pending |
-| ACF-04 | Phase 38 | Pending |
+| ACF-01 | Phase 38 | Complete |
+| ACF-02 | Phase 38 | Complete |
+| ACF-03 | Phase 38 | Complete |
+| ACF-04 | Phase 38 | Complete |
 | ACF-05 | Phase 38 | Pending |
-| ACF-06 | Phase 38 | Pending |
+| ACF-06 | Phase 38 | Complete |
 | ACF-07 | Phase 38 | Pending |
 | LM-01 | Phase 39 | Pending |
 | LM-02 | Phase 39 | Pending |
