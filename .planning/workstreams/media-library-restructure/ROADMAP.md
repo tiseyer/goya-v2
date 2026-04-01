@@ -15,7 +15,7 @@
 **Plans:** 1 plan
 
 Plans:
-- [ ] 01-01-PLAN.md — Add is_system column, set bucket default, regen types
+- [x] 01-01-PLAN.md — Add is_system column, set bucket default, regen types
 
 **Success Criteria:**
 1. Migration file creates `bucket` default ('media') and `is_system` (boolean, default false) columns on media_folders
@@ -30,6 +30,11 @@ Plans:
 **Goal:** Replace flat folder sidebar with 3 bucket sections (All Media, Certificates, Avatars) with collapsible subfolder trees and bucket-aware query filtering.
 
 **Requirements:** SIDE-01, SIDE-02, SIDE-03, SIDE-04, SIDE-05, SIDE-06, SIDE-07, QUERY-01, QUERY-02, QUERY-03, QUERY-04, QUERY-05
+
+**Plans:** 1 plan
+
+Plans:
+- [ ] 02-01-PLAN.md — Restructure constants, query logic, sidebar UI, and state management for 3-section bucket navigation
 
 **Success Criteria:**
 1. Sidebar renders 3 bucket sections with correct lucide-react icons (Image, Award, User)
