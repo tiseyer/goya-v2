@@ -35,7 +35,7 @@ export default async function AdminUserDetailPage({
   const serviceClient = getSupabaseService();
   const { data: profile } = await serviceClient
     .from('profiles')
-    .select('id, email, full_name, first_name, last_name, username, role, member_type, subscription_status, is_verified, verification_status, onboarding_completed, created_at, avatar_url, mrn, last_login_at, wp_user_id, wp_roles')
+    .select('id, email, full_name, first_name, last_name, username, role, member_type, subscription_status, is_verified, verification_status, onboarding_completed, created_at, updated_at, avatar_url, mrn, wp_user_id, wp_roles')
     .eq('id', id)
     .single();
 
@@ -134,7 +134,7 @@ export default async function AdminUserDetailPage({
             verification_status: profile.verification_status ?? null,
             onboarding_completed: profile.onboarding_completed ?? null,
             created_at: profile.created_at,
-            last_login_at: profile.last_login_at ?? null,
+            last_login_at: profile.updated_at ?? null,
             wp_user_id: profile.wp_user_id ?? null,
             wp_roles: profile.wp_roles ?? null,
           }}
