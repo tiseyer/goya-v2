@@ -73,6 +73,68 @@ async function getMaintenanceActive(): Promise<boolean> {
   }
 }
 
+// ─── Page visibility cache (60s TTL) ─────────────────────────────────────────
+
+interface PageVisibilityEntry {
+  enabled: boolean
+  fallback1: string
+  fallback2: string
+}
+
+interface PageVisibilityCache {
+  pages: Record<string, PageVisibilityEntry>
+  expires: number
+}
+
+let pageVisibilityCache: PageVisibilityCache | null = null
+
+async function getPageVisibility(): Promise<Record<string, PageVisibilityEntry> | null> {
+  const now = Date.now()
+  if (pageVisibilityCache && now < pageVisibilityCache.expires) {
+    return pageVisibilityCache.pages
+  }
+
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    const url = `${supabaseUrl}/rest/v1/site_settings?key=eq.page_visibility&select=value`
+    const res = await fetch(url, {
+      headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+    })
+    if (!res.ok) return null
+    const rows = (await res.json()) as Array<{ value: string }>
+    if (!rows[0]?.value) return null
+    const pages = JSON.parse(rows[0].value) as Record<string, PageVisibilityEntry>
+    pageVisibilityCache = { pages, expires: now + 60_000 }
+    return pages
+  } catch {
+    return null
+  }
+}
+
+function getPageRedirect(pathname: string, pages: Record<string, PageVisibilityEntry>): string | null {
+  // Find the matching page entry
+  let entry: PageVisibilityEntry | undefined
+  for (const path of Object.keys(pages)) {
+    if (pathname === path || pathname.startsWith(path + '/')) {
+      entry = pages[path]
+      break
+    }
+  }
+  if (!entry || entry.enabled) return null
+
+  // Check fallback1
+  const fb1 = pages[entry.fallback1]
+  if (!fb1 || fb1.enabled) return entry.fallback1
+
+  // Check fallback2
+  const fb2 = pages[entry.fallback2]
+  if (!fb2 || fb2.enabled) return entry.fallback2
+
+  // Both fallbacks disabled — do not redirect (loop protection)
+  return null
+}
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
@@ -201,6 +263,26 @@ export async function middleware(request: NextRequest) {
 
       if (!isAdminOrMod) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
+      }
+    }
+  }
+
+  // ─── Page visibility enforcement ──────────────────────────────────────────────
+  // Only redirect non-admin users away from disabled pages
+  if (user) {
+    const { data: pvProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    const pvRole = pvProfile?.role ?? 'member'
+    if (pvRole !== 'admin' && pvRole !== 'moderator') {
+      const pages = await getPageVisibility()
+      if (pages) {
+        const redirect = getPageRedirect(pathname, pages)
+        if (redirect) {
+          return NextResponse.redirect(new URL(redirect, request.url))
+        }
       }
     }
   }

@@ -3,6 +3,7 @@
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
+import { useThemeLock } from '@/lib/hooks/useThemeLock';
 
 const THEMES = [
   {
@@ -52,11 +53,24 @@ async function persistTheme(theme: string) {
 /**
  * Cards variant — for Settings > General page.
  * Shows three clickable cards in a row with icon + label.
+ * Hidden when theme is locked for non-admin users.
  */
-export function ThemeCards() {
+export function ThemeCards({ isAdmin }: { isAdmin?: boolean }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { lock, loading: lockLoading } = useThemeLock();
   useEffect(() => setMounted(true), []);
+
+  // Apply theme lock for non-admins
+  useEffect(() => {
+    if (!mounted || lockLoading) return;
+    if (lock && !isAdmin) {
+      setTheme(lock);
+    }
+  }, [lock, isAdmin, mounted, lockLoading, setTheme]);
+
+  // Hide theme cards entirely when locked for non-admins
+  if (lock && !isAdmin) return null;
 
   if (!mounted) {
     return (
@@ -98,13 +112,26 @@ export function ThemeCards() {
 /**
  * Inline variant — for profile dropdown.
  * Shows three small icon buttons in a row.
+ * Hidden when theme is locked for non-admin users.
  */
-export function ThemeInline() {
+export function ThemeInline({ isAdmin }: { isAdmin?: boolean }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { lock, loading: lockLoading } = useThemeLock();
   useEffect(() => setMounted(true), []);
 
+  // Apply theme lock for non-admins
+  useEffect(() => {
+    if (!mounted || lockLoading) return;
+    if (lock && !isAdmin) {
+      setTheme(lock);
+    }
+  }, [lock, isAdmin, mounted, lockLoading, setTheme]);
+
   if (!mounted) return null;
+
+  // Hide when locked for non-admins
+  if (lock && !isAdmin) return null;
 
   return (
     <div className="flex w-full bg-surface-muted rounded-lg p-1">

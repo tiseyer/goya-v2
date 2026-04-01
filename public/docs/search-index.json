@@ -114,7 +114,7 @@
       "admin"
     ],
     "section": "admin",
-    "content": "System Settings\nThe System Settings page controls platformwide configuration. Navigate to Settings > System in the sidebar or go to /admin/settings.\nThe page has four tabs: General, Health, Maintenance, and Deployments.\nTable of Contents\nGeneral Tab\nHealth Tab\nMaintenance Tab\nGeneral Tab\nShows readonly platform information:\n Value \n GOYA — Global Online Yoga Association  Version \n Production or Development  Audit Log  Emails"
+    "content": "System Settings\nThe System Settings page controls platformwide configuration. Navigate to Settings > System in the sidebar or go to /admin/settings.\nThe page has four tabs: General, Health, Maintenance, and Deployments.\nTable of Contents\nGeneral Tab\nHealth Tab\nMaintenance Tab\nMaintenance Mode\nEmail Sandbox\nChatbot Maintenance\nFlows Sandbox\nCredit Hours Sandbox\nTheme Lock\nPage Visibility\nGeneral Tab\nShows readonly platform information:\n Value \n GOYA — Global Online Yoga Association  Version \n Production or Development  Audit Log  Emails"
   },
   {
     "slug": "admin/shop",

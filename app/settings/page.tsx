@@ -422,7 +422,7 @@ export default function SettingsGeneralPage() {
             <h2 className="text-lg font-bold text-[#1a2744]">Appearance</h2>
             <p className="text-sm text-slate-400 mt-0.5">Choose your preferred theme</p>
           </div>
-          <ThemeCards />
+          <ThemeCards isAdmin={profile?.role === 'admin' || profile?.role === 'moderator'} />
         </div>
 
         {/* SECTION 4: Danger Zone */}

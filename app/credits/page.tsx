@@ -7,6 +7,7 @@ import { getUserCreditStatus, type CreditTypeStatus, type CreditStatus } from '@
 import { GraduationCap, Heart, Flower2, Users, Award, CheckCircle2, AlertTriangle, AlertCircle, Info } from 'lucide-react';
 import CreditHistory from './components/CreditHistory';
 import CreditSubmissionFormToggle from './components/CreditSubmissionFormToggle';
+import { isSandboxActive } from '@/lib/site-settings';
 
 const TYPE_LABELS: Record<string, string> = {
   ce: 'CE Credits',
@@ -61,6 +62,13 @@ export default async function CreditsPage() {
     .select('*')
     .eq('id', userId)
     .single();
+
+  // Credit hours sandbox: hide from non-admin users
+  const role = profile?.role ?? 'member';
+  if (role !== 'admin' && role !== 'moderator') {
+    const sandboxed = await isSandboxActive('credit_hours_sandbox');
+    if (sandboxed) redirect('/dashboard');
+  }
 
   const isTeacher = profile?.member_type === 'teacher' || profile?.role === 'admin';
 

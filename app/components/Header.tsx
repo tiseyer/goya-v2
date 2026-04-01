@@ -598,7 +598,7 @@ function UserMenu({
 
           {/* Theme quick switch */}
           <div className="border-t border-[#E5E7EB] px-4 py-2">
-            <ThemeInline />
+            <ThemeInline isAdmin={userRole === 'admin' || userRole === 'moderator'} />
           </div>
 
           {/* Logout */}

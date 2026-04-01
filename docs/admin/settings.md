@@ -17,6 +17,13 @@ The page has four tabs: **General**, **Health**, **Maintenance**, and **Deployme
 - [General Tab](#general-tab)
 - [Health Tab](#health-tab)
 - [Maintenance Tab](#maintenance-tab)
+  - [Maintenance Mode](#enabling-maintenance-mode-immediately)
+  - [Email Sandbox](#email-sandbox)
+  - [Chatbot Maintenance](#chatbot-maintenance)
+  - [Flows Sandbox](#flows-sandbox)
+  - [Credit Hours Sandbox](#credit-hours-sandbox)
+  - [Theme Lock](#theme-lock)
+  - [Page Visibility](#page-visibility)
 
 ---
 
@@ -73,6 +80,52 @@ The platform automatically enters and exits maintenance mode at the specified ti
 ### Disabling maintenance mode
 
 Toggle **Maintenance Mode Enabled** to off and save. The maintenance page is removed immediately for public visitors.
+
+---
+
+## Flows Sandbox
+
+Toggle **Enable Flows Sandbox Mode** to hide all flows from regular users. Admins and moderators can still see and test flows. This is useful for testing new flows before going live.
+
+Setting stored in `site_settings` as `flows_sandbox`.
+
+---
+
+## Credit Hours Sandbox
+
+Toggle **Enable Credit Hours Sandbox Mode** to hide credit hour submissions from regular users. The `/credits` and `/teaching-hours` pages redirect non-admin users to the dashboard when active.
+
+Setting stored in `site_settings` as `credit_hours_sandbox`.
+
+---
+
+## Theme Lock
+
+Force a specific theme (Light or Dark) for all non-admin users. Admins can still switch freely.
+
+- **Unlocked** (default) — users choose their own theme
+- **Force Light Mode** — all non-admin users see Light, theme toggle is hidden
+- **Force Dark Mode** — all non-admin users see Dark, theme toggle is hidden
+
+Use this if one theme has a visual bug that needs fixing before users can access it.
+
+Setting stored in `site_settings` as `theme_lock` (values: empty, `light`, or `dark`).
+
+---
+
+## Page Visibility
+
+Disable individual pages and configure fallback redirects. Each page has:
+
+- **Enabled/Disabled** toggle
+- **Fallback 1** — where to redirect if this page is disabled
+- **Fallback 2** — where to redirect if Fallback 1 is also disabled
+
+Pages available: Dashboard, Members, Academy, Events, Add-Ons, Settings.
+
+Admins and moderators are never redirected. If both fallbacks are disabled, the page is shown anyway (loop protection).
+
+Setting stored in `site_settings` as `page_visibility` (JSON).
 
 ---
 

@@ -6,6 +6,7 @@ import { getEffectiveUserId, getEffectiveClient } from '@/lib/supabase/getEffect
 import { getUserCreditTotals, checkUserMeetsRequirements } from '@/lib/credits';
 import CreditHistory from '@/app/credits/components/CreditHistory';
 import CreditSubmissionFormToggle from '@/app/credits/components/CreditSubmissionFormToggle';
+import { isSandboxActive } from '@/lib/site-settings';
 
 export default async function TeachingHoursPage() {
   const userId = await getEffectiveUserId();
@@ -19,6 +20,13 @@ export default async function TeachingHoursPage() {
 
   if (profile?.member_type !== 'teacher' && profile?.role !== 'admin') {
     redirect('/credits');
+  }
+
+  // Credit hours sandbox: hide from non-admin users
+  const teachingRole = profile?.role ?? 'member';
+  if (teachingRole !== 'admin' && teachingRole !== 'moderator') {
+    const sandboxed = await isSandboxActive('credit_hours_sandbox');
+    if (sandboxed) redirect('/dashboard');
   }
 
   const totals = await getUserCreditTotals(userId, client as Parameters<typeof getUserCreditTotals>[1]);

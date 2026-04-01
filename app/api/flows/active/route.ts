@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getEffectiveUserId } from '@/lib/supabase/getEffectiveUserId';
 import { getActiveFlowForUser } from '@/lib/flows/engine';
+import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { FlowTriggerType } from '@/lib/flows/types';
 
 export async function GET(request: Request) {
@@ -9,6 +10,17 @@ export async function GET(request: Request) {
     userId = await getEffectiveUserId();
   } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Check flows sandbox — if active, only admins see flows
+  const supabase = await createSupabaseServerClient();
+  const [{ data: sandboxRow }, { data: profile }] = await Promise.all([
+    supabase.from('site_settings').select('value').eq('key', 'flows_sandbox').single(),
+    supabase.from('profiles').select('role').eq('id', userId).single(),
+  ]);
+  const role = profile?.role ?? 'member';
+  if (sandboxRow?.value === 'true' && role !== 'admin' && role !== 'moderator') {
+    return NextResponse.json({ flow: null }, { status: 200 });
   }
 
   // Read optional trigger query param, default to 'login'
