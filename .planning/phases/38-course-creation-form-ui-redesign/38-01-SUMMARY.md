@@ -132,3 +132,14 @@ None — no external service configuration required.
 ---
 *Phase: 38-course-creation-form-ui-redesign*
 *Completed: 2026-04-01*
+
+## Self-Check: PASSED
+
+- FOUND: lib/types.ts
+- FOUND: app/admin/courses/components/CourseForm.tsx
+- FOUND: app/admin/courses/new/page.tsx
+- FOUND: app/admin/courses/[id]/edit/page.tsx
+- FOUND: .planning/phases/38-course-creation-form-ui-redesign/38-01-SUMMARY.md
+- FOUND: commit d96839f (Task 1)
+- FOUND: commit 26f177e (Task 2)
+- tsc --noEmit: only pre-existing type definition errors (linkify-it, mdurl), no new errors from this plan
