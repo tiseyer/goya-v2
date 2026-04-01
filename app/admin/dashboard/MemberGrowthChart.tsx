@@ -117,14 +117,14 @@ export default function MemberGrowthChart() {
                   color: 'white',
                   padding: '8px 12px',
                 }}
-                labelFormatter={(d: string) =>
-                  new Date(d).toLocaleDateString('en-US', {
+                labelFormatter={(d: unknown) =>
+                  new Date(String(d)).toLocaleDateString('en-US', {
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
                   })
                 }
-                formatter={(value: number) => [value.toLocaleString(), 'Members']}
+                formatter={(value: unknown) => [Number(value).toLocaleString(), 'Members']}
               />
               <Area
                 type="monotone"
