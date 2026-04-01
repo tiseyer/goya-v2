@@ -11,9 +11,13 @@
 - ✅ **v1.8 AI Support System** - Phases 12-15 (shipped 2026-03-30)
 - ✅ **v1.9 Member Events** - Phases 16-21 (shipped 2026-03-31)
 - ✅ **v1.10 Member Courses** - Phases 22-27 (shipped 2026-03-31)
-- 🚧 **v1.14 School Owner System** - Phases 28-35 (in progress)
+- ✅ **v1.14 School Owner System** - Phases 28-35 (shipped 2026-03-31)
+- 🚧 **v1.15 Course System Redesign** - Phases 36-40 (in progress)
 
 ## Phases
+
+<details>
+<summary>✅ v1.14 School Owner System (Phases 28-35) - SHIPPED 2026-03-31</summary>
 
 **Milestone Goal:** Teachers can register their yoga school on GOYA — select designations, pay via Stripe, complete onboarding, get admin-verified, and go live with a public school profile.
 
@@ -149,17 +153,100 @@ Plans:
 Plans:
 - [x] 35-01-PLAN.md — Faculty invitation email + registration auto-link
 
+</details>
+
+### 🚧 v1.15 Course System Redesign (In Progress)
+
+**Milestone Goal:** Redesign admin course management with categories table, multi-lesson support, drag-and-drop ordering, platform-aware video fields, and modern SaaS UI.
+
+- [ ] **Phase 36: Database Migrations** - Create course_categories and lessons tables, migrate courses schema, RLS policies, TypeScript types
+- [ ] **Phase 37: Admin Courses — Tabs + Categories** - Courses/Categories tab bar, category table, CRUD modal, delete guard
+- [ ] **Phase 38: Course Creation Form — UI Redesign** - Card-section layout, dynamic category select, duration slider, remove vimeo_url, post-save redirect
+- [ ] **Phase 39: Lesson Management — UI + Logic** - Drag-and-drop lesson list, type-specific forms (Video/Audio/Text), sort_order persistence, mobile touch support
+- [ ] **Phase 40: Wire Lessons to Frontend** - Academy page lesson list, lesson player page by type, category color on course cards, member my-courses lesson management
+
+### Phase 36: Database Migrations
+**Goal**: The database fully supports the course system redesign — course_categories and lessons tables exist, courses schema updated, RLS policies enforced, and TypeScript types pass
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: DB-01, DB-02, DB-03, DB-04, DB-05, DB-06, DB-07
+**Success Criteria** (what must be TRUE):
+  1. The course_categories table exists with 5 seeded canonical categories (Workshop, Yoga Sequence, Dharma Talk, Music Playlist, Research), each with id, name, slug, description, color, parent_id, and sort_order
+  2. The lessons table exists with course_id FK (CASCADE), type enum (video/audio/text), sort_order as numeric for float-position drag reorder, and all platform-specific URL and media fields
+  3. The courses table has category_id FK pointing to course_categories, duration_minutes integer column, and the old category text column and vimeo_url column are dropped
+  4. RLS on course_categories allows admin/mod full CRUD and public SELECT; RLS on lessons allows admin/mod full CRUD, members SELECT published lessons of published courses, and course creators SELECT their own
+  5. npx tsc --noEmit passes with no type errors after types are regenerated
+**Plans**: TBD
+
+### Phase 37: Admin Courses — Tabs + Categories
+**Goal**: Admins can manage course categories from a dedicated tab on the courses page, with full CRUD and a safe delete guard
+**Depends on**: Phase 36
+**Requirements**: ACAT-01, ACAT-02, ACAT-03, ACAT-04, ACAT-05
+**Success Criteria** (what must be TRUE):
+  1. The admin courses page has a Courses/Categories tab bar; switching tabs does not lose the current course list state
+  2. The Categories tab shows a table with color swatch, name, slug, parent category, description, and edit/delete action buttons
+  3. An admin can open an "Add Category" modal, enter a name (slug auto-generates), optionally set description, parent, and color, and save to the database
+  4. An admin can open an existing category in the same modal, edit any field, and save the update
+  5. Clicking delete on a category that has courses referencing it shows the course count and blocks deletion; a category with no references is deleted immediately
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 38: Course Creation Form — UI Redesign
+**Goal**: The admin course creation and edit form has a premium card-section layout, database-driven category select, and duration slider, with no legacy vimeo_url field
+**Depends on**: Phase 36, Phase 37
+**Requirements**: ACF-01, ACF-02, ACF-03, ACF-04, ACF-05, ACF-06, ACF-07
+**Success Criteria** (what must be TRUE):
+  1. The course form is structured as visually distinct card sections (e.g., Basic Info, Media, Settings) rather than a flat single-scroll form
+  2. The category dropdown is populated from the course_categories table; selecting a category saves category_id to the database
+  3. The duration field is a slider from 5 to 600 minutes in steps of 5, displaying the selected value as "Xh Ym" next to the slider
+  4. The vimeo_url field is absent from the form; no reference to it appears in the UI
+  5. After saving a new course, the admin is redirected to the course edit page where they can immediately add lessons
+  6. The form renders correctly on mobile screens with no overflow or truncated controls
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 39: Lesson Management — UI + Logic
+**Goal**: Admins can add, edit, reorder, and delete lessons on the course edit page, with type-specific forms for Video, Audio, and Text lessons and full drag-and-drop support on desktop and mobile
+**Depends on**: Phase 36, Phase 38
+**Requirements**: LM-01, LM-02, LM-03, LM-04, LM-05, LM-06, LM-07, LM-08, LM-09
+**Success Criteria** (what must be TRUE):
+  1. The course edit page has a Lessons section; when no lessons exist the section shows "No lessons yet" with a prompt to add the first lesson
+  2. Each lesson in the list shows a drag handle, sequential number, title, type badge (Video/Audio/Text), duration, and edit/delete actions
+  3. Clicking "Add lesson" or the edit button opens a form with a visual type selector (card-style toggle for Video, Audio, Text)
+  4. The Video lesson form shows a platform toggle (Vimeo/YouTube), URL field, short and long description fields, and a duration slider (1–180 min); the Audio form shows audio URL, featured image upload, descriptions, and duration slider; the Text form shows featured image, descriptions, and duration slider
+  5. Dragging a lesson to a new position updates sort_order in the database with a single-row write (float position midpoint); the list reflects the new order immediately without a full page reload
+  6. Drag-and-drop works on touch screens (mobile and tablet)
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 40: Wire Lessons to Frontend
+**Goal**: The public academy shows lesson lists on course detail pages, renders each lesson type correctly, displays category colors on course cards, and member course management includes the same lesson editor
+**Depends on**: Phase 36, Phase 39
+**Requirements**: FA-01, FA-02, FA-03, FA-04, FA-05
+**Success Criteria** (what must be TRUE):
+  1. The /academy/[id] page shows an ordered lesson list fetched from the lessons table, with a type icon, title, and duration for each lesson
+  2. Each lesson has a player page at /academy/[id]/lesson that renders correctly by type — Vimeo or YouTube embed for Video, an HTML5 audio player for Audio, and formatted text for Text
+  3. Lessons appear in the order defined by sort_order, not insertion order
+  4. Course cards on the academy listing page display a colored badge or border that reflects the category color stored in course_categories
+  5. The My Courses settings page for members includes the same lesson management section available to admins (without the category tab)
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
-**Execution Order:** 28 → 29 + 30 (parallel) → 31 → 32 + 33 (parallel) → 34 → 35
+**Execution Order:** 36 → 37 → 38 → 39 → 40
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 28. Database Foundation | 2/2 | Complete    | 2026-03-31 |
-| 29. Interest & Entry Points | 1/1 | Complete    | 2026-03-31 |
-| 30. School Registration Flow | 2/2 | Complete   | 2026-03-31 |
-| 31. School Onboarding Flow | 3/3 | Complete    | 2026-03-31 |
-| 32. School Settings | 3/3 | Complete    | 2026-03-31 |
-| 33. Admin School Management | 2/2 | Complete    | 2026-03-31 |
-| 34. Public School Profile | 2/2 | Complete    | 2026-03-31 |
-| 35. Faculty Invitations | 1/1 | Complete   | 2026-03-31 |
+| 28. Database Foundation | 2/2 | Complete | 2026-03-31 |
+| 29. Interest & Entry Points | 1/1 | Complete | 2026-03-31 |
+| 30. School Registration Flow | 2/2 | Complete | 2026-03-31 |
+| 31. School Onboarding Flow | 3/3 | Complete | 2026-03-31 |
+| 32. School Settings | 3/3 | Complete | 2026-03-31 |
+| 33. Admin School Management | 2/2 | Complete | 2026-03-31 |
+| 34. Public School Profile | 2/2 | Complete | 2026-03-31 |
+| 35. Faculty Invitations | 1/1 | Complete | 2026-03-31 |
+| 36. Database Migrations | 0/? | Not started | - |
+| 37. Admin Courses — Tabs + Categories | 0/? | Not started | - |
+| 38. Course Creation Form — UI Redesign | 0/? | Not started | - |
+| 39. Lesson Management — UI + Logic | 0/? | Not started | - |
+| 40. Wire Lessons to Frontend | 0/? | Not started | - |

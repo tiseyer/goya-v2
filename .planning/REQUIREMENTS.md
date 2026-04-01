@@ -79,45 +79,45 @@ Requirements for Course System Redesign milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | — | Pending |
-| DB-02 | — | Pending |
-| DB-03 | — | Pending |
-| DB-04 | — | Pending |
-| DB-05 | — | Pending |
-| DB-06 | — | Pending |
-| DB-07 | — | Pending |
-| ACAT-01 | — | Pending |
-| ACAT-02 | — | Pending |
-| ACAT-03 | — | Pending |
-| ACAT-04 | — | Pending |
-| ACAT-05 | — | Pending |
-| ACF-01 | — | Pending |
-| ACF-02 | — | Pending |
-| ACF-03 | — | Pending |
-| ACF-04 | — | Pending |
-| ACF-05 | — | Pending |
-| ACF-06 | — | Pending |
-| ACF-07 | — | Pending |
-| LM-01 | — | Pending |
-| LM-02 | — | Pending |
-| LM-03 | — | Pending |
-| LM-04 | — | Pending |
-| LM-05 | — | Pending |
-| LM-06 | — | Pending |
-| LM-07 | — | Pending |
-| LM-08 | — | Pending |
-| LM-09 | — | Pending |
-| FA-01 | — | Pending |
-| FA-02 | — | Pending |
-| FA-03 | — | Pending |
-| FA-04 | — | Pending |
-| FA-05 | — | Pending |
+| DB-01 | Phase 36 | Pending |
+| DB-02 | Phase 36 | Pending |
+| DB-03 | Phase 36 | Pending |
+| DB-04 | Phase 36 | Pending |
+| DB-05 | Phase 36 | Pending |
+| DB-06 | Phase 36 | Pending |
+| DB-07 | Phase 36 | Pending |
+| ACAT-01 | Phase 37 | Pending |
+| ACAT-02 | Phase 37 | Pending |
+| ACAT-03 | Phase 37 | Pending |
+| ACAT-04 | Phase 37 | Pending |
+| ACAT-05 | Phase 37 | Pending |
+| ACF-01 | Phase 38 | Pending |
+| ACF-02 | Phase 38 | Pending |
+| ACF-03 | Phase 38 | Pending |
+| ACF-04 | Phase 38 | Pending |
+| ACF-05 | Phase 38 | Pending |
+| ACF-06 | Phase 38 | Pending |
+| ACF-07 | Phase 38 | Pending |
+| LM-01 | Phase 39 | Pending |
+| LM-02 | Phase 39 | Pending |
+| LM-03 | Phase 39 | Pending |
+| LM-04 | Phase 39 | Pending |
+| LM-05 | Phase 39 | Pending |
+| LM-06 | Phase 39 | Pending |
+| LM-07 | Phase 39 | Pending |
+| LM-08 | Phase 39 | Pending |
+| LM-09 | Phase 39 | Pending |
+| FA-01 | Phase 40 | Pending |
+| FA-02 | Phase 40 | Pending |
+| FA-03 | Phase 40 | Pending |
+| FA-04 | Phase 40 | Pending |
+| FA-05 | Phase 40 | Pending |
 
 **Coverage:**
 - v1.15 requirements: 33 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 33
+- Mapped to phases: 33
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-01*
-*Last updated: 2026-04-01 after initial definition*
+*Last updated: 2026-04-01 after roadmap creation — all 33 requirements mapped to Phases 36-40*

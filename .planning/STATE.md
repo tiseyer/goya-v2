@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.15
 milestone_name: Course System Redesign
-status: defining_requirements
+status: ready_to_plan
 stopped_at: ""
 last_updated: "2026-04-01T00:00:00.000Z"
 last_activity: 2026-04-01
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-01)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** Defining requirements for v1.15 Course System Redesign
+**Current focus:** Phase 36 — Database Migrations (v1.15 Course System Redesign)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-04-01 — Milestone v1.15 started
+Phase: 36 of 40 (Database Migrations)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-04-01 — Roadmap created for v1.15 Course System Redesign (Phases 36-40)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -52,24 +54,25 @@ Last activity: 2026-04-01 — Milestone v1.15 started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- v1.15: Float numeric sort_order for lessons (not integer) — enables single-row drag reorder via midpoint math
+- v1.15: LessonList.tsx must use dynamic(..., { ssr: false }) — dnd-kit uses browser APIs that fail during SSR
+- v1.15: Category FK backfill order is critical — add column, seed categories, UPDATE existing courses, verify zero NULLs, then drop old text column
 - v1.10: Shared audit utility pattern (lib/courses/audit.ts) — reuse for course-related changes
-- v1.9: event_type column distinguishes 'goya' vs 'member' — course_type follows same pattern
-- v1.8: Chat route must run Node.js runtime — crypto required for AES-256-GCM decryption
-- v1.6: Per-route auth composition — /api/ excluded from middleware; each handler validates explicitly
-- event_categories table exists as pattern reference for course_categories
+- event_categories migration is the authoritative schema reference for course_categories
 
 ### Codebase Findings (v1.15 pre-flight)
 
 - `course_categories` table: does NOT exist — needs creation
 - `lessons` table: does NOT exist — needs creation
 - `courses.vimeo_url`: exists — needs removal (moves to lessons)
-- `courses.course_type`: already exists ✓
 - `courses.category`: string column — needs replacement with `category_id` FK
 - `event_categories` table: exists as pattern reference
+- `@dnd-kit/sortable` v10: already installed (used in ProductsTable.tsx)
 
 ### Blockers/Concerns
 
-None yet.
+- Category FK backfill: 8 existing seed courses have duration as freeform text (e.g. "4h 30m") — Phase 36 migration must parse to integer minutes; unparseable values default to 0
+- Vimeo embed domain allowlist: production domain and localhost:3000 must be added to Vimeo before Phase 40 testing
 
 ### Pending Todos
 
@@ -92,5 +95,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-04-01T00:00:00.000Z
-Stopped at: Milestone v1.15 started
+Stopped at: Roadmap created — Phases 36-40 defined, ready to plan Phase 36
 Resume file: None
