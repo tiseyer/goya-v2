@@ -3,7 +3,7 @@ title: Database Schema
 audience: ["developer"]
 section: developer
 order: 3
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # Database Schema
@@ -458,8 +458,9 @@ Hierarchical folder structure for media organisation.
 |---|---|---|
 | `name` | `text` | — |
 | `parent_id` | `uuid` | Self-referential FK (nullable = root) |
-| `bucket` | `text` | — |
+| `bucket` | `text` | Default `'media'`. Which storage bucket this folder belongs to. |
 | `sort_order` | `integer` | — |
+| `is_system` | `boolean` | Default `false`. System folders (created by migrations) vs user-created folders. |
 
 ---
 
