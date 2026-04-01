@@ -33,6 +33,7 @@ export interface Deployment {
   commitSha: string
   createdAt: string
   isCurrent: boolean
+  target: 'production' | 'preview'
 }
 
 // ─── Route handler ───────────────────────────────────────────────────────────
@@ -74,29 +75,13 @@ export async function GET() {
   const currentBranch = process.env.VERCEL_GIT_COMMIT_REF ?? ''
   const currentEnv = process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'development'
 
-  try {
-    const res = await fetch(
-      `https://api.vercel.com/v6/deployments?projectId=${projectId}&limit=50&state=READY`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+  }
 
-    if (!res.ok) {
-      console.error('[deployments] Vercel API non-200:', res.status)
-      return NextResponse.json(
-        { error: 'Failed to fetch deployments' },
-        { status: 502, headers: { 'Cache-Control': 'no-store' } }
-      )
-    }
-
-    const json = (await res.json()) as VercelDeploymentsResponse
-    const raw = json?.deployments ?? []
-
-    const deployments: Deployment[] = raw.map((d) => {
+  function mapDeployments(raw: VercelDeployment[], target: 'production' | 'preview'): Deployment[] {
+    return raw.map((d) => {
       const sha = d.meta?.githubCommitSha ?? ''
       const url = d.url.startsWith('http') ? d.url : `https://${d.url}`
       return {
@@ -106,8 +91,65 @@ export async function GET() {
         commitSha: sha,
         createdAt: new Date(d.created).toISOString(),
         isCurrent: Boolean(currentSha && sha && sha === currentSha),
+        target,
       }
     })
+  }
+
+  try {
+    const [previewRes, productionRes] = await Promise.all([
+      fetch(
+        `https://api.vercel.com/v6/deployments?projectId=${projectId}&limit=50&state=READY`,
+        { headers }
+      ),
+      fetch(
+        `https://api.vercel.com/v6/deployments?projectId=${projectId}&limit=10&state=READY&target=production`,
+        { headers }
+      ),
+    ])
+
+    let previewDeployments: Deployment[] = []
+    let productionDeployments: Deployment[] = []
+
+    if (previewRes.ok) {
+      const json = (await previewRes.json()) as VercelDeploymentsResponse
+      previewDeployments = mapDeployments(json?.deployments ?? [], 'preview')
+    } else {
+      console.warn('[deployments] Preview fetch non-200:', previewRes.status)
+    }
+
+    if (productionRes.ok) {
+      const json = (await productionRes.json()) as VercelDeploymentsResponse
+      productionDeployments = mapDeployments(json?.deployments ?? [], 'production')
+    } else {
+      console.warn('[deployments] Production fetch non-200:', productionRes.status)
+    }
+
+    if (!previewRes.ok && !productionRes.ok) {
+      return NextResponse.json(
+        { error: 'Failed to fetch deployments' },
+        { status: 502, headers: { 'Cache-Control': 'no-store' } }
+      )
+    }
+
+    // Merge and deduplicate by commitSha — production takes priority over preview for same SHA
+    const merged = new Map<string, Deployment>()
+
+    // Add preview deployments first (lower priority)
+    for (const dep of previewDeployments) {
+      const key = dep.commitSha || dep.url
+      merged.set(key, dep)
+    }
+
+    // Add production deployments second (overwrites preview entries for same SHA)
+    for (const dep of productionDeployments) {
+      const key = dep.commitSha || dep.url
+      merged.set(key, dep)
+    }
+
+    const deployments = Array.from(merged.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
 
     return NextResponse.json(
       {
