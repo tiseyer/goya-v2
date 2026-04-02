@@ -29,10 +29,10 @@ Requirements for Dashboard Redesign milestone. Each maps to roadmap phases.
 
 ### Student Dashboard
 
-- [ ] **STU-01**: Greeting + "Ready to practice today?"
-- [ ] **STU-02**: Recommended teachers carousel with style-tag matching + "Show all teachers →"
-- [ ] **STU-03**: Courses carousel with interest matching + "Show all courses →"
-- [ ] **STU-04**: Upcoming events carousel + "Show all events →"
+- [x] **STU-01**: Greeting + "Ready to practice today?"
+- [x] **STU-02**: Recommended teachers carousel with style-tag matching + "Show all teachers →"
+- [x] **STU-03**: Courses carousel with interest matching + "Show all courses →"
+- [x] **STU-04**: Upcoming events carousel + "Show all events →"
 
 ### Teacher Dashboard
 
@@ -104,10 +104,10 @@ Requirements for Dashboard Redesign milestone. Each maps to roadmap phases.
 | COMP-07 | Phase 44 | Pending |
 | COMP-08 | Phase 44 | Pending |
 | COMP-09 | Phase 44 | Pending |
-| STU-01 | Phase 45 | Pending |
-| STU-02 | Phase 45 | Pending |
-| STU-03 | Phase 45 | Pending |
-| STU-04 | Phase 45 | Pending |
+| STU-01 | Phase 45 | Complete |
+| STU-02 | Phase 45 | Complete |
+| STU-03 | Phase 45 | Complete |
+| STU-04 | Phase 45 | Complete |
 | TCH-01 | Phase 46 | Pending |
 | TCH-02 | Phase 46 | Pending |
 | TCH-03 | Phase 46 | Pending |
