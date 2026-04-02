@@ -370,7 +370,7 @@ Plans:
 
 **Milestone Goal:** Rebuild /members/[id] with cover image hero, role-specific pill sections, intro video embed, school affiliation, faculty grid, events/courses carousels, Mapbox map, sidebar with membership card and social links, and own-profile editing nudge.
 
-- [ ] **Phase 47: Foundation** - DB migration (4 new cols), lib/types.ts update, PUBLIC_PROFILE_COLUMNS, deriveProfileVisibility(), own-profile detection, Promise.all data fetch skeleton, fetchMemberEvents/fetchMemberCourses
+- [x] **Phase 47: Foundation** - DB migration, types, privacy helper, data fetch architecture (completed 2026-04-02)
 - [ ] **Phase 48: Hero + Sidebar** - ProfileHero (cover, avatar, name, badge, intro, location, languages, actions), ProfileSidebar (membership card, designations, connect/message, social links, quick stats), two-column layout, pill + format design tokens
 - [ ] **Phase 49: Content Sections** - Bio section, role-specific pill sections (4 role types), school affiliation card + faculty list for teachers, faculty grid + community section for schools
 - [ ] **Phase 50: Media** - Intro video facade embed, Mapbox GL JS inline map (privacy-gated), events carousel, courses carousel
@@ -456,7 +456,7 @@ Plans:
 | 44. Shared UI Components | 2/2 | Complete | 2026-04-02 |
 | 45. Student + Wellness Practitioner Dashboards | 2/2 | Complete | 2026-04-02 |
 | 46. Teacher + School Dashboards | 2/2 | Complete | 2026-04-02 |
-| 47. Foundation | 0/TBD | Not started | - |
+| 47. Foundation | 2/2 | Complete | 2026-04-02 |
 | 48. Hero + Sidebar | 0/TBD | Not started | - |
 | 49. Content Sections | 0/TBD | Not started | - |
 | 50. Media | 0/TBD | Not started | - |
