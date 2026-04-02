@@ -13,7 +13,8 @@
     "avatars:migrate": "tsx scripts/migrate-wp-avatars.ts",
     "media:migrate-wp": "tsx scripts/migrate-wp-media.ts",
     "buckets:ensure": "tsx scripts/ensure-buckets.ts",
-    "migration:recon": "tsx scripts/recon-migration.ts"
+    "migration:recon": "tsx scripts/recon-migration.ts",
+    "seed:school-test": "tsx scripts/seed-school-context-test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
