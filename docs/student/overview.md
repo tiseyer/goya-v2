@@ -3,7 +3,7 @@ title: Student Role Overview
 audience: ["student"]
 section: student
 order: 1
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # Student Role Overview
@@ -41,6 +41,8 @@ Welcome to GOYA — a global community for yoga practitioners, teachers, and sch
 ---
 
 ## How the platform is organised
+
+**Dashboard** — Your personalised home page (`/dashboard`). Shows a greeting, a carousel of teachers you are connected with, recently published courses, and upcoming events. Each section links to its full directory page.
 
 **Members** — Browse and connect with the global GOYA community. Find teachers by location, specialty, or designation using the interactive directory and map view.
 

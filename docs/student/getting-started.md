@@ -3,7 +3,7 @@ title: Getting Started
 audience: ["student"]
 section: student
 order: 2
-last_updated: "2026-03-31"
+last_updated: "2026-04-01"
 ---
 
 # Getting Started
@@ -12,11 +12,24 @@ Welcome to GOYA. This guide walks you through the first things to do after creat
 
 ## Table of Contents
 
+- [Your Dashboard](#your-dashboard)
 - [Step 1 — Complete your profile](#step-1--complete-your-profile)
 - [Step 2 — Find teachers and members](#step-2--find-teachers-and-members)
 - [Step 3 — Explore events](#step-3--explore-events)
 - [Step 4 — Browse the Academy](#step-4--browse-the-academy)
 - [Step 5 — Get to know your Settings](#step-5--get-to-know-your-settings)
+
+---
+
+## Your Dashboard
+
+After signing in, you land on your personal **Dashboard** (`/dashboard`). It is designed to give you a quick overview of what is happening in the community:
+
+- **Teachers that might suit you** — a scrollable carousel of teachers you are connected with. Click "Show all teachers" to browse the full member directory filtered by the Teacher role.
+- **Courses you might enjoy** — a carousel of recently published courses from the Academy. Click "Show all courses" to view the full catalogue.
+- **Upcoming events** — a carousel of the next events on the community calendar. Click "Show all events" to see the full calendar.
+
+If a section is empty, a prompt will guide you to the relevant directory page.
 
 ---
 
