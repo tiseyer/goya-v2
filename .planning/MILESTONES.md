@@ -1,5 +1,21 @@
 # Milestones
 
+## v1.18 User Profile Redesign (Shipped: 2026-04-02)
+
+**Phases completed:** 4 phases (47-50), 7 plans
+**Files changed:** 17 | **Lines:** +1,679 / -236
+
+**Key accomplishments:**
+
+- Foundation: migration (4 new profile columns + lineage fix), lib/members/ module with privacy helper (deriveProfileVisibility), PUBLIC_PROFILE_COLUMNS, own-profile detection, Promise.all data fetch
+- ProfileHero: cover image with dark overlay, 120px avatar with white ring, name, role badge, intro text, location, language pills, action buttons, edit button, completion nudge
+- ProfileSidebar: sticky sidebar with membership card, gold designation badges, connect/message buttons, social link icons, quick stats
+- Content: ProfileBio, reusable ProfilePillSection, 4-role pill orchestrator (teacher/student/school/wellness), SchoolAffiliation, FacultyGrid, CommunitySection
+- Media: ProfileVideo (YouTube facade with thumbnail + play click), ProfileMap (Mapbox GL JS, privacy-gated), events + courses carousels reusing dashboard components
+- Privacy: server-side enforcement — no map/address for students or online-only profiles
+
+---
+
 ## v1.17 Dashboard Redesign (Shipped: 2026-04-02)
 
 **Phases completed:** 4 phases (43-46), 8 plans

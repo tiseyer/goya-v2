@@ -8,23 +8,15 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: v1.18 User Profile Redesign
+## Current Milestone: (Planning next)
 
-**Goal:** Rebuild the public member profile page (`/members/[id]`) with hero, role-specific pill sections, intro video, school affiliation, faculty grid, events/courses carousels, Mapbox map, sidebar with membership card and social links, and own-profile editing nudge.
-
-**Target features:**
-- Hero with cover image, 120px avatar, name, role badge, intro text, location, languages, action buttons
-- Intro video embed (YouTube/Vimeo), role-specific pill sections per user type
-- School affiliation for teachers, Faculty grid + Community section for schools
-- Events + Courses carousels reusing dashboard components
-- Mapbox inline map for in-person/hybrid users
-- Sidebar: membership card, designation badges, connect/message, social icons, quick stats
-- Own profile: edit button + completion nudge banner
-- Privacy rules for address visibility (no full address for students or online-only)
+No active milestone. Run `/gsd:new-milestone` to start the next one.
 
 ## Current State
 
-**As of v1.17 (2026-04-02):** Dashboard Redesign shipped. Complete rebuild of /dashboard with role-specific layouts (Student, Teacher, School, Wellness Practitioner). Apple/Netflix aesthetic with horizontal carousels (embla + snap-x), profile completion scoring (6-field weighted), stat heroes, value-driven CTAs. "View as School" toggle for school-owner teachers. Old community feed deleted.
+**As of v1.18 (2026-04-02):** User Profile Redesign shipped. Complete rebuild of /members/[id] with cover image hero, 120px avatar, role badge, intro video (YouTube facade), role-specific pill sections (4 types), school affiliation + faculty grid + community section, Mapbox GL JS map (privacy-gated), events + courses carousels, sidebar with membership card + designations + social icons, own-profile edit button + completion nudge. Server-side privacy enforcement via deriveProfileVisibility().
+
+**Previous v1.17 (2026-04-02):** Dashboard Redesign shipped. Complete rebuild of /dashboard with role-specific layouts (Student, Teacher, School, Wellness Practitioner). Apple/Netflix aesthetic with horizontal carousels (embla + snap-x), profile completion scoring (6-field weighted), stat heroes, value-driven CTAs. "View as School" toggle for school-owner teachers. Old community feed deleted.
 
 **Previous v1.16 (2026-04-02):** Admin Color Settings milestone shipped. Admins can configure brand colors (Primary, Accent, Background, Surface, Border, Foreground), role colors (Student, Teacher, Wellness, School, Moderator, Admin), and maintenance indicator color from Admin Settings > Colors tab. ThemeColorProvider server component injects 13 CSS variables globally on every page, with instant preview and per-color reset.
 
@@ -187,6 +179,15 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 - ✓ Wellness Practitioner dashboard: completion, stat hero, CTAs, connections, events — v1.17
 - ✓ Profile completion scoring: 6-field weighted (avatar, bio, location, styles, social, content) — v1.17
 
+<!-- v1.18 User Profile Redesign milestone -->
+- ✓ Profile page foundation: migration (cover_image_url, location_lat/lng, location_place_id), PUBLIC_PROFILE_COLUMNS, deriveProfileVisibility(), own-profile auth — v1.18
+- ✓ ProfileHero: cover image, 120px avatar, role badge, intro text, location, language pills, action buttons — v1.18
+- ✓ ProfileSidebar: sticky sidebar, membership card, gold designation badges, social icons, quick stats — v1.18
+- ✓ Role-specific pill sections: teacher, student, school, wellness practitioner with reusable ProfilePillSection — v1.18
+- ✓ SchoolAffiliation + FacultyGrid + CommunitySection for teacher/school profiles — v1.18
+- ✓ ProfileVideo YouTube facade + ProfileMap Mapbox GL JS (privacy-gated) — v1.18
+- ✓ Events + courses carousels on profile pages reusing dashboard components — v1.18
+
 ### Out of Scope
 
 - Notification preferences — out of scope for settings MVP
@@ -246,6 +247,10 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 | Embla + CSS snap-x for carousels | embla-carousel-react for desktop drag, CSS snap for mobile touch, @utility no-scrollbar | ✓ HorizontalCarousel — v1.17 |
 | JSONB empty arrays = incomplete | isFieldComplete() checks Array.isArray(v) ? v.length > 0 : Boolean(v) | ✓ profileCompletion.ts — v1.17 |
 | Server-side only data fetching for dashboard | Promise.all in page.tsx, role layouts receive props — no client-side fetching | ✓ page.tsx — v1.17 |
+| PUBLIC_PROFILE_COLUMNS for profile security | Never select('*') with service role — explicit column allowlist | ✓ constants.ts — v1.18 |
+| deriveProfileVisibility() server-side privacy | Students/online-only never see map/full address — enforced before props reach client | ✓ profileVisibility.ts — v1.18 |
+| YouTube facade pattern for video embeds | Thumbnail + play overlay, iframe only on click — saves 500KB+ initial load | ✓ ProfileVideo.tsx — v1.18 |
+| Mapbox GL JS with interactive:false | Non-interactive single-marker map, dynamic(ssr:false), 240px height | ✓ ProfileMap.tsx — v1.18 |
 
 ## Parallel Workstream: v1.11 Media Library
 
@@ -288,4 +293,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after v1.18 User Profile Redesign milestone started*
+*Last updated: 2026-04-02 after v1.18 User Profile Redesign milestone shipped*
