@@ -342,7 +342,10 @@ Plans:
   3. lib/dashboard/profileCompletion.ts exports a scorer with isFieldComplete() that treats JSONB empty arrays as incomplete; a fresh test account with no fields filled scores 0%
   4. app/dashboard/page.tsx is an async server component using getEffectiveUserId() + Promise.all, branching to DashboardStudent, DashboardTeacher, DashboardSchool, or DashboardWellness stubs based on role — where school is detected via role='teacher' AND principal_trainer_school_id IS NOT NULL
   5. Visiting /dashboard as each role (and impersonating a teacher with a school) renders the correct stub without errors
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 43-01-PLAN.md — Grep audit + delete feed files, create lib/dashboard/queries.ts and profileCompletion.ts
+- [ ] 43-02-PLAN.md — Rewrite page.tsx as async server component with role branching + 4 role layout stubs
 
 ### Phase 44: Shared UI Components
 **Goal**: HorizontalCarousel, DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero, and all five card types exist as reusable components that any role layout can consume
@@ -354,7 +357,10 @@ Plans:
   3. ProfileCompletionCard renders a progress bar (0–100%), a checklist of the 6 weighted fields, and deep links to the exact settings section for each incomplete field — the card is hidden when completion is 100%
   4. StatHero displays its metric tile with an explicit "—" when the value is null or undefined; it never shows "0 profile views" for untracked stats
   5. All five card types (TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard) render correctly with shrink-0 set so they do not collapse inside the carousel, and each has a "Show all →" link at the carousel header pointing to the relevant directory page
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 43-01-PLAN.md — Grep audit + delete feed files, create lib/dashboard/queries.ts and profileCompletion.ts
+- [ ] 43-02-PLAN.md — Rewrite page.tsx as async server component with role branching + 4 role layout stubs
 **UI hint**: yes
 
 ### Phase 45: Student + Wellness Practitioner Dashboards
@@ -366,7 +372,10 @@ Plans:
   2. A Wellness Practitioner visiting /dashboard sees a greeting with WP role badge, a profile completion card (when < 100%), a stat hero placeholder, primary CTAs for sharing an event and adding a course, a suggested connections panel linking to the directory, and an upcoming events carousel
   3. Both layouts are mobile-first: sections stack vertically on small screens, CTAs display side-by-side on desktop
   4. Empty carousels show a non-blank empty state with a contextual CTA rather than an invisible blank space
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 43-01-PLAN.md — Grep audit + delete feed files, create lib/dashboard/queries.ts and profileCompletion.ts
+- [ ] 43-02-PLAN.md — Rewrite page.tsx as async server component with role branching + 4 role layout stubs
 **UI hint**: yes
 
 ### Phase 46: Teacher + School Dashboards
@@ -378,7 +387,10 @@ Plans:
   2. A teacher who owns a school sees a "View as School" toggle; activating it switches the layout to show the school name in the greeting, a school profile completion card, a school discovery stat hero, school-specific CTAs ("Add workshops & courses", "Manage designations"), a faculty list (max 5) with "Manage faculty →", and an enrolled students list (max 5) with "View all →"
   3. The "View as School" toggle state is remembered within the session so refreshing does not reset it
   4. Both layouts are mobile-first: sections stack vertically on small screens, CTAs display side-by-side on desktop
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 43-01-PLAN.md — Grep audit + delete feed files, create lib/dashboard/queries.ts and profileCompletion.ts
+- [ ] 43-02-PLAN.md — Rewrite page.tsx as async server component with role branching + 4 role layout stubs
 **UI hint**: yes
 
 ## Progress
@@ -402,7 +414,7 @@ Plans:
 | 40. Wire Lessons to Frontend | 3/3 | Complete | 2026-04-01 |
 | 41. ThemeProvider Infrastructure | 1/1 | Complete | 2026-04-01 |
 | 42. Admin Colors UI | 1/1 | Complete | 2026-04-01 |
-| 43. Feed Cleanup + Data Infrastructure | 0/? | Not started | - |
+| 43. Feed Cleanup + Data Infrastructure | 0/2 | Not started | - |
 | 44. Shared UI Components | 0/? | Not started | - |
 | 45. Student + Wellness Practitioner Dashboards | 0/? | Not started | - |
 | 46. Teacher + School Dashboards | 0/? | Not started | - |
