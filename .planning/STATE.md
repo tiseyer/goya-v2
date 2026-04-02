@@ -80,6 +80,7 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260402-jsp | Fix profile route UUID/slug resolution and dropdown link | 2026-04-02 | a6b3344, da8697a | [260402-jsp-fix-profile-route-uuid-slug-resolution-a](./quick/260402-jsp-fix-profile-route-uuid-slug-resolution-a/) |
+| 260402-jts | Fix dashboard to show full v1.17 redesign (carousels) | 2026-04-02 | 17b17ff, 555da57 | [260402-jts-fix-dashboard-to-show-full-v1-17-redesig](./quick/260402-jts-fix-dashboard-to-show-full-v1-17-redesig/) |
 
 ## Session Continuity
 
