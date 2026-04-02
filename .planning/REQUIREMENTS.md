@@ -1,91 +1,139 @@
 # Requirements: GOYA v2
 
-**Defined:** 2026-04-01
+**Defined:** 2026-04-02
 **Core Value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## v1.16 Requirements
+## v1.17 Requirements
 
-Requirements for Admin Color Settings milestone. Each maps to roadmap phases.
+Requirements for Dashboard Redesign milestone. Each maps to roadmap phases.
 
-### Brand Colors
+### Infrastructure
 
-- [ ] **BRAND-01**: Admin can view and edit Primary Blue color via color picker with hex input and preview swatch
-- [ ] **BRAND-02**: Admin can view and edit Accent Red color via color picker with hex input and preview swatch
-- [ ] **BRAND-03**: Admin can view and edit Background, Surface, Border, and Text Foreground colors
-- [ ] **BRAND-04**: Admin can reset any individual brand color to its default value
-- [ ] **BRAND-05**: Brand color changes are persisted to site_settings as JSON key "brand_colors"
+- [ ] **INFRA-01**: Dashboard page.tsx is an async server component with parallel data fetching via Promise.all
+- [ ] **INFRA-02**: Role branching renders Student, Teacher, School, or Wellness Practitioner layout based on profile role + school ownership
+- [ ] **INFRA-03**: Teacher with principal_trainer_school_id can switch to "View as School" dashboard mode
+- [ ] **INFRA-04**: HorizontalCarousel component with snap-x scrolling, swipeable on mobile, hidden scrollbar on desktop
+- [ ] **INFRA-05**: Old dashboard feed UI (FeedView, PostComposer, etc.) safely deleted after import audit
 
-### Role Colors
+### Shared Components
 
-- [ ] **ROLE-01**: Admin can view and edit colors for all 6 roles (Student, Teacher, Wellness Practitioner, School, Moderator, Admin)
-- [ ] **ROLE-02**: Admin can reset any individual role color to its default value
-- [ ] **ROLE-03**: Role color changes are persisted to site_settings as JSON key "role_colors"
+- [ ] **COMP-01**: DashboardGreeting shows time-of-day greeting, user name, and role badge
+- [ ] **COMP-02**: ProfileCompletionCard with checklist, progress bar, and deep links to settings (shown when < 100%)
+- [ ] **COMP-03**: StatHero displays a single large metric with placeholder "—" when no data
+- [ ] **COMP-04**: PrimaryActionCard with value line and CTA button (Hormozi principle)
+- [ ] **COMP-05**: TeacherCard for recommended teachers carousel
+- [ ] **COMP-06**: CourseCard for courses carousel
+- [ ] **COMP-07**: EventCard for upcoming events carousel
+- [ ] **COMP-08**: ConnectionCard for recent connections list
+- [ ] **COMP-09**: FacultyCard for school faculty list
 
-### Maintenance Indicator
+### Student Dashboard
 
-- [ ] **MAINT-01**: Admin can view and edit the maintenance indicator color with default amber (#F59E0B)
-- [ ] **MAINT-02**: Maintenance indicator color is persisted to site_settings as key "maintenance_indicator_color"
+- [ ] **STU-01**: Greeting + "Ready to practice today?"
+- [ ] **STU-02**: Recommended teachers carousel with style-tag matching + "Show all teachers →"
+- [ ] **STU-03**: Courses carousel with interest matching + "Show all courses →"
+- [ ] **STU-04**: Upcoming events carousel + "Show all events →"
 
-### Color Infrastructure
+### Teacher Dashboard
 
-- [ ] **INFRA-01**: ThemeProvider component reads brand_colors and role_colors from site_settings and injects CSS variables on the html element
-- [ ] **INFRA-02**: ThemeProvider wraps the app in layout.tsx so colors apply globally
-- [ ] **INFRA-03**: Color changes preview instantly in the admin UI before saving (CSS vars update on change)
-- [ ] **INFRA-04**: "Save" button persists all changes to site_settings
-- [ ] **INFRA-05**: "Reset All" button resets all colors to defaults
+- [ ] **TCH-01**: Greeting + teacher role badge
+- [ ] **TCH-02**: Profile completion card (when < 100%) with 6 weighted fields
+- [ ] **TCH-03**: Stat hero showing weekly profile views (placeholder)
+- [ ] **TCH-04**: Primary CTAs: "Share your next event" + "Add a course link"
+- [ ] **TCH-05**: Recent connections list (max 3) + "View all connections →"
 
-### Admin UI
+### School Dashboard
 
-- [ ] **UI-01**: Colors settings page accessible at /admin/settings with "Colors" tab
-- [ ] **UI-02**: Page has 3 sections: Brand Colors, Role Colors, Maintenance Indicator
-- [ ] **UI-03**: "Colors" appears in admin sidebar under Settings group
+- [ ] **SCH-01**: Greeting with school name + "School" badge
+- [ ] **SCH-02**: Profile completion card for school fields
+- [ ] **SCH-03**: Stat hero showing weekly school discovery (placeholder)
+- [ ] **SCH-04**: Primary CTAs: "Add workshops & courses" + "Manage designations"
+- [ ] **SCH-05**: Faculty list (max 5) + "Manage faculty →"
+- [ ] **SCH-06**: Enrolled students list (max 5) + "View all →"
+
+### Wellness Practitioner Dashboard
+
+- [ ] **WP-01**: Greeting + WP role badge
+- [ ] **WP-02**: Profile completion card with WP-specific fields
+- [ ] **WP-03**: Stat hero (placeholder)
+- [ ] **WP-04**: Primary CTAs: "Share your next event" + "Add a course"
+- [ ] **WP-05**: Suggested connections (teachers/schools nearby) + "Explore directory →"
+- [ ] **WP-06**: Upcoming events carousel
+
+### Design
+
+- [ ] **DES-01**: Apple/Netflix aesthetic — large white space, bold headers, minimal color, no clutter
+- [ ] **DES-02**: Mobile-first responsive layout — stacked on mobile, side-by-side CTAs on desktop
+- [ ] **DES-03**: Each carousel has "Show all →" link at top right leading to relevant directory page
 
 ## Future Requirements
 
-### Color Enhancements (deferred)
+### Dashboard Enhancements (deferred)
 
-- **CLR-F01**: Dark mode toggle with separate dark color palette
-- **CLR-F02**: Color scheme presets (e.g., "Ocean", "Earth", "Sunset")
-- **CLR-F03**: Per-school brand color overrides
-- **CLR-F04**: Color accessibility contrast checker (WCAG AA/AAA)
+- **DASH-F01**: Real profile view analytics (track views, show actual numbers)
+- **DASH-F02**: Content recommendation algorithm (beyond simple tag matching)
+- **DASH-F03**: Netflix-style content library with categories
+- **DASH-F04**: Notification feed on dashboard
+- **DASH-F05**: Teacher schedule/calendar widget
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Dark mode | Separate feature — v1.16 focuses on admin-configurable brand/role colors only |
-| Per-school colors | School-level theming is a larger feature, deferred |
-| Color presets/themes | Keep it simple — manual hex input for now |
-| Accessibility checker | Nice-to-have, not blocking for color configuration |
+| Real view tracking / analytics | Placeholder "—" for now — analytics wired up in future milestone |
+| Recommendation algorithm | Simple tag matching sufficient for v1.17 |
+| Netflix-style content library | Phase 2 feature |
+| Community feed on dashboard | Explicitly removed per spec — no feed |
+| Dark mode dashboard | Covered by ThemeProvider (v1.16), not dashboard-specific |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BRAND-01 | Phase 42 | Pending |
-| BRAND-02 | Phase 42 | Pending |
-| BRAND-03 | Phase 42 | Pending |
-| BRAND-04 | Phase 42 | Pending |
-| BRAND-05 | Phase 41 | Pending |
-| ROLE-01 | Phase 42 | Pending |
-| ROLE-02 | Phase 42 | Pending |
-| ROLE-03 | Phase 41 | Pending |
-| MAINT-01 | Phase 42 | Pending |
-| MAINT-02 | Phase 41 | Pending |
-| INFRA-01 | Phase 41 | Pending |
-| INFRA-02 | Phase 41 | Pending |
-| INFRA-03 | Phase 42 | Pending |
-| INFRA-04 | Phase 42 | Pending |
-| INFRA-05 | Phase 42 | Pending |
-| UI-01 | Phase 42 | Pending |
-| UI-02 | Phase 42 | Pending |
-| UI-03 | Phase 42 | Pending |
+| INFRA-01 | — | Pending |
+| INFRA-02 | — | Pending |
+| INFRA-03 | — | Pending |
+| INFRA-04 | — | Pending |
+| INFRA-05 | — | Pending |
+| COMP-01 | — | Pending |
+| COMP-02 | — | Pending |
+| COMP-03 | — | Pending |
+| COMP-04 | — | Pending |
+| COMP-05 | — | Pending |
+| COMP-06 | — | Pending |
+| COMP-07 | — | Pending |
+| COMP-08 | — | Pending |
+| COMP-09 | — | Pending |
+| STU-01 | — | Pending |
+| STU-02 | — | Pending |
+| STU-03 | — | Pending |
+| STU-04 | — | Pending |
+| TCH-01 | — | Pending |
+| TCH-02 | — | Pending |
+| TCH-03 | — | Pending |
+| TCH-04 | — | Pending |
+| TCH-05 | — | Pending |
+| SCH-01 | — | Pending |
+| SCH-02 | — | Pending |
+| SCH-03 | — | Pending |
+| SCH-04 | — | Pending |
+| SCH-05 | — | Pending |
+| SCH-06 | — | Pending |
+| WP-01 | — | Pending |
+| WP-02 | — | Pending |
+| WP-03 | — | Pending |
+| WP-04 | — | Pending |
+| WP-05 | — | Pending |
+| WP-06 | — | Pending |
+| DES-01 | — | Pending |
+| DES-02 | — | Pending |
+| DES-03 | — | Pending |
 
 **Coverage:**
-- v1.16 requirements: 18 total
-- Mapped to phases: 18
-- Unmapped: 0
+- v1.17 requirements: 38 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 38
 
 ---
-*Requirements defined: 2026-04-01*
-*Last updated: 2026-04-01*
+*Requirements defined: 2026-04-02*
+*Last updated: 2026-04-02*
