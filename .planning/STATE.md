@@ -73,7 +73,13 @@ None.
 
 ### Pending Todos
 
-- [ ] Plan Phase 47 via /gsd:plan-phase 47
+None.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260402-jsp | Fix profile route UUID/slug resolution and dropdown link | 2026-04-02 | a6b3344, da8697a | [260402-jsp-fix-profile-route-uuid-slug-resolution-a](./quick/260402-jsp-fix-profile-route-uuid-slug-resolution-a/) |
 
 ## Session Continuity
 
