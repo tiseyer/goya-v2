@@ -434,7 +434,9 @@ Plans:
   3. A teacher or wellness practitioner with in-person or hybrid practice_format and non-null location_lat/lng sees an inline Mapbox map pinned to their location; students and members with online-only format see no map element at all (enforced server-side via deriveProfileVisibility())
   4. A member's published events appear in a horizontal carousel reusing HorizontalCarousel + EventCard from dashboard components; the section is hidden when the member has no published events
   5. A member's published courses appear in a horizontal carousel reusing HorizontalCarousel + CourseCard; the section is hidden when the member has no published courses
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 50-01-PLAN.md — Video facade, Mapbox map, events & courses carousels
 **UI hint**: yes
 
 ## Progress
