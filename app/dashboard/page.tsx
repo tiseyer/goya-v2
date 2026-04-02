@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { getEffectiveUserId, getEffectiveClient } from '@/lib/supabase/getEffectiveUserId'
 import { getUserCreditTotals } from '@/lib/credits'
 import {
@@ -9,6 +10,7 @@ import {
   fetchUserInProgressCourses,
 } from '@/lib/dashboard/queries'
 import { getProfileCompletion } from '@/lib/dashboard/profileCompletion'
+import { parseActiveContext } from '@/lib/active-context'
 import DashboardStudent from './components/DashboardStudent'
 import DashboardTeacher from './components/DashboardTeacher'
 import DashboardSchool from './components/DashboardSchool'
@@ -17,12 +19,7 @@ import DashboardWellness from './components/DashboardWellness'
 const PROFILE_COLUMNS =
   'id, full_name, username, avatar_url, role, bio, location, website, instagram, youtube, teaching_styles, principal_trainer_school_id, member_type'
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}) {
-  const params = await searchParams
+export default async function DashboardPage() {
   const userId = await getEffectiveUserId()
   const supabase = await getEffectiveClient()
 
@@ -36,13 +33,14 @@ export default async function DashboardPage({
   if (!profile) redirect('/sign-in')
 
   // 2. Detect school ownership
-  // CRITICAL: school owners have role='teacher' AND principal_trainer_school_id IS NOT NULL
-  // There is NO separate 'school' role — never check role === 'school'
   const isSchoolOwner =
     profile.role === 'teacher' && Boolean(profile.principal_trainer_school_id)
 
-  // 3. "View as School" toggle — URL param ?view=school
-  const viewAsSchool = isSchoolOwner && params.view === 'school'
+  // 3. Read active context from middleware header
+  const headerList = await headers()
+  const contextHeader = headerList.get('x-active-context')
+  const activeContext = parseActiveContext(contextHeader, userId)
+  const viewAsSchool = activeContext.type === 'school'
 
   // 4. Parallel data fetch via Promise.all
   const [events, courses, connections, creditTotals, inProgressCourses] =
@@ -54,20 +52,23 @@ export default async function DashboardPage({
       fetchUserInProgressCourses(supabase, userId),
     ])
 
-  // 5. School-specific data (only when viewing as school)
+  // 5. School-specific data (only when in school context)
   let school = null
   let faculty: Awaited<ReturnType<typeof fetchSchoolFaculty>> = []
-  if (viewAsSchool && profile.principal_trainer_school_id) {
-    const [schoolRes, facultyRes] = await Promise.all([
-      supabase
-        .from('schools')
-        .select('id, name, slug, bio, logo_url, status')
-        .eq('id', profile.principal_trainer_school_id)
-        .single(),
-      fetchSchoolFaculty(supabase, profile.principal_trainer_school_id),
-    ])
-    school = schoolRes.data
-    faculty = facultyRes
+  if (viewAsSchool) {
+    const schoolId = activeContext.type === 'school' ? activeContext.schoolId : null
+    if (schoolId) {
+      const [schoolRes, facultyRes] = await Promise.all([
+        supabase
+          .from('schools')
+          .select('id, name, slug, bio, logo_url, status')
+          .eq('id', schoolId)
+          .single(),
+        fetchSchoolFaculty(supabase, schoolId),
+      ])
+      school = schoolRes.data
+      faculty = facultyRes
+    }
   }
 
   // 6. Profile completion — computed server-side to avoid client flicker
@@ -92,7 +93,7 @@ export default async function DashboardPage({
 
   // 8. Role branching — in page.tsx, NOT layout.tsx (layouts don't re-run on navigation)
 
-  // School view (teacher + school + ?view=school)
+  // School view (active school context)
   if (viewAsSchool && school) {
     return (
       <DashboardSchool

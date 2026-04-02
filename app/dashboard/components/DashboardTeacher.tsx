@@ -30,19 +30,7 @@ export default function DashboardTeacher({
             subtitle="Welcome back."
           />
 
-          {/* 2. View as School toggle — only for school owners */}
-          {isSchoolOwner && (
-            <div>
-              <Link
-                href="/dashboard?view=school"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-full transition-colors"
-              >
-                View as School <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          )}
-
-          {/* 3. Profile completion nudge (auto-hides at 100%) */}
+          {/* 2. Profile completion nudge (auto-hides at 100%) */}
           <ProfileCompletionCard completion={completion} />
 
           {/* 4. Stat hero — profile views (placeholder) */}

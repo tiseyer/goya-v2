@@ -38,18 +38,7 @@ export default function DashboardSchool({
             subtitle="Welcome back."
           />
 
-          {/* 2. "View as Teacher" toggle pill */}
-          <div>
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-full transition-colors"
-            >
-              <span aria-hidden="true">&larr;</span>
-              View as Teacher
-            </Link>
-          </div>
-
-          {/* 3. School profile completion card */}
+          {/* 2. School profile completion card */}
           {completion.score < 100 && (
             <div>
               <p className="text-sm text-slate-500 -mb-4">
