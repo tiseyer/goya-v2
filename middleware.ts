@@ -332,7 +332,7 @@ export async function middleware(request: NextRequest) {
       } else {
         // Invalid context — reset cookie to personal
         response.cookies.set('goya_active_context', 'personal', {
-          httpOnly: true,
+          httpOnly: false,
           sameSite: 'lax',
           path: '/',
           secure: process.env.NODE_ENV === 'production',

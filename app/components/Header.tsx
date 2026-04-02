@@ -12,8 +12,17 @@ import { ThemeInline } from '@/app/components/ThemeToggle';
 import type { NotifRecord } from '@/app/context/ConnectionsContext';
 import { useImpersonation } from '@/app/context/ImpersonationContext';
 import { endImpersonation } from '@/app/actions/impersonation';
+import { switchContext } from '@/app/actions/context';
 import { getNotifications, markNotificationsRead, getUnreadNotificationCount } from '@/lib/messaging';
 import type { AppNotification } from '@/lib/types';
+
+interface ContextSchool {
+  id: string
+  name: string
+  slug: string
+  logo_url: string | null
+  status: string
+}
 
 // ─── config ───────────────────────────────────────────────────────────────────
 
@@ -416,7 +425,6 @@ function UserMenu({
   userId,
   userUsername,
   userMemberType,
-  userSchoolId,
   avatarUrl,
   onLogout,
   isImpersonating,
@@ -424,6 +432,9 @@ function UserMenu({
   impersonatedName,
   impersonatedInitials,
   impersonatedAvatarUrl,
+  availableSchools,
+  activeSchoolId,
+  onSwitchContext,
 }: {
   userName: string;
   userMrn: string;
@@ -432,7 +443,6 @@ function UserMenu({
   userId?: string;
   userUsername?: string | null;
   userMemberType?: string;
-  userSchoolId?: string;
   avatarUrl?: string | null;
   onLogout: () => void;
   isImpersonating?: boolean;
@@ -440,20 +450,84 @@ function UserMenu({
   impersonatedName?: string;
   impersonatedInitials?: string;
   impersonatedAvatarUrl?: string | null;
+  availableSchools: ContextSchool[];
+  activeSchoolId: string | null;
+  onSwitchContext: (target: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setOpen(false));
 
-  const displayName = isImpersonating && impersonatedName ? impersonatedName : userName;
-  const displayInitials = isImpersonating && impersonatedInitials ? impersonatedInitials : userInitials;
-  const displayAvatar = isImpersonating ? impersonatedAvatarUrl : avatarUrl;
+  const isSchoolContext = !!activeSchoolId;
+  const activeSchool = availableSchools.find(s => s.id === activeSchoolId);
 
-  const menuItems = [
-    { label: 'My Profile',      href: userId ? `/members/${userUsername || userId}` : '#', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-    { label: 'Credits & Hours',  href: '/credits',            icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
-    ...(userMemberType === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' }] : []),
-    { label: 'Messages',        href: '/messages',           icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+  const displayName = isImpersonating && impersonatedName
+    ? impersonatedName
+    : isSchoolContext && activeSchool
+    ? activeSchool.name
+    : userName;
+
+  const displayInitials = isImpersonating && impersonatedInitials
+    ? impersonatedInitials
+    : isSchoolContext && activeSchool
+    ? activeSchool.name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : userInitials;
+
+  const displayAvatar = isImpersonating
+    ? impersonatedAvatarUrl
+    : isSchoolContext && activeSchool
+    ? activeSchool.logo_url
+    : avatarUrl;
+
+  const displaySubtext = isImpersonating
+    ? undefined
+    : isSchoolContext
+    ? 'School Account'
+    : userMrn
+    ? `MRN: ${userMrn}`
+    : undefined;
+
+  // SVG path constants
+  const ICON_PROFILE = 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z';
+  const ICON_CREDITS = 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z';
+  const ICON_TEACHING = 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z';
+  const ICON_MESSAGES = 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z';
+  const ICON_SETTINGS = 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z';
+  const ICON_SETTINGS_INNER = 'M15 12a3 3 0 11-6 0 3 3 0 016 0z';
+  const ICON_SCHOOL = 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h6';
+  const ICON_SWITCH = 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4';
+  const ICON_BACK = 'M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z';
+  const ICON_LOGOUT = 'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1';
+
+  function MenuIcon({ d, className }: { d: string; className?: string }) {
+    return (
+      <svg className={className || 'w-4 h-4 text-[#6B7280] shrink-0'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={d} />
+      </svg>
+    );
+  }
+
+  function MenuItem({ href, icon, label, onClick, className }: { href: string; icon: string; label: string; onClick?: () => void; className?: string }) {
+    return (
+      <Link href={href} onClick={() => { setOpen(false); onClick?.(); }}
+        className={className || 'flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors'}
+      >
+        <MenuIcon d={icon} />
+        {label}
+      </Link>
+    );
+  }
+
+  // Build context-aware menu items
+  const menuItems = isSchoolContext && activeSchool ? [
+    { label: 'School Profile', href: `/schools/${activeSchool.slug}`, icon: ICON_SCHOOL },
+    { label: 'Messages', href: '/messages', icon: ICON_MESSAGES },
+    { label: 'School Settings', href: `/schools/${activeSchool.slug}/settings`, icon: ICON_SETTINGS },
+  ] : [
+    { label: 'My Profile', href: userId ? `/members/${userUsername || userId}` : '#', icon: ICON_PROFILE },
+    { label: 'Credits & Hours', href: '/credits', icon: ICON_CREDITS },
+    ...(userMemberType === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours', icon: ICON_TEACHING }] : []),
+    { label: 'Messages', href: '/messages', icon: ICON_MESSAGES },
   ];
 
   return (
@@ -465,11 +539,10 @@ function UserMenu({
         }`}
         aria-label="User menu"
       >
-        {/* Avatar */}
         {displayAvatar ? (
-          <img src={displayAvatar} alt="" className={`w-7 h-7 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : ''}`} />
+          <img src={displayAvatar} alt="" className={`w-7 h-7 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : isSchoolContext ? 'ring-2 ring-[#345c83]' : ''}`} />
         ) : (
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : isSchoolContext ? 'bg-[#345c83]' : 'bg-[#4E87A0]'}`}>
             <span className="text-white text-[10px] font-black">{displayInitials}</span>
           </div>
         )}
@@ -481,135 +554,117 @@ function UserMenu({
 
       {open && (
         <Dropdown>
-          {/* User header */}
+          {/* Active identity header */}
           <div className="px-4 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
             {displayAvatar ? (
-              <img src={displayAvatar} alt="" className={`w-10 h-10 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : ''}`} />
+              <img src={displayAvatar} alt="" className={`w-10 h-10 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : isSchoolContext ? 'ring-2 ring-[#345c83]' : ''}`} />
             ) : (
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : isSchoolContext ? 'bg-[#345c83]' : 'bg-[#4E87A0]'}`}>
                 <span className="text-white text-xs font-black">{displayInitials}</span>
               </div>
             )}
             <div>
               <p className="text-sm font-semibold text-[#1B3A5C]">{displayName}</p>
-              {!isImpersonating && userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>}
+              {displaySubtext && <p className="text-[11px] text-[#6B7280]">{displaySubtext}</p>}
             </div>
           </div>
+
+          {/* Context switcher — only shown when schools available and not impersonating */}
+          {!isImpersonating && availableSchools.length > 0 && (
+            <div className="border-b border-[#E5E7EB] py-1.5">
+              <p className="px-4 py-1 text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider">Switch to</p>
+              {isSchoolContext ? (
+                /* In school context: show personal account as switch target */
+                <button
+                  onClick={() => { onSwitchContext('personal'); setOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+                >
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
+                      <span className="text-white text-[8px] font-black">{userInitials}</span>
+                    </div>
+                  )}
+                  <span className="flex-1 text-left">{userName}</span>
+                  <MenuIcon d={ICON_SWITCH} className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0" />
+                </button>
+              ) : (
+                /* In personal context: show available schools as switch targets */
+                availableSchools.map(school => (
+                  <button
+                    key={school.id}
+                    onClick={() => { onSwitchContext(`school:${school.id}`); setOpen(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+                  >
+                    {school.logo_url ? (
+                      <img src={school.logo_url} alt="" className="w-6 h-6 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-[#345c83] flex items-center justify-center shrink-0">
+                        <span className="text-white text-[8px] font-black">{school.name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()}</span>
+                      </div>
+                    )}
+                    <span className="flex-1 text-left">{school.name}</span>
+                    <MenuIcon d={ICON_SWITCH} className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0" />
+                  </button>
+                ))
+              )}
+            </div>
+          )}
 
           {/* Menu items */}
           <div className="py-1.5">
             {menuItems.map(item => (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
-              >
-                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={item.icon} />
-                </svg>
-                {item.label}
-              </Link>
+              <MenuItem key={item.label} href={item.href} icon={item.icon} label={item.label} />
             ))}
           </div>
 
           {/* Settings + Admin Settings — admin/moderator, hidden when impersonating */}
-          {!isImpersonating && (userRole === 'admin' || userRole === 'moderator') && (
+          {!isImpersonating && !isSchoolContext && (userRole === 'admin' || userRole === 'moderator') && (
             <div className="border-t border-[#E5E7EB] py-1.5">
-              <Link
-                href="/settings"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
-              >
-                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Settings
-              </Link>
-              <Link
-                href="/admin"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
-              >
-                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Admin Settings
-              </Link>
+              <MenuItem href="/settings" icon={ICON_SETTINGS} label="Settings" />
+              <MenuItem href="/admin" icon={ICON_SETTINGS} label="Admin Settings" />
             </div>
           )}
 
-          {/* Settings — regular users, hidden when impersonating */}
-          {!isImpersonating && userRole !== 'admin' && userRole !== 'moderator' && (
+          {/* Settings — regular users in personal context, hidden when impersonating */}
+          {!isImpersonating && !isSchoolContext && userRole !== 'admin' && userRole !== 'moderator' && (
             <div className="border-t border-[#E5E7EB] py-1.5">
-              <Link
-                href="/settings"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
-              >
-                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Settings
-              </Link>
+              <MenuItem href="/settings" icon={ICON_SETTINGS} label="Settings" />
             </div>
           )}
 
-          {/* School Settings / Register School (teacher role) — hidden when impersonating */}
-          {!isImpersonating && userRole === 'teacher' && (
+          {/* Register School — teachers without a school, personal context only */}
+          {!isImpersonating && !isSchoolContext && userRole === 'teacher' && availableSchools.length === 0 && (
             <div className="border-t border-[#E5E7EB] py-1.5">
-              {userSchoolId ? (
-                <Link
-                  href={`/schools/${userSchoolId}/settings`}
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
-                >
-                  <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h6" />
-                  </svg>
-                  School Settings
-                </Link>
-              ) : (
-                <Link
-                  href="/schools/create"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
-                >
-                  <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Register School
-                </Link>
-              )}
+              <MenuItem href="/schools/create" icon={ICON_SCHOOL} label="Register School" />
+            </div>
+          )}
+
+          {/* Back to personal — shown in school context */}
+          {!isImpersonating && isSchoolContext && (
+            <div className="border-t border-[#E5E7EB] py-1.5">
+              <button
+                onClick={() => { onSwitchContext('personal'); setOpen(false); }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
+              >
+                <MenuIcon d={ICON_BACK} />
+                Back to personal
+              </button>
             </div>
           )}
 
           {/* Settings + Switch Back — shown when impersonating */}
           {isImpersonating && (
             <div className="border-t border-[#E5E7EB] py-1.5">
-              <Link
-                href="/settings"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 transition-colors"
-              >
-                <svg className="w-4 h-4 text-[#6B7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Settings
-              </Link>
+              <MenuItem href="/settings" icon={ICON_SETTINGS} label="Settings" />
               <form action={endImpersonation}>
                 <button
                   type="submit"
                   onClick={() => setOpen(false)}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-amber-700 hover:text-amber-900 hover:bg-amber-50 transition-colors"
                 >
-                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
-                  </svg>
+                  <MenuIcon d={ICON_BACK} className="w-4 h-4 shrink-0" />
                   Switch Back to Admin
                 </button>
               </form>
@@ -627,9 +682,7 @@ function UserMenu({
               onClick={() => { setOpen(false); onLogout(); }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
             >
-              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              <MenuIcon d={ICON_LOGOUT} className="w-4 h-4 shrink-0" />
               Logout
             </button>
           </div>
@@ -807,7 +860,8 @@ export default function Header() {
   const [profile, setProfile] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [maintenanceActive, setMaintenanceActive] = useState(false);
-  const [schoolSlug, setSchoolSlug] = useState<string | null>(null);
+  const [availableSchools, setAvailableSchools] = useState<ContextSchool[]>([]);
+  const [activeSchoolId, setActiveSchoolId] = useState<string | null>(null);
   const { isImpersonating, targetProfile, adminProfile } = useImpersonation();
 
   function checkMaintenance(role: string | undefined) {
@@ -834,6 +888,61 @@ export default function Header() {
       });
   }
 
+  async function fetchSchoolContext(userId: string, role: string | undefined) {
+    if (role !== 'teacher') {
+      setAvailableSchools([]);
+      setActiveSchoolId(null);
+      return;
+    }
+
+    // Fetch schools where user is owner
+    const { data: owned } = await supabase
+      .from('schools')
+      .select('id, name, slug, logo_url, status')
+      .eq('owner_id', userId)
+      .in('status', ['approved', 'pending_review']);
+
+    // Fetch schools where user has can_manage faculty access
+    const { data: managedFaculty } = await supabase
+      .from('school_faculty')
+      .select('school_id')
+      .eq('profile_id', userId)
+      .eq('can_manage', true)
+      .eq('status', 'active');
+
+    const ownedIds = (owned ?? []).map((s: any) => s.id);
+    const managedIds = (managedFaculty ?? [])
+      .map((f: any) => f.school_id)
+      .filter((id: string) => !ownedIds.includes(id));
+
+    let managed: ContextSchool[] = [];
+    if (managedIds.length > 0) {
+      const { data: managedSchools } = await supabase
+        .from('schools')
+        .select('id, name, slug, logo_url, status')
+        .in('id', managedIds)
+        .in('status', ['approved', 'pending_review']);
+      managed = (managedSchools ?? []) as ContextSchool[];
+    }
+
+    const allSchools = [...((owned ?? []) as ContextSchool[]), ...managed];
+    setAvailableSchools(allSchools);
+
+    // Read active context from cookie (httpOnly=false won't work, so check header via fetch)
+    // Instead, derive from URL or rely on server-passed context
+    // For now, check the non-httpOnly readable cookie
+    const cookieValue = document.cookie
+      .split('; ')
+      .find(c => c.startsWith('goya_active_context='))
+      ?.split('=')[1];
+    if (cookieValue?.startsWith('school:')) {
+      const schoolId = cookieValue.slice(7);
+      if (allSchools.some(s => s.id === schoolId)) {
+        setActiveSchoolId(schoolId);
+      }
+    }
+  }
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user ?? null);
@@ -843,10 +952,7 @@ export default function Header() {
             setProfile(p);
             setAuthLoading(false);
             checkMaintenance(p?.role);
-            if (p?.role === 'teacher') {
-              supabase.from('schools').select('slug').eq('owner_id', data.user!.id).maybeSingle()
-                .then(({ data: s }: { data: { slug: string } | null }) => setSchoolSlug(s?.slug ?? null));
-            }
+            fetchSchoolContext(data.user!.id, p?.role);
           });
       } else {
         setAuthLoading(false);
@@ -859,17 +965,13 @@ export default function Header() {
           .then(({ data: p }) => {
             setProfile(p);
             checkMaintenance(p?.role);
-            if (p?.role === 'teacher') {
-              supabase.from('schools').select('slug').eq('owner_id', session.user!.id).maybeSingle()
-                .then(({ data: s }: { data: { slug: string } | null }) => setSchoolSlug(s?.slug ?? null));
-            } else {
-              setSchoolSlug(null);
-            }
+            fetchSchoolContext(session.user!.id, p?.role);
           });
       } else {
         setProfile(null);
         setMaintenanceActive(false);
-        setSchoolSlug(null);
+        setAvailableSchools([]);
+        setActiveSchoolId(null);
       }
     });
     return () => subscription.unsubscribe();
@@ -881,11 +983,26 @@ export default function Header() {
   const userMrn = profile?.mrn ?? '';
   const userInitials = getInitials(profile?.full_name, user?.email);
   const handleLogout = () => {
+    // Clear context cookie on logout
+    document.cookie = 'goya_active_context=; path=/; max-age=0';
+    setActiveSchoolId(null);
     supabase.auth.signOut().then(() => {
       setUser(null);
       setProfile(null);
       router.push('/');
     });
+  };
+
+  const handleSwitchContext = async (target: string) => {
+    const result = await switchContext(target);
+    if (!result.error) {
+      if (target === 'personal') {
+        setActiveSchoolId(null);
+      } else if (target.startsWith('school:')) {
+        setActiveSchoolId(target.slice(7));
+      }
+      router.refresh();
+    }
   };
 
   const impersonatedName = isImpersonating && targetProfile
@@ -965,7 +1082,6 @@ export default function Header() {
                   userId={isImpersonating && targetProfile ? targetProfile.id : profile?.id}
                   userUsername={isImpersonating && targetProfile ? targetProfile.username : profile?.username}
                   userMemberType={isImpersonating && targetProfile ? (targetProfile.member_type ?? undefined) : profile?.member_type}
-                  userSchoolId={schoolSlug ?? undefined}
                   avatarUrl={profile?.avatar_url}
                   onLogout={handleLogout}
                   isImpersonating={isImpersonating}
@@ -973,6 +1089,9 @@ export default function Header() {
                   impersonatedName={impersonatedName}
                   impersonatedInitials={impersonatedInitials}
                   impersonatedAvatarUrl={targetProfile?.avatar_url}
+                  availableSchools={availableSchools}
+                  activeSchoolId={activeSchoolId}
+                  onSwitchContext={handleSwitchContext}
                 />
               </>
             ) : (
@@ -1095,83 +1214,140 @@ export default function Header() {
               <div className="w-10 h-1 bg-slate-200 rounded-full" />
             </div>
             {/* User header */}
-            <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : 'bg-[#4E87A0]'}`}>
-                <span className="text-white text-xs font-black">{impersonatedInitials ?? userInitials}</span>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-[#1B3A5C]">{impersonatedName ?? userName}</p>
-                {isImpersonating ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full mt-0.5">
-                    Viewing as — admin: {adminProfile?.full_name ?? 'Admin'}
-                  </span>
-                ) : (
-                  userMrn && <p className="text-[11px] text-[#6B7280]">MRN: {userMrn}</p>
-                )}
-              </div>
-            </div>
-            {/* Menu items */}
-            <div className="px-3 py-2 space-y-0.5">
-              {[
-                { label: 'My Profile', href: (isImpersonating && targetProfile ? (targetProfile.username || targetProfile.id) : (profile?.username || profile?.id)) ? `/members/${isImpersonating && targetProfile ? (targetProfile.username || targetProfile.id) : (profile?.username || profile?.id)}` : '#' },
-                { label: 'Credits & Hours', href: '/credits' },
-                ...((isImpersonating ? targetProfile?.member_type : profile?.member_type) === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours' }] : []),
-                { label: 'Messages', href: '/messages' },
-              ].map(item => (
-                <Link key={item.label} href={item.href} onClick={() => setProfileOpen(false)}
-                  className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              {!isImpersonating && (profile?.role === 'admin' || profile?.role === 'moderator') && (
+            {(() => {
+              const activeSchool = availableSchools.find(s => s.id === activeSchoolId);
+              const mobileIsSchool = !!activeSchoolId && !!activeSchool;
+              const mobileName = isImpersonating ? (impersonatedName ?? userName)
+                : mobileIsSchool ? activeSchool.name : userName;
+              const mobileSubtext = isImpersonating ? undefined
+                : mobileIsSchool ? 'School Account' : userMrn || undefined;
+              const mobileInitials = isImpersonating ? (impersonatedInitials ?? userInitials)
+                : mobileIsSchool ? activeSchool.name.split(/\s+/).map((w: string) => w[0]).slice(0, 2).join('').toUpperCase() : userInitials;
+
+              return (
                 <>
-                  <Link href="/settings" onClick={() => setProfileOpen(false)}
-                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
-                  >
-                    Settings
-                  </Link>
-                  <Link href="/admin" onClick={() => setProfileOpen(false)}
-                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
-                  >
-                    Admin Settings
-                  </Link>
+                  <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : mobileIsSchool ? 'bg-[#345c83]' : 'bg-[#4E87A0]'}`}>
+                      <span className="text-white text-xs font-black">{mobileInitials}</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[#1B3A5C]">{mobileName}</p>
+                      {isImpersonating ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full mt-0.5">
+                          Viewing as — admin: {adminProfile?.full_name ?? 'Admin'}
+                        </span>
+                      ) : mobileSubtext ? (
+                        <p className="text-[11px] text-[#6B7280]">{mobileSubtext}</p>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* Context switcher (mobile) */}
+                  {!isImpersonating && availableSchools.length > 0 && (
+                    <div className="px-3 py-2 border-b border-[#E5E7EB]">
+                      <p className="px-4 py-1 text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider">Switch to</p>
+                      {mobileIsSchool ? (
+                        <button
+                          onClick={() => { handleSwitchContext('personal'); setProfileOpen(false); }}
+                          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#374151] hover:bg-slate-50 text-sm transition-colors"
+                        >
+                          <div className="w-6 h-6 rounded-full bg-[#4E87A0] flex items-center justify-center shrink-0">
+                            <span className="text-white text-[8px] font-black">{userInitials}</span>
+                          </div>
+                          {userName}
+                        </button>
+                      ) : (
+                        availableSchools.map(school => (
+                          <button
+                            key={school.id}
+                            onClick={() => { handleSwitchContext(`school:${school.id}`); setProfileOpen(false); }}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#374151] hover:bg-slate-50 text-sm transition-colors"
+                          >
+                            <div className="w-6 h-6 rounded-full bg-[#345c83] flex items-center justify-center shrink-0">
+                              <span className="text-white text-[8px] font-black">{school.name.split(/\s+/).map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()}</span>
+                            </div>
+                            {school.name}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+
+                  {/* Menu items */}
+                  <div className="px-3 py-2 space-y-0.5">
+                    {mobileIsSchool ? (
+                      <>
+                        <Link href={`/schools/${activeSchool.slug}`} onClick={() => setProfileOpen(false)}
+                          className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors">
+                          School Profile
+                        </Link>
+                        <Link href="/messages" onClick={() => setProfileOpen(false)}
+                          className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors">
+                          Messages
+                        </Link>
+                        <Link href={`/schools/${activeSchool.slug}/settings`} onClick={() => setProfileOpen(false)}
+                          className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors">
+                          School Settings
+                        </Link>
+                        <button
+                          onClick={() => { handleSwitchContext('personal'); setProfileOpen(false); }}
+                          className="w-full text-left px-4 py-3 rounded-xl text-[#374151] hover:bg-slate-50 text-sm transition-colors"
+                        >
+                          Back to personal
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        {[
+                          { label: 'My Profile', href: (isImpersonating && targetProfile ? (targetProfile.username || targetProfile.id) : (profile?.username || profile?.id)) ? `/members/${isImpersonating && targetProfile ? (targetProfile.username || targetProfile.id) : (profile?.username || profile?.id)}` : '#' },
+                          { label: 'Credits & Hours', href: '/credits' },
+                          ...((isImpersonating ? targetProfile?.member_type : profile?.member_type) === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours' }] : []),
+                          { label: 'Messages', href: '/messages' },
+                        ].map(item => (
+                          <Link key={item.label} href={item.href} onClick={() => setProfileOpen(false)}
+                            className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                        {!isImpersonating && (profile?.role === 'admin' || profile?.role === 'moderator') && (
+                          <>
+                            <Link href="/settings" onClick={() => setProfileOpen(false)}
+                              className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors">
+                              Settings
+                            </Link>
+                            <Link href="/admin" onClick={() => setProfileOpen(false)}
+                              className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors">
+                              Admin Settings
+                            </Link>
+                          </>
+                        )}
+                        {!isImpersonating && profile?.role !== 'admin' && profile?.role !== 'moderator' && (
+                          <Link href="/settings" onClick={() => setProfileOpen(false)}
+                            className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors">
+                            Settings
+                          </Link>
+                        )}
+                        {!isImpersonating && profile?.role === 'teacher' && availableSchools.length === 0 && (
+                          <Link href="/schools/create" onClick={() => setProfileOpen(false)}
+                            className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors">
+                            Register School
+                          </Link>
+                        )}
+                        {isImpersonating && (
+                          <form action={endImpersonation}>
+                            <button type="submit" onClick={() => setProfileOpen(false)}
+                              className="w-full text-left px-4 py-3 rounded-xl text-amber-700 hover:bg-amber-50 text-sm transition-colors">
+                              ↩ Switch Back to Admin
+                            </button>
+                          </form>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </>
-              )}
-              {!isImpersonating && profile?.role !== 'admin' && profile?.role !== 'moderator' && (
-                <Link href="/settings" onClick={() => setProfileOpen(false)}
-                  className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
-                >
-                  Settings
-                </Link>
-              )}
-              {!isImpersonating && profile?.role === 'teacher' && (
-                schoolSlug ? (
-                  <Link href={`/schools/${schoolSlug}/settings`} onClick={() => setProfileOpen(false)}
-                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
-                  >
-                    School Settings
-                  </Link>
-                ) : (
-                  <Link href="/schools/create" onClick={() => setProfileOpen(false)}
-                    className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors"
-                  >
-                    Register School
-                  </Link>
-                )
-              )}
-              {isImpersonating && (
-                <form action={endImpersonation}>
-                  <button
-                    type="submit"
-                    onClick={() => setProfileOpen(false)}
-                    className="w-full text-left px-4 py-3 rounded-xl text-amber-700 hover:bg-amber-50 text-sm transition-colors"
-                  >
-                    ↩ Switch Back to Admin
-                  </button>
-                </form>
-              )}
-            </div>
+              );
+            })()}
             <div className="px-3 pb-4">
               <button
                 onClick={() => { setProfileOpen(false); handleLogout(); }}

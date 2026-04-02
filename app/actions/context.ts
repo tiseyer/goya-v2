@@ -23,7 +23,7 @@ export async function switchContext(target: string): Promise<{ error?: string }>
 
   if (target === 'personal') {
     cookieStore.set(COOKIE_NAME, 'personal', {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: 'lax',
       path: '/',
       secure: process.env.NODE_ENV === 'production',
@@ -42,7 +42,7 @@ export async function switchContext(target: string): Promise<{ error?: string }>
     }
 
     cookieStore.set(COOKIE_NAME, target, {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: 'lax',
       path: '/',
       secure: process.env.NODE_ENV === 'production',
