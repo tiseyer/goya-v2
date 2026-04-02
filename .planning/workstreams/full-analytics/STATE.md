@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-01-PLAN.md — Visitors Analytics page with GA4 Data API integration
-last_updated: "2026-04-01T06:10:00.000Z"
-last_activity: 2026-04-01 — Completed Phase 03 Plan 01 (Visitors Analytics GA4)
+stopped_at: Completed 46-02-PLAN.md
+last_updated: "2026-04-02T05:01:34.667Z"
+last_activity: 2026-04-02
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 4
-  completed_plans: 3
+  total_plans: 3
+  completed_plans: 5
   percent: 60
 ---
 
@@ -28,7 +28,7 @@ See: .planning/workstreams/full-analytics/PROJECT.md (updated 2026-04-01)
 Phase: 03-visitors-analytics
 Plan: 01 (complete)
 Status: Executing
-Last activity: 2026-04-01 — Completed Visitors Analytics GA4 integration
+Last activity: 2026-04-02
 
 Progress: [██████░░░░] 60%
 
@@ -59,6 +59,14 @@ Progress: [██████░░░░] 60%
 - [Phase 40-wire-lessons-to-frontend]: CourseWithCategory local type extends Course with _categoryColor for academy listing — avoids polluting shared Course interface
 - [Phase 40]: MemberLessons uses useEffect + fetchLessons (not server-fetched initialLessons) — avoids re-architecting edit view as server component
 - [Phase 40]: next/dynamic ssr:false for LessonList in member my-courses — same pattern as admin LessonSection (dnd-kit fails on SSR)
+- [Phase 41-themeprovider-infrastructure]: CSS variable name mappings kept in defaults.ts as single source of truth; ThemeColorProvider generates :root block dynamically from those maps
+- [Phase 42]: Colors tab positioned after General in settings tab bar; per-color reset button uses opacity-0 when not dirty to avoid layout shift; live preview deferred until loaded flag is true
+- [Phase 43]: fetchUserInProgressCourses uses enrolled_at (not last_accessed_at) — actual user_course_progress schema has no last_accessed_at column
+- [Phase 43]: SchoolProps.school nullable fields: slug and status typed as string|null to match Supabase return type
+- [Phase 44]: @utility no-scrollbar in globals.css — tailwind-scrollbar-hide confirmed broken under Tailwind v4
+- [Phase 45-student-wp-dashboards]: StatHero value=null renders em-dash placeholder; real analytics deferred per REQUIREMENTS.md Out of Scope
+- [Phase 45]: Teacher carousel populates from connections filtered to role=teacher (no dedicated fetch query needed)
+- [Phase 46]: School name used as greeting firstName for school-owner framing
 
 ### Blockers/Concerns
 
@@ -66,6 +74,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T06:10:00.000Z
-Stopped at: Completed 03-01-PLAN.md — Visitors Analytics GA4 integration
+Last session: 2026-04-02T05:01:34.664Z
+Stopped at: Completed 46-02-PLAN.md
 Resume file: None
