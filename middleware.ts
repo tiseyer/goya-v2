@@ -135,6 +135,60 @@ function getPageRedirect(pathname: string, pages: Record<string, PageVisibilityE
   return null
 }
 
+// ─── Active context validation cache (60s TTL) ──────────────────────────────
+
+interface ContextValidationCache {
+  key: string // "userId:schoolId"
+  valid: boolean
+  expires: number
+}
+
+let contextValidationCache: ContextValidationCache | null = null
+
+async function validateContextAccess(userId: string, schoolId: string): Promise<boolean> {
+  const now = Date.now()
+  const key = `${userId}:${schoolId}`
+  if (contextValidationCache && contextValidationCache.key === key && now < contextValidationCache.expires) {
+    return contextValidationCache.valid
+  }
+
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+    // Check if owner
+    const ownerUrl = `${supabaseUrl}/rest/v1/schools?id=eq.${schoolId}&owner_id=eq.${userId}&select=id`
+    const ownerRes = await fetch(ownerUrl, {
+      headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+    })
+    if (ownerRes.ok) {
+      const ownerRows = await ownerRes.json()
+      if (ownerRows.length > 0) {
+        contextValidationCache = { key, valid: true, expires: now + 60_000 }
+        return true
+      }
+    }
+
+    // Check if can_manage faculty
+    const facultyUrl = `${supabaseUrl}/rest/v1/school_faculty?school_id=eq.${schoolId}&profile_id=eq.${userId}&can_manage=eq.true&status=eq.active&select=id`
+    const facultyRes = await fetch(facultyUrl, {
+      headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+    })
+    if (facultyRes.ok) {
+      const facultyRows = await facultyRes.json()
+      if (facultyRows.length > 0) {
+        contextValidationCache = { key, valid: true, expires: now + 60_000 }
+        return true
+      }
+    }
+
+    contextValidationCache = { key, valid: false, expires: now + 60_000 }
+    return false
+  } catch {
+    return false
+  }
+}
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
@@ -264,6 +318,29 @@ export async function middleware(request: NextRequest) {
       if (!isAdminOrMod) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
       }
+    }
+  }
+
+  // ─── Active context cookie forwarding ────────────────────────────────────────
+  if (user) {
+    const contextCookie = request.cookies.get('goya_active_context')?.value
+    if (contextCookie && contextCookie.startsWith('school:')) {
+      const schoolId = contextCookie.slice(7)
+      const valid = await validateContextAccess(user.id, schoolId)
+      if (valid) {
+        response.headers.set('x-active-context', contextCookie)
+      } else {
+        // Invalid context — reset cookie to personal
+        response.cookies.set('goya_active_context', 'personal', {
+          httpOnly: true,
+          sameSite: 'lax',
+          path: '/',
+          secure: process.env.NODE_ENV === 'production',
+        })
+        response.headers.set('x-active-context', 'personal')
+      }
+    } else {
+      response.headers.set('x-active-context', contextCookie || 'personal')
     }
   }
 

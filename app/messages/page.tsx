@@ -358,6 +358,8 @@ function MessagesPageInner() {
       id: `opt-${Date.now()}`,
       conversation_id: activeConvId,
       sender_id: userId,
+      sender_type: 'personal',
+      sender_school_id: null,
       content,
       read_at: null,
       created_at: new Date().toISOString(),
