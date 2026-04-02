@@ -1,6 +1,13 @@
 'use client'
+
+import Link from 'next/link'
 import PageContainer from '@/app/components/ui/PageContainer'
-import { getTimeOfDay, StubSection } from './utils'
+import Card from '@/app/components/ui/Card'
+import { DashboardGreeting } from './DashboardGreeting'
+import { HorizontalCarousel } from './HorizontalCarousel'
+import { TeacherCard } from './TeacherCard'
+import { CourseCard } from './CourseCard'
+import { EventCard } from './EventCard'
 import type { DashboardProps } from './types'
 
 export default function DashboardStudent({
@@ -8,25 +15,102 @@ export default function DashboardStudent({
   events,
   courses,
   connections,
-  completion,
 }: DashboardProps) {
   const firstName = profile.full_name?.trim().split(' ')[0] || 'there'
+
+  const teacherConnections = connections.filter(
+    (c) => c.profile.role === 'teacher'
+  )
+
   return (
     <div className="min-h-screen bg-slate-50">
       <PageContainer>
-        <div className="py-8 space-y-6">
-          <h1 className="text-2xl font-bold text-slate-900">
-            Good {getTimeOfDay()}, {firstName}
-          </h1>
-          <p className="text-slate-500">Ready to practice today?</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StubSection title="Upcoming Events" count={events.length} />
-            <StubSection title="Courses" count={courses.length} />
-            <StubSection title="Connections" count={connections.length} />
-          </div>
-          {completion.score < 100 && (
-            <StubSection title="Profile Completion" count={completion.score} suffix="%" />
-          )}
+        <div className="py-8 space-y-8">
+          {/* 1. Greeting */}
+          <DashboardGreeting
+            firstName={firstName}
+            role="student"
+            subtitle="Ready to practice today?"
+          />
+
+          {/* 2. Teachers carousel */}
+          <HorizontalCarousel
+            title="Teachers that might suit you"
+            showAllHref="/members?role=teacher"
+            showAllLabel="Show all teachers"
+            emptyState={
+              <Card variant="flat" padding="lg">
+                <p className="text-sm text-slate-500">
+                  Discover yoga teachers in the GOYA community.{' '}
+                  <Link href="/members?role=teacher" className="text-[var(--goya-primary)] hover:underline">
+                    Browse teachers
+                  </Link>
+                </p>
+              </Card>
+            }
+          >
+            {teacherConnections.length > 0
+              ? teacherConnections.map((c) => (
+                  <TeacherCard
+                    key={c.connectionId}
+                    teacher={{
+                      id: c.profile.id,
+                      full_name: c.profile.full_name,
+                      avatar_url: c.profile.avatar_url,
+                      teaching_styles: null,
+                      location: null,
+                      username: c.profile.username,
+                    }}
+                  />
+                ))
+              : null}
+          </HorizontalCarousel>
+
+          {/* 3. Courses carousel */}
+          <HorizontalCarousel
+            title="Courses you might enjoy"
+            showAllHref="/academy"
+            showAllLabel="Show all courses"
+            emptyState={
+              <Card variant="flat" padding="lg">
+                <p className="text-sm text-slate-500">
+                  Browse courses from GOYA teachers.{' '}
+                  <Link href="/academy" className="text-[var(--goya-primary)] hover:underline">
+                    Explore courses
+                  </Link>
+                </p>
+              </Card>
+            }
+          >
+            {courses.length > 0
+              ? courses.map((course) => (
+                  <CourseCard key={course.id} course={course} />
+                ))
+              : null}
+          </HorizontalCarousel>
+
+          {/* 4. Events carousel */}
+          <HorizontalCarousel
+            title="Upcoming events"
+            showAllHref="/events"
+            showAllLabel="Show all events"
+            emptyState={
+              <Card variant="flat" padding="lg">
+                <p className="text-sm text-slate-500">
+                  No upcoming events yet — check back soon.{' '}
+                  <Link href="/events" className="text-[var(--goya-primary)] hover:underline">
+                    Browse events
+                  </Link>
+                </p>
+              </Card>
+            }
+          >
+            {events.length > 0
+              ? events.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))
+              : null}
+          </HorizontalCarousel>
         </div>
       </PageContainer>
     </div>
