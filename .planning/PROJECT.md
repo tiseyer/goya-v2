@@ -8,23 +8,15 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: v1.17 Dashboard Redesign
+## Current Milestone: (Planning next)
 
-**Goal:** Rebuild the user dashboard (/dashboard) from scratch with role-specific layouts (Student, Teacher, School, Wellness Practitioner), Apple/Netflix aesthetic, horizontal carousels, profile completion scoring, stat heroes, and value-driven CTAs.
-
-**Target features:**
-- Role-specific dashboard layouts with greeting, profile completion, stat heroes, primary CTAs
-- Reusable HorizontalCarousel (snap-x, swipeable mobile, scrollable desktop)
-- Teacher/Course/Event cards in carousels with "Show all →" links
-- Profile completion scoring (6 weighted fields, calculated on the fly)
-- ProfileCompletionCard with checklist, progress bar, deep links
-- StatHero showing weekly profile views (placeholder until analytics)
-- ConnectionsList and FacultyList for teacher/school dashboards
-- Complete rebuild — delete all existing dashboard UI, no community feed
+No active milestone. Run `/gsd:new-milestone` to start the next one.
 
 ## Current State
 
-**As of v1.16 (2026-04-02):** Admin Color Settings milestone shipped. Admins can configure brand colors (Primary, Accent, Background, Surface, Border, Foreground), role colors (Student, Teacher, Wellness, School, Moderator, Admin), and maintenance indicator color from Admin Settings > Colors tab. ThemeColorProvider server component injects 13 CSS variables globally on every page, with instant preview and per-color reset.
+**As of v1.17 (2026-04-02):** Dashboard Redesign shipped. Complete rebuild of /dashboard with role-specific layouts (Student, Teacher, School, Wellness Practitioner). Apple/Netflix aesthetic with horizontal carousels (embla + snap-x), profile completion scoring (6-field weighted), stat heroes, value-driven CTAs. "View as School" toggle for school-owner teachers. Old community feed deleted.
+
+**Previous v1.16 (2026-04-02):** Admin Color Settings milestone shipped. Admins can configure brand colors (Primary, Accent, Background, Surface, Border, Foreground), role colors (Student, Teacher, Wellness, School, Moderator, Admin), and maintenance indicator color from Admin Settings > Colors tab. ThemeColorProvider server component injects 13 CSS variables globally on every page, with instant preview and per-color reset.
 
 **Previous v1.15 (2026-04-01):** Course System Redesign shipped. Admin course management with course_categories + lessons tables, Categories tab with CRUD, premium card-section course form with duration slider, drag-and-drop lesson management with type-specific forms (Video/Audio/Text), frontend lesson rendering, and member my-courses lesson editor.
 
@@ -175,6 +167,16 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 - ✓ Instant CSS variable preview, per-color reset, Save All, Reset All — v1.16
 - ✓ Colors entry in admin sidebar Settings group — v1.16
 
+<!-- v1.17 Dashboard Redesign milestone -->
+- ✓ Dashboard rebuilt as async server component with Promise.all + 4-way role branching — v1.17
+- ✓ HorizontalCarousel (embla + snap-x), DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero — v1.17
+- ✓ 5 card types: TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard — v1.17
+- ✓ Student dashboard: 3 carousels (teachers, courses, events) with style-tag matching — v1.17
+- ✓ Teacher dashboard: completion card, stat hero, CTAs, connections, View as School toggle — v1.17
+- ✓ School dashboard: school greeting, school CTAs, faculty list, students list — v1.17
+- ✓ Wellness Practitioner dashboard: completion, stat hero, CTAs, connections, events — v1.17
+- ✓ Profile completion scoring: 6-field weighted (avatar, bio, location, styles, social, content) — v1.17
+
 ### Out of Scope
 
 - Notification preferences — out of scope for settings MVP
@@ -230,6 +232,10 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 | ThemeColorProvider as server component | Fetches from site_settings via REST, injects CSS vars on html before body renders | ✓ layout.tsx — v1.16 |
 | site_settings JSON keys for colors | brand_colors, role_colors, maintenance_indicator_color — reuses existing upsert pattern | ✓ ColorsTab — v1.16 |
 | Native HTML color picker + hex input | No third-party color picker library needed — simple, accessible | ✓ ColorsTab — v1.16 |
+| School is teacher + principal_trainer_school_id, not a role | profiles.role has no 'school' value — View as School via URL param ?view=school | ✓ page.tsx — v1.17 |
+| Embla + CSS snap-x for carousels | embla-carousel-react for desktop drag, CSS snap for mobile touch, @utility no-scrollbar | ✓ HorizontalCarousel — v1.17 |
+| JSONB empty arrays = incomplete | isFieldComplete() checks Array.isArray(v) ? v.length > 0 : Boolean(v) | ✓ profileCompletion.ts — v1.17 |
+| Server-side only data fetching for dashboard | Promise.all in page.tsx, role layouts receive props — no client-side fetching | ✓ page.tsx — v1.17 |
 
 ## Parallel Workstream: v1.11 Media Library
 
@@ -272,4 +278,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after v1.17 Dashboard Redesign milestone started*
+*Last updated: 2026-04-02 after v1.17 Dashboard Redesign milestone shipped*

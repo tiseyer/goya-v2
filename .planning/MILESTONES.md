@@ -1,5 +1,21 @@
 # Milestones
 
+## v1.17 Dashboard Redesign (Shipped: 2026-04-02)
+
+**Phases completed:** 4 phases (43-46), 8 plans
+**Files changed:** 28 | **Lines:** +1,388 / -1,953 (net reduction — old feed deleted)
+
+**Key accomplishments:**
+
+- Complete dashboard rebuild: deleted old community feed, rewrote page.tsx as async server component with Promise.all + 4-way role branching (Student, Teacher, School, Wellness Practitioner)
+- Data infrastructure: lib/dashboard/queries.ts (5 fetch functions) + profileCompletion.ts (6-field weighted scorer handling JSONB empty arrays)
+- 10 shared components: HorizontalCarousel (embla + snap-x), DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero, TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard
+- Student dashboard: 3 carousels (teachers, courses, events) with style-tag matching and "Show all →" links
+- Teacher + School dashboards: profile completion, stat heroes, CTAs, connections list, "View as School" toggle for school owners with school-specific layout
+- Apple/Netflix aesthetic: large white space, minimal color, mobile-first responsive design
+
+---
+
 ## v1.16 Admin Color Settings (Shipped: 2026-04-02)
 
 **Phases completed:** 2 phases (41-42), 2 plans, 4 tasks
