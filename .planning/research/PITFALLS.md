@@ -1,379 +1,402 @@
-# Pitfalls Research
+# Domain Pitfalls
 
-**Domain:** LMS course system redesign — adding categories (string-to-FK migration), lessons table, drag-and-drop ordering, and video/audio embeds to an existing Next.js 16 + Supabase platform
-**Researched:** 2026-04-01
-**Confidence:** HIGH (codebase inspection of actual migration files and component code + verified external sources)
+**Domain:** Role-specific dashboards with carousels, profile completion scoring, and personalized content added to an existing Next.js 16 + Supabase platform
+**Researched:** 2026-04-02
+**Confidence:** HIGH (codebase inspection of actual `app/dashboard/page.tsx`, `supabase/migrations/`, and `app/components/` + verified external sources)
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: `category` String-to-FK Migration Leaves NULL Foreign Keys on Existing Rows
+### Pitfall 1: `overflow-x: hidden` on the Carousel Container Makes It Unscrollable
 
 **What goes wrong:**
-The current `courses.category` column is a `text` CHECK constraint with 5 hardcoded values (`'Workshop' | 'Yoga Sequence' | 'Dharma Talk' | 'Music Playlist' | 'Research'`). If the migration adds a `course_category_id uuid FK` column and drops the old `category` column without backfilling first, all 8 existing seed courses have `course_category_id IS NULL`. Every query that filters or displays category — including the admin courses page `CATEGORY_BADGE` map and the public academy category filter — silently returns wrong data or crashes.
+The instinct to hide the horizontal scrollbar is to add `overflow-x: hidden` to the carousel container. This does hide the scrollbar — but it also prevents any horizontal scrolling entirely. The carousel becomes a static display, not interactive. On mobile, swipe gestures produce no movement. On desktop, the overflow clips card edges visually but no scrolling is possible.
 
 **Why it happens:**
-Developers focus on the schema change (add FK column, drop text column) and forget the data change (backfill the FK from the old string values). The FK column defaults to `NULL` which is structurally valid but semantically broken. The bug is invisible in development if testing only new courses.
+Developers confuse "hide scrollbar visually" with "hide overflow." They are different operations. `overflow-x: hidden` disables the scroll entirely. Scrollbar visual hiding requires keeping `overflow-x: scroll` (or `overflow-x: auto`) and suppressing the scrollbar UI separately via `::-webkit-scrollbar { display: none }` + `scrollbar-width: none`.
 
-**How to avoid:**
-Execute the migration in strict order within a single SQL file:
-1. Create `course_categories` table and INSERT the 5 canonical category rows.
-2. `ALTER TABLE courses ADD COLUMN course_category_id uuid REFERENCES course_categories(id)`.
-3. `UPDATE courses SET course_category_id = (SELECT id FROM course_categories WHERE name = courses.category)` — backfill before touching the old column.
-4. Verify: `SELECT COUNT(*) FROM courses WHERE course_category_id IS NULL` must be 0.
-5. `ALTER TABLE courses ALTER COLUMN course_category_id SET NOT NULL`.
-6. Drop the `category` text column.
+**Consequences:**
+Carousel is non-functional. Cards are clipped. On mobile, swipe does nothing.
 
-Never split steps 1–3 across separate migration files — if step 1 deploys but step 3 does not run, production is in a broken intermediate state.
+**Prevention:**
+Use the scrollbar-hiding pattern that preserves scroll functionality:
 
-**Warning signs:**
-- Admin courses page shows empty or missing category badges after migration
-- `SELECT COUNT(*) FROM courses WHERE course_category_id IS NULL` returns > 0
-- Category filter dropdown on academy page returns 0 results for any category
-
-**Phase to address:**
-Phase 1 — Database schema. Must be the very first migration, completed before any UI work begins.
-
----
-
-### Pitfall 2: Hardcoded Category Strings Left in TypeScript After DB Migration
-
-**What goes wrong:**
-The category values are currently hardcoded in at least 4 locations in the codebase: `lib/types.ts` (`CourseCategory` type union), `app/admin/courses/page.tsx` (`CATEGORY_BADGE` record), `app/academy/[id]/page.tsx` (`CATEGORY_COLORS` record), and the original migration CHECK constraint. After migrating to a FK-based `course_categories` table, any hardcoded reference left in TypeScript continues to compile but silently fails at runtime — new categories added via the admin UI will have no badge color, new category names won't appear in filters, and TypeScript treats deleted categories as valid.
-
-**Why it happens:**
-The migration audit focuses on the DB layer. The TypeScript layer is not separately audited. Grep for the category string literals is skipped.
-
-**How to avoid:**
-Before writing the migration, run a full-codebase grep for each hardcoded category string: `'Workshop'`, `'Yoga Sequence'`, `'Dharma Talk'`, `'Music Playlist'`, `'Research'`. After migration:
-- Remove the `CourseCategory` string union from `lib/types.ts` and replace with a `CourseCategory` interface `{ id: string; name: string; color?: string }`.
-- Move badge/color maps to a runtime config (either a column on `course_categories` table, or a generic hash function).
-- Category dropdowns must fetch from DB at runtime, not from a hardcoded array.
-
-**Warning signs:**
-- New category created in admin UI shows a generic or empty badge
-- TypeScript still compiles after you remove `CourseCategory` type — means it was never used properly
-- Category dropdown hardcodes the 5 original strings and ignores the DB
-
-**Phase to address:**
-Phase 1 — Database schema (migration) and Phase 2 — Admin UI (category CRUD). Audit TypeScript references at the start of Phase 1.
-
----
-
-### Pitfall 3: `user_course_progress` Breaks Semantically When Lessons Are Added
-
-**What goes wrong:**
-The existing `user_course_progress` table tracks one row per `(user_id, course_id)` with a single `status` field (`in_progress | completed`). Once multi-lesson courses exist, "course completion" is ambiguous — does watching lesson 1 of 5 count as `in_progress`? Does completing all 5 mark `completed`? If this is not resolved before the lesson player ships, enrolled students accumulate progress records that cannot be mapped to lesson-level completion retroactively. CPD credits awarded on course completion may fire incorrectly.
-
-**Why it happens:**
-The lesson player gets built first because it is visible and demonstrates value. Progress tracking is treated as a later concern. But the schema decision made at lesson player build time constrains all future credit/completion logic.
-
-**How to avoid:**
-Decide the completion model in Phase 1 and encode it in the DB schema:
-- Add a separate `user_lesson_progress` table: `(id, user_id, lesson_id, completed_at)` with `UNIQUE(user_id, lesson_id)`.
-- Keep `user_course_progress` for enrollment tracking (`enrolled_at`) and overall status.
-- Derive `user_course_progress.status = 'completed'` from a count: when all non-optional lessons in a course have a `user_lesson_progress` row, trigger the course completion.
-- Never conflate course-level and lesson-level progress — they are different data.
-
-**Warning signs:**
-- `user_course_progress.status` is set to `'completed'` the moment a student starts any lesson
-- No `user_lesson_progress` table exists when lesson player ships
-- CPD credits fire on `in_progress` status
-
-**Phase to address:**
-Phase 1 — Database schema. `user_lesson_progress` must exist before Phase 3 (frontend lesson rendering).
-
----
-
-### Pitfall 4: Integer `position` Column Causes N-Row Updates on Every Drag Reorder
-
-**What goes wrong:**
-The existing products page uses a `priority integer` column for ordering (manual numeric input, not drag-and-drop). Copying this pattern to a true drag-and-drop lesson reorder requires updating every lesson that shifted position. Moving lesson 1 to position 5 in a 10-lesson course requires updating 5 rows. Under any concurrent admin edits (two browser tabs open), conflicting integer positions have no resolution strategy and silently corrupt the order.
-
-**Why it happens:**
-The `products.priority` pattern is the only ordering precedent in the codebase. Developers copy it without recognising that products are rarely reordered and the pattern was never designed for drag-and-drop.
-
-**How to avoid:**
-Use a `position numeric` (float) column instead of integer, seeded with gaps. A drag between positions 2000 and 3000 sets the moved lesson to 2500 — only ONE row update. When float precision is exhausted after hundreds of reorders, a background renormalization resets positions to multiples of 1000.
-
-```sql
-ALTER TABLE lessons ADD COLUMN position numeric NOT NULL DEFAULT 0;
--- On seed/create: assign position = ROW_NUMBER() OVER (PARTITION BY course_id ORDER BY created_at) * 1000
+```css
+/* On the carousel track element */
+overflow-x: auto;
+scrollbar-width: none;           /* Firefox */
+-ms-overflow-style: none;        /* IE/Edge */
 ```
-
-On drag end: `newPosition = (predecessorPosition + successorPosition) / 2`. Only update the moved lesson row.
-
-**Warning signs:**
-- Drag reorder save takes > 500ms with 10+ lessons
-- Position column is `integer` type rather than `numeric` or `float8`
-- Drag end handler loops through all lessons and updates each one individually
-
-**Phase to address:**
-Phase 1 — Database schema (position column type). Phase 2 — Lesson management UI (drag end handler logic).
-
----
-
-### Pitfall 5: dnd-kit `DndContext` Causes React Hydration Mismatch in Next.js App Router
-
-**What goes wrong:**
-dnd-kit's `DndContext` uses `window`, `document`, and browser pointer APIs internally. In Next.js App Router, even a `'use client'` component gets server-rendered first. The server renders the sortable list without drag state; the client attaches dnd-kit event listeners during hydration, producing a React hydration mismatch. In some configurations, the `useSortable` hook generates inline `transform` styles that differ between server and client renders, escalating to a full hydration error that breaks the lesson list entirely.
-
-**Why it happens:**
-`'use client'` is mistaken for "skip server render." It means "allow client-side interactivity," not "render only on client." The distinction matters only for browser-API-dependent libraries like dnd-kit.
-
-**How to avoid:**
-Wrap the draggable lesson list in a dynamic import with SSR explicitly disabled:
-
-```typescript
-// In the lesson edit page (Server Component)
-const LessonSortableList = dynamic(
-  () => import('./LessonSortableList'),  // 'use client' component with dnd-kit
-  { ssr: false }
-)
-```
-
-The non-draggable parts of the lesson management page (course header, save button, add lesson button) remain server-rendered. Only the `SortableContext`/`DndContext` subtree is client-only.
-
-**Warning signs:**
-- React hydration mismatch warnings in browser console on the lesson edit page
-- Lesson list flickers white on first page load
-- `window is not defined` or `document is not defined` errors during Next.js build or in server logs
-
-**Phase to address:**
-Phase 2 — Lesson management UI. Apply the `dynamic` import pattern from the start, not as a fix after hydration errors appear in QA.
-
----
-
-### Pitfall 6: dnd-kit State Flicker When Syncing Position to Supabase After Drop
-
-**What goes wrong:**
-After a drag ends, if the developer `await`s the Supabase `update()` before updating local React state, the UI reverts to the pre-drag order for 200–500ms (the network round-trip duration), then snaps to the new order. This creates a visible reorder-flash that feels broken to users. If the developer instead updates local state first but the Supabase call fails silently, the UI shows the new order while the database still has the old order — with no error surfaced and no rollback.
-
-**Why it happens:**
-The `onDragEnd` handler naturally wants to `await` persistence before committing the UI change. dnd-kit's OptimisticSortingPlugin manages DOM transforms during drag but relinquishes control to React state at `onDragEnd` — the timing gap is where the flash occurs.
-
-**How to avoid:**
-Optimistic update pattern with snapshot rollback:
-
-```typescript
-const preOrderRef = useRef<Lesson[]>([])
-
-// onDragStart: save snapshot for potential rollback
-preOrderRef.current = [...lessons]
-
-// onDragEnd: update UI immediately, then persist in background
-const reordered = arrayMove(lessons, oldIndex, newIndex)
-  .map((lesson, i) => ({ ...lesson, position: computeNewPosition(i, lessons) }))
-setLessons(reordered)                        // immediate — no flash
-const { error } = await saveLessonPositions(reordered)
-if (error) {
-  setLessons(preOrderRef.current)            // rollback on failure
-  toast.error('Reorder failed — order reverted')
+```css
+/* With webkit pseudo-element (CSS-in-JS or global stylesheet) */
+.carousel-track::-webkit-scrollbar {
+  display: none;
 }
 ```
 
-**Warning signs:**
-- Lesson list visibly snaps back to original position for ~300ms after drop
-- Supabase update errors are caught but not surfaced to the user
-- No pre-drag snapshot is saved before drag starts
+In Tailwind CSS 4 with the `scrollbar-hide` plugin or utility this is: `overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none]`. Never use `overflow-x-hidden` on a scroll container.
+
+**Detection:**
+Swipe left on the carousel in mobile viewport. If it does not scroll, the container has `overflow-x: hidden`.
 
 **Phase to address:**
-Phase 2 — Lesson management UI.
+HorizontalCarousel component phase. Apply correct CSS from the first implementation — this is not a refinement, it is the fundamental requirement.
 
 ---
 
-### Pitfall 7: Vimeo Domain-Level Privacy Blocks Embeds on Localhost and Vercel Preview URLs
+### Pitfall 2: Scroll Snap Without `scroll-snap-type` on the Container Does Nothing
 
 **What goes wrong:**
-Vimeo's "embed only on specific domains" privacy setting is commonly used to prevent video hotlinking. If a content admin sets a video to domain-restricted and only adds the production domain, the embed shows "This video is private" on `localhost:3000` and all Vercel preview deployments (`*.vercel.app`). Development and QA review become impossible.
-
-Separate but related: videos set to Vimeo's "Private" privacy level (not domain-restricted) **cannot be embedded anywhere at all** — they return a blank player regardless of `allowfullscreen` or iframe attributes. This is a Vimeo account-level setting invisible to developers.
+Developers add `scroll-snap-align: start` (or Tailwind's `snap-start`) to each card but forget to add `scroll-snap-type: x mandatory` (or `snap-x snap-mandatory`) to the scroll container. Result: the carousel scrolls freely without snapping — it feels loose on mobile and does not land on a clean card boundary.
 
 **Why it happens:**
-Content admins configure Vimeo privacy settings without understanding the distinction between "Private" (no embed anywhere) and "Only on sites I specify" (domain allowlist). Developers also forget that Vercel preview deployments use auto-generated subdomains that cannot be pre-registered with Vimeo.
+Snap alignment is set on children (cards). Snap type must be set on the parent (scroll container). This split ownership is non-obvious.
 
-**How to avoid:**
-- Add a server-side URL validation step in the lesson save Server Action: call Vimeo's oEmbed API (`https://vimeo.com/api/oembed.json?url=[url]`) before saving — it returns an error for private videos.
-- Show an inline warning in the lesson form: "Vimeo videos must be set to 'Public' or 'Domain-level' privacy. Private videos cannot be embedded."
-- Document Vimeo setup for admins: production domain AND `localhost:3000` must both be in the Vimeo allowlist.
-- Add the production custom domain to Vimeo's allowlist from day one — never rely on `*.vercel.app`.
+**Consequences:**
+Carousel scrolls but cards do not snap to clean positions. On mobile, a fast swipe often leaves the view between two cards.
 
-**Warning signs:**
-- Blank or "This video is private" iframe in the lesson player
-- Vimeo oEmbed API returns `{ "error": "Not Found" }` for the URL
-- Video works in Vimeo's own player but not on the platform
+**Prevention:**
+The scroll container needs **both**:
+- `scroll-snap-type: x mandatory` (Tailwind: `snap-x snap-mandatory`)
+- `overflow-x: auto` (must be set; browsers ignore snap on non-scrolling containers)
+
+Each card item needs:
+- `scroll-snap-align: start` (Tailwind: `snap-start`)
+- `flex-shrink: 0` (Tailwind: `shrink-0`) to prevent cards from collapsing
+
+Also add `overscroll-behavior-x: contain` (Tailwind: `overscroll-x-contain`) to prevent the carousel scroll from bubbling to the page and triggering a browser back gesture.
+
+**Detection:**
+Swipe-scroll the carousel. If it doesn't land cleanly on a card boundary, snap-type is missing from the container.
 
 **Phase to address:**
-Phase 2 — Lesson management UI (validation in lesson form). Phase 3 — Frontend lesson rendering (embed error handling).
+HorizontalCarousel component phase.
 
 ---
 
-### Pitfall 8: RLS Policy on `lessons` Table Silently Blocks Student Queries via JOIN
+### Pitfall 3: Profile Completion Scores 100% Due to Empty String Fields
 
 **What goes wrong:**
-When RLS is enabled on the new `lessons` table, student queries that JOIN `courses` with `lessons` return 0 lessons — not an error, just an empty array. Supabase evaluates RLS independently on each table in a JOIN. If the `lessons` RLS policy references only `lessons` columns without checking the parent `courses.status`, students get nothing even for published courses. Worse, the Supabase client returns `[]` with no error, making the bug look like a data problem.
+The existing `getCompletion()` function in the current dashboard uses the truthiness check `profile?.[f.key]`. In JavaScript, an empty string `""` is falsy — so this check works correctly for empty strings. However, some profile fields are pre-populated with empty strings by the registration trigger or onboarding flow rather than `NULL`. More critically, JSONB array fields (`practice_styles`, `teaching_styles_profile`, `teaching_focus`) default to `'[]'::jsonb` in the DB — an empty array serializes to `[]`, which is truthy in JavaScript. A user with no teaching styles set could score those fields as "complete."
 
-Supabase's official documentation explicitly warns: "If you enable RLS and forget to add policies, every query returns empty results — your application appears broken but there are no error messages."
+The `full_name` field is also set to `coalesce(new.raw_user_meta_data->>'full_name', '')` in the auth trigger — users who sign up without providing a name get `full_name = ''`, which is falsy and scores correctly. But users who signed up via OAuth may get a placeholder name from the provider that satisfies the truthy check even though it's a provider-generated value the user never personally reviewed.
 
 **Why it happens:**
-Developers assume the `courses` table's existing RLS policy ("public can read published courses") carries through to joined tables. It does not — each table's RLS evaluates independently.
+DB-level defaults (`'[]'::jsonb`, `''`) diverge from semantic emptiness. A field being non-NULL does not mean the user has meaningfully filled it in.
 
-**How to avoid:**
-Write the `lessons` SELECT policy to check the parent course's publication status:
+**Consequences:**
+Profile completion shows 70–80% for newly registered users who have not done anything, undermining the CTA to complete their profile. Trust in the metric is lost.
 
-```sql
-CREATE POLICY "Students can read lessons of published courses" ON public.lessons
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.courses
-      WHERE courses.id = lessons.course_id
-        AND courses.status = 'published'
-    )
-  );
+**Prevention:**
+Adjust the completion check to account for semantic emptiness:
+
+```typescript
+function isFieldComplete(value: unknown): boolean {
+  if (value === null || value === undefined) return false
+  if (typeof value === 'string') return value.trim().length > 0
+  if (Array.isArray(value)) return value.length > 0
+  return Boolean(value)
+}
 ```
 
-After adding RLS, always test from the Supabase JS client SDK (not the SQL Editor) — the SQL Editor bypasses RLS and will show data even when policies are broken.
+For JSONB array fields (e.g. `practice_styles`), parse the Supabase response and check `.length > 0`, not just truthiness.
 
-**Warning signs:**
-- Academy lesson player returns 0 lessons for a course confirmed as published
-- No Supabase client error thrown — just an empty array
-- The SQL Editor shows lessons correctly but the browser app does not
+**Detection:**
+Register a new test account via email. The profile completion score should be close to 0% before the user fills anything in. If it shows 30%+, there are false positives.
 
 **Phase to address:**
-Phase 1 — Database schema (RLS policies for the lessons table). Verify by testing with a student-role user, not service-role.
+ProfileCompletionCard phase. Also audit the 6 chosen weighted fields before writing the scoring function — choose fields where DB-level defaults cannot inflate the score.
 
 ---
 
-### Pitfall 9: Video and Audio Media Players Break on Server-Side Render
+### Pitfall 4: Role Check in Layout Prevents Re-verification on Navigation
 
 **What goes wrong:**
-The HTML `<audio>` element and `<video>` with JavaScript APIs (`HTMLAudioElement.play()`, Vimeo Player SDK, YouTube IFrame API) cannot execute during SSR. If the lesson player component is a Server Component, or if a `'use client'` component references these APIs at the module scope rather than inside `useEffect`/event handlers, the Next.js build fails with `ReferenceError: HTMLAudioElement is not defined` or `ReferenceError: window is not defined`.
-
-Additionally, rendering an `<iframe>` for embed is fine in a Server Component, but any lesson completion detection (video `ended` event, Vimeo Player `finish` event) requires the Vimeo Player SDK or YouTube IFrame API — both browser-only. If these are not properly isolated, completion events never fire and lesson progress never updates.
+Doing the role-branching check (which dashboard layout to render — Student, Teacher, School, WP) inside the `/dashboard/layout.tsx` instead of `/dashboard/page.tsx` means the role is only read once when the layout first mounts. Due to Next.js App Router's partial rendering, layout server components do not re-run on client-side navigations within the same layout subtree. If an admin impersonates a different user (GOYA has an impersonation system), or if a user upgrades their role mid-session, the wrong layout stays rendered.
 
 **Why it happens:**
-The lesson page is started as a Server Component for SEO/performance. Client interactivity is added incrementally without establishing clean `'use client'` boundaries. The Vimeo Player SDK is imported at the top of a file that also gets server-rendered.
+Putting auth/role logic in layouts feels natural — it's "above" all content pages. But in Next.js 15+, the official guidance is explicit: "Be careful when doing checks in Layouts as these don't re-render on navigation. Auth checks should be done close to your data source."
 
-**How to avoid:**
-Establish component boundaries up front:
-- Lesson page wrapper (`/academy/[courseId]/[lessonId]/page.tsx`) stays a Server Component — fetches lesson data and renders static metadata.
-- Media renderer components (`VideoLesson.tsx`, `AudioLesson.tsx`, `TextLesson.tsx`) are all `'use client'` components with `dynamic(..., { ssr: false })` imports where browser APIs are needed.
-- For Vimeo completion detection, use the `@vimeo/player` npm package inside a `'use client'` component — it wraps the postMessage API and fires `ended` and `timeupdate` events.
-- Never import `@vimeo/player` in a Server Component.
+**Consequences:**
+Teacher who upgrades to School owner mid-session sees the Teacher layout until they hard-refresh. Admin impersonating a Student sees the Teacher layout if they were previously impersonating a Teacher.
 
-**Warning signs:**
-- Build error: `ReferenceError: HTMLAudioElement is not defined`
-- Build error: `window is not defined` in lesson player files
-- Lesson completion never fires (event listeners not attached due to SSR)
-- Vimeo SDK imported at module scope in a file without `'use client'` directive
+**Prevention:**
+Put role-branching logic in `page.tsx`, not `layout.tsx`. Read the user's profile in the page's Server Component fetch. Impersonation context resolves at the page level, not the layout level. Pattern:
+
+```typescript
+// app/dashboard/page.tsx (Server Component)
+const profile = await getProfile(userId) // reads cookies/session fresh on every request
+if (profile.role === 'teacher' && profile.principal_trainer_school_id) {
+  return <SchoolDashboard profile={profile} ... />
+}
+if (profile.role === 'teacher') {
+  return <TeacherDashboard profile={profile} ... />
+}
+```
+
+**Detection:**
+Admin impersonates a student, then navigates to `/dashboard`. Layout should reflect student role, not admin role. If it shows the admin/wrong layout, role check is in the layout.
 
 **Phase to address:**
-Phase 3 — Frontend lesson rendering. Component boundary decisions must be made before writing any media render code.
+Dashboard page architecture phase (first phase of the build). This structural decision must be made before any role-specific layout components are written.
 
 ---
 
-### Pitfall 10: Deleting a Category That Has Courses Assigned — Orphaned FK or Blocked Delete
+### Pitfall 5: N+1 Queries Across 4 Role Layouts Due to Per-Section Data Fetching
 
 **What goes wrong:**
-The admin UI will support category CRUD. If a category is deleted that has courses assigned, one of two bad outcomes occurs:
-1. The DELETE fails with a Postgres FK violation error, shown as an unhandled 500 in the admin UI.
-2. The FK is defined with `ON DELETE SET NULL`, silently orphaning all courses in that category (their `course_category_id` becomes NULL), breaking every display that reads the category name.
+Each dashboard section (ProfileCompletionCard, StatHero, ConnectionsList, FacultyList, UpcomingEventsCarousel, RecommendedCoursesCarousel) fetches its own data independently. In a Server Component tree, if these are sequential `await` calls (not parallelised), each fetch blocks the next. A teacher dashboard with 6 sections that each make 1 Supabase call takes 6× the latency of a single batched query.
+
+The current dashboard already exhibits this — it fetches `supabase.auth.getUser()` then `supabase.from('profiles').select('*')` sequentially in a `useEffect`, not in parallel.
 
 **Why it happens:**
-The FK constraint behavior on delete is not explicitly designed — it defaults to `NO ACTION` (blocks delete) without a user-facing explanation, or is set to `SET NULL` carelessly.
+Component-level data fetching feels clean. Each component "owns" its data. But without `Promise.all()` or a single page-level fetch that passes data down as props, each component adds its own round-trip to the waterfall.
 
-**How to avoid:**
-- Default FK behavior: `NO ACTION` (prevents deletion) — this is the safe default.
-- The admin UI must check before allowing category deletion: `SELECT COUNT(*) FROM courses WHERE course_category_id = $categoryId`. If > 0, show a blocking warning: "This category has X courses. Reassign or delete courses before removing this category."
-- Do not use `ON DELETE CASCADE` or `ON DELETE SET NULL` — either destroys data or creates orphans.
+**Consequences:**
+Dashboard TTFB increases linearly with the number of sections. On a slow connection, users see the page load progressively in sections, each appearing ~100–200ms apart.
 
-**Warning signs:**
-- Category delete button triggers a 500 error with no user-facing message
-- Courses in deleted category display "Unknown Category" or blank after delete
-- No course count shown in the admin category list
+**Prevention:**
+Fetch all dashboard data in a single Server Component at the page level, using `Promise.all` for independent queries:
+
+```typescript
+// app/dashboard/page.tsx
+const [profile, connections, upcomingEvents, courses] = await Promise.all([
+  getProfile(userId),
+  getConnections(userId),
+  getUpcomingEvents({ limit: 6 }),
+  getEnrolledCourses(userId, { limit: 6 }),
+])
+```
+
+Pass data as props to layout components. Only use per-component data fetching for sections behind `<Suspense>` boundaries where streaming makes sense (e.g. a slow personalized recommendations section).
+
+**Detection:**
+Check the Vercel function logs or add timing instrumentation. If total server render time is 800ms+ for a dashboard with 4 independent sections, queries are sequential.
 
 **Phase to address:**
-Phase 2 — Admin UI (category CRUD). The constraint behavior is set in Phase 1 migration.
+Data fetching architecture phase. Establish the page-level parallel fetch pattern before building individual section components.
 
 ---
 
-## Technical Debt Patterns
+### Pitfall 6: Deleting the Existing Dashboard Code Breaks FeedView and Related Components
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| Keep `user_course_progress` for lesson completion instead of adding `user_lesson_progress` | No new table, faster to ship | Cannot track per-lesson completion; CPD credit logic wrong for multi-lesson courses | Never — multi-lesson courses make this incorrect by definition |
-| Integer `position` column copied from `products.priority` pattern | Consistent with existing code | N row updates per reorder; integer collision under concurrent edits | Never for drag-and-drop; acceptable only for manual priority fields like products |
-| Skip oEmbed validation on lesson save — accept any URL | Simpler Server Action | Admins save private/broken Vimeo URLs; broken embeds in production courses | Never — validation is < 20 lines of code |
-| Run DB migration and UI change in the same PR | Fewer PRs | If migration fails, UI PR is blocked; schema changes are hard to rollback independently | Never — always separate DB schema migrations from UI code changes |
-| Render all media types unconditionally — load Vimeo SDK on text lessons | Simpler component tree | 45KB+ Vimeo SDK loaded on every lesson page even when no video exists | Never — conditional loading is a single `if` statement |
-| Hardcode `course_categories` as TypeScript enum after FK migration | Simpler TypeScript, no DB fetch needed | New categories added via admin UI are invisible until code is redeployed | Never — defeats the purpose of a DB-driven categories table |
+**What goes wrong:**
+The existing `app/dashboard/page.tsx` imports `FeedView`, `PostComposer`, `FeedPostCard`, `PostActionsMenu`, and `CommentDeleteButton` — all of which live inside `app/dashboard/`. When the dashboard is rebuilt from scratch and these imports are removed from the page, the components themselves still exist as files. They are not dead until removed. If they are also imported anywhere else (other pages, tests), removing them without a grep audit will break those imports.
 
----
+Additionally, `FeedView.tsx` uses `supabase` client-side with posts/likes/comments queries. If any of these tables are referenced elsewhere (admin panel, API routes), they are unrelated to the dashboard delete and must be preserved.
 
-## Integration Gotchas
+**Why it happens:**
+"Delete existing dashboard UI" scoped to the page component. The co-located component files and their dependencies are not part of the same delete scope in the developer's mental model.
 
-| Integration | Common Mistake | Correct Approach |
-|-------------|----------------|------------------|
-| Vimeo embed URL | Use video watch URL `vimeo.com/[id]` in `<iframe src>` | Use embed URL `player.vimeo.com/video/[id]` — watch URLs are not embeddable |
-| Vimeo unlisted videos | Use only the video ID in embed URL | Unlisted videos require the `h` hash parameter: `player.vimeo.com/video/[id]?h=[hash]` |
-| Vimeo Player SDK | Import at module scope in any component | Dynamic import inside `'use client'` component only; never in Server Components |
-| YouTube embed | Use watch URL `youtube.com/watch?v=[id]` in `<iframe src>` | Use embed URL `youtube.com/embed/[id]` — YouTube blocks watch URLs in iframes via X-Frame-Options |
-| dnd-kit in Next.js App Router | Import `DndContext` directly in `'use client'` file | Use `dynamic(() => import('./SortableList'), { ssr: false })` to prevent hydration errors |
-| Supabase RLS + JOIN | Test policies via SQL Editor | Always test from Supabase JS client (`createSupabaseServerClient`) — SQL Editor bypasses RLS and gives false confidence |
-| Supabase lesson position updates | `Promise.all` of N individual update calls | Update only the single moved row using the float position midpoint; batch via RPC if N rows must update |
+**Consequences:**
+Build fails on next `vercel build` due to broken imports from non-dashboard pages that reference the deleted components.
 
----
+**Prevention:**
+Before deleting any file in `app/dashboard/`:
+1. Run a codebase-wide grep for each component name: `FeedView`, `FeedPostCard`, `PostComposer`, `PostActionsMenu`, `CommentDeleteButton`.
+2. If referenced only from `app/dashboard/page.tsx` → safe to delete with the page.
+3. If referenced from other pages → extract to `app/components/` before deleting from `app/dashboard/`.
+4. The feed database tables (`posts`, `likes`, `comments`) are referenced in the admin panel and potentially the REST API — those tables must not be dropped.
 
-## Performance Traps
+**Detection:**
+`npx next build` after deletion. Any `Module not found` error reveals an orphaned import.
 
-| Trap | Symptoms | Prevention | When It Breaks |
-|------|----------|------------|----------------|
-| Fetching all lessons for all courses on the academy index page | Slow index page, large payloads on page load | Fetch only course metadata on index; fetch lessons only on the individual course/lesson page | With 20+ courses each having 5+ lessons |
-| Loading Vimeo Player SDK unconditionally on every lesson page | 45KB extra JS on text and audio lessons | Conditionally load Vimeo SDK only when `lesson.type === 'video'` and `lesson.video_platform === 'vimeo'` | Every non-video lesson load |
-| N+1 lesson position updates on drag reorder (integer position) | Reorder save takes 500ms+ with 10+ lessons | Float position — single row update per reorder | With 10+ lessons per course |
-| Querying `course_categories` on every admin courses page render without any caching | Category dropdown re-fetches on every filter change, every navigation | Fetch once at page load; pass as prop to client filter components | With frequent admin filter interactions |
-| No index on `lessons.course_id` | Slow lesson fetch on courses with many enrolled students | `CREATE INDEX ON lessons(course_id)` in the Phase 1 migration | With 50+ courses |
+**Phase to address:**
+Deletion/cleanup phase before new dashboard build begins. This is the first action — not the last.
 
 ---
 
-## Security Mistakes
+## Moderate Pitfalls
 
-| Mistake | Risk | Prevention |
-|---------|------|------------|
-| Accepting any URL string in the lesson video URL field without validation | XSS via `javascript:` protocol URL reflected into `<iframe src>` if not sanitized server-side | Server Action must validate: URL must match `https://player.vimeo.com/video/\d+` or `https://www.youtube.com/embed/[\w-]+` before saving |
-| No RLS `INSERT` policy on `lessons` table scoped to course ownership | Members could insert lessons into admin-created GOYA courses | RLS INSERT policy: `auth.uid() = (SELECT created_by FROM courses WHERE id = lessons.course_id)` OR `role IN ('admin', 'moderator')` |
-| Publishing a course with lessons where all `position` values are 0 | Students see lessons in undefined DB sort order (varies by server planner) | Enforce non-zero positions: CHECK constraint or auto-assign at INSERT; warn on publish if any lesson has `position = 0` |
-| Bypassing lesson access RLS via direct lesson ID URL | Student accesses lesson from a non-published or private course by guessing the lesson UUID | RLS SELECT on `lessons` must check parent course status AND access level — do not rely solely on course-level access control |
+### Pitfall 7: Apple/Netflix Aesthetic Becomes Bland Without Depth Cues
+
+**What goes wrong:**
+Apple and Netflix use massive whitespace effectively because their content (product photography, movie posters) provides visual density and hierarchy. A dashboard with text-only stat cards and minimal content becomes aesthetically empty — it reads as an unfinished wireframe rather than a refined interface.
+
+**Why it happens:**
+Developers apply "lots of whitespace, minimal color" without the image content that makes those designs work. The visual weight of a Netflix carousel comes from the poster art, not the surrounding chrome.
+
+**Prevention:**
+- Ensure every carousel card has an image (course thumbnails, event cover photos, member avatars). If data has no image, generate consistent color-coded initials avatars (as the existing dashboard already does for FOLLOWING_PLACEHOLDERS).
+- Use typography contrast as the depth cue: a large bold number (stat hero value) next to a small subdued label creates hierarchy without adding color.
+- Surface colors should not all be `bg-white` — use `bg-slate-50` for the page background and `bg-white` for cards so cards visually lift off the surface.
+- Cards should have subtle `shadow-sm` and `border border-slate-100` to separate from the background. Removing all borders/shadows in the name of "minimalism" makes all sections merge into one flat layer.
+
+**Detection:**
+Screenshot the dashboard on a `bg-white` page background with `bg-white` cards and no images. If it looks like a skeleton loader, it needs depth cues.
+
+**Phase to address:**
+Visual design/card component phase. Establish the surface/card/shadow hierarchy in the base Card component before building all layouts.
 
 ---
 
-## UX Pitfalls
+### Pitfall 8: Horizontal Carousel on iOS Safari — Touch Momentum Scroll Triggers Page Back Navigation
 
-| Pitfall | User Impact | Better Approach |
-|---------|-------------|-----------------|
-| Drag reorder with no persistent save confirmation | Admin drags, closes tab, loses order if background save failed silently | Show "Order saved" toast on success; show "Save failed — order reverted" on error, with rollback to pre-drag state |
-| Duration stored as freeform text (`"4h 30m"`) in 8 existing courses, new UI uses integer minutes | Existing course durations display as `0 min` or throw a parse error after schema change | Migration must parse existing duration strings to minutes integer; store as `duration_minutes integer`; display as `Xh Ym` |
-| Lesson player with no explicit "Mark Complete" button | Students who pause the video early never trigger completion; progress never advances | Provide both auto-detection (Vimeo/YouTube `ended` event) and an explicit "Mark as Complete" button |
-| No lesson count shown on course rows in admin | Admin cannot see which courses have 0 lessons; empty courses get published | Show lesson count badge on each course row in admin; display a warning on the publish action for courses with 0 lessons |
-| Adding lessons inside the course edit form (same page scroll) | Long page, confusing nesting, hard to manage 5+ lessons | Use a dedicated lesson sub-page (`/admin/courses/[id]/lessons`) linked from the course edit form |
-| Category delete with no warning UI | Admin deletes a category with 20 courses; all courses lose their category silently | Check course count before delete; show: "X courses are assigned to this category. Reassign them before deleting." |
+**What goes wrong:**
+On iOS Safari, a horizontal swipe near the left edge of the screen triggers the browser's "back" gesture (a system-level gesture, not scroll). When a carousel is positioned at the left edge of the viewport (full-width sections), users attempting to scroll the carousel left accidentally navigate away from the page.
+
+Also, iOS 15+ has a bug where scrolling within an embedded element causes the browser toolbar to resize/jump, which shifts the viewport height mid-scroll.
+
+**Why it happens:**
+iOS Safari interprets horizontal swipe gestures at the viewport edge as navigation intent, competing with the carousel's scroll event.
+
+**Prevention:**
+- Add `overscroll-behavior-x: contain` to the carousel container. This tells the browser: horizontal scroll is "contained" to this element and should not propagate to browser-level navigation.
+- Add `-webkit-overflow-scrolling: touch` for iOS momentum scrolling (still needed on older iOS).
+- Carousel should have `touch-action: pan-x` so the browser knows this element handles horizontal gestures.
+- For the iOS toolbar resize issue: use `dvh` (dynamic viewport height) instead of `100vh` in any section using full-height layouts.
+
+**Detection:**
+Test on a real iPhone (not Chrome DevTools device emulation). Swipe left hard from the left side of the carousel. If the browser navigates back, `overscroll-behavior-x: contain` is missing.
+
+**Phase to address:**
+HorizontalCarousel component phase. Test on iOS Safari before marking carousel complete.
+
+---
+
+### Pitfall 9: Profile Completion Score Changes Between Renders Due to Client-Side State
+
+**What goes wrong:**
+The existing dashboard calculates completion score on the client inside a `useEffect` after `setProfile(data)`. The score flickers: the page renders with 0% (before data loads), then snaps to the real percentage. If the new dashboard is a Server Component that calculates completion server-side and passes it as a prop, this flicker disappears — but if the ProfileCompletionCard is a Client Component that re-derives the score from local state, any state update (even unrelated) can trigger a re-render and a brief flash of an intermediate value.
+
+**Why it happens:**
+Computing derived state (the score) outside of `useMemo` or server-side in places where re-renders are frequent.
+
+**Prevention:**
+Calculate the profile completion score exactly once, server-side, when the page fetches the profile. Pass the computed `{ pct: number, missingFields: string[] }` as props to `ProfileCompletionCard`. Never re-derive the score in the client component. If the card needs to "update" after the user saves settings in another tab, that requires a full page refresh or a server action revalidation — not real-time client recalculation.
+
+**Detection:**
+Hard refresh the dashboard page. If the profile completion percentage visibly counts up from 0% to the real value, the calculation is happening client-side after data loads.
+
+**Phase to address:**
+ProfileCompletionCard phase. Decide server-vs-client derivation at the start.
+
+---
+
+### Pitfall 10: "School" Role Is Not a Separate `role` Value — Schools Are a Teacher Sub-State
+
+**What goes wrong:**
+PROJECT.md describes 4 dashboard layouts including a "School" layout. But in the GOYA schema, `profiles.role` has values: `student`, `teacher`, `wellness_practitioner`, `moderator`, `admin`. There is no `school` role. A teacher who owns a school is identified by `profiles.principal_trainer_school_id IS NOT NULL` (a FK to the schools table), not by a distinct role value.
+
+If the dashboard role-branching code checks `profile.role === 'school'`, it will never match — the School dashboard will never render.
+
+**Why it happens:**
+Product language ("4 role-specific layouts including School") does not align with the DB schema language (`role = 'teacher'` + `principal_trainer_school_id IS NOT NULL`).
+
+**Consequences:**
+School owners always see the Teacher dashboard. The School-specific sections (FacultyList, school management CTA) never appear.
+
+**Prevention:**
+The branching condition for the School layout must be:
+
+```typescript
+const isSchoolOwner = profile.role === 'teacher' && 
+                      Boolean(profile.principal_trainer_school_id)
+```
+
+Not `profile.role === 'school'`. Confirm this by checking `supabase/migrations/20260376_school_owner_schema.sql` for the actual column name used to link teachers to schools.
+
+**Detection:**
+Log in as a teacher with an approved school. Check `profile.role` — it will be `'teacher'`, not `'school'`. The School dashboard renders only when `principal_trainer_school_id` is also checked.
+
+**Phase to address:**
+Role branching architecture phase. Inspect the profiles schema before writing any role-gate condition.
+
+---
+
+### Pitfall 11: Carousel Cards Without `flex-shrink-0` Collapse to Zero Width
+
+**What goes wrong:**
+In a horizontal flexbox carousel (`display: flex`, `overflow-x: auto`), flex children try to fit within the container by default (`flex-shrink: 1`). Cards shrink to fill the available width instead of maintaining their designed fixed width. On a narrow mobile viewport, all cards in the carousel squeeze down to ~50px wide and become unreadable.
+
+**Why it happens:**
+Flexbox's default `flex-shrink: 1` behavior is not intuitive for carousels. Developers set a `w-64` or `min-w-[280px]` on cards and expect it to hold, not realising flex-shrink overrides min-width in some browser implementations.
+
+**Prevention:**
+Always set `shrink-0` (Tailwind) or `flex-shrink: 0` on carousel card items. Combine with explicit `w-[280px]` or `min-w-[280px]`. Test on 375px viewport (iPhone SE) — cards should have the designed width, not collapse.
+
+**Detection:**
+Resize the browser to 375px width. If carousel cards are narrower than intended, `shrink-0` is missing.
+
+**Phase to address:**
+HorizontalCarousel component phase.
+
+---
+
+## Minor Pitfalls
+
+### Pitfall 12: Greeting Uses `full_name` Which Is Pre-Populated as Empty String
+
+**What goes wrong:**
+The current dashboard greeting: `profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there'`. The `full_name` column is set to `''` (empty string) by the auth trigger for users who sign up without providing a name. An empty string is falsy in the `||` chain — so this correctly falls through to the email fallback. But the new dashboard may change this to a null-check pattern or rename the column, breaking the fallback.
+
+**Prevention:**
+Keep the defensive fallback chain: `full_name?.trim() || email?.split('@')[0] || 'there'`. Never assume `full_name` is NULL for new users — the trigger sets it to `''`.
+
+**Phase to address:**
+Dashboard greeting/header component phase.
+
+---
+
+### Pitfall 13: `select('*')` on Profiles Fetches Unused Columns for Personalization
+
+**What goes wrong:**
+The current dashboard fetches `supabase.from('profiles').select('*')`. The profiles table has 25+ columns after all the migrations (onboarding fields, school FK, WP registration fields, etc.). For the dashboard, only 6–10 are needed. `select('*')` transfers all columns over the wire unnecessarily and pulls potentially sensitive columns into client memory.
+
+**Prevention:**
+Use a named column select in all dashboard queries:
+```typescript
+.select('id, full_name, role, avatar_url, bio, principal_trainer_school_id, member_type')
+```
+
+This also makes TypeScript inference narrower and prevents accidental display of sensitive fields.
+
+**Phase to address:**
+Data fetching architecture phase.
+
+---
+
+### Pitfall 14: StatHero Weekly Profile Views Placeholder That Never Gets Replaced
+
+**What goes wrong:**
+PROJECT.md notes: "StatHero showing weekly profile views (placeholder until analytics)." Placeholder numbers in dashboards have a known pattern of shipping and then persisting through several milestones because the analytics system needed to populate them is always "next milestone." Users notice fake stats and lose trust in the platform.
+
+**Prevention:**
+Render the StatHero with explicit "Coming Soon" or "—" state rather than fake numbers. Use the existing `analytics_enabled` site setting (GOYA already has DB-controlled analytics toggles) to conditionally show the real stat when available. Design the component to gracefully show `null` data from the start.
+
+**Phase to address:**
+StatHero component phase. Never hardcode numeric placeholder values in a production feature.
+
+---
+
+## Phase-Specific Warnings
+
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| HorizontalCarousel component | `overflow-x: hidden` disabling scroll; missing snap-type on container; iOS back-gesture conflict | Apply correct CSS from the start; test on real iOS Safari before marking done |
+| ProfileCompletionCard | JSONB `[]` arrays scoring as complete; empty string false negatives; client-side flicker | Semantic `isFieldComplete()` helper; compute score server-side; choose 6 fields where defaults cannot inflate score |
+| Role branching (4 layouts) | `role === 'school'` never matches; role check in layout not page | Check `principal_trainer_school_id`; branch in `page.tsx` not `layout.tsx` |
+| Data fetching (personalized content) | Sequential awaits → waterfall; `select('*')` → oversized response | `Promise.all` all independent queries at page level; named column selects |
+| Deletion of existing dashboard | Orphaned imports from non-dashboard files; feed DB tables are used elsewhere | Grep all component names before delete; preserve table references; verify `next build` passes |
+| Visual design (Apple/Netflix aesthetic) | All-white surfaces with no depth cues; placeholder stat numbers | Surface/card/shadow hierarchy; real or initials-avatar content in carousels; "—" for missing analytics |
+| Carousel card items | Cards collapse to zero width on mobile | `shrink-0` + explicit `w-[N]` on all card items |
+| Greeting / profile name | `full_name = ''` (not NULL) for new users | Defensive `trim() || fallback` chain, not a null check |
 
 ---
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Category migration backfill:** `SELECT COUNT(*) FROM courses WHERE course_category_id IS NULL` returns 0 after migration runs
-- [ ] **Category hardcodes removed:** No `'Workshop'` / `'Yoga Sequence'` / `'Dharma Talk'` / `'Music Playlist'` / `'Research'` string literals remain in TypeScript after migration (grep to verify)
-- [ ] **Lesson RLS verified from client:** Test lesson fetch from a logged-in student browser session — not the SQL Editor, which bypasses RLS
-- [ ] **Drag reorder single update:** Verify in browser network tab that a drag produces exactly 1 Supabase update call (float position midpoint), not N calls
-- [ ] **No dnd-kit hydration warnings:** Open lesson management page with browser console open — zero hydration mismatch warnings
-- [ ] **Vimeo private video blocked at save:** Attempt to save a Vimeo private video URL in the lesson form — it must be rejected with a user-facing error
-- [ ] **Lesson completion triggers course completion:** Complete all lessons for a multi-lesson course as a student — verify `user_course_progress.status` updates to `'completed'`
-- [ ] **Audio/video conditional load:** Open a text-type lesson — verify Vimeo Player SDK is NOT loaded in the network tab
-- [ ] **Category delete guarded:** Attempt to delete a category with courses assigned — verify blocking warning appears, not a 500 error
-- [ ] **REST API still works:** After schema changes, verify the existing Courses API endpoint (`/api/v1/courses`) returns correct data including the new `course_category_id` field
-- [ ] **Duration field migration:** Open an existing course (`"4h 30m"` duration) after migration — verify it displays correctly as `270 min` or `4h 30m`, not `0` or `NaN`
+- [ ] **Carousel actually scrolls on mobile:** Open on iPhone. Swipe left on carousel. It should scroll and snap. Does not trigger browser back navigation.
+- [ ] **Scrollbar hidden but scroll functional:** Carousel has no visible scrollbar. Swipe/mouse drag still scrolls. No `overflow-x: hidden` on the scroll container.
+- [ ] **Profile completion accurate on new account:** Register new test account. Profile completion must show near 0% before any fields are filled in. JSONB array fields and empty string fields do not count as complete.
+- [ ] **School owner sees School layout:** Log in as a teacher with `principal_trainer_school_id` set. Dashboard must render School layout, not Teacher layout. Confirm condition checks `principal_trainer_school_id`, not `role === 'school'`.
+- [ ] **Role branch is in page.tsx:** Confirm `app/dashboard/page.tsx` does the role check, not `app/dashboard/layout.tsx`.
+- [ ] **Old dashboard files cleanly deleted:** Run `npx next build`. Zero `Module not found` errors related to removed dashboard components.
+- [ ] **Feed tables not dropped:** `posts`, `likes`, `comments` tables still exist and respond to queries from admin panel.
+- [ ] **Parallel data fetching:** Add `console.time` around dashboard data fetch. Total time should be close to the slowest single query, not the sum of all queries.
+- [ ] **StatHero shows "—" not fake numbers:** If analytics are not yet wired, StatHero displays a "Coming soon" or dash state, not a hardcoded number.
+- [ ] **Cards have fixed width on 375px viewport:** Test on narrow mobile. Carousel cards maintain their designed `w-[N]` width and do not collapse.
 
 ---
 
@@ -381,48 +404,28 @@ Phase 2 — Admin UI (category CRUD). The constraint behavior is set in Phase 1 
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Category migration leaves NULL FKs in production | MEDIUM | Write a targeted backfill UPDATE migration; deploy as hotfix; no data loss, but a brief period of broken category display |
-| Hardcoded category strings break after FK migration | LOW | Update TypeScript maps to fetch from DB; no migration needed; one deploy |
-| dnd-kit hydration error breaks lesson management page | LOW | Wrap sortable component in `dynamic(..., { ssr: false })`; deploy; no DB changes needed |
-| Integer position collision (two lessons at same position) | LOW | Run renormalization: `UPDATE lessons SET position = ROW_NUMBER() OVER (PARTITION BY course_id ORDER BY position, created_at) * 1000` |
-| `user_course_progress` semantics broken by multi-lesson model | HIGH | Retroactively create `user_lesson_progress` rows from `user_course_progress` completion records; requires per-student data analysis; cannot be automated safely |
-| Vimeo private videos saved to production courses | LOW | Update Vimeo privacy settings in Vimeo account; no code change; update admin documentation |
-| Lessons RLS returns empty for students | LOW | Add correct RLS SELECT policy via a new migration; no data changes needed; verify from JS client |
-
----
-
-## Pitfall-to-Phase Mapping
-
-| Pitfall | Prevention Phase | Verification |
-|---------|------------------|--------------|
-| Category string-to-FK migration with NULL backfill | Phase 1: DB Schema | `SELECT COUNT(*) FROM courses WHERE course_category_id IS NULL` = 0 |
-| Hardcoded category TypeScript strings | Phase 1 (audit before migration) + Phase 2 (admin category UI) | Grep for category string literals returns 0 matches |
-| `user_lesson_progress` table absent — completion breaks | Phase 1: DB Schema | Lesson player can mark individual lessons complete; course completion derived from lesson completion |
-| Integer position → N row updates on reorder | Phase 1: DB Schema (numeric position column) | Network tab shows 1 Supabase update on drag end |
-| dnd-kit hydration mismatch | Phase 2: Admin lesson management UI | Zero hydration warnings in browser console on lesson edit page |
-| dnd-kit state flicker on drop | Phase 2: Admin lesson management UI | Drag end shows new order instantly with no revert flash |
-| Vimeo private video breaks embed | Phase 2: Lesson form validation | oEmbed validation rejects private URL at save time |
-| Vimeo domain privacy blocks localhost/preview | Phase 3: Frontend lesson rendering + admin documentation | Embed visible on localhost and production domain |
-| RLS on lessons silently returns empty | Phase 1: DB Schema (RLS policies) | Logged-in student sees lessons; logged-out user sees 0 lessons for members_only courses |
-| Audio/video embed SSR errors | Phase 3: Frontend lesson rendering | Build succeeds with zero `window is not defined` errors; `dynamic` import used for all media components |
-| Category delete with assigned courses — 500 error | Phase 2: Admin category CRUD UI | Attempt delete with courses assigned — blocking warning appears, not an error |
+| `overflow-x: hidden` shipped on carousel | LOW | One-line CSS fix; no data changes |
+| Profile completion scoring inflated by JSONB defaults | LOW | Update scoring function; deploy; no DB migration needed |
+| `role === 'school'` condition never matches — school owners see teacher layout | LOW | Fix condition to check `principal_trainer_school_id`; one deploy |
+| Role check in layout causes stale role after impersonation switch | LOW | Move role check from layout to page; one deploy; no data changes |
+| Feed component files deleted — build broken due to orphaned imports | MEDIUM | Git restore deleted files; extract to `app/components/`; delete originals |
+| N+1 waterfall queries on dashboard load | MEDIUM | Refactor page-level fetch to `Promise.all`; may require extracting data-fetching logic from individual components |
+| StatHero shipped with hardcoded placeholder numbers | LOW | Replace hardcoded values with `null` state; deploy; no DB changes |
 
 ---
 
 ## Sources
 
-- Vimeo domain-level privacy setup: https://help.vimeo.com/hc/en-us/articles/30030693052305-How-do-I-set-up-domain-level-privacy
-- Vimeo private video embed restrictions: https://help.vimeo.com/hc/en-us/articles/12426199699985-About-video-privacy-settings
-- Supabase RLS performance and best practices (JOIN tables apply RLS independently): https://supabase.com/docs/guides/troubleshooting/rls-performance-and-best-practices-Z5Jjwv
-- Supabase RLS: empty results when policies missing or misconfigured: https://supabase.com/docs/guides/database/postgres/row-level-security
-- dnd-kit + React Query state flicker on drop (optimistic update race): https://github.com/clauderic/dnd-kit/discussions/1522
-- dnd-kit hydration issue in Next.js (dynamic import with ssr: false required): https://github.com/sujjeee/nextjs-dnd
-- Float/numeric position for drag reorder (single update pattern): https://www.basedash.com/blog/implementing-re-ordering-at-the-database-level-our-experience
-- Fractional indexing for ordered lists: https://hollos.dev/blog/fractional-indexing-a-solution-to-sorting/
-- PostgreSQL CHECK constraint NOT VALID migration pattern: https://squawkhq.com/docs/constraint-missing-not-valid
-- Next.js hydration error solutions (dynamic with ssr: false): https://nextjs.org/docs/messages/react-hydration-error
-- Codebase inspection: `supabase/migrations/20260324_add_courses_tables.sql`, `supabase/migrations/20260372_member_courses_schema.sql`, `lib/types.ts`, `app/academy/[id]/page.tsx`, `app/admin/courses/page.tsx`, `app/admin/products/AdminProductsClient.tsx`
+- Next.js: auth checks in layouts vs pages (partial rendering, don't re-run on navigation): https://nextjs.org/docs/app/guides/authentication
+- Next.js: common App Router mistakes including layout auth checks: https://vercel.com/blog/common-mistakes-with-the-next-js-app-router-and-how-to-fix-them
+- CSS `overflow-x: hidden` makes container unscrollable (not the scrollbar-hiding pattern): https://blog.logrocket.com/hide-scrollbar-without-impacting-scrolling-css/
+- CSS scroll snap: `scroll-snap-type` must be set on the container, not children: https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Overflow/Carousels
+- Tailwind CSS scroll snap utilities (`snap-x`, `snap-mandatory`, `snap-start`, `overscroll-x-contain`): https://tailwindcss.com/docs/scroll-snap-type
+- `overscroll-behavior-x: contain` prevents iOS Safari back-navigation gesture conflict: https://pqina.nl/blog/how-to-prevent-scrolling-the-page-on-ios-safari/
+- iOS Safari scrollbar hidden while preserving scroll functionality (`-webkit-overflow-scrolling: touch`): https://nolanlawson.com/2019/02/10/building-a-modern-carousel-with-css-scroll-snap-smooth-scrolling-and-pinch-zoom/
+- Supabase + Next.js parallel data fetching with `Promise.all` to avoid waterfall: https://nextjs.org/docs/app/getting-started/fetching-data
+- Codebase inspection: `app/dashboard/page.tsx`, `supabase/migrations/001_profiles.sql`, `supabase/migrations/002_profile_fields.sql`, `supabase/migrations/20260376_school_owner_schema.sql`, `.planning/PROJECT.md`
 
 ---
-*Pitfalls research for: GOYA v2 — v1.15 Course System Redesign (categories, lessons, drag-and-drop, video/audio embeds on Next.js 16 + Supabase)*
-*Researched: 2026-04-01*
+*Pitfalls research for: GOYA v2 — v1.17 Dashboard Redesign (role-specific layouts, carousels, profile completion, personalized content on Next.js 16 + Supabase)*
+*Researched: 2026-04-02*

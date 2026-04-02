@@ -1,17 +1,17 @@
 # Project Research Summary
 
-**Project:** GOYA v2 — v1.15 Course System Redesign
-**Domain:** LMS admin course management — categories, multi-lesson structure, drag-and-drop ordering, platform-aware video/audio embeds
-**Researched:** 2026-04-01
+**Project:** GOYA v2 — v1.17 Dashboard Redesign
+**Domain:** Role-specific community platform dashboard (yoga/wellness professional network)
+**Researched:** 2026-04-02
 **Confidence:** HIGH
 
 ## Executive Summary
 
-This milestone is a well-scoped LMS feature upgrade layered onto a stable Next.js 16 + Supabase production platform. The core work is three-part: (1) replace a hardcoded 5-item string enum with a DB-driven `course_categories` table and admin CRUD, (2) introduce a `lessons` table to give every course a structured, ordered list of video/audio/text lessons, and (3) update the public academy to render those lessons. The existing codebase already contains every library and pattern needed — `@dnd-kit/core` and `@dnd-kit/sortable` are installed and used in products admin, Vimeo embed code exists in the lesson page, and `event_categories` provides an exact reference schema for `course_categories`. Only two new npm packages are required: `react-lite-youtube-embed` for lazy YouTube embeds, and `react-h5-audio-player` for a cross-browser audio UI.
+The v1.17 dashboard redesign is a pure UI orchestration milestone — replacing a client-side community feed with a role-specific, Netflix/Apple-style layout built on top of existing data tables. All underlying data (profiles, courses, events, connections, schools, credits) is already in Supabase. No schema migrations are required. The only new npm dependency is `embla-carousel-react` (~6 KB gzipped), added for desktop mouse-drag-to-scroll on carousels; native CSS scroll snap handles mobile touch natively. The fundamental architectural shift is converting `app/dashboard/page.tsx` from a `'use client'` component with `useEffect` fetching into an `async` Server Component that fetches all data in parallel via `Promise.all` and passes it to presentational role-layout components. The exact same pattern already exists in `app/settings/layout.tsx` and multiple admin pages.
 
-The recommended approach is a strict bottom-up build order: database migrations first (categories, then courses schema changes, then lessons), TypeScript types next, then admin UI, then public rendering. This order is non-negotiable because four downstream components depend on the `lessons` table and `course_category_id` FK before any UI work can begin. Every phase has a clear predecessor and a clear deliverable.
+The recommended build order is strict and dependency-driven: data utilities first (`lib/dashboard/queries.ts`, `lib/dashboard/profileCompletion.ts`), then the new server page with role branching, then shared carousel and card infrastructure, then the four role layout components, and finally cleanup of the old feed files. Role branching logic must live in `page.tsx`, not `layout.tsx`, because Next.js App Router layouts do not re-run on client-side navigation — putting the check in the layout breaks the existing impersonation system. The impersonation-aware helpers `getEffectiveUserId()` and `getEffectiveClient()` already exist and handle this correctly at the page level.
 
-The highest-risk items are the data migration (backfilling `course_category_id` on existing courses before dropping the `category` text column), RLS policies on the new `lessons` table (which must check parent course status to avoid silently empty results), and the drag-and-drop position strategy (float column, not integer, to allow single-row updates per reorder). All three risks have explicit, well-tested mitigations documented in PITFALLS.md.
+The two highest-risk issues are CSS-level: using `overflow-x: hidden` instead of scrollbar-hiding CSS (silently breaks carousel scroll), and semantic correctness in the profile completion scorer (JSONB empty arrays `[]` are truthy in JavaScript and will inflate scores for blank profiles). Both are fast to fix once diagnosed but produce invisible bugs — a carousel that looks built but cannot scroll, or a completion card showing 60% for a new account that has filled in nothing. Both must be validated against a real test account before the milestone is marked done. A third structural risk: there is no `school` role in the database — school owners have `role = 'teacher'` plus `principal_trainer_school_id IS NOT NULL`. Any role-branch condition that checks `role === 'school'` will silently never match.
 
 ---
 
@@ -19,139 +19,141 @@ The highest-risk items are the data migration (backfilling `course_category_id` 
 
 ### Recommended Stack
 
-The base stack is unchanged and production-stable. Only two new packages are added. `react-lite-youtube-embed@^3.5.0` replaces a naive YouTube `<iframe>` — it defers the 500KB YouTube IFrame API until the user clicks play, preserving Lighthouse scores. `react-h5-audio-player@^3.10.2` provides a styled, accessible, TypeScript-native audio player that would take ~200 lines of cross-browser CSS/JS to replicate. Everything else — drag-and-drop (`@dnd-kit/sortable` v10), rich text (`@tiptap/react`), Vimeo embedding (raw `<iframe>`), and form UI (Tailwind + existing design tokens) — is already in the project and must not be replaced.
+The existing stack (Next.js 16, Tailwind CSS 4, Supabase, framer-motion, lucide-react) handles all milestone requirements. One new package is added: `embla-carousel-react ^8.6.0` for desktop mouse-drag-to-scroll on carousels. Do NOT install `tailwind-scrollbar-hide`; it has a confirmed open bug under Tailwind CSS 4's `@import "tailwindcss"` model (GitHub issue #31). Instead, add a single `@utility no-scrollbar` block to `globals.css`. The animated number counters on stat heroes (originally listed as a milestone goal) are classified as an anti-feature — users scan KPIs and do not benefit from watching numbers count up. Static rendering is preferred.
 
-**Core technologies (new additions only):**
-- `react-lite-youtube-embed@^3.5.0`: YouTube lazy embed — avoids 500KB IFrame API on initial render, privacy-safe
-- `react-h5-audio-player@^3.10.2`: Audio lesson player UI — cross-browser consistent, TypeScript, accessible
+**Core technologies (new or decision-specific):**
+- `embla-carousel-react ^8.6.0`: Desktop drag-to-scroll on carousels — lightest option (~6 KB), SSR-safe, no framer-motion conflict. Install: `npm install embla-carousel-react`.
+- `@utility no-scrollbar` in globals.css: Scrollbar hiding — replaces broken `tailwind-scrollbar-hide` plugin under Tailwind CSS 4.
+- Tailwind CSS 4 scroll snap (`snap-x snap-mandatory`, `snap-start`, `shrink-0`, `overscroll-x-contain`): Carousel track — zero JS, keyboard-accessible, native iOS momentum scroll.
+- Pure TypeScript in `lib/dashboard/`: Profile completion scoring and data fetch functions — no library needed; stateless, server-only.
 
-**No new libraries for:**
-- Drag-and-drop: `@dnd-kit/sortable` v10 (already installed, used in `ProductsTable.tsx`)
-- Vimeo: raw `<iframe>` (existing pattern in `app/academy/[id]/lesson/page.tsx`)
-- Duration slider: native `<input type="range">` with Tailwind `accent-*`
-- Category/lesson forms: existing Tailwind + design token patterns
-
-See `.planning/research/STACK.md` for full integration code patterns and alternatives considered.
+See `.planning/research/STACK.md` for full integration code, Tailwind class reference, and alternatives rejected.
 
 ### Expected Features
 
-Encrypted key storage is not applicable here — the critical path dependency is the database schema. The `lessons` table and `course_category_id` FK must exist before any lesson UI can be built. All other features cascade from this.
-
 **Must have (table stakes):**
-- `course_categories` DB table with admin CRUD — replaces hardcoded string enum; every LMS uses a managed taxonomy
-- Multi-lesson structure per course — `lessons` table with `lesson_type` (video/audio/text), `sort_order`, platform-specific URL fields
-- Drag-and-drop lesson reordering — expected in any modern course builder; uses existing dnd-kit pattern
-- Platform-aware video embed (Vimeo + YouTube) — platform lock to Vimeo excludes YouTube-native instructors
-- Frontend lesson rendering — video iframe, HTML5 audio, formatted text per lesson type
-- Lesson type-specific admin forms — conditional fields prevent noise and confusion
+- Role-specific greeting with first name and time-of-day — anonymous dashboards feel cold; every professional SaaS personalizes this
+- Profile completion card with 6-field weighted progress bar (0–100%) and deep links to exact settings fields — visible progress prompt drives 40% of profile completions
+- Role-aware stat heroes (2–4 KPIs per role) — headline numbers are expected; placeholder "—" is correct for untracked stats; "0 profile views" punishes new users
+- Horizontal content carousels with snap-x mobile and mouse-drag desktop — the defining visual of the Apple/Netflix aesthetic milestone goal
+- Empty state handling per carousel with CTA — new members have no content; blank carousels feel broken
+- Primary CTA per role derived from profile completeness and activity state — single next action outperforms a menu of choices
+- Full deletion of existing community feed UI (FeedView, PostComposer, FeedPostCard, etc.)
 
 **Should have (differentiators):**
-- Premium card-section course form — replaces flat single-scroll layout; reduces cognitive load for complex course creation
-- Category color metadata — colored badges on course cards enable richer visual browsing
-- URL preview in lesson admin form — admins verify video plays before saving
-- Audio as a first-class lesson type — yoga-specific content (meditations, dharma talks) is often audio-first
+- ConnectionsList panel for Teacher/WP (5 most recent accepted connections, avatar + name + role badge)
+- FacultyList panel for school-owner Teacher (faculty roster with invite action)
+- School-aware Teacher layout (augmented Teacher layout, not a separate role)
+- Skeleton loading states on carousels (3–4 placeholder cards matching card dimensions)
+- Surface/card/shadow hierarchy (`bg-slate-50` page, `bg-white` cards, `shadow-sm border border-slate-100`) — Apple/Netflix aesthetic requires depth cues; all-white flat layout reads as unfinished
 
-**Defer (v2+):**
-- Lesson-level user progress tracking — `user_lesson_progress` table is a separate learner experience milestone
-- Quiz/assessment within lessons — different product domain; CPD credit system handles accreditation
-- Hierarchical category nesting — over-engineered for current scale (<100 courses)
-- Rich text / Markdown for text lessons — validate demand before adding ~200KB WYSIWYG dependency
+**Defer to v2+:**
+- Real-time profile view analytics (requires new `analytics_events` table and instrumentation — separate milestone)
+- "Suggested connections" algorithm (requires collaborative filtering — separate data science milestone)
+- Notification surface on dashboard (inbox at `/settings/inbox` already handles this; avoid two sources of truth)
+- CPD credits stat hero (credits table exists but aggregation by type is scoped to a dedicated CPD milestone)
+- Drag-and-drop dashboard layout customization (Apple/Netflix aesthetic is fixed layout; over-engineering for current scale)
 
-See `.planning/research/FEATURES.md` for full dependency map, prioritization matrix, and competitor analysis.
+See `.planning/research/FEATURES.md` for role-by-role feature breakdowns, card type specifications, and full dependency map.
 
 ### Architecture Approach
 
-The build follows a strict 8-step dependency chain from pure infrastructure (migrations → types) through admin UI (CourseForm, category panel, lesson management) to public rendering (lesson player page). All new components are either Server Components (data-fetching pages) or `'use client'` components with clean boundaries. `LessonList.tsx` owns its own optimistic state and must be wrapped in `dynamic(..., { ssr: false })` to prevent dnd-kit hydration errors. The `event_categories` migration and `ProductsTable.tsx` drag-and-drop implementation are the authoritative reference patterns for the two main new components.
+The core of this milestone is converting `app/dashboard/page.tsx` from `'use client'` with client-side `useEffect` auth/data-fetching into an `async` Server Component that authenticates via `getEffectiveUserId()`, fetches all role-relevant data in a single `Promise.all`, then branches to one of four presentational role layout components (`DashboardStudent`, `DashboardTeacher`, `DashboardSchool`, `DashboardWellness`). Role layouts are `'use client'` only for carousel interactivity; they receive all data as props and do no internal fetching. Five existing files in `app/dashboard/` are deleted (the feed component files) after a codebase-wide import audit verifies no other pages reference them.
 
 **Major components:**
-1. `course_categories` table + `CourseCategoriesPanel.tsx` — DB-driven taxonomy with inline admin CRUD; mirrors `event_categories` schema and FAQ admin UI pattern
-2. `CourseForm.tsx` (modified) — card-section layout, dynamic category select, duration slider, removes `vimeo_url`
-3. `LessonList.tsx` + `LessonFormModal.tsx` (new) — dnd-kit sortable list with type-conditional lesson form; mirrors `ProductsTable.tsx` pattern
-4. `app/academy/[id]/lessons/[lessonId]/page.tsx` (new) — Server Component lesson player that branches to VideoLesson/AudioLesson/TextLesson client sub-components
-5. `lib/courses/video.ts` (new) — shared URL parser/embed generator used by both admin form preview and public lesson renderer
+1. `lib/dashboard/queries.ts` (NEW) — server-only fetch functions: `fetchUpcomingEvents`, `fetchRecentCourses`, `fetchAcceptedConnections`, `fetchSchoolFaculty`, `fetchUserInProgressCourses`
+2. `lib/dashboard/profileCompletion.ts` (NEW) — pure TypeScript 6-field weighted scorer with semantic `isFieldComplete()` guard (handles JSONB `[]` arrays correctly)
+3. `app/dashboard/page.tsx` (REPLACE) — async Server Component: `getEffectiveUserId()` auth, `Promise.all` parallel fetch, role branch including `principal_trainer_school_id` check
+4. `HorizontalCarousel.tsx` (NEW) — `'use client'`, snap-x container, `no-scrollbar`, empty state, skeleton loading
+5. `ProfileCompletionCard.tsx` (NEW) — `'use client'`, animated progress bar; score received as pre-computed prop from server (no client re-derivation)
+6. `StatHero.tsx` (NEW) — Server Component; 2–4 KPI tiles per role; explicit "—" state for untracked stats
+7. Five card components (NEW): `TeacherCard`, `CourseCard`, `EventCard`, `ConnectionCard`, `FacultyCard` — Server Components, no interactivity
+8. Four role layout components (NEW): `DashboardStudent`, `DashboardTeacher`, `DashboardSchool`, `DashboardWellness` — `'use client'` presentational containers, no data fetching
+9. Feed files (DELETE): `FeedView.tsx`, `FeedPostCard.tsx`, `PostComposer.tsx`, `PostActionsMenu.tsx`, `CommentDeleteButton.tsx` — after import audit
 
-See `.planning/research/ARCHITECTURE.md` for full data flow diagrams, component boundaries, and file inventory.
+See `.planning/research/ARCHITECTURE.md` for full data flow pseudocode, component boundaries, file structure, and build order table.
 
 ### Critical Pitfalls
 
-Ten pitfalls were identified. The five most critical:
+Six critical and five moderate pitfalls were identified. The top five:
 
-1. **Category FK migration without backfill** — Add `course_category_id`, seed `course_categories`, UPDATE existing courses to set the FK, verify `COUNT(*) WHERE course_category_id IS NULL = 0`, then and only then drop the `category` text column. Never split these steps across separate migration files.
+1. **`overflow-x: hidden` disabling carousel scroll** — Use `overflow-x: auto` + `scrollbar-width: none` + `no-scrollbar` CSS utility. Never use `overflow-x: hidden` on a scroll container. Test: swipe left on mobile; if nothing moves, the container CSS is wrong.
 
-2. **RLS on `lessons` silently returns empty** — The lessons SELECT policy must use `EXISTS (SELECT 1 FROM courses WHERE courses.id = lessons.course_id AND courses.status = 'published')`. Supabase evaluates RLS independently per table in a JOIN. Always verify from the JS client, not the SQL Editor (which bypasses RLS).
+2. **Profile completion inflated by JSONB empty arrays** — `teaching_styles` and similar JSONB array fields default to `[]` in the DB, which is truthy in JavaScript. Use a semantic `isFieldComplete()` helper: `Array.isArray(v) ? v.length > 0 : Boolean(v?.trim())`. Validate: register a fresh test account and confirm score shows ~0% before any fields are filled.
 
-3. **Integer `sort_order` causes N-row updates on drag reorder** — Use `numeric` (float) position column, seeded at multiples of 1000. Each drag end sets `newPosition = (predecessor + successor) / 2` and updates exactly one row. The existing `products.priority` integer pattern is NOT suitable for drag-and-drop.
+3. **`role === 'school'` never matches** — No `school` role exists in the DB. School owners have `role = 'teacher'` plus `principal_trainer_school_id IS NOT NULL`. The branch condition must check both. Confirm the exact column name in `supabase/migrations/20260376_school_owner_schema.sql`.
 
-4. **dnd-kit hydration mismatch in Next.js App Router** — Wrap `LessonList.tsx` in `dynamic(() => import('./LessonList'), { ssr: false })`. The `'use client'` directive does not prevent SSR; dnd-kit uses `window` and browser pointer APIs that fail during server render.
+4. **Role branching in `layout.tsx` breaks impersonation** — Next.js App Router layouts do not re-run on client-side navigation. Role checks in the layout return stale state after impersonation switches or mid-session role changes. All role branching must be in `page.tsx`.
 
-5. **Hardcoded category strings survive TypeScript migration** — Grep for all 5 category string literals (`'Workshop'`, `'Yoga Sequence'`, `'Dharma Talk'`, `'Music Playlist'`, `'Research'`) before writing the migration. Four codebase locations must be updated: `lib/types.ts`, `app/admin/courses/page.tsx` (`CATEGORY_BADGE`), `app/academy/[id]/page.tsx` (`CATEGORY_COLORS`), and `AdminCoursesFilters.tsx`.
+5. **Deleting feed files before import audit breaks build** — `FeedView`, `PostComposer`, and related components may be imported by pages outside `app/dashboard/`. Grep all component names before deletion. Run `npx next build` after. Feed DB tables (`posts`, `likes`, `comments`) are used by the admin panel — do not drop the tables, only the UI files.
 
-See `.planning/research/PITFALLS.md` for full detail including integration gotchas, the "Looks Done But Isn't" verification checklist, and recovery strategies.
+See `.planning/research/PITFALLS.md` for full detail including iOS Safari back-gesture pitfall, sequential waterfall query pitfall, card `shrink-0` collapse pitfall, and the complete "Looks Done But Isn't" verification checklist.
 
 ---
 
 ## Implications for Roadmap
 
-Based on the dependency chain identified in FEATURES.md and the build order from ARCHITECTURE.md, five phases are recommended. The phases map directly to the 8-step hard dependency chain from ARCHITECTURE.md and cannot be reordered.
+Based on the dependency graph in ARCHITECTURE.md and pitfall timing in PITFALLS.md, six phases are recommended. Phases 1–3 are infrastructure; Phases 4–5 are component builds; Phase 6 assembles the final layouts. This order cannot be reversed.
 
-### Phase 1: Database Foundation
+### Phase 1: Codebase Audit and Feed Cleanup
 
-**Rationale:** All UI work depends on the schema. Running migrations first gives clean DB history and surfaces FK constraints before any code references them. This is also when the highest-risk operation (category string-to-FK backfill) must be done correctly.
-**Delivers:** Three migrations — `course_categories` (+ seed 5 canonical categories), `courses` schema changes (`category_id` FK, drop `category` text, drop `vimeo_url`, add `duration_minutes`), `lessons` table (with `numeric` position, RLS policies). Updated `lib/types.ts` with `CourseCategoryRow` and `Lesson` interfaces.
-**Addresses:** Course categories prerequisite, multi-lesson structure prerequisite, all P1 table stakes at schema level.
-**Avoids:** Category FK NULL backfill pitfall, integer position pitfall, RLS empty-results pitfall — all three must be solved here.
-**Research flag:** Standard patterns — Supabase migration and RLS patterns are well-documented and directly verified in existing codebase migrations (`event_categories`, `member_courses`). Skip research phase.
+**Rationale:** Must happen before any new files are written. Orphaned imports from non-dashboard pages will break `next build` if the feed files are deleted without a prior grep audit. Feed DB tables (`posts`, `likes`, `comments`) are referenced in the admin panel and must not be dropped. Establishing a clean `app/dashboard/` baseline (only `page.tsx` remaining) prevents file conflicts during subsequent phases.
+**Delivers:** `app/dashboard/` reduced to `page.tsx` stub only; zero feed component references remaining in codebase; `npx next build` passing with no `Module not found` errors.
+**Avoids:** Pitfall 6 (build-breaking orphaned imports from deleted feed components).
 
-### Phase 2: Admin Category Management
+### Phase 2: Data Infrastructure
 
-**Rationale:** Categories must exist in the UI before the course form can reference them. This is a low-complexity, isolated deliverable that unblocks Phase 3.
-**Delivers:** `CourseCategoriesPanel.tsx` with inline CRUD (create/edit/delete with course-count guard), tab bar on `/admin/courses` page (`?tab=courses` / `?tab=categories`), and the four Server Actions (`createCourseCategory`, `updateCourseCategory`, `deleteCourseCategory`).
-**Uses:** `event_categories` schema pattern from existing codebase; URL-driven tab pattern from `app/admin/users/[id]/page.tsx`.
-**Avoids:** Category delete 500 error pitfall (course-count guard in Server Action), hardcoded TypeScript strings pitfall (category dropdown fetches from DB).
-**Research flag:** Standard patterns — mirrors existing admin tab and inline CRUD patterns exactly. Skip research phase.
+**Rationale:** `lib/dashboard/queries.ts` and `lib/dashboard/profileCompletion.ts` are pure TypeScript with no UI dependencies. They block all downstream work — no role layout can be built without them. Building them first forces explicit decisions about column selects (avoiding `select('*')` oversizing) and the semantic completeness checker (avoiding JSONB false positives). The `getUserCreditTotals()` function already exists in `lib/credits.ts` and is imported, not duplicated.
+**Delivers:** `lib/dashboard/queries.ts` (5 server-only fetch functions), `lib/dashboard/profileCompletion.ts` (6-field weighted scorer with `isFieldComplete()` guard)
+**Uses:** Existing `getEffectiveUserId()`, `getEffectiveClient()`, `lib/credits.ts`
+**Avoids:** Pitfall 3 (JSONB false-positive scoring), Pitfall 5 (sequential waterfall from per-component fetching), Pitfall 13 (`select('*')` oversized response)
 
-### Phase 3: Premium Course Form
+### Phase 3: Server Page and Role Branch
 
-**Rationale:** `CourseForm.tsx` is the central admin entry point. Redesigning it (card sections, dynamic category select, duration slider, remove `vimeo_url`) clears the path for the lesson management UI in Phase 4, which lives inside the course edit page.
-**Delivers:** Redesigned `CourseForm.tsx` with card-section layout, DB-driven category select, integer duration slider, removed `vimeo_url` field. Also updates member-side course form in `app/settings/courses/` (easy-to-miss integration point) and updates `AdminCoursesFilters.tsx` to fetch categories dynamically.
-**Implements:** Premium SaaS card-section UI pattern (Thinkific-style grouped sections).
-**Avoids:** Two-source-of-truth pitfall (DB-driven category select, no hardcoded fallback), missing member-side form update.
-**Research flag:** Standard patterns — existing form patterns in `CourseForm.tsx` are well-understood; card section layout is Tailwind-only. Skip research phase.
+**Rationale:** Once data functions exist, `page.tsx` can be rewritten as an async Server Component with `Promise.all` parallel fetching and the four-way role branch including the school owner `principal_trainer_school_id` detection. Role layouts are stubbed as empty placeholders at this stage. The goal is a working, testable server route that proves auth, impersonation, and role routing all function correctly before any layout UI is built.
+**Delivers:** `app/dashboard/page.tsx` as async Server Component; working role branch with school detection; impersonation-aware auth; parallel data fetch with `Promise.all`
+**Avoids:** Pitfall 4 (role check in layout not page), Pitfall 10 (`role === 'school'` never matches), Pitfall 5 (waterfall queries)
 
-### Phase 4: Lesson Management UI
+### Phase 4: Shared Component Infrastructure
 
-**Rationale:** Lesson CRUD and drag-and-drop reordering are the highest-complexity UI work. They depend on the `lessons` table (Phase 1) and the course form redesign context (Phase 3). This phase has the most pitfall exposure.
-**Delivers:** `LessonList.tsx` (dnd-kit sortable, SSR-disabled via `dynamic`), `LessonFormModal.tsx` (type-conditional: video/audio/text), lesson Server Actions in `actions.ts` (`createLesson`, `updateLesson`, `deleteLesson`, `reorderLessons`). Lesson management panel embedded in the course edit page. Also builds `lib/courses/video.ts` URL parser utility shared with Phase 5.
-**Uses:** `react-lite-youtube-embed@^3.5.0` and `react-h5-audio-player@^3.10.2` (new installs), `@dnd-kit/sortable` (existing), `lib/courses/video.ts` URL parser (new).
-**Avoids:** dnd-kit hydration mismatch (`dynamic` SSR-disabled import from day one), drag state flicker (optimistic update with snapshot rollback), Vimeo private video issue (oEmbed validation on lesson save).
-**Research flag:** dnd-kit patterns are directly verified in `ProductsTable.tsx` — standard. Vimeo oEmbed validation and float-position drag math need careful implementation per PITFALLS.md integration gotchas table before building. Consult PITFALLS.md before starting this phase rather than running a research agent.
+**Rationale:** `HorizontalCarousel.tsx` and the five card components are used by all four role layouts. They must exist before any role layout can be fully implemented. Isolating them in a dedicated phase enables focused CSS testing — snap behaviour, iOS Safari back-gesture, card width collapse on narrow viewports — before they are composed into four separate layouts. This phase is also where `embla-carousel-react` is installed.
+**Delivers:** `HorizontalCarousel.tsx` (snap-x, `no-scrollbar`, `overscroll-x-contain`, empty state, skeleton), five card components (`TeacherCard`, `CourseCard`, `EventCard`, `ConnectionCard`, `FacultyCard`)
+**Uses:** `embla-carousel-react ^8.6.0`, `@utility no-scrollbar` in globals.css, Tailwind snap utilities
+**Avoids:** Pitfall 1 (`overflow-x: hidden`), Pitfall 2 (missing `snap-type` on container), Pitfall 8 (iOS Safari back-gesture — add `overscroll-behavior-x: contain`), Pitfall 11 (cards collapsing without `shrink-0`)
 
-### Phase 5: Frontend Lesson Rendering
+### Phase 5: ProfileCompletionCard and StatHero
 
-**Rationale:** The public-facing lesson player is the last piece. It depends on all schema work and the `lib/courses/video.ts` utility built in Phase 4. It is a pure consumer of data — no new DB changes.
-**Delivers:** Updated `app/academy/[id]/page.tsx` (ordered lessons list with type icons and links), new `app/academy/[id]/lessons/[lessonId]/page.tsx` (Server Component wrapper with access gate + `VideoLesson`, `AudioLesson`, `TextLesson` client sub-components with `dynamic` SSR-disabled imports). REST API service updated to return `category_id` instead of `category` string.
-**Implements:** Platform-aware lesson rendering using shared `lib/courses/video.ts` URL parser.
-**Avoids:** Audio/video SSR errors (`dynamic` + `ssr: false` for all media components), loading Vimeo SDK on non-video lessons (conditional imports), Vimeo domain privacy issues (document localhost and preview URL setup for admins).
-**Research flag:** Standard patterns for iframe embeds (Next.js official video guide verified). REST API shape change needs careful verification against existing API consumers. Skip research phase but verify API consumers before shipping.
+**Rationale:** These two widgets are shared across all role layouts but simpler than the carousel. They can be built in parallel with Phase 4. ProfileCompletionCard receives the pre-computed score as a prop from the server page — no re-derivation on the client prevents score flicker. StatHero must render explicit "—" placeholders for untracked stats from first implementation; hardcoded fake numbers must never ship to production.
+**Delivers:** `ProfileCompletionCard.tsx` (animated progress bar, checklist with deep links to settings, dismiss at ≥80%), `StatHero.tsx` (KPI tiles with role color accents from ThemeColorProvider CSS variables, explicit "—" placeholder state)
+**Avoids:** Pitfall 9 (score flicker from client re-derivation), Pitfall 14 (hardcoded fake placeholder numbers), Pitfall 12 (greeting fallback — `full_name = ''` not NULL for new users; use `trim() || fallback`)
+
+### Phase 6: Role Layout Components
+
+**Rationale:** All dependencies are complete. Role layouts are thin presentational assembly — compose existing components, add role-specific section headings and CTAs. Student and WP layouts are medium complexity. Teacher layout is medium-high (school owner detection, ConnectionsList). School-aware Teacher layout is highest complexity (school status CTA branching, FacultyList, designation queries — but all data arrives as props already fetched in Phase 3).
+**Delivers:** `DashboardStudent.tsx`, `DashboardTeacher.tsx`, `DashboardWellness.tsx`, `DashboardSchool.tsx`; page.tsx stubs replaced with real imports
+**Avoids:** Pitfall 2 anti-pattern (fetching data inside role layouts), Pitfall 7 (flat visual without depth cues — establish `bg-slate-50` page / `bg-white` card / `shadow-sm` hierarchy in base Card component before assembling layouts)
 
 ### Phase Ordering Rationale
 
-- Phases 1 and 2 are pure prerequisites. No lesson UI can be built before the schema exists; no dynamic category select can be built before the categories table is populated.
-- Phase 3 (course form) follows Phase 2 because the redesigned form depends on the categories DB select. It precedes Phase 4 because lesson management lives inside the course edit page.
-- Phase 4 (lesson management) is the implementation complexity peak — most pitfalls concentrate here. Isolating it after simpler admin work (Phases 2–3) keeps the critical path clean.
-- Phase 5 (public rendering) is intentionally last because it is a pure consumer. It cannot be tested meaningfully until real lesson data exists from Phase 4.
-- The `lib/courses/video.ts` URL parser utility bridges Phases 4 and 5 — build it at the start of Phase 4 and reuse in Phase 5.
+- The dependency graph is strict: data utilities must precede the server page; the server page (with stubs) must precede role layouts; carousel and card components must precede role layouts.
+- The feed cleanup (Phase 1) is front-loaded to avoid mid-build discovery that deleted components are imported elsewhere — a breakage that stalls later phases.
+- The `Promise.all` fetch pattern (Phase 3) is established before any individual layout is built — retrofitting parallel fetching into an existing per-component waterfall is a larger refactor than starting correctly.
+- CSS correctness (scroll snap, iOS Safari, `shrink-0`) is validated at the component level (Phase 4) before the carousel appears in four separate layouts. A bug fixed once in Phase 4 does not need to be fixed four times in Phase 6.
+- The `principal_trainer_school_id` school detection condition (Phase 3) is locked in before the school layout component is written (Phase 6), preventing the silent `role === 'school'` mistake.
 
 ### Research Flags
 
-Phases needing careful PITFALLS.md consultation (not external research, but known-gotcha attention):
-- **Phase 1:** Category FK backfill sequence is the highest-risk operation in the milestone. Follow the exact 6-step order in PITFALLS.md Pitfall 1 — no shortcuts.
-- **Phase 4:** Float-position drag math, Vimeo oEmbed validation, and the `dynamic` SSR-disabled dnd-kit import pattern all need to be implemented correctly from the start, not fixed in QA. Review the full integration gotchas table in PITFALLS.md before building.
+Phases with standard, well-documented patterns — no research agent needed:
+- **Phase 1 (Feed Cleanup):** Grep-and-delete; no unknowns.
+- **Phase 2 (Data Infrastructure):** Pure TypeScript; mirrors existing patterns in `lib/credits.ts` and `app/settings/subscriptions/queries.ts`.
+- **Phase 3 (Server Page):** Exact pattern from `app/settings/layout.tsx`. Confirm `principal_trainer_school_id` column name in migration file before writing condition.
+- **Phase 5 (ProfileCompletionCard, StatHero):** Fully specified in FEATURES.md and PITFALLS.md. No novel patterns.
 
-Phases with standard, low-risk patterns (skip research agent):
-- **Phase 2:** Mirrors existing admin tab + inline CRUD patterns exactly. No novel patterns.
-- **Phase 3:** Tailwind card-section layout plus dynamic DB select. No novel patterns.
-- **Phase 5:** iframe embeds follow the Next.js official video guide exactly. REST API update is additive.
+Phase requiring device testing before sign-off:
+- **Phase 4 (HorizontalCarousel):** iOS Safari back-gesture conflict cannot be tested in Chrome DevTools device emulation. Test on a real iPhone before marking this phase complete. The fix (`overscroll-behavior-x: contain`) is known; the risk is shipping without verifying it.
+
+Phase requiring schema verification before first line of code:
+- **Phase 6 (Role Layouts):** Confirm `principal_trainer_school_id` is the correct column name for school owner detection. Check `supabase/migrations/20260376_school_owner_schema.sql` — this was referenced in PITFALLS.md but the exact column name was not independently verified in ARCHITECTURE.md.
 
 ---
 
@@ -159,50 +161,57 @@ Phases with standard, low-risk patterns (skip research agent):
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All new packages verified against React 19 and Next.js 16. react-lite-youtube-embed (Feb 2026) and react-h5-audio-player (Mar 2026) confirmed production-stable. All existing patterns verified directly in codebase. |
-| Features | HIGH | Feature scope derived from direct codebase inspection + competitor analysis (Thinkific 2026, MasterStudy). Table stakes are well-established LMS patterns. Anti-features clearly justified with alternatives. |
-| Architecture | HIGH | All component patterns have direct existing analogues in the codebase (ProductsTable.tsx, event_categories migration, FAQ admin CRUD). No novel architecture required. Build order verified against actual dependency graph. |
-| Pitfalls | HIGH | Pitfalls sourced from direct codebase inspection of existing migration patterns, Supabase official RLS documentation, dnd-kit GitHub issues, and verified Vimeo privacy documentation. Each pitfall includes verified warning signs and recovery steps. |
+| Stack | HIGH | All decisions verified against official docs and direct codebase inspection. embla-carousel-react version 8.6.0 confirmed via secondary sources (npm returned 403 during research) — MEDIUM on that specific version, HIGH on the library choice and integration pattern. |
+| Features | HIGH | Feature scope verified against codebase (existing tables, component files, settings field names). Profile completion weights from external research (LinkedIn engagement data) are MEDIUM confidence; the implementation pattern is HIGH. Anti-features are clearly reasoned against project goals. |
+| Architecture | HIGH | All integration points verified by direct codebase inspection. Pattern match with `app/settings/layout.tsx` is exact. Build order verified against actual file dependency graph. No novel architecture required. |
+| Pitfalls | HIGH | CSS carousel pitfalls verified against MDN, official Next.js auth guidance, and confirmed open GitHub issues. JSONB scoring pitfall verified against actual migration files. School owner detection verified against schema. Each pitfall includes detection steps and recovery cost. |
 
-**Overall confidence: HIGH**
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **`user_lesson_progress` decision:** PITFALLS.md recommends adding this table in Phase 1 to avoid retroactive data problems. However, FEATURES.md marks lesson-level progress tracking as deferred (v2+). This is a deliberate design decision — but the team should explicitly acknowledge that `user_course_progress` semantics will be ambiguous for multi-lesson courses until lesson-level tracking is built. Document the interim completion model (e.g., "all lessons visible = course available; completion is manual or deferred to v2").
+- **`principal_trainer_school_id` column name verification:** Referenced in PITFALLS.md via codebase inspection but should be explicitly confirmed in `supabase/migrations/20260376_school_owner_schema.sql` before writing the school owner branch condition in Phase 3.
 
-- **Vimeo embed domain allowlist:** The production custom domain and `localhost:3000` must both be added to Vimeo's embed allowlist before Phase 5 testing. This is an operational task outside the code build order but will block QA if forgotten.
+- **embla-carousel-react exact version:** npm page returned 403 during research; v8.6.0 confirmed via secondary sources. Verify with `npm info embla-carousel-react` at install time. Confirm 9.x is still RC and not production-ready before pinning to `^8`.
 
-- **REST API consumer audit:** The existing `/api/v1/courses` response shape changes (adding `category_id`, potentially removing `category` string). Any external API consumers beyond the web app need to be identified before Phase 5 ships. If none exist, this is low risk.
+- **Profile view analytics (permanent deferral):** The StatHero "profile views" tile must render "—" in v1.17. This is intentional. The next milestone that implements analytics will need a separate research pass for `analytics_events` table design, write instrumentation on profile page load, and aggregation query patterns.
 
-- **Duration migration for existing courses:** 8 existing seed courses have `duration` stored as freeform text (e.g., `"4h 30m"`). The Phase 1 migration must parse these strings to integer minutes. If any values are unparseable, they should default to `0` with a warning rather than failing the migration.
+- **RLS on `schools` table:** ARCHITECTURE.md flags a LOW risk that the school record may not be readable by the owner without the service client. Verify in Phase 3: check if `principal_trainer_school_id` is already joined into the profile query, or if a separate schools query needs the service client vs. a regular server client.
+
+- **Feed DB tables:** `posts`, `likes`, `comments` tables are used by the admin panel. The Phase 1 cleanup deletes only UI component files in `app/dashboard/`. Confirm during the grep audit that no other non-admin pages reference these tables directly before closing Phase 1.
 
 ---
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Existing codebase: `app/admin/shop/products/ProductsTable.tsx`, `app/admin/media/FolderSidebar.tsx` — dnd-kit pattern (verified)
-- Existing codebase: `supabase/migrations/20260331100714_event_categories.sql` — category schema reference (verified)
-- Existing codebase: `app/admin/courses/components/CourseForm.tsx`, `lib/types.ts`, `app/academy/[id]/page.tsx` — current state (verified)
-- [Next.js 16 Video Guide](https://nextjs.org/docs/app/guides/videos) — iframe embed recommendation, updated 2026-03-31
-- [react-lite-youtube-embed GitHub](https://github.com/ibrahimcesar/react-lite-youtube-embed) — v3.5.0, React 19 compat confirmed
-- [react-h5-audio-player GitHub](https://github.com/lhz516/react-h5-audio-player) — v3.10.2, CSS import requirement, props API
-- [Supabase RLS documentation](https://supabase.com/docs/guides/database/postgres/row-level-security) — empty results on missing policies
-- [Supabase RLS performance guide](https://supabase.com/docs/guides/troubleshooting/rls-performance-and-best-practices-Z5Jjwv) — JOIN table RLS evaluation independence
-- [Vimeo privacy settings](https://help.vimeo.com/hc/en-us/articles/12426199699985-About-video-privacy-settings) — private video embed restrictions
-- [Vimeo domain-level privacy](https://help.vimeo.com/hc/en-us/articles/30030693052305-How-do-I-set-up-domain-level-privacy) — domain allowlist setup
+- Codebase: `app/dashboard/page.tsx` — current dashboard state (direct inspection)
+- Codebase: `app/settings/layout.tsx` — reference server component auth + role fetch pattern
+- Codebase: `app/schools/[slug]/page.tsx` — reference for `getSupabaseService()` in server component
+- Codebase: `lib/supabase/getEffectiveUserId.ts`, `lib/credits.ts`, `app/context/ConnectionsContext.tsx` — direct inspection
+- Codebase: `supabase/migrations/` — schema verification (profiles, schools, connections, credit_entries)
+- Codebase: `.planning/PROJECT.md` — v1.17 milestone spec, role definitions
+- [Embla Carousel official docs — React setup](https://www.embla-carousel.com/docs/get-started/react)
+- [Tailwind CSS scroll snap utilities](https://tailwindcss.com/docs/scroll-snap-type)
+- [tailwind-scrollbar-hide v4 bug — GitHub Issue #31](https://github.com/reslear/tailwind-scrollbar-hide/issues/31)
+- [Next.js Auth in Layouts vs Pages](https://nextjs.org/docs/app/guides/authentication)
+- [MDN — CSS Scroll Snap / Carousels](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Overflow/Carousels)
 
 ### Secondary (MEDIUM confidence)
-- [Thinkific New Course Builder 2026](https://support.thinkific.com/hc/en-us/articles/37547732533655-Introducing-Thinkific-s-New-Course-Builder) — card-section UX pattern (WebSearch verified)
-- [Thinkific Lesson Types](https://support.thinkific.com/hc/en-us/articles/360030720053-Thinkific-Lesson-Types) — lesson type taxonomy (WebSearch, direct fetch 403)
-- [MasterStudy LMS Lessons Docs](https://docs.stylemixthemes.com/masterstudy-lms/lms-course-features/lessons) — audio as first-class type (WebSearch)
-- [MasterStudy LMS Categories Docs](https://docs.stylemixthemes.com/masterstudy-lms/lms-course-features/courses-category) — category fields: icon, color, slug, parent (WebSearch)
-- [Float position for drag reorder](https://www.basedash.com/blog/implementing-re-ordering-at-the-database-level-our-experience) — single-row update pattern
-- [Fractional indexing for ordered lists](https://hollos.dev/blog/fractional-indexing-a-solution-to-sorting/) — numeric midpoint math
-- [dnd-kit hydration issue in Next.js](https://github.com/sujjeee/nextjs-dnd) — dynamic ssr: false solution
-- [dnd-kit state flicker discussion](https://github.com/clauderic/dnd-kit/discussions/1522) — optimistic update race condition
-- [Next.js hydration error solutions](https://nextjs.org/docs/messages/react-hydration-error) — dynamic with ssr: false
+- [Embla Carousel — framer-motion conflict report #317](https://github.com/davidjerleke/embla-carousel/issues/317)
+- [Tailwind CSS v4 @utility directive discussion](https://github.com/tailwindlabs/tailwindcss/discussions/14093)
+- [CSS overflow-x hidden vs scrollbar hiding](https://blog.logrocket.com/hide-scrollbar-without-impacting-scrolling-css/)
+- [iOS Safari overscroll-behavior-x contain](https://pqina.nl/blog/how-to-prevent-scrolling-the-page-on-ios-safari/)
+- [Vercel — Common Next.js App Router Mistakes](https://vercel.com/blog/common-mistakes-with-the-next-js-app-router-and-how-to-fix-them)
+- [Dashboard Design UX Patterns — Pencil & Paper](https://www.pencilandpaper.io/articles/ux-pattern-analysis-data-dashboards)
+- [NN/G Mobile Carousels](https://www.nngroup.com/articles/mobile-carousels/)
+- [Netflix Carousel UX Pattern](https://medium.com/@andrew.tham.cc/recreating-netflixs-slider-component-2d6ad9009ab0)
+- [KPI Card Best Practices — Tabular Editor](https://tabulareditor.com/blog/kpi-card-best-practices-dashboard-design)
+
+### Tertiary (LOW confidence)
+- [React carousel library comparison 2025/2026](https://enstacked.com/react-carousel-component-libraries/) — bundle size cross-reference only
+- [Userpilot — SaaS Onboarding Patterns](https://userpilot.com/blog/app-onboarding-design/) — single case study; profile completion claim used directionally only
 
 ---
-*Research completed: 2026-04-01*
+*Research completed: 2026-04-02*
 *Ready for roadmap: yes*

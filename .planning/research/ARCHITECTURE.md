@@ -1,413 +1,449 @@
 # Architecture Research
 
-**Domain:** Course system redesign — categories, multi-lesson, drag-and-drop ordering, platform-aware video/audio
-**Researched:** 2026-04-01
+**Domain:** Dashboard redesign — role-specific layouts, server-side data fetching, carousel components
+**Researched:** 2026-04-02
 **Confidence:** HIGH (all findings from direct codebase inspection)
 
 ---
 
-## How New Features Plug Into the Existing Architecture
+## How the New Dashboard Integrates With the Existing Architecture
 
-This is an integration architecture document. It maps each new v1.15 feature to the existing code it touches, the new code it requires, and the order those pieces must be built.
+This document maps every integration point between the new v1.17 dashboard and the existing codebase: what gets deleted, what gets modified, what is new, and the order in which pieces must be built.
 
 ---
 
 ## System Overview
 
 ```
-┌────────────────────────────────────────────────────────────────┐
-│  Next.js 16 App Router  (Server Components + Server Actions)   │
-│                                                                │
-│  app/admin/courses/                                            │
-│  ├── page.tsx              MODIFY: add Courses/Categories tab  │
-│  ├── actions.ts            MODIFY: add lesson + category       │
-│  │                                  Server Actions             │
-│  ├── new/page.tsx          MODIFY: pass categories prop        │
-│  ├── [id]/page.tsx         MODIFY: add LessonList section      │
-│  ├── [id]/edit/            MODIFY: pass categories prop        │
-│  └── components/                                               │
-│      ├── CourseForm.tsx    MODIFY: rm vimeo_url, category→FK,  │
-│      │                             duration slider, card UI    │
-│      ├── LessonList.tsx    NEW: dnd-kit sortable lessons       │
-│      ├── LessonFormModal.tsx NEW: type-conditional lesson form │
-│      └── CourseCategoriesPanel.tsx NEW: inline category CRUD  │
-│                                                                │
-│  app/academy/                                                  │
-│  ├── page.tsx              no change                           │
-│  └── [id]/                                                     │
-│      ├── page.tsx          MODIFY: add ordered lessons list    │
-│      └── lessons/[lessonId]/                                   │
-│          └── page.tsx      NEW: Video/Audio/Text render        │
-└──────────────────────────┬─────────────────────────────────────┘
-                           │ Supabase SSR client
-┌──────────────────────────▼─────────────────────────────────────┐
-│  Supabase (PostgreSQL + RLS)                                   │
-│                                                                │
-│  courses          MODIFY: category text→uuid FK, drop          │
-│                           vimeo_url, add duration_minutes      │
-│  course_categories NEW: replaces 5 hardcoded string values     │
-│  lessons           NEW: multi-lesson per course, sort_order    │
-└────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│  Next.js 16 App Router                                                 │
+│                                                                        │
+│  app/dashboard/                                                        │
+│  ├── page.tsx             REPLACE: server component, role-branch       │
+│  ├── FeedView.tsx         DELETE: no community feed in new design      │
+│  ├── FeedPostCard.tsx     DELETE                                       │
+│  ├── PostComposer.tsx     DELETE                                       │
+│  ├── PostActionsMenu.tsx  DELETE                                       │
+│  ├── CommentDeleteButton.tsx DELETE                                    │
+│  └── components/          NEW directory                                │
+│      ├── DashboardStudent.tsx   NEW: student layout                    │
+│      ├── DashboardTeacher.tsx   NEW: teacher layout                    │
+│      ├── DashboardSchool.tsx    NEW: school owner layout               │
+│      ├── DashboardWellness.tsx  NEW: wellness practitioner layout      │
+│      ├── HorizontalCarousel.tsx NEW: reusable snap-x carousel          │
+│      ├── TeacherCard.tsx        NEW: teacher profile card for carousel │
+│      ├── CourseCard.tsx         NEW: course card for carousel          │
+│      ├── EventCard.tsx          NEW: event card for carousel           │
+│      ├── ProfileCompletionCard.tsx NEW: checklist + progress bar       │
+│      └── StatHero.tsx           NEW: weekly profile views hero         │
+└────────────────────────────┬───────────────────────────────────────────┘
+                             │ Supabase server client
+┌────────────────────────────▼───────────────────────────────────────────┐
+│  Supabase (PostgreSQL + RLS)                                           │
+│                                                                        │
+│  profiles          READ: full_name, avatar_url, role, bio,            │
+│                          location, website, instagram, youtube,        │
+│                          username, teaching_styles,                    │
+│                          principal_trainer_school_id                   │
+│  courses           READ: published courses for carousels               │
+│  events            READ: upcoming published events for carousels       │
+│  connections       READ: accepted connections for lists                │
+│  credit_entries    READ: approved credits for stat heroes              │
+│  user_course_progress READ: in-progress courses                        │
+│  schools           READ: school name/slug for school owner greeting    │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Database: What Changes, What Is New
+## What Gets Deleted
 
-### courses table — MODIFY (three-step migration)
+The entire `app/dashboard/` directory except `page.tsx` is community-feed infrastructure that has no place in the new design.
 
-| Column | Change | Why |
-|--------|--------|-----|
-| `category text CHECK(IN(...))` | Replace with `category_id uuid REFERENCES course_categories(id)` | Enable admin CRUD of categories without code deployments |
-| `vimeo_url text` | DROP | Replaced by per-lesson `video_url` + `video_platform` |
-| `duration text` | Add `duration_minutes integer` alongside; backfill; keep old column for one release as fallback | Slider needs integer; existing data is "4h 30m" strings |
+| File | Why Deleted |
+|------|------------|
+| `FeedView.tsx` | Community feed is removed entirely per v1.17 spec |
+| `FeedPostCard.tsx` | Feed post rendering, no longer needed |
+| `PostComposer.tsx` | Feed post creation, no longer needed |
+| `PostActionsMenu.tsx` | Feed post actions, no longer needed |
+| `CommentDeleteButton.tsx` | Feed comment management, no longer needed |
 
-**Three-step migration approach for `category`:**
-1. Add `category_id uuid REFERENCES course_categories(id)` (nullable first)
-2. Seed `course_categories` with the 5 existing values; UPDATE `courses` to set `category_id` from the seed
-3. Add NOT NULL constraint; drop `category text`
+`page.tsx` is completely rewritten, not modified. The only value it contributes is the `COMPLETION_FIELDS` constant (8 fields) and the `getCompletion()` function, which are superseded by the new 6-field weighted scoring.
 
-Attempting a single ALTER that drops-and-adds in one transaction risks a lock on a table with live data. Three steps are safer.
+---
 
-### course_categories table — NEW
+## The Core Architectural Shift
 
-Mirror of `event_categories` (migration `20260331100714_event_categories.sql`). That table is the authoritative reference pattern for this codebase:
+**Before (current):** `app/dashboard/page.tsx` is `'use client'`. It fetches the authenticated user and profile via `supabase.auth.getUser()` in a `useEffect`, stores state locally, and renders a 3-column layout with a community feed in the center column. Data for events, connections, and recently active members is all hardcoded placeholder data.
 
-```sql
-CREATE TABLE public.course_categories (
-  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  name        text        NOT NULL,
-  slug        text        NOT NULL UNIQUE,
-  description text,
-  color       text        NOT NULL DEFAULT '#345c83',
-  sort_order  integer     DEFAULT 0,
-  created_at  timestamptz DEFAULT now(),
-  updated_at  timestamptz DEFAULT now()
-);
+**After (new):** `app/dashboard/page.tsx` becomes an `async` Server Component (no `'use client'`). It uses `getEffectiveUserId()` and `getEffectiveClient()` — the existing impersonation-aware helpers — to authenticate and fetch the user profile server-side. Based on `profile.role`, it renders one of four role-specific layout components, passing fully-loaded data as props. The role layouts are `'use client'` only where they need interactivity (carousel drag/swipe); the static sections are Server Components.
+
+This follows the exact pattern established in `app/settings/layout.tsx`:
+
+```typescript
+// app/settings/layout.tsx (reference pattern)
+export default async function SettingsLayout({ children }) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/sign-in');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  return <SettingsShell userRole={profile?.role}>{children}</SettingsShell>;
+}
 ```
 
-No `parent_id` for v1.15 (flat list). Defer if subcategories needed later.
+The new `app/dashboard/page.tsx` is the same pattern but also fetches role-specific content before branching.
 
-**RLS — copy `event_categories` verbatim:**
-- `SELECT`: public (any)
-- `INSERT/UPDATE/DELETE`: admin or moderator role only
+---
 
-**Seed data in the same migration:** The 5 existing hardcoded values (`Workshop`, `Yoga Sequence`, `Dharma Talk`, `Music Playlist`, `Research`) become rows with appropriate slugs.
+## Impersonation Compatibility
 
-### lessons table — NEW
+The current dashboard already handles impersonation by checking `ImpersonationContext` and calling `/api/me` when impersonating. This is the **wrong pattern** — it uses a client-side context to conditionally fetch from an API route.
 
-```sql
-CREATE TABLE public.lessons (
-  id               uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  course_id        uuid        NOT NULL REFERENCES public.courses(id) ON DELETE CASCADE,
-  title            text        NOT NULL,
-  description      text,
-  lesson_type      text        NOT NULL CHECK (lesson_type IN ('video', 'audio', 'text')),
-  sort_order       integer     NOT NULL DEFAULT 0,
+The new server component must use `getEffectiveUserId()` and `getEffectiveClient()` from `lib/supabase/getEffectiveUserId.ts`. These already handle impersonation correctly server-side:
 
-  -- Video fields (lesson_type = 'video')
-  video_platform   text        CHECK (video_platform IN ('vimeo', 'youtube')),
-  video_url        text,
-
-  -- Audio fields (lesson_type = 'audio')
-  audio_url        text,
-  audio_duration   integer,    -- seconds
-
-  -- Text content (lesson_type = 'text')
-  content          text,
-
-  -- Shared
-  duration_minutes integer,
-  is_preview       boolean     NOT NULL DEFAULT false,
-  created_at       timestamptz DEFAULT now(),
-  updated_at       timestamptz DEFAULT now()
-);
-
-CREATE INDEX idx_lessons_course_id
-  ON public.lessons(course_id);
-CREATE INDEX idx_lessons_course_sort
-  ON public.lessons(course_id, sort_order);
+```typescript
+// lib/supabase/getEffectiveUserId.ts — ALREADY EXISTS, USE AS-IS
+export async function getEffectiveUserId(): Promise<string>
+export async function getEffectiveClient(): Promise<SupabaseClient>
 ```
 
-**Why explicit `video_platform` field:** The old `vimeo_url` was Vimeo-only. A separate platform column lets the frontend switch embed format without URL-guessing. Store the full user-pasted URL in `video_url`; parse out the embed ID at render time in a utility function.
+`getEffectiveClient()` returns the service client (bypasses RLS) when the impersonation cookie is present, or the normal server client otherwise. No changes needed to this file.
 
-**RLS for lessons:**
-- `SELECT`: public, but only for lessons whose course is published (`JOIN courses ON courses.id = lessons.course_id WHERE courses.status = 'published'`)
-- `ALL`: admin or moderator (same pattern as courses table)
-- Members do NOT manage lessons in v1.15 — lesson management is admin/mod only
+---
+
+## Data Flow: Server-Side Fetching
+
+### page.tsx: What Gets Fetched at the Top Level
+
+All fetches happen in `app/dashboard/page.tsx` before role branching. The result is passed as props to the role layout component. This avoids duplicate fetches and keeps the role components as presentational.
+
+```typescript
+// app/dashboard/page.tsx (new, pseudocode)
+export default async function DashboardPage() {
+  const userId = await getEffectiveUserId()      // handles impersonation
+  const supabase = await getEffectiveClient()    // handles impersonation
+
+  // Core: profile (always needed)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id, full_name, username, avatar_url, role, bio, location,
+             website, instagram, youtube, teaching_styles,
+             principal_trainer_school_id')
+    .eq('id', userId)
+    .single()
+
+  if (!profile) redirect('/sign-in')
+
+  // Role-branch data (fetch all in parallel with Promise.all)
+  const [courses, events, connections, creditTotals] = await Promise.all([
+    fetchUpcomingCourses(supabase),
+    fetchUpcomingEvents(supabase),
+    fetchAcceptedConnections(supabase, userId),
+    getUserCreditTotals(userId, supabase),     // lib/credits.ts — already exists
+  ])
+
+  // School data (teachers/school owners only)
+  let school = null
+  if (profile.role === 'teacher' || profile.role === 'admin') {
+    if (profile.principal_trainer_school_id) {
+      const { data } = await supabase
+        .from('schools')
+        .select('id, name, slug')
+        .eq('id', profile.principal_trainer_school_id)
+        .single()
+      school = data
+    }
+  }
+
+  // Branch to role layout
+  switch (profile.role) {
+    case 'teacher':
+      return <DashboardTeacher profile={profile} courses={courses}
+               events={events} connections={connections}
+               creditTotals={creditTotals} school={school} />
+    case 'wellness_practitioner':
+      return <DashboardWellness ... />
+    case 'student':
+    default:
+      return <DashboardStudent ... />
+  }
+}
+```
+
+### Data Fetch Functions (New, in lib/dashboard/)
+
+These are thin query functions, `'server-only'`, following the pattern of `lib/supabase/queries.ts` (subscriptions) and `lib/credits.ts`.
+
+**`lib/dashboard/queries.ts`** (NEW FILE):
+
+```typescript
+// Upcoming published events — capped at 8 for carousels
+export async function fetchUpcomingEvents(supabase, limit = 8)
+
+// Published courses — most recent, capped at 8
+export async function fetchRecentCourses(supabase, limit = 8)
+
+// Accepted connections for current user, with profile data joined
+export async function fetchAcceptedConnections(supabase, userId, limit = 12)
+
+// Faculty members for a school (teachers/school dashboard)
+export async function fetchSchoolFaculty(supabase, schoolId, limit = 8)
+
+// In-progress courses for current user
+export async function fetchUserInProgressCourses(supabase, userId, limit = 4)
+```
+
+`getUserCreditTotals()` is already in `lib/credits.ts`. Import and reuse it directly — no duplicate.
+
+### Profile Completion Scoring
+
+The current dashboard has 8 fields, all weighted equally. The new spec calls for **6 weighted fields**. This is a pure computation function — no DB query.
+
+```typescript
+// lib/dashboard/profileCompletion.ts (NEW FILE)
+const WEIGHTED_FIELDS = [
+  { key: 'avatar_url',    weight: 25, label: 'Profile photo',  href: '/settings' },
+  { key: 'bio',           weight: 20, label: 'Bio',            href: '/settings' },
+  { key: 'full_name',     weight: 20, label: 'Full name',      href: '/settings' },
+  { key: 'location',      weight: 15, label: 'Location',       href: '/settings' },
+  { key: 'teaching_styles', weight: 10, label: 'Teaching styles', href: '/settings' },
+  { key: 'instagram',     weight: 10, label: 'Instagram',      href: '/settings' },
+]
+
+export function getProfileCompletion(profile: ProfileData): {
+  score: number        // 0–100
+  missing: { key, label, href }[]
+  complete: string[]
+}
+```
+
+This replaces the current `getCompletion()` function in `page.tsx`.
 
 ---
 
 ## Component Boundaries: New vs Modified
 
-### MODIFIED: CourseForm.tsx
+### REPLACED: app/dashboard/page.tsx
 
-**Current state:** Single flat form with `vimeo_url` text input, `category` as a `<select>` over a hardcoded `CATEGORIES` constant, `duration` as free text, no card sectioning.
+**From:** `'use client'`, 3-column feed layout, placeholder data, client-side auth.
+**To:** `async` server component, role-branch, server-side data fetch, impersonation-aware.
 
-**Required changes:**
-1. Replace the hardcoded `CATEGORIES` `<select>` with a `<select>` populated from a `categories` prop (array of `CourseCategoryRow`). The parent Server Component fetches categories and passes them down — the form itself stays `'use client'` and receives them as a serializable prop.
-2. Remove `vimeoUrl` state and the corresponding input field entirely.
-3. Add `durationMinutes: number` state; render as `<input type="range" min={0} max={300} step={15}>` with a formatted label ("2h 30m"). Map to `duration_minutes` column.
-4. Wrap logical groups in card sections (title/category/level block; access/status block; media/content block). This is the "premium SaaS UI" requirement.
+No `'use client'` directive. No `useState`. No `useEffect`. No `supabase.auth.getUser()` in the browser.
 
-**Parent server page pattern (same for new and edit):**
+### NEW: app/dashboard/components/HorizontalCarousel.tsx
+
+`'use client'` — needs touch events and scroll state.
+
+The codebase has no existing carousel component. The design spec calls for Netflix/Apple-style snap-x scrolling. The right approach for this codebase (Tailwind CSS 4, no component library) is native CSS scroll snap:
+
 ```typescript
-const { data: categories } = await supabase
-  .from('course_categories')
-  .select('*')
-  .order('sort_order');
+// HorizontalCarousel.tsx
+'use client'
 
-<CourseForm course={course} categories={categories ?? []} />
+export function HorizontalCarousel({ title, href, children }) {
+  return (
+    <section>
+      <header>
+        <h2>{title}</h2>
+        <Link href={href}>Show all →</Link>
+      </header>
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory
+                      scrollbar-none pb-2 -mx-4 px-4">
+        {children}
+      </div>
+    </section>
+  )
+}
 ```
 
-### NEW: LessonList.tsx ('use client', in app/admin/courses/components/)
+Each child (TeacherCard, CourseCard, EventCard) applies `snap-start shrink-0` and a fixed width (`w-56 sm:w-64`).
 
-The drag-and-drop pattern is already established in two places in this codebase:
-- `app/admin/shop/products/ProductsTable.tsx` — `DndContext` + `SortableContext` + `useSortable` + `arrayMove` on `DragEndEvent`
-- `app/admin/media/FolderSidebar.tsx` — identical imports, same structure
+**No npm install needed.** This is pure Tailwind. `scrollbar-none` is a Tailwind utility (available in v4).
 
-Both use `@dnd-kit/core@^6.3.1`, `@dnd-kit/sortable@^10.0.0`, `@dnd-kit/utilities@^3.2.2`. No new npm installs required.
+### NEW: Card Components
 
-**LessonList responsibilities:**
-- Receive `initialLessons: Lesson[]` and `courseId: string` as props from the course detail Server Component
-- Own local `lessons: Lesson[]` state (optimistic updates)
-- Render each lesson as a `SortableLessonRow` sub-component (same file)
-- On `DragEndEvent`: `arrayMove` locally, then call `reorderLessons(courseId, orderedIds)` Server Action
-- "Add Lesson" button opens `LessonFormModal`
-- Each row: drag handle, title, type badge, duration, edit icon, delete icon
-
-**SortableLessonRow** follows the pattern from `ProductsTable.tsx`:
-```typescript
-const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-  useSortable({ id: lesson.id });
-const style = { transform: CSS.Transform.toString(transform), transition };
-```
-
-### NEW: LessonFormModal.tsx ('use client')
-
-Type-conditional fields:
-- `video`: platform radio (`vimeo` / `youtube`) + URL text input
-- `audio`: URL input + optional duration-in-seconds input
-- `text`: `<textarea>` for markdown/plain content
-
-Controlled form with `useState`. On save, calls `createLesson` or `updateLesson` Server Action. On success, calls an `onSave(lesson)` callback to update `LessonList`'s local state — no `router.refresh()` needed.
-
-### NEW: CourseCategoriesPanel.tsx ('use client', in app/admin/courses/components/)
-
-Inline CRUD table rendered in the Categories tab. Receives `initialCategories` as a prop from the Server Component. Manages local state. Each row: name, slug, color swatch, sort_order, edit/delete icons. "Add Category" opens an inline form row (same pattern as FAQ admin in `app/admin/chatbot/faq/`).
-
-Server Actions: `createCourseCategory`, `updateCourseCategory`, `deleteCourseCategory`.
-Deletion guard: the Server Action checks `COUNT(*) FROM courses WHERE category_id = $id` before deleting; returns an error string if > 0.
-
-### MODIFIED: app/admin/courses/page.tsx
-
-Add a tab bar at the top using `searchParams.tab` (URL-driven, no client state). Pattern: `?tab=courses` (default) renders existing course table; `?tab=categories` renders `<CourseCategoriesPanel>`.
-
-This matches the established URL-param tab pattern from `app/admin/users/[id]/page.tsx` (`?tab=connections`), `app/admin/inbox/page.tsx`, and `app/admin/chatbot/`.
-
-### MODIFIED: app/admin/courses/[id]/page.tsx
-
-Add a `LessonList` section below the course detail. Server Component fetches lessons ordered by `sort_order` and passes them to `LessonList` as `initialLessons`.
-
-### MODIFIED: app/academy/[id]/page.tsx
-
-Currently hardcodes `lessonTitle = \`Video – ${course.title}\`` — this is a placeholder. Replace with:
-1. Query `lessons WHERE course_id = $id ORDER BY sort_order`
-2. Render a lessons list with type icons and durations
-3. Each lesson links to `/academy/[courseId]/lessons/[lessonId]`
-
-### NEW: app/academy/[id]/lessons/[lessonId]/page.tsx
-
-Server Component. Fetches lesson joined to course (for access check). Renders based on `lesson_type`:
-- `video`: extract embed ID from `video_url` in a utility function; render `<iframe>` with Vimeo or YouTube embed URL
-- `audio`: HTML5 `<audio controls src={lesson.audio_url} />`
-- `text`: render `lesson.content` with prose typography classes
-
-Access gate: if `course.access === 'members_only'` and no authenticated user, redirect to sign-in.
-
----
-
-## Data Flow
-
-### Admin: Create/Edit Course
+All three cards are server-renderable (no interactivity). They accept plain data objects as props.
 
 ```
-CourseForm (client)
-  → Server Action: upsertCourse({ ...fields, category_id, duration_minutes })
-    → supabase.from('courses').upsert(payload)
-    → logAdminCourseAction(courseId, 'edited', changes)
-    → router.push('/admin/courses/[id]')
+TeacherCard  — avatar, name, role badge, location, designation tags
+CourseCard   — thumbnail (gradient), title, instructor, duration, category color
+EventCard    — date pill, title, location/format badge, price
 ```
 
-The payload shape changes from `{ category: 'Workshop' }` to `{ category_id: uuid }`. The `actions.ts` audit call is unchanged — it still logs to `course_audit_log`.
+These are `function` components in `app/dashboard/components/`, no `'use client'` directive. They can receive serialized props from the Server Component parent.
 
-### Admin: Reorder Lessons
+### NEW: ProfileCompletionCard.tsx
 
-```
-LessonList DragEndEvent
-  → arrayMove(lessons, oldIndex, newIndex)    [optimistic, instant]
-  → reorderLessons(courseId, orderedIds)       [Server Action]
-    → Promise.all(
-        orderedIds.map((id, i) =>
-          supabase.from('lessons').update({ sort_order: i }).eq('id', id)
-        )
-      )
-```
+`'use client'` — needs animated progress bar (CSS transition on width).
 
-Identical to `reorderProducts` in `app/admin/shop/products/actions.ts`.
+Receives `{ score, missing, complete }` from the server component as a serializable prop. Renders:
+- Circular SVG progress (same pattern as current `page.tsx`)
+- Checklist of remaining fields with deep links to `/settings`
+- "Edit Profile" button
 
-### Admin: Category CRUD
+### NEW: StatHero.tsx
 
-```
-CourseCategoriesPanel (client)
-  → createCourseCategory({ name, slug, color, sort_order })
-    → supabase.from('course_categories').insert(payload)
-    → return created row
-  → onSave(row): update local state in panel
+Server Component (no interactivity). Receives `creditTotals: CreditTotals` from page.tsx. Displays CE Hours, Community, Karma, Practice as stat tiles. Replaces the current placeholder "Membership Activity" widget with real data from `credit_entries` via `getUserCreditTotals()`.
 
-deleteCourseCategory(id)
-  → count = SELECT COUNT(*) FROM courses WHERE category_id = $id
-  → if count > 0: return { error: 'Category in use by N courses' }
-  → supabase.from('course_categories').delete().eq('id', id)
-```
+Weekly profile views stat is a **placeholder** (displays "—") until analytics is wired. Do not block the milestone on this.
 
-### Public: Render Lesson
+### NEW: Role Layout Components
 
-```
-GET /academy/[courseId]/lessons/[lessonId]  (Server Component)
-  → supabase.from('lessons')
-      .select('*, courses(access, status)')
-      .eq('id', lessonId)
-      .single()
-  → if course.access = 'members_only' AND !user: redirect('/sign-in')
-  → if lesson.lesson_type = 'video': extractEmbedId(lesson.video_platform, lesson.video_url)
-  → render based on lesson_type
-```
+Each role layout is a thin **presentational** component. It receives fully-fetched data as props and composes the carousel, stat hero, and list sections into a layout specific to that role.
 
----
+| Component | Role | Unique Sections |
+|-----------|------|-----------------|
+| `DashboardStudent.tsx` | student | Courses carousel, Events carousel, Connections list, Profile Completion |
+| `DashboardTeacher.tsx` | teacher | Connections list (peer/mentorship), Courses carousel, Events carousel, Faculty list, School CTA (if no school) |
+| `DashboardSchool.tsx` | teacher + school | Faculty carousel, Courses carousel, Events carousel, School stats |
+| `DashboardWellness.tsx` | wellness_practitioner | Events carousel, Courses carousel, Connections list, Profile Completion |
 
-## File Structure: What Gets Added
+`DashboardSchool.tsx` is rendered when `profile.role === 'teacher'` AND `profile.principal_trainer_school_id !== null`. The teacher without a school gets `DashboardTeacher.tsx` with the School Registration CTA.
 
-```
-app/admin/courses/
-├── page.tsx                       MODIFY — add ?tab= bar
-├── actions.ts                     MODIFY — add reorderLessons, category CRUD actions
-├── components/
-│   ├── CourseForm.tsx             MODIFY — category FK, rm vimeo_url, duration slider
-│   ├── LessonList.tsx             NEW    — dnd-kit sortable list
-│   ├── LessonFormModal.tsx        NEW    — type-conditional lesson form
-│   └── CourseCategoriesPanel.tsx  NEW    — inline category CRUD
-
-app/academy/
-└── [id]/
-    ├── page.tsx                   MODIFY — add lessons list
-    └── lessons/
-        └── [lessonId]/
-            └── page.tsx           NEW    — lesson detail with embed
-
-supabase/migrations/
-├── XXXX_course_categories.sql     NEW — table + RLS + seed 5 existing categories
-├── XXXX_courses_redesign.sql      NEW — add category_id, backfill, drop category text,
-│                                         drop vimeo_url, add duration_minutes
-└── XXXX_lessons.sql               NEW — lessons table + RLS + indexes
-
-lib/types.ts
-  MODIFY — add CourseCategoryRow interface
-  MODIFY — add Lesson interface
-  MODIFY — update Course: category_id (uuid) not category (string), remove vimeo_url
-```
-
----
-
-## Build Order
-
-Hard dependency chain — do not start a step before its dependency is complete.
-
-| Step | Work | Blocks Step(s) |
-|------|------|----------------|
-| 1 | Migration: `course_categories` table + RLS + seed | 2, 4 |
-| 2 | Migration: `courses` schema changes (category_id, drop category, drop vimeo_url, duration_minutes) | 3, 4 |
-| 3 | Migration: `lessons` table + RLS + indexes | 5, 8 |
-| 4 | Update `lib/types.ts`: CourseCategoryRow, Lesson, update Course | 5, 6, 7 |
-| 5 | `CourseForm.tsx`: category FK select, rm vimeo_url, duration slider, card sections | 6 |
-| 6 | Admin `page.tsx` tab bar + `CourseCategoriesPanel` + category Server Actions | — |
-| 7 | `LessonList.tsx` + `LessonFormModal.tsx` + lesson Server Actions in `actions.ts` | 8 |
-| 8 | `app/academy/[id]/page.tsx`: add lessons list + `app/academy/[id]/lessons/[lessonId]/page.tsx` | — |
-
-Steps 1–4 are pure infrastructure. Steps 5–6 are admin form UI. Steps 7–8 are lesson management + public rendering.
+All four layout components should be `'use client'` to allow carousel interactivity. They receive props only from the server page — no internal data fetching.
 
 ---
 
 ## Integration Points With Existing Code
 
-| Existing System | How v1.15 Touches It | Risk |
+| Existing System | How v1.17 Touches It | Risk |
 |----------------|----------------------|------|
-| `courses` RLS policies | None of the existing policies reference the `category` or `vimeo_url` columns — column changes do not break RLS | LOW |
-| `user_course_progress` table | Unchanged. Progress tracking stays at course granularity. Lesson-level progress is out of scope. | NONE |
-| `app/settings/courses/` (Member Courses) | This page has its own course form that also contains `vimeo_url`. Must be updated alongside `CourseForm.tsx`. Easy to miss. | MEDIUM — verify and update |
-| `lib/api/services/` REST API | The courses service returns raw `category` text. After migration, join `course_categories` and return `category: { id, name, slug }`. The API response shape changes — update service + `API_DOCS.md`. | MEDIUM |
-| `lib/types.ts` `CourseCategory` type | The union type `'Workshop' | 'Yoga Sequence' | ...` becomes obsolete. Replace with `CourseCategoryRow` interface (DB-driven). Remove the old `CourseCategory` type union. | LOW — TypeScript will surface all usages |
-| `lib/courses/audit.ts` | No changes. Audit log entries reference `course_id` only. Category and lesson changes fire with action `'edited'` and a `changes` JSONB payload — no schema changes needed. | NONE |
-| `app/admin/courses/AdminCoursesFilters.tsx` | Filter dropdown for category is currently hardcoded from `CourseCategory` union. Must be updated to fetch `course_categories` dynamically. | MEDIUM — easy to overlook |
-| `app/academy/[id]/page.tsx` hardcoded `lessonTitle` | Currently: `lessonTitle = \`Video – ${course.title}\`` — this is the primary mutation point on the public side. | LOW — isolated, small change |
+| `lib/credits.ts` → `getUserCreditTotals()` | Called directly in `page.tsx`. No changes to the function. | NONE |
+| `lib/supabase/getEffectiveUserId.ts` | `getEffectiveUserId()` and `getEffectiveClient()` are the auth entry point. No changes. | NONE |
+| `lib/supabaseServer.ts` → `createSupabaseServerClient()` | Used inside `getEffectiveClient()`. No changes. | NONE |
+| `app/components/ui/PageContainer.tsx` | New dashboard must wrap all content sections with `<PageContainer>` per CLAUDE.md standard. Already correct pattern — just import and use. | NONE |
+| `ImpersonationContext` | **No longer used in dashboard.** The server component replaces the client-side impersonation check. The context still exists for other pages. | LOW — remove import from dashboard, don't delete context |
+| `app/components/SchoolRegistrationCTA.tsx` | Already renders in the current sidebar for teachers without a school. Reused in `DashboardTeacher.tsx`. No changes to the component. | NONE |
+| `lib/types.ts` → `Course`, `Event` types | Carousel cards need `id`, `title`, `status`, `created_at` from courses; `id`, `title`, `date`, `location`, `is_online` from events. Already typed. | NONE |
+| `connections` table | `fetchAcceptedConnections()` queries `connections` joined with `profiles`. Same join pattern used in `ConnectionsContext.tsx`. | NONE |
+| `credit_entries` table | Queried via existing `getUserCreditTotals()`. RLS allows users to read own entries. | NONE |
+| `schools` table | Dashboard reads `name`, `slug` for the school greeting. RLS: school is readable by its owner and faculty members. | LOW — verify RLS allows owner read without service client |
+
+---
+
+## File Structure: What Gets Added and Removed
+
+```
+app/dashboard/
+├── page.tsx                         REPLACE — async server component
+├── FeedView.tsx                     DELETE
+├── FeedPostCard.tsx                 DELETE
+├── PostComposer.tsx                 DELETE
+├── PostActionsMenu.tsx              DELETE
+├── CommentDeleteButton.tsx          DELETE
+└── components/                      NEW directory
+    ├── DashboardStudent.tsx         NEW
+    ├── DashboardTeacher.tsx         NEW
+    ├── DashboardSchool.tsx          NEW
+    ├── DashboardWellness.tsx        NEW
+    ├── HorizontalCarousel.tsx       NEW
+    ├── TeacherCard.tsx              NEW
+    ├── CourseCard.tsx               NEW
+    ├── EventCard.tsx                NEW
+    ├── ProfileCompletionCard.tsx    NEW
+    └── StatHero.tsx                 NEW
+
+lib/dashboard/                       NEW directory
+├── queries.ts                       NEW — server-only data fetch functions
+└── profileCompletion.ts             NEW — pure computation, profile scoring
+```
+
+No migrations required. No schema changes. All data already exists in Supabase.
+
+---
+
+## Build Order
+
+Dependencies are strict: the server page cannot be written before the data-fetch helpers, and the role layouts cannot be written before the card components they compose.
+
+| Step | Work | Depends On | Blocks |
+|------|------|-----------|--------|
+| 1 | `lib/dashboard/profileCompletion.ts` — weighted scoring function | — | 6, 7, 8, 9 |
+| 2 | `lib/dashboard/queries.ts` — 5 server-only fetch functions | — | 3 |
+| 3 | `app/dashboard/page.tsx` — async server component, role branch | 2 | 6, 7, 8, 9 |
+| 4 | `HorizontalCarousel.tsx` — snap-x scroll container | — | 6, 7, 8, 9 |
+| 5 | `TeacherCard.tsx`, `CourseCard.tsx`, `EventCard.tsx` — presentational cards | — | 6, 7, 8, 9 |
+| 6 | `DashboardStudent.tsx` — student layout | 1, 3, 4, 5 | — |
+| 7 | `DashboardTeacher.tsx` — teacher layout | 1, 3, 4, 5 | — |
+| 8 | `DashboardSchool.tsx` — school owner layout | 1, 3, 4, 5 | — |
+| 9 | `DashboardWellness.tsx` — wellness layout | 1, 3, 4, 5 | — |
+| 10 | `ProfileCompletionCard.tsx` | 1 | — |
+| 11 | `StatHero.tsx` | — | — |
+| 12 | Delete feed files | 3 (once page.tsx no longer imports them) | — |
+
+Steps 1 and 2 are pure TypeScript with no UI. Steps 4 and 5 are small isolated components. Steps 6–9 can be built in any order once their deps are done. Step 12 is the final cleanup.
+
+**Recommended implementation order:** 1 → 2 → 3 (with stubs for role components) → 4 → 5 → 10 → 11 → 6 → 7 → 8 → 9 → 12.
 
 ---
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: Keeping the hardcoded CATEGORIES constant as a fallback
+### Anti-Pattern 1: Keeping the dashboard as a client component
 
-**What people do:** Leave `const CATEGORIES = ['Workshop', ...]` in `CourseForm.tsx` and `AdminCoursesFilters.tsx` "just in case" the DB query is empty.
-**Why it's wrong:** Two sources of truth. Adding a category in the DB won't appear in filters; deleting one won't remove it from the dropdown.
-**Do this instead:** Pass categories as a prop everywhere. If the DB returns empty (edge case), show an empty dropdown with a placeholder. Never fall back to the hardcoded list.
+**What people do:** Add `'use client'` to `page.tsx` and keep `useEffect` data fetching because the current code does it.
+**Why it's wrong:** Client-side fetching means layout shift, loading spinners, and SEO gap. The server component pattern is established in `app/settings/layout.tsx`, `app/schools/[slug]/page.tsx`, and multiple admin pages.
+**Do this instead:** Async server component. Auth via `getEffectiveUserId()`. Data via `await` queries. Pass serializable props to client components.
 
-### Anti-Pattern 2: Managing lesson state in the parent Server Component
+### Anti-Pattern 2: Fetching data inside role layout components
 
-**What people do:** Call `router.refresh()` after every lesson mutation to re-render the course detail page.
-**Why it's wrong:** The full page re-renders. The drag-and-drop list loses optimistic state and flickers visually.
-**Do this instead:** `LessonList.tsx` owns its own `lessons` state. Server Actions return the updated lesson or an error. The client updates state locally on success. Only use `router.refresh()` on hard error or when navigating away.
+**What people do:** Each role layout (`DashboardTeacher.tsx`, etc.) fetches its own data via `useEffect` or `getEffectiveUserId()`.
+**Why it's wrong:** N separate client-side waterfall fetches. Role layouts cannot easily be server components because they include `HorizontalCarousel` which needs `'use client'`.
+**Do this instead:** All fetching happens once in the server `page.tsx`. Role layouts receive complete data as props. They are purely presentational.
 
-### Anti-Pattern 3: Storing video embed IDs instead of original URLs
+### Anti-Pattern 3: Using a third-party carousel library
 
-**What people do:** Parse `https://vimeo.com/123456789` at input time and store only `"123456789"`.
-**Why it's wrong:** Platform URL formats change. Storing the full URL and parsing at render time is more resilient.
-**Do this instead:** Store the full user-pasted URL in `video_url`. Extract the embed ID with a utility function at render time. A single function `getEmbedUrl(platform, url)` handles both Vimeo and YouTube formats.
+**What people do:** Install `react-slick`, `embla-carousel`, or `keen-slider` for carousel functionality.
+**Why it's wrong:** Adds a dependency, increases bundle size, and introduces a version-pinning maintenance burden (see `Recharts 3.8.0` pinning in PROJECT.md as an example). The existing codebase uses no React UI component library.
+**Do this instead:** CSS scroll snap via Tailwind. `overflow-x-auto snap-x snap-mandatory` on the container, `snap-start shrink-0` on each card. This is native-browser scroll behavior — smooth on iOS, keyboard-accessible, zero JS.
 
-### Anti-Pattern 4: Adding lesson-level progress tracking in v1.15
+### Anti-Pattern 4: Inline role-specific JSX in page.tsx
 
-**What people do:** Extend `user_course_progress` with a `lesson_id` column to track per-lesson completion.
-**Why it's wrong:** Out of scope for this milestone. Adds schema complexity, RLS complexity, and frontend state management that blocks delivery of the primary features.
-**Do this instead:** Track progress at course granularity (as today). Lesson-level checkboxes/completion is a future milestone.
+**What people do:** Write all four role layouts as if/else branches directly inside `page.tsx`.
+**Why it's wrong:** `page.tsx` becomes a 500+ line file. Role-specific UI cannot be modified without touching the root page file.
+**Do this instead:** `page.tsx` handles auth, data fetching, and role branching. Each role gets its own named component file. `page.tsx` stays under 80 lines.
+
+### Anti-Pattern 5: Fetching all published teachers for the carousel from profiles
+
+**What people do:** `SELECT * FROM profiles WHERE role = 'teacher' LIMIT 8` — returns potentially inactive or incomplete profiles.
+**Why it's wrong:** Teachers without avatars, bios, or public profiles will show as empty cards. The carousel looks broken.
+**Do this instead:** Filter to `WHERE avatar_url IS NOT NULL AND bio IS NOT NULL AND role = 'teacher'`, ordered by some engagement signal (e.g., `connections count`, or `created_at DESC` as a fallback). The query can be tightened over time as real data accumulates.
 
 ---
 
 ## Scaling Considerations
 
-At GOYA's current scale, none of these are concerns. Documented for completeness.
+None of these are concerns at GOYA's current user count. Documented for reference.
 
-| Concern | At Current Scale | Mitigation If Needed |
-|---------|-----------------|----------------------|
-| Lesson list query | `WHERE course_id = ? ORDER BY sort_order` — fast with the composite index | Index is already in the schema above |
-| Category lookups | Tiny table, fetched on each admin page load | `unstable_cache` in Next.js if needed |
-| Bulk sort_order updates | `Promise.all` of N UPDATE calls on reorder — fine for <100 lessons | Batch upsert if lesson count grows |
+| Concern | At Current Scale | If Needed |
+|---------|-----------------|-----------|
+| Dashboard query time | 5–6 parallel Supabase queries, each indexed and low-cardinality | Combine into a single RPC function |
+| Connections list query | `OR (requester_id = $uid OR recipient_id = $uid)` — needs compound index on both columns | Index already exists from v1.1 migration |
+| Credit totals | Full scan of `credit_entries` per user on each dashboard load | Cache via Next.js `unstable_cache` keyed by userId |
 
 ---
 
 ## Sources
 
-- `app/admin/courses/page.tsx` — current courses list Server Component
-- `app/admin/courses/components/CourseForm.tsx` — current form with `vimeo_url`, hardcoded CATEGORIES
-- `app/admin/courses/actions.ts` — existing audit log Server Action pattern
-- `app/admin/shop/products/ProductsTable.tsx` — established dnd-kit sortable pattern
-- `app/admin/media/FolderSidebar.tsx` — second example of dnd-kit sortable pattern
-- `supabase/migrations/20260324_add_courses_tables.sql` — original courses schema
-- `supabase/migrations/20260331100714_event_categories.sql` — event_categories reference pattern
-- `supabase/migrations/20260372_member_courses_schema.sql` — Member Courses schema changes
-- `supabase/migrations/20260373_member_courses_rls.sql` — Member Courses RLS pattern
-- `lib/types.ts` — Course, CourseCategory, EventCategoryRow interfaces
-- `app/academy/[id]/page.tsx` — current public course/lesson rendering
-- `package.json` — confirmed `@dnd-kit/core@^6.3.1`, `@dnd-kit/sortable@^10.0.0`, `@dnd-kit/utilities@^3.2.2`
+- `app/dashboard/page.tsx` — current dashboard (inspected directly)
+- `app/settings/layout.tsx` — reference pattern for server component auth + role fetch
+- `app/schools/[slug]/page.tsx` — reference pattern for `getSupabaseService()` in server component
+- `lib/supabase/getEffectiveUserId.ts` — impersonation-aware auth helpers
+- `lib/supabaseServer.ts` — server client factory
+- `lib/credits.ts` — `getUserCreditTotals()`, `CreditTotals` type
+- `app/settings/subscriptions/queries.ts` — reference for `'server-only'` query file pattern
+- `app/settings/my-events/actions.ts` — reference for `'use server'` Server Action pattern
+- `app/context/ConnectionsContext.tsx` — connections table shape, join pattern
+- `app/components/ui/PageContainer.tsx` — required width wrapper
+- `app/components/SchoolRegistrationCTA.tsx` — reusable school CTA component
+- `.planning/PROJECT.md` — v1.17 feature spec, role definitions
 
 ---
-*Architecture research for: GOYA v2 v1.15 Course System Redesign*
-*Researched: 2026-04-01*
+*Architecture research for: GOYA v2 v1.17 Dashboard Redesign*
+*Researched: 2026-04-02*

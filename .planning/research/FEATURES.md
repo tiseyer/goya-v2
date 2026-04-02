@@ -1,210 +1,370 @@
-# Feature Research
+# Feature Landscape: Dashboard Redesign
 
-**Domain:** Course system redesign — LMS admin course management with categories, multi-lesson support, drag-and-drop ordering, platform-aware video/audio embeds
+**Domain:** Role-specific community platform dashboard — yoga/wellness professional network with Students, Teachers, Wellness Practitioners, and Schools
 **Researched:** 2026-04-01
-**Confidence:** HIGH (existing codebase patterns verified, standard LMS patterns well-documented, dnd-kit already installed)
+**Confidence:** HIGH (codebase verified, patterns from LinkedIn/Netflix/SaaS platforms well-documented)
 
 ---
 
-## Context: What Already Exists
+## Context: What Already Exists (Do Not Rebuild)
 
-The following are NOT new features — they must be preserved and extended:
+These are live in GOYA v2 and feed dashboard data — do not reimport or re-create:
 
-- `courses` table with `title`, `category` (string), `level`, `access`, `status`, `vimeo_url`, `instructor`, `duration`, `course_type` (goya/member), `created_by`, `rejection_reason`, `deleted_at`, `gradient_from/to`, `thumbnail_url`
-- Admin courses page: list table, filters, soft-delete/restore, pagination
-- Admin course form (`CourseForm.tsx`): flat form for all fields including single `vimeo_url`
-- `course_audit_log` + shared audit utility (`lib/courses/audit.ts`)
-- Status workflow: draft → pending_review → published / rejected
-- Public academy page with type filter
-- My Courses settings page for member submissions
-- `@dnd-kit/core ^6.3.1` and `@dnd-kit/sortable ^10.0.0` already installed and used in `ProductsTable.tsx` and media `FolderSidebar.tsx`
-- Pattern for drag-and-drop: `DndContext` + `SortableContext` + `useSortable` + `arrayMove` + server action to persist `sort_order` / `priority`
+- `profiles` table: `role`, `avatar_url`, `bio`, `location`, `website`, `instagram`, `youtube`, `teaching_styles`, `lineages`, `teaching_focus`, `influences`, `programs`, `years_teaching`, `first_name`, `last_name`
+- Connections system: peer, mentorship, faculty connection types with status
+- Events: CRUD, status workflow, public listing at `/events`
+- Academy/Courses: lessons, categories, progress tracking at `/academy`
+- Schools: designations, faculty, public profile at `/schools/[slug]`
+- Admin analytics: Recharts-based charts (pattern for stat rendering)
+- Settings shell: `SettingsShell` mirrors `AdminShell` — sidebar layout pattern exists
+- `PageContainer` component: `max-w-7xl` standard width — must be used on dashboard
 
 ---
 
-## Feature Landscape
+## Table Stakes
 
-### Table Stakes (Users Expect These)
-
-Features that must exist for the admin to manage courses properly. Missing these = incomplete redesign.
+Features that users of any professional community platform expect. Missing any of these makes the dashboard feel incomplete or generic.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Course categories as a managed DB table | Current hardcoded string enum cannot be edited at runtime; every LMS (Thinkific, Teachable, MasterStudy) uses a managed categories table | MEDIUM | Replaces `CourseCategory` type union. Needs `course_categories` table with `id`, `name`, `slug`, `description`, `color`, `sort_order`. Flat list only — no parent/hierarchy for yoga platform scale |
-| Admin Courses/Categories tab layout | Admins expect to manage categories alongside courses, not in a separate settings page | LOW | Two tabs on `/admin/courses`: "Courses" (existing table) and "Categories" (new CRUD). Matches existing tab patterns in admin inbox and chatbot config |
-| Category CRUD (create/edit/delete) | Any managed taxonomy needs in-page CRUD. Inline modal is the standard admin pattern | LOW | Inline modal dialog. Must prevent deletion of categories with assigned courses — show count and disable if > 0 |
-| Multi-lesson structure per course | Every serious LMS (Thinkific, MasterStudy, Teachable) organizes courses into discrete lessons with an explicit order. A single `vimeo_url` on the course is a dead end | HIGH | New `lessons` table: `id`, `course_id`, `title`, `lesson_type` (video/audio/text), `sort_order`, `vimeo_url`, `youtube_url`, `audio_url`, `content`, `description`, `duration_minutes`, `is_published`, timestamps, RLS. Keep existing `vimeo_url` on `courses` for backward compatibility during migration |
-| Lesson type-specific forms | Video, audio, and text lessons have different fields. Showing all fields for all types creates confusion and noise | MEDIUM | Conditional field rendering based on `lesson_type` selector. Video: platform auto-detect + URL field + preview. Audio: URL + optional description. Text: plain textarea. All share: title, description, duration, published toggle |
-| Drag-and-drop lesson reordering | Expected in any modern course builder. Arbitrary ordering without DnD is unusable for 10+ lessons | MEDIUM | Use existing `@dnd-kit/core` + `@dnd-kit/sortable` pattern from `ProductsTable.tsx`. `SortableContext` with `verticalListSortingStrategy`. Persist `sort_order` integers on drag end via server action matching the `reorderProducts` pattern |
-| Platform-aware video embed (Vimeo + YouTube) | Platform lock to Vimeo excludes YouTube-native instructors. Both platforms are standard on yoga content | MEDIUM | Utility function in `lib/courses/video.ts` that detects platform from URL (`vimeo.com` vs `youtube.com` / `youtu.be`) and generates the correct embed URL. Renders `<iframe loading="lazy">` per Next.js 16 official guidance. No third-party video library needed |
-| Frontend lesson rendering | Users expect to watch/listen/read lessons on the public course detail page | MEDIUM | Lesson player component per type: Vimeo iframe, YouTube iframe, HTML5 `<audio controls>`, formatted text block. Responsive 16:9 aspect wrapper for video iframes |
+| Role-specific greeting with name | Every SaaS dashboard personalizes "Good morning, Sarah" — anonymous dashboards feel cold | LOW | Use `first_name` from profiles. Time-based greeting (morning/afternoon/evening) is a small touch that significantly increases warmth perception |
+| Profile completion card with progress bar | LinkedIn pioneered this pattern — 40% of users complete profiles only when prompted by a visible progress indicator. Professional platforms have obligation to help members look credible | MEDIUM | 6 weighted fields (see Profile Completion section below). Progress bar 0–100%. Checklist with deep links to the exact settings field. Card dismisses or collapses once 100% |
+| Role-aware stat heroes (2–4 KPIs) | Every dashboard has headline numbers. Users need to feel like the platform tracks their activity | MEDIUM | Stat is a number + label + optional trend. Placeholder stats are acceptable for v1.17 (profile views as placeholder). Must not show zero-state stats that make new users feel inactive |
+| Horizontal content carousels | Netflix/Spotify pattern: content rows organized by category with horizontal scroll. This is the defining visual of the Apple/Netflix aesthetic called out in the milestone goal | HIGH | Snap-x scroll on mobile, scrollable desktop. Each carousel has a label and "Show all →" link. Cards are reused from existing pages where possible |
+| "Show all →" links on each carousel | Users expect to be able to leave the dashboard and get the full listing | LOW | Links to `/events`, `/academy`, `/directory`, etc. with appropriate filters pre-applied where possible |
+| Empty state handling per carousel | New members will have no connections, no courses, no events. Empty carousels without guidance feel broken | LOW | Each carousel shows an empty state with a CTA instead of rendering zero cards. Example: "You haven't connected with anyone yet. Find teachers →" |
+| Primary CTA per role | Every SaaS onboarding study shows that a single clear next action outperforms a menu of options. The dashboard should tell each role what to do next | LOW | Derived from profile completeness + activity. Teacher with no school → "Register your school". Student with no connections → "Find teachers". See Role Behaviors below |
+| Mobile responsiveness | 60%+ of community platform traffic comes from mobile. Horizontal carousels must be swipeable | MEDIUM | CSS `overflow-x: scroll` with `snap-x snap-mandatory` and `scroll-behavior: smooth`. Hide scrollbar on desktop with `-ms-overflow-style: none; scrollbar-width: none` |
 
-### Differentiators (Competitive Advantage)
+---
 
-Features that go beyond baseline LMS patterns and align with GOYA's premium community positioning.
+## Profile Completion Scoring
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Premium SaaS course form with card sections | Flat single-scroll forms feel dated. Thinkific's 2026 builder uses grouped card sections with live preview and progressive disclosure — this pattern reduces cognitive load for admins creating complex courses | MEDIUM | Replace flat `CourseForm.tsx` with multi-section card layout. Sections: Basic Info, Media & Appearance, Lessons, Settings. Each section is a white rounded card with a heading. Duration as a slider (5–240 min) with formatted text preview ("1h 30m"). No separate page needed — same `/admin/courses/new` and `/admin/courses/[id]/edit` routes |
-| Category color metadata | MasterStudy and similar platforms show colored category badges on course cards. Enables richer visual browsing on the public academy page | LOW | Add `color` (hex string) field to `course_categories`. Color picker in category CRUD modal. Render colored badge on course cards and in admin table — replaces the current hardcoded `CATEGORY_BADGE` record |
-| Vimeo/YouTube URL preview in admin form | Admin can verify the video plays correctly before saving, reducing submission errors | LOW | After URL field blur, extract video ID and render a small `<iframe>` preview below the field. Purely client-side, no API call required |
-| Audio lesson support | Yoga content (guided meditations, dharma talks, music playlists) is often audio-first. Audio as a first-class lesson type rather than a workaround is a meaningful differentiator vs. video-only platforms | LOW | `audio_url` field on lessons table. Frontend: HTML5 `<audio controls>` element styled with Tailwind to match GOYA design tokens — thin wrapper, no npm dependency |
+### How It Works
 
-### Anti-Features (Commonly Requested, Often Problematic)
+Profile completion is calculated on the fly from the user's profile record — no stored score. Weighted fields ensure that meaningful professional fields contribute more than cosmetic ones.
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| Rich text / WYSIWYG editor for text lessons | Natural choice for "Text" lesson type | Adds a heavy dependency (TipTap, Quill, Slate ~200KB+). High maintenance burden. Most yoga content is paragraphs and links, not complex layouts. Introduces XSS risk if not carefully sanitized | Plain `<textarea>` with `whitespace-pre-wrap` rendering in v1.15. Markdown support only when demand is validated in a future milestone |
-| Hierarchical / nested categories | "Workshop > Restorative > Beginner" nesting seems useful | Over-engineering for a platform with under 100 courses. Requires recursive DB queries, complex tree UI, and the current 5-item category list is flat for a reason | Flat category list with `sort_order`. Tags can be added in v2 if more granularity is needed |
-| Video upload and hosting on GOYA | Full control, no third-party dependency | Vercel Blob is not optimized for adaptive video streaming. Adds storage cost, transcoding complexity, and no CDN optimization. Vimeo/YouTube handle all of this for free with better global delivery | Keep external platform embedding. Store URL only. Vimeo Pro handles instructor-uploaded content |
-| Quiz / assessment within lessons | Seen in Thinkific/Teachable, often requested for CPD | CPD credit logging already has its own separate system. A quiz engine is a different product domain with its own DB schema, grading logic, and UX. Enormous scope | Not in v1.15. CPD credit submission flow already handles accreditation |
-| Lesson-level user progress tracking | Expected in consumer LMS products | `user_course_progress` table exists for course-level progress. Lesson-level granularity requires a new table, API changes, and frontend tracking across every lesson view. Scope creep | Course-level progress stays. Lesson progress is a dedicated learner experience milestone |
-| react-player or video.js library | Attractive unified API for Vimeo, YouTube, HLS, RTMP | Adds ~100KB to bundle for use cases that a 20-line URL parser + `<iframe>` handles. Next.js 16 official video guide explicitly recommends direct `<iframe>` for external platform embeds | Custom URL parser + `<iframe>`. Only add react-player if HLS streaming or multiple simultaneous video sources are required (not in scope) |
+### Recommended 6-Field Weighting (totals 100%)
+
+| Field | Weight | Why | DB Column |
+|-------|--------|-----|-----------|
+| Avatar | 20% | Visual identity is the #1 trust signal in professional networks. A profile without a photo gets 14× fewer engagement responses (LinkedIn data, MEDIUM confidence) | `avatar_url` |
+| Bio | 25% | Bio is the primary discovery text. Most important field for SEO and peer trust. LinkedIn weights this as #2 | `bio` |
+| Location | 15% | Enables directory map panel, local event recommendations, school discovery. Already used in member directory | `location` |
+| Teaching Styles (teacher/WP only) | 20% | Core professional identity. Empty for teacher = useless profile for students searching by style | `teaching_styles` (array, non-empty = complete) |
+| Website or Instagram | 10% | Social proof. Either satisfies this — OR condition | `website` OR `instagram` non-null |
+| Years Teaching (teacher/WP) / Designation (school) / Course Enrolled (student) | 10% | Role-specific proof of engagement. For students: `years_teaching` is irrelevant → substitute with "enrolled in at least one course" from `user_course_progress` | varies by role |
+
+**For Students:** Replace "Teaching Styles" (20%) and "Years Teaching" (10%) with:
+- Enrolled in at least 1 course (20%) — pulls from `user_course_progress`
+- Connected with at least 1 teacher (10%) — pulls from `connections`
+
+**For Schools (school role via school owner teacher):** Replace teaching-specific fields with school-specific completion fields.
+
+### Implementation Pattern
+
+```
+score = 0
+if avatar_url → score += 20
+if bio && bio.length > 20 → score += 25
+if location → score += 15
+if role is teacher/WP:
+  if teaching_styles.length > 0 → score += 20
+  if years_teaching → score += 10
+if role is student:
+  if has_enrolled_course → score += 20
+  if has_connection → score += 10
+if website || instagram → score += 10
+return Math.min(score, 100)
+```
+
+Calculation is a pure function — no API call, just computed from the profile object already loaded on the dashboard.
+
+### ProfileCompletionCard Behavior
+
+- Shows when score < 100%
+- Progress bar with percentage label
+- Checklist: each incomplete item is a deep link to the exact settings field
+  - "Add your photo" → `/settings?section=avatar`
+  - "Write your bio" → `/settings?section=bio`
+  - "Add your location" → `/settings?section=location`
+- At 100%: card collapses or shows a congratulations state — does not disappear abruptly
+- Card is dismissable (localStorage flag `dashboard-completion-dismissed`) once score ≥ 80%
+
+---
+
+## Role Behaviors
+
+### Student Dashboard
+
+**Goal:** Discovery and learning progress. Students are consumers — they want to find teachers, join events, and track their academy progress.
+
+**Stat Heroes (2–3):**
+- Courses enrolled (from `user_course_progress`)
+- Connections (from `connections` table, accepted status)
+- Profile views (placeholder stat — "Coming soon" label acceptable in v1.17)
+
+**Carousels:**
+1. "Continue Learning" — courses the student is enrolled in, ordered by `last_accessed_at`. CTA: "Browse Courses" if empty.
+2. "Upcoming Events" — next 5 published events sorted by date. CTA: "View Calendar" if empty.
+3. "Teachers Near You" — profiles with `role = teacher` filtered by matching `location` (city match, fuzzy). CTA: "Find Teachers" if empty.
+
+**Primary CTA:**
+- If profile < 60%: "Complete your profile to be found by teachers"
+- If profile ≥ 60% and no courses: "Browse the Academy"
+- If enrolled: "Continue [most recent course]"
+
+**Complexity:** MEDIUM — requires 3 DB queries (progress, events, directory) but all data already exists.
+
+---
+
+### Teacher Dashboard
+
+**Goal:** Professional visibility and community building. Teachers are producers — they want to be discovered, show their credentials, and manage their community presence.
+
+**Stat Heroes (3–4):**
+- Active connections (accepted connections count)
+- Events hosted (published events created by this teacher, from `events` where `created_by = user_id`)
+- Courses published (published courses created by this teacher)
+- Profile views (placeholder)
+
+**Carousels:**
+1. "Your Connections" — accepted connections. CTA: "Explore Directory" if empty.
+2. "Your Events" — teacher's own published events. CTA: "Create an Event" if empty.
+3. "Academy Courses" — published GOYA courses, not the teacher's own. Discovery carousel for CPD. CTA: "Browse Academy" if empty.
+
+**Primary CTA:**
+- If no school: "Register your school on GOYA" (links to school registration) — high-value monetization CTA
+- If school exists but onboarding incomplete: "Continue school setup"
+- If school live: "Manage your school"
+- If profile < 60%: "Complete your profile"
+
+**Special Component:** ConnectionsList — a small panel (not a carousel) showing the 5 most recent accepted connections with avatar + name + role badge + "Message" action. This is distinct from the carousel and sits near the stat heroes.
+
+**Complexity:** MEDIUM-HIGH — teacher-specific events/courses queries need `created_by` filter, school status check adds one more query.
+
+---
+
+### Wellness Practitioner Dashboard
+
+**Goal:** Same as Teacher but without the school system. Wellness practitioners focus on visibility, events, and connections.
+
+**Stat Heroes (2–3):**
+- Active connections
+- Events hosted
+- Profile views (placeholder)
+
+**Carousels:**
+1. "Your Connections" — accepted connections. CTA: "Explore Directory" if empty.
+2. "Your Events" — WP's own published events. CTA: "Create an Event" if empty.
+3. "Recommended Courses" — published GOYA courses. CTA: "Browse Academy" if empty.
+
+**Primary CTA:**
+- If profile < 60%: "Complete your profile to be found by clients"
+- If no events: "Submit your first event"
+- If no connections: "Connect with teachers and practitioners"
+
+**Complexity:** MEDIUM — same pattern as Teacher but without school queries.
+
+---
+
+### School Dashboard (Teacher with active school)
+
+A teacher who owns a school gets an augmented teacher dashboard, not a separate role. The `role` stays `teacher`, but the dashboard detects school ownership and renders school-specific components.
+
+**Detection:** Query `schools` table where `owner_id = user_id AND status = 'active'`.
+
+**Stat Heroes (3–4):**
+- Faculty members (from `school_faculty` table, accepted)
+- School profile views (placeholder)
+- Active designations (from `school_designations`)
+- Events hosted (by teacher)
+
+**Carousels:**
+1. "Your Faculty" — FacultyList component showing faculty members with avatar + name + role. CTA: "Invite Faculty" if empty.
+2. "Your Events" — school-associated events. CTA: "Create an Event" if empty.
+3. "Academy Courses" — discovery carousel.
+
+**Special Component:** FacultyList — small panel showing current faculty with invite action button. Similar to ConnectionsList but faculty-specific. Links to school settings for full management.
+
+**Primary CTA:**
+- If school pending review: "Your school is pending approval — we'll email you"
+- If school approved: "View public school profile" → `/schools/[slug]`
+- If school onboarding incomplete: "Complete school setup" → `/schools/[slug]/settings`
+
+**Complexity:** HIGH — requires school status detection, faculty query, designation query on top of teacher queries.
+
+---
+
+## HorizontalCarousel Component
+
+This is a shared infrastructure component used by all role dashboards — the most complex piece of the milestone.
+
+### Behavior Specification
+
+- **Desktop:** Scrollable with mouse/trackpad. No visible scrollbar (`scrollbar-width: none`). Subtle right fade gradient to hint at more content. Navigation arrows on hover.
+- **Mobile:** Swipeable with touch gestures. CSS scroll snap (`snap-x snap-mandatory`). First card slightly visible from edge to hint at more.
+- **Cards:** Fixed width (e.g., `w-64` or `w-72`). Do not stretch. Consistent height enforced.
+- **Overflow:** Parent is `overflow-x-auto` with `-webkit-overflow-scrolling: touch`.
+- **Gap:** Consistent `gap-4` between cards.
+- **"Show all →" link:** Rendered in the carousel header row, right-aligned. Always links somewhere.
+- **Empty state:** Full-width placeholder replacing card row. Icon + message + CTA button.
+- **Loading state:** 3–4 skeleton cards matching card dimensions.
+
+### Card Types Needed
+
+| Card | Used By | Data From | Existing Component? |
+|------|---------|-----------|---------------------|
+| CourseCard | All roles | `courses` + `course_categories` | No — new component |
+| EventCard | All roles | `events` | No — new component (public events page uses its own layout) |
+| TeacherCard | Student | `profiles` where role=teacher | No — new component |
+| ConnectionCard | Teacher/WP | `profiles` via `connections` | No — new component |
+| FacultyCard | School | `profiles` via `school_faculty` | No — new component |
+
+All cards follow the same sizing contract so `HorizontalCarousel` can render any card type.
+
+---
+
+## StatHero Component
+
+A KPI card showing a single number + label + optional trend indicator.
+
+### Behavior Specification
+
+- **Number:** Large type (text-3xl or text-4xl), semibold
+- **Label:** Small muted text below the number
+- **Trend:** Optional up/down arrow with delta ("+3 this week"). Omit if data is unavailable — never show fake trends
+- **Placeholder state:** For stats not yet backed by data (profile views), render "—" or "Coming soon" rather than "0". "0 profile views" feels punishing for new users.
+- **Grid:** StatHeroes render in a 2–4 column responsive grid (`grid-cols-2 sm:grid-cols-4`). Each card has a subtle border and rounded corners matching `Card.tsx`.
+- **Color accent:** Use role color CSS variable (`--color-teacher`, `--color-student`, etc.) from the ThemeColorProvider system (v1.16) for the number or an accent bar.
+
+---
+
+## Anti-Features
+
+Features commonly seen on dashboards but explicitly wrong for this milestone.
+
+| Anti-Feature | Why Requested | Why Wrong Here | Alternative |
+|--------------|---------------|----------------|-------------|
+| Community feed / posts | The old dashboard had a feed. Users may expect activity from their connections | PROJECT.md explicitly says "Complete rebuild — no community feed." The feed was removed intentionally to create an Apple/Netflix aesthetic, not a Facebook one. A feed conflicts with the carousel layout. | Carousels showing curated content serve the same "what's happening" need without the feed noise |
+| Real-time profile view analytics | "Weekly profile views" is a stated milestone goal | Analytics infrastructure (Supabase + Vercel Analytics + GA4) does not currently track profile views per-user. Building this requires an `analytics_events` table, write calls on profile page load, and aggregation queries. This is a separate analytics milestone. | Show placeholder stat "Profile Views — Coming soon" in v1.17. Do NOT instrument analytics in this milestone. |
+| Notification feed on dashboard | Many platforms surface notifications on the dashboard | GOYA already has an inbox at `/settings/inbox` for connection requests. Duplicating notifications on the dashboard creates two sources of truth. | The header notification bell (already built) handles notifications. Dashboard CTAs handle next-action guidance. |
+| Drag-and-drop dashboard layout customization | Some enterprise dashboards allow widget reorder | Over-engineering for a 5,800-user community platform. Apple/Netflix aesthetic is fixed layout, not configurable grid. | Fixed role-specific layouts. Role determines content. No customization. |
+| "Suggested connections" ML algorithm | Common on LinkedIn-style platforms | Requires collaborative filtering or cosine similarity on profile data — a separate data science milestone. Current `connections` table has no similarity signals. | "Teachers Near You" carousel uses location match (simpler, deterministic). |
+| Animated number counters on stat heroes | Often seen as a "premium" touch | Adds JavaScript complexity with no UX benefit on dashboards. Users scan KPIs — they don't need to watch them count up. `AnimatedCounter.tsx` exists in landing components but should stay in landing. | Static number rendering. Transition from loading skeleton to number is sufficient motion. |
+| Infinite scroll on carousels | Feels modern | Infinite scroll carousels defeat the purpose of a dashboard overview. The carousel's value is showing a finite curated set — "here are your 5 upcoming events." Infinite undermines the curation. | Fixed 5–8 items per carousel. "Show all →" exits to full listing pages. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-course_categories table
-    └──enables──> Category CRUD admin UI
-    └──enables──> category_id FK on courses table (replaces string category)
-                      └──enables──> Category filter on admin courses list
-                      └──enables──> Colored category badge on public academy page
+Supabase profile data (already exists)
+  └──feeds──> ProfileCompletionCard (pure computation, no new queries)
+  └──feeds──> StatHero: connections count
+  └──feeds──> TeacherCard carousel (directory query)
 
-lessons table (with sort_order, lesson_type)
-    └──migration sequence──> After course_categories migration (clean DB history)
-    └──enables──> Lesson type-specific form fields (video / audio / text)
-    └──enables──> Drag-and-drop lesson reordering (sort_order column)
-    └──enables──> Frontend lesson renderer (iframe, audio, text)
+Connections table (v1.1, already exists)
+  └──feeds──> StatHero: connections count
+  └──feeds──> ConnectionsList panel
+  └──feeds──> ConnectionCard carousel
 
-Platform-aware video URL parser (lib/courses/video.ts)
-    └──used by──> Lesson form (URL validation + embed preview)
-    └──used by──> Frontend lesson renderer (generate iframe src)
+Events table (v1.9, already exists)
+  └──feeds──> EventCard carousel (filter: upcoming, published)
+  └──feeds──> StatHero: events hosted (filter: created_by)
 
-Premium course form (card sections)
-    └──requires──> lessons table (Lessons card section shows lesson list)
-    └──contains──> Lesson management UI (lessons created within course edit form)
+Courses + course_categories tables (v1.15, already exists)
+  └──feeds──> CourseCard carousel
+  └──feeds──> StatHero: courses published
 
-drag-and-drop lesson reordering
-    └──requires──> sort_order column on lessons table
-    └──reuses──> @dnd-kit/core + @dnd-kit/sortable (already installed)
-    └──reuses──> ProductsTable.tsx pattern (DndContext, SortableContext, arrayMove, server action)
+Schools + school_faculty tables (v1.14, already exists)
+  └──feeds──> FacultyList panel
+  └──feeds──> School status detection for Teacher dashboard CTA
+  └──feeds──> StatHero: faculty count
+
+ThemeColorProvider CSS variables (v1.16, already exists)
+  └──feeds──> StatHero role color accent (--color-teacher, --color-student, etc.)
+
+HorizontalCarousel (NEW — shared component)
+  └──used by──> all role carousels
+  └──renders──> CourseCard | EventCard | TeacherCard | ConnectionCard | FacultyCard
+
+ProfileCompletionCard (NEW)
+  └──requires──> profile data (already in dashboard session query)
+  └──links to──> /settings with section anchors
+
+StatHero (NEW)
+  └──requires──> aggregation queries per role
+  └──uses──> CSS variables from ThemeColorProvider
+
+Role detection (already exists via auth session)
+  └──determines──> which dashboard layout renders
+  └──determines──> which queries are made
+  └──determines──> school ownership check (Teacher only)
 ```
 
 ### Dependency Notes
 
-- **course_categories before lessons:** No hard technical dependency, but running the categories migration first keeps DB history clean and avoids a combined mega-migration
-- **drag-and-drop requires sort_order:** The integer column must exist in the `lessons` table before the DnD UI is built. Pattern is identical to `products.priority` in `ProductsTable.tsx` — HIGH confidence it works
-- **URL parser is shared infrastructure:** The same `lib/courses/video.ts` utility serves both the admin form preview and the public lesson renderer. Build once, use in both places
-- **category_id FK is additive:** Add `category_id` as a nullable FK alongside the existing `category` string column. Migrate data in the same migration. Keep `category` temporarily for backward compatibility with existing API routes (v1.6 REST API)
+- **All data already exists** — this milestone is pure UI orchestration on top of existing DB tables. No new tables required for v1.17 unless profile view tracking is added (explicitly deferred above).
+- **School detection is additive** — a teacher's dashboard checks for school ownership. If no school, the school-specific components are simply not rendered. No separate "school role" exists — this is a check, not a new auth path.
+- **Card components are new** — `CourseCard`, `EventCard`, `TeacherCard`, `ConnectionCard`, `FacultyCard` do not exist yet. They are the main build work of this milestone alongside `HorizontalCarousel`, `ProfileCompletionCard`, and `StatHero`.
+- **ThemeColorProvider CSS variables** — already injected globally (v1.16). StatHero role colors can use `var(--color-teacher)` etc. without any new infrastructure.
 
 ---
 
-## MVP Definition (This Milestone: v1.15)
+## MVP Scope (v1.17)
 
-All items below are in scope for v1.15. This is not a prioritized backlog — it is the full target.
+### Must Have
 
-### Phase 1: Database Foundation
+- `HorizontalCarousel` shared component with snap-x mobile, desktop scroll, empty state, skeleton loading
+- `ProfileCompletionCard` with 6-field weighted score, checklist, deep links
+- `StatHero` grid with placeholder support
+- Student dashboard layout with greeting, completion card, 3 carousels, 2–3 stat heroes
+- Teacher dashboard layout with greeting, completion card, ConnectionsList, 3 carousels, 3–4 stat heroes, school CTA
+- Wellness Practitioner dashboard layout (same as Teacher minus school components)
+- School-aware Teacher layout (FacultyList, school stat heroes, school CTA variants)
+- `CourseCard`, `EventCard`, `TeacherCard`, `ConnectionCard`, `FacultyCard` — new card components
+- Full deletion of existing dashboard UI (community feed, old layout)
 
-- [ ] `course_categories` migration with RLS — `id`, `name`, `slug`, `description`, `color`, `sort_order`, timestamps
-- [ ] `lessons` migration with RLS — `id`, `course_id`, `title`, `lesson_type`, `sort_order`, `vimeo_url`, `youtube_url`, `audio_url`, `content`, `description`, `duration_minutes`, `is_published`, timestamps
-- [ ] Add `category_id` (FK → course_categories) to courses table, keep `category` string for compat
-- [ ] Seed default categories from current `CourseCategory` values (Workshop, Yoga Sequence, Dharma Talk, Music Playlist, Research)
+### Defer to v2
 
-### Phase 2: Admin Categories Tab
-
-- [ ] Add "Courses / Categories" tab switcher to `/admin/courses` page
-- [ ] Categories tab: list table with name, slug, color badge, course count, sort_order
-- [ ] Inline modal for create/edit (name, slug auto-generated, description, color picker)
-- [ ] Delete with guard — show course count, disable delete if courses are assigned
-
-### Phase 3: Premium Course Form
-
-- [ ] Redesign `CourseForm.tsx` with card section layout (Basic Info, Appearance, Lessons, Settings)
-- [ ] Category field is now a dynamic select populated from `course_categories` table
-- [ ] Duration as slider (5–240 min) with formatted "Xh Ym" display
-- [ ] `vimeo_url` on courses table becomes legacy — new video content lives in lessons
-
-### Phase 4: Lesson Management UI
-
-- [ ] Lesson list panel within course edit page (inline, not a separate route)
-- [ ] Add/edit lesson via expandable inline panel or modal
-- [ ] Type selector (Video / Audio / Text) shows/hides relevant fields
-- [ ] Video: platform auto-detect from URL, iframe preview below field
-- [ ] Audio: `audio_url` field + optional description
-- [ ] Text: plain textarea (no WYSIWYG)
-- [ ] Drag-and-drop reorder using `@dnd-kit/core` + `@dnd-kit/sortable` (existing pattern)
-- [ ] Persist `sort_order` on drag end via server action
-
-### Phase 5: Frontend Lesson Rendering
-
-- [ ] Course detail page lists lessons with type icons and duration
-- [ ] Video lessons: responsive 16:9 `<iframe loading="lazy">` for Vimeo and YouTube
-- [ ] Audio lessons: HTML5 `<audio controls>` with Tailwind-styled wrapper
-- [ ] Text lessons: `whitespace-pre-wrap` formatted text block
-
-### Deferred (v2+)
-
-- [ ] Lesson-level user progress tracking — separate learner experience milestone
-- [ ] Quiz / assessment within lessons — separate product domain
-- [ ] Hierarchical category nesting — only if flat list proves insufficient at scale
-- [ ] Rich text / Markdown rendering for text lessons — only after demand validated
+- Real profile view analytics (requires new `analytics_events` table + instrumentation)
+- "Suggested connections" recommendation algorithm
+- Notification surface on dashboard
+- CPD credits stat hero (credits table exists but requires aggregation by type — scope for a dedicated CPD milestone)
 
 ---
 
-## Feature Prioritization Matrix
+## Complexity Summary
 
-| Feature | User Value | Implementation Cost | Priority |
-|---------|------------|---------------------|----------|
-| course_categories DB + admin CRUD | HIGH | LOW | P1 |
-| lessons DB schema + RLS | HIGH | MEDIUM | P1 |
-| Category FK on courses + seeded data | HIGH | LOW | P1 |
-| Lesson management UI (type-specific forms) | HIGH | HIGH | P1 |
-| Drag-and-drop lesson reordering | HIGH | MEDIUM | P1 |
-| Platform-aware video embed (Vimeo + YouTube) | HIGH | LOW | P1 |
-| Frontend lesson renderer | HIGH | MEDIUM | P1 |
-| Premium card-section course form | MEDIUM | MEDIUM | P1 |
-| Duration slider on course form | LOW | LOW | P2 |
-| Category color picker + colored badges | MEDIUM | LOW | P2 |
-| URL preview in lesson form | MEDIUM | LOW | P2 |
-| Styled audio player wrapper | LOW | LOW | P3 |
-
-**Priority key:**
-- P1: Must have for v1.15
-- P2: Should have — include if time allows
-- P3: Nice to have — defer if behind schedule
-
----
-
-## Competitor Feature Analysis
-
-| Feature | Thinkific (2026) | MasterStudy LMS | GOYA v1.15 Approach |
-|---------|-----------------|-----------------|---------------------|
-| Category management | Tag/category system with colors, admin-managed | Full category CRUD with icon + color + parent hierarchy | Flat `course_categories` table, color field, no hierarchy |
-| Lesson types | Video, Audio, Text, PDF, Quiz, Presentation, Multimedia | Video, Audio, Text, Quiz | Video, Audio, Text — no quiz (CPD handles accreditation separately) |
-| Lesson ordering | Drag-and-drop in course builder | Drag-and-drop | dnd-kit (already in codebase at `@dnd-kit/sortable ^10.0.0`) |
-| Video platforms | Upload to Thinkific OR embed YouTube | Vimeo, YouTube, Wistia | URL-parsed iframe for Vimeo + YouTube; no video hosting |
-| Course form layout | New 2026 builder: card sections, live preview | Wizard-style multi-step | Card sections; no wizard (admin power-user context) |
-| Audio player | Native HTML5 | Custom player with waveform | Native HTML5 with thin Tailwind wrapper |
-| Text lessons | Full rich text editor (HTML output) | Rich text editor | Plain textarea — no WYSIWYG in v1.15 |
+| Component | Complexity | Reason |
+|-----------|------------|--------|
+| HorizontalCarousel | MEDIUM | CSS snap + touch handling + skeleton + empty state + responsive arrows |
+| ProfileCompletionCard | MEDIUM | Multi-role weighted logic, deep link routing, dismiss state |
+| StatHero | LOW | Display-only, no complex logic |
+| Student dashboard layout | MEDIUM | 3 new queries, 3 carousels, empty states |
+| Teacher dashboard layout | MEDIUM-HIGH | 4+ queries, school detection, ConnectionsList |
+| WP dashboard layout | MEDIUM | Same as Teacher minus school check |
+| School-aware teacher layout | HIGH | School status query, faculty query, designation query, CTA branching |
+| Card components (5×) | LOW-MEDIUM each | New components but follow existing design system |
+| Delete existing dashboard | LOW | File deletion + route cleanup |
 
 ---
 
 ## Sources
 
-- [Next.js 16 Video Embedding Guide](https://nextjs.org/docs/app/guides/videos) — Authoritative recommendation for `<iframe>` for external platforms (Vimeo/YouTube). Version 16.2.1, updated 2026-03-31. HIGH confidence
-- [Thinkific New Course Builder 2026](https://support.thinkific.com/hc/en-us/articles/37547732533655-Introducing-Thinkific-s-New-Course-Builder) — Card section layout with live preview confirmed as current best-in-class UX pattern. MEDIUM confidence (WebSearch verified)
-- [Thinkific Lesson Types](https://support.thinkific.com/hc/en-us/articles/360030720053-Thinkific-Lesson-Types) — Lesson type taxonomy: Video, Audio, Text, PDF, Quiz, Presentation, Multimedia. MEDIUM confidence (WebSearch verified, direct fetch returned 403)
-- [MasterStudy LMS Lessons Docs](https://docs.stylemixthemes.com/masterstudy-lms/lms-course-features/lessons) — Audio Lesson as first-class type. MEDIUM confidence (WebSearch)
-- [MasterStudy LMS Categories Docs](https://docs.stylemixthemes.com/masterstudy-lms/lms-course-features/courses-category) — Standard category fields: icon, color, slug, parent. MEDIUM confidence (WebSearch)
-- [@dnd-kit/sortable npm](https://www.npmjs.com/package/@dnd-kit/sortable) — v10.0.0 installed in project. HIGH confidence (verified in `package.json`)
-- [dnd-kit Sortable Documentation](https://docs.dndkit.com/presets/sortable) — SortableContext, useSortable, arrayMove API. HIGH confidence (cross-referenced with `ProductsTable.tsx` in codebase)
-- Codebase: `app/admin/shop/products/ProductsTable.tsx` — Existing dnd-kit sortable implementation with `DndContext`, `SortableContext`, `useSortable`, `arrayMove`, server action pattern. HIGH confidence (direct code read)
-- Codebase: `app/admin/courses/components/CourseForm.tsx` — Current form fields, vimeo_url field, flat layout. HIGH confidence (direct code read)
-- Codebase: `lib/types.ts` — Current `CourseCategory`, `Course` type definitions. HIGH confidence (direct code read)
+- PROJECT.md (codebase) — v1.17 milestone goal, target features, existing system state. HIGH confidence
+- Codebase: `app/settings/page.tsx` — Profile fields verified: `avatar_url`, `bio`, `location`, `website`, `instagram`, `teaching_styles`, `years_teaching`. HIGH confidence
+- Codebase: `app/components/ui/` — Existing `Card.tsx`, `Button.tsx`, `Badge.tsx`, `PageContainer.tsx`. HIGH confidence
+- Codebase: `app/components/ThemeColorProvider.tsx` — CSS variable injection from v1.16. HIGH confidence
+- [Designing a smart 'Complete Your Profile' UI](https://blog.logrocket.com/ux-design/complete-profile-ui-interaction/) — Profile completion checklist patterns. MEDIUM confidence
+- [Netflix Carousel UX Pattern](https://medium.com/@andrew.tham.cc/recreating-netflixs-slider-component-2d6ad9009ab0) — Horizontal slider with peek items and CSS transform. MEDIUM confidence
+- [NN/G Mobile Carousels](https://www.nngroup.com/articles/mobile-carousels/) — Reachable in 3–4 swipes, gestural control on mobile. MEDIUM confidence
+- [Dashboard Design UX Patterns — Pencil & Paper](https://www.pencilandpaper.io/articles/ux-pattern-analysis-data-dashboards) — KPI card hierarchy, progressive disclosure. MEDIUM confidence
+- [Userpilot — SaaS Onboarding Patterns](https://userpilot.com/blog/app-onboarding-design/) — Checklist + gamification = 124% activation increase (Blip case study). LOW-MEDIUM confidence (single study)
+- [KPI Card Best Practices — Tabular Editor](https://tabulareditor.com/blog/kpi-card-best-practices-dashboard-design) — Placeholder/trend guidance for KPI cards. MEDIUM confidence
 
 ---
 
-*Feature research for: GOYA v2 — v1.15 Course System Redesign*
+*Feature research for: GOYA v2 — v1.17 Dashboard Redesign*
 *Researched: 2026-04-01*
