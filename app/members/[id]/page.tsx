@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import nextDynamic from 'next/dynamic';
 import { getSupabaseService } from '@/lib/supabase/service';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { PUBLIC_PROFILE_COLUMNS } from '@/lib/members/constants';
@@ -16,6 +17,13 @@ import ProfileContentPills from './components/ProfileContentPills';
 import SchoolAffiliation from './components/SchoolAffiliation';
 import FacultyGrid from './components/FacultyGrid';
 import CommunitySection from './components/CommunitySection';
+import ProfileVideo from './components/ProfileVideo';
+import { HorizontalCarousel } from '@/app/dashboard/components/HorizontalCarousel';
+import { EventCard } from '@/app/dashboard/components/EventCard';
+import { CourseCard } from '@/app/dashboard/components/CourseCard';
+
+// mapbox-gl is SSR-hostile — must be loaded client-side only
+const ProfileMap = nextDynamic(() => import('./components/ProfileMap'), { ssr: false });
 
 export const dynamic = 'force-dynamic';
 
@@ -112,6 +120,7 @@ export default async function MemberProfilePage({
     practice_styles: string[] | null;
     practice_level: string | null;
     wellness_focus: string[] | null;
+    youtube_intro_url: string | null;
   };
 
   const isOwnProfile = viewerId === profile.id;
@@ -134,8 +143,6 @@ export default async function MemberProfilePage({
     location_lat: profile.location_lat,
     location_lng: profile.location_lng,
   });
-  // Keep for Phase 50 map consumption
-  void visibility;
 
   // Connections count query for sidebar stats
   const connectionsCountPromise = serviceClient
@@ -153,6 +160,7 @@ export default async function MemberProfilePage({
   ]);
 
   const hasContent = memberEvents.length > 0 || memberCourses.length > 0;
+  // hasContent is used for profileCompletion calculation below
 
   const role = profile.role ?? 'student';
 
@@ -244,7 +252,12 @@ export default async function MemberProfilePage({
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8">
           {/* Main column — left */}
           <div className="space-y-6">
-            {/* 1. Bio */}
+            {/* 1. Video facade — only when youtube_intro_url is set */}
+            {profile.youtube_intro_url && (
+              <ProfileVideo youtubeIntroUrl={profile.youtube_intro_url} />
+            )}
+
+            {/* 2. Bio */}
             <ProfileBio bio={profile.bio} />
 
             {/* 2. Role-specific content pills */}
@@ -291,8 +304,44 @@ export default async function MemberProfilePage({
               />
             )}
 
-            {/* 6. Connections */}
+            {/* 6. Events carousel — hidden when no events */}
+            {memberEvents.length > 0 && (
+              <HorizontalCarousel
+                title="Upcoming events"
+                showAllHref="/events"
+                showAllLabel="View all events"
+              >
+                {memberEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </HorizontalCarousel>
+            )}
+
+            {/* 7. Courses carousel — hidden when no courses */}
+            {memberCourses.length > 0 && (
+              <HorizontalCarousel
+                title="Courses & classes"
+                showAllHref="/academy"
+                showAllLabel="View all"
+              >
+                {memberCourses.map((course) => (
+                  <CourseCard key={course.id} course={course} />
+                ))}
+              </HorizontalCarousel>
+            )}
+
+            {/* 8. Connections */}
             <ConnectionsSection profileMemberId={profile.id} />
+
+            {/* 9. Map — privacy-gated server-side via deriveProfileVisibility */}
+            {visibility.showMap &&
+              profile.location_lat != null &&
+              profile.location_lng != null && (
+                <ProfileMap
+                  lat={profile.location_lat}
+                  lng={profile.location_lng}
+                />
+              )}
           </div>
 
           {/* Sidebar column — right */}
