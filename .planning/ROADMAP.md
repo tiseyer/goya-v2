@@ -296,7 +296,7 @@ Plans:
 
 **Milestone Goal:** Rebuild /dashboard from scratch with role-specific layouts (Student, Teacher, School-view, Wellness Practitioner), Apple/Netflix aesthetic, horizontal carousels, profile completion scoring, stat heroes, and value-driven CTAs. Delete all existing feed UI.
 
-- [ ] **Phase 43: Feed Cleanup + Data Infrastructure** - Delete old feed UI after import audit, build lib/dashboard/queries.ts + profileCompletion.ts, rewrite page.tsx as async server component with role branch skeleton
+- [x] **Phase 43: Feed Cleanup + Data Infrastructure** - Delete old feed UI after import audit, build lib/dashboard/queries.ts + profileCompletion.ts, rewrite page.tsx as async server component with role branch skeleton (completed 2026-04-02)
 - [ ] **Phase 44: Shared UI Components** - HorizontalCarousel, DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero, and 5 card types (TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard)
 - [ ] **Phase 45: Student + Wellness Practitioner Dashboards** - Full Student and Wellness Practitioner role layouts assembled from Phase 44 components
 - [ ] **Phase 46: Teacher + School Dashboards** - Full Teacher and School-view layouts including school detection, "View as School" toggle, faculty list, connections list, and complex CTA branching
@@ -414,7 +414,7 @@ Plans:
 | 40. Wire Lessons to Frontend | 3/3 | Complete | 2026-04-01 |
 | 41. ThemeProvider Infrastructure | 1/1 | Complete | 2026-04-01 |
 | 42. Admin Colors UI | 1/1 | Complete | 2026-04-01 |
-| 43. Feed Cleanup + Data Infrastructure | 0/2 | Not started | - |
+| 43. Feed Cleanup + Data Infrastructure | 2/2 | Complete | 2026-04-02 |
 | 44. Shared UI Components | 0/? | Not started | - |
 | 45. Student + Wellness Practitioner Dashboards | 0/? | Not started | - |
 | 46. Teacher + School Dashboards | 0/? | Not started | - |
