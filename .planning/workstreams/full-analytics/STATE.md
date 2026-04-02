@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: milestone
 status: executing
-stopped_at: Completed 47-01-PLAN.md
-last_updated: "2026-04-02T05:45:38Z"
+stopped_at: Completed 47-foundation 47-02-PLAN.md
+last_updated: "2026-04-02T06:19:23.602Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 5
@@ -68,6 +68,8 @@ Progress: [██████░░░░] 60%
 - [Phase 45]: Teacher carousel populates from connections filtered to role=teacher (no dedicated fetch query needed)
 - [Phase 46]: School name used as greeting firstName for school-owner framing
 - [Phase 47-01]: Applied migration via pg client SET SESSION ROLE postgres (project has pre-existing migration history drift blocking db push)
+- [Phase 47-foundation]: PUBLIC_PROFILE_COLUMNS allowlist as sole SELECT string for service-role profile fetches
+- [Phase 47-foundation]: deriveProfileVisibility() enforces privacy server-side with showMap=false for students and online-only profiles
 
 ### Blockers/Concerns
 
@@ -75,6 +77,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T05:45:38Z
-Stopped at: Completed 47-01-PLAN.md
+Last session: 2026-04-02T06:19:23.599Z
+Stopped at: Completed 47-foundation 47-02-PLAN.md
 Resume file: None
