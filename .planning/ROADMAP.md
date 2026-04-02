@@ -392,8 +392,8 @@ Plans:
   4. Both layouts are mobile-first: sections stack vertically on small screens, CTAs display side-by-side on desktop
 **Plans:** 2 plans
 Plans:
-- [ ] 43-01-PLAN.md — Grep audit + delete feed files, create lib/dashboard/queries.ts and profileCompletion.ts
-- [ ] 43-02-PLAN.md — Rewrite page.tsx as async server component with role branching + 4 role layout stubs
+- [ ] 46-01-PLAN.md — DashboardTeacher: greeting, completion, stat hero, CTAs, connections list, View as School toggle
+- [ ] 46-02-PLAN.md — DashboardSchool: school greeting, completion, stat hero, school CTAs, faculty list, students list
 **UI hint**: yes
 
 ## Progress
