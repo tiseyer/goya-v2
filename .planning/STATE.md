@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.16
-milestone_name: Admin Color Settings
-status: complete
+milestone: v1.17
+milestone_name: Dashboard Redesign
+status: defining_requirements
 stopped_at: null
-last_updated: "2026-04-01T13:00:00.000Z"
-last_activity: 2026-04-01 - All phases complete — v1.16 Admin Color Settings shipped
+last_updated: "2026-04-02T08:00:00.000Z"
+last_activity: 2026-04-02 - Milestone v1.17 started
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-01)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** v1.16 Admin Color Settings — COMPLETE
+**Current focus:** v1.17 — Dashboard Redesign
 
 ## Current Position
 
-Phase: 42 of 42 (Admin Colors UI) — COMPLETE
-Plan: 1 of 1
-Status: All phases complete — milestone shipped
-Last activity: 2026-04-01 — Phase 42 Admin Colors UI complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-02 — Milestone v1.17 started
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 

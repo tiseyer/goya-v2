@@ -8,9 +8,19 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: (Planning next)
+## Current Milestone: v1.17 Dashboard Redesign
 
-No active milestone. Run `/gsd:new-milestone` to start the next one.
+**Goal:** Rebuild the user dashboard (/dashboard) from scratch with role-specific layouts (Student, Teacher, School, Wellness Practitioner), Apple/Netflix aesthetic, horizontal carousels, profile completion scoring, stat heroes, and value-driven CTAs.
+
+**Target features:**
+- Role-specific dashboard layouts with greeting, profile completion, stat heroes, primary CTAs
+- Reusable HorizontalCarousel (snap-x, swipeable mobile, scrollable desktop)
+- Teacher/Course/Event cards in carousels with "Show all →" links
+- Profile completion scoring (6 weighted fields, calculated on the fly)
+- ProfileCompletionCard with checklist, progress bar, deep links
+- StatHero showing weekly profile views (placeholder until analytics)
+- ConnectionsList and FacultyList for teacher/school dashboards
+- Complete rebuild — delete all existing dashboard UI, no community feed
 
 ## Current State
 
@@ -262,4 +272,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after v1.16 Admin Color Settings milestone shipped*
+*Last updated: 2026-04-02 after v1.17 Dashboard Redesign milestone started*
