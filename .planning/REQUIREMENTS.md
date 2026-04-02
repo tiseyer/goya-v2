@@ -90,46 +90,46 @@ Requirements for User Profile Redesign milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | — | Pending |
-| DB-02 | — | Pending |
-| DB-03 | — | Pending |
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| HERO-01 | — | Pending |
-| HERO-02 | — | Pending |
-| HERO-03 | — | Pending |
-| HERO-04 | — | Pending |
-| HERO-05 | — | Pending |
-| HERO-06 | — | Pending |
-| CONT-01 | — | Pending |
-| CONT-02 | — | Pending |
-| CONT-03 | — | Pending |
-| CONT-04 | — | Pending |
-| CONT-05 | — | Pending |
-| CONT-06 | — | Pending |
-| CONT-07 | — | Pending |
-| REL-01 | — | Pending |
-| REL-02 | — | Pending |
-| REL-03 | — | Pending |
-| MED-01 | — | Pending |
-| MED-02 | — | Pending |
-| MED-03 | — | Pending |
-| MED-04 | — | Pending |
-| SIDE-01 | — | Pending |
-| SIDE-02 | — | Pending |
-| SIDE-03 | — | Pending |
-| SIDE-04 | — | Pending |
-| DES-01 | — | Pending |
-| DES-02 | — | Pending |
-| DES-03 | — | Pending |
+| DB-01 | Phase 47 | Pending |
+| DB-02 | Phase 47 | Pending |
+| DB-03 | Phase 47 | Pending |
+| INFRA-01 | Phase 47 | Pending |
+| INFRA-02 | Phase 47 | Pending |
+| INFRA-03 | Phase 47 | Pending |
+| INFRA-04 | Phase 47 | Pending |
+| INFRA-05 | Phase 47 | Pending |
+| HERO-01 | Phase 48 | Pending |
+| HERO-02 | Phase 48 | Pending |
+| HERO-03 | Phase 48 | Pending |
+| HERO-04 | Phase 48 | Pending |
+| HERO-05 | Phase 48 | Pending |
+| HERO-06 | Phase 48 | Pending |
+| SIDE-01 | Phase 48 | Pending |
+| SIDE-02 | Phase 48 | Pending |
+| SIDE-03 | Phase 48 | Pending |
+| SIDE-04 | Phase 48 | Pending |
+| DES-01 | Phase 48 | Pending |
+| DES-02 | Phase 48 | Pending |
+| DES-03 | Phase 48 | Pending |
+| CONT-02 | Phase 49 | Pending |
+| CONT-03 | Phase 49 | Pending |
+| CONT-04 | Phase 49 | Pending |
+| CONT-05 | Phase 49 | Pending |
+| CONT-06 | Phase 49 | Pending |
+| CONT-07 | Phase 49 | Pending |
+| REL-01 | Phase 49 | Pending |
+| REL-02 | Phase 49 | Pending |
+| REL-03 | Phase 49 | Pending |
+| CONT-01 | Phase 50 | Pending |
+| MED-01 | Phase 50 | Pending |
+| MED-02 | Phase 50 | Pending |
+| MED-03 | Phase 50 | Pending |
+| MED-04 | Phase 50 | Pending |
 
 **Coverage:**
 - v1.18 requirements: 35 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 35
+- Mapped to phases: 35 (100%)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-02*

@@ -15,6 +15,7 @@
 - ✅ **v1.15 Course System Redesign** - Phases 36-40 (shipped 2026-04-01)
 - ✅ **v1.16 Admin Color Settings** - Phases 41-42 (shipped 2026-04-01)
 - ✅ **v1.17 Dashboard Redesign** - Phases 43-46 (shipped 2026-04-02)
+- 🔄 **v1.18 User Profile Redesign** - Phases 47-50 (in progress)
 
 ## Phases
 
@@ -292,45 +293,15 @@ Plans:
 
 </details>
 
-### ✅ v1.17 Dashboard Redesign (Phases 43-46) — SHIPPED 2026-04-02
+<details>
+<summary>✅ v1.17 Dashboard Redesign (Phases 43-46) - SHIPPED 2026-04-02</summary>
 
 **Milestone Goal:** Rebuild /dashboard from scratch with role-specific layouts (Student, Teacher, School-view, Wellness Practitioner), Apple/Netflix aesthetic, horizontal carousels, profile completion scoring, stat heroes, and value-driven CTAs. Delete all existing feed UI.
 
 - [x] **Phase 43: Feed Cleanup + Data Infrastructure** - Delete old feed UI after import audit, build lib/dashboard/queries.ts + profileCompletion.ts, rewrite page.tsx as async server component with role branch skeleton (completed 2026-04-02)
 - [x] **Phase 44: Shared UI Components** - HorizontalCarousel, DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero, and 5 card types (completed 2026-04-02)
-- [x] **Phase 45: Student + Wellness Practitioner Dashboards** - Full Student and Wellness Practitioner role layouts assembled from Phase 44 components
-- [x] **Phase 46: Teacher + School Dashboards** - Full Teacher and School-view layouts including school detection, "View as School" toggle, faculty list, connections list, and complex CTA branching
-
-## Phase Details
-
-### Phase 41: ThemeProvider Infrastructure
-**Goal**: Color settings are stored in site_settings and injected as CSS variables globally so any page can consume them via CSS custom properties
-**Depends on**: Nothing (first phase of milestone)
-**Requirements**: INFRA-01, INFRA-02, BRAND-05, ROLE-03, MAINT-02
-**Success Criteria** (what must be TRUE):
-  1. A ThemeProvider component exists that reads brand_colors and role_colors from site_settings and sets CSS variables on the html element at render time
-  2. ThemeProvider is present in layout.tsx so CSS variables are available on every page of the app without any per-page setup
-  3. brand_colors saved to site_settings as a JSON value under the key "brand_colors" are reflected as CSS variables after a page reload
-  4. role_colors saved to site_settings as a JSON value under the key "role_colors" are reflected as CSS variables after a page reload
-  5. maintenance_indicator_color saved to site_settings under the key "maintenance_indicator_color" is reflected as a CSS variable after a page reload
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 41-01-PLAN.md — Color defaults/types module + ThemeColorProvider server component + layout.tsx integration
-
-### Phase 42: Admin Colors UI
-**Goal**: Admins can view, edit, preview, save, and reset all brand colors, role colors, and the maintenance indicator color from a dedicated Colors page in Admin Settings
-**Depends on**: Phase 41
-**Requirements**: UI-01, UI-02, UI-03, BRAND-01, BRAND-02, BRAND-03, BRAND-04, ROLE-01, ROLE-02, MAINT-01, INFRA-03, INFRA-04, INFRA-05
-**Success Criteria** (what must be TRUE):
-  1. A "Colors" link appears in the admin sidebar under the Settings group and navigates to /admin/settings with the Colors tab active
-  2. The page shows three labeled sections — Brand Colors, Role Colors, and Maintenance Indicator — each with color pickers showing a hex input field and a preview swatch
-  3. Changing any color updates the CSS variables on the page instantly so the admin can see how the color looks before saving
-  4. Clicking "Save" persists all current color values to site_settings; clicking the per-color reset icon restores that single color to its default value
-  5. Clicking "Reset All" restores every color across all three sections to its default value
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 42-01-PLAN.md — ColorsTab component with color pickers, live preview, save/reset + settings page tab + sidebar entry
-**UI hint**: yes
+- [x] **Phase 45: Student + Wellness Practitioner Dashboards** - Full Student and Wellness Practitioner role layouts assembled from Phase 44 components (completed 2026-04-02)
+- [x] **Phase 46: Teacher + School Dashboards** - Full Teacher and School-view layouts including school detection, "View as School" toggle, faculty list, connections list, and complex CTA branching (completed 2026-04-02)
 
 ### Phase 43: Feed Cleanup + Data Infrastructure
 **Goal**: The old dashboard feed is safely deleted, lib/dashboard/ contains tested data fetch functions and a profile completion scorer, and page.tsx is a working async server component that routes to the correct role layout stub
@@ -342,10 +313,10 @@ Plans:
   3. lib/dashboard/profileCompletion.ts exports a scorer with isFieldComplete() that treats JSONB empty arrays as incomplete; a fresh test account with no fields filled scores 0%
   4. app/dashboard/page.tsx is an async server component using getEffectiveUserId() + Promise.all, branching to DashboardStudent, DashboardTeacher, DashboardSchool, or DashboardWellness stubs based on role — where school is detected via role='teacher' AND principal_trainer_school_id IS NOT NULL
   5. Visiting /dashboard as each role (and impersonating a teacher with a school) renders the correct stub without errors
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 43-01-PLAN.md — Grep audit + delete feed files, create lib/dashboard/queries.ts and profileCompletion.ts
-- [ ] 43-02-PLAN.md — Rewrite page.tsx as async server component with role branching + 4 role layout stubs
+- [x] 43-01-PLAN.md — Grep audit + delete feed files, create lib/dashboard/queries.ts and profileCompletion.ts
+- [x] 43-02-PLAN.md — Rewrite page.tsx as async server component with role branching + 4 role layout stubs
 
 ### Phase 44: Shared UI Components
 **Goal**: HorizontalCarousel, DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero, and all five card types exist as reusable components that any role layout can consume
@@ -357,13 +328,10 @@ Plans:
   3. ProfileCompletionCard renders a progress bar (0–100%), a checklist of the 6 weighted fields, and deep links to the exact settings section for each incomplete field — the card is hidden when completion is 100%
   4. StatHero displays its metric tile with an explicit "—" when the value is null or undefined; it never shows "0 profile views" for untracked stats
   5. All five card types (TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard) render correctly with shrink-0 set so they do not collapse inside the carousel, and each has a "Show all →" link at the carousel header pointing to the relevant directory page
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 44-01-PLAN.md — Install embla-carousel-react, @utility no-scrollbar, HorizontalCarousel, DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero
-- [ ] 44-02-PLAN.md — TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard
-
-
-
+- [x] 44-01-PLAN.md — Install embla-carousel-react, @utility no-scrollbar, HorizontalCarousel, DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero
+- [x] 44-02-PLAN.md — TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard
 **UI hint**: yes
 
 ### Phase 45: Student + Wellness Practitioner Dashboards
@@ -375,10 +343,10 @@ Plans:
   2. A Wellness Practitioner visiting /dashboard sees a greeting with WP role badge, a profile completion card (when < 100%), a stat hero placeholder, primary CTAs for sharing an event and adding a course, a suggested connections panel linking to the directory, and an upcoming events carousel
   3. Both layouts are mobile-first: sections stack vertically on small screens, CTAs display side-by-side on desktop
   4. Empty carousels show a non-blank empty state with a contextual CTA rather than an invisible blank space
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 45-01-PLAN.md — Restore card components + replace DashboardStudent stub with full layout (teachers, courses, events carousels)
-- [ ] 45-02-PLAN.md — Restore ConnectionCard + replace DashboardWellness stub with full layout (completion, stats, CTAs, connections, events)
+- [x] 45-01-PLAN.md — Restore card components + replace DashboardStudent stub with full layout (teachers, courses, events carousels)
+- [x] 45-02-PLAN.md — Restore ConnectionCard + replace DashboardWellness stub with full layout (completion, stats, CTAs, connections, events)
 **UI hint**: yes
 
 ### Phase 46: Teacher + School Dashboards
@@ -390,15 +358,79 @@ Plans:
   2. A teacher who owns a school sees a "View as School" toggle; activating it switches the layout to show the school name in the greeting, a school profile completion card, a school discovery stat hero, school-specific CTAs ("Add workshops & courses", "Manage designations"), a faculty list (max 5) with "Manage faculty →", and an enrolled students list (max 5) with "View all →"
   3. The "View as School" toggle state is remembered within the session so refreshing does not reset it
   4. Both layouts are mobile-first: sections stack vertically on small screens, CTAs display side-by-side on desktop
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 46-01-PLAN.md — DashboardTeacher: greeting, completion, stat hero, CTAs, connections list, View as School toggle
-- [ ] 46-02-PLAN.md — DashboardSchool: school greeting, completion, stat hero, school CTAs, faculty list, students list
+- [x] 46-01-PLAN.md — DashboardTeacher: greeting, completion, stat hero, CTAs, connections list, View as School toggle
+- [x] 46-02-PLAN.md — DashboardSchool: school greeting, completion, stat hero, school CTAs, faculty list, students list
+**UI hint**: yes
+
+</details>
+
+### v1.18 User Profile Redesign (Phases 47-50) — IN PROGRESS
+
+**Milestone Goal:** Rebuild /members/[id] with cover image hero, role-specific pill sections, intro video embed, school affiliation, faculty grid, events/courses carousels, Mapbox map, sidebar with membership card and social links, and own-profile editing nudge.
+
+- [ ] **Phase 47: Foundation** - DB migration (4 new cols), lib/types.ts update, PUBLIC_PROFILE_COLUMNS, deriveProfileVisibility(), own-profile detection, Promise.all data fetch skeleton, fetchMemberEvents/fetchMemberCourses
+- [ ] **Phase 48: Hero + Sidebar** - ProfileHero (cover, avatar, name, badge, intro, location, languages, actions), ProfileSidebar (membership card, designations, connect/message, social links, quick stats), two-column layout, pill + format design tokens
+- [ ] **Phase 49: Content Sections** - Bio section, role-specific pill sections (4 role types), school affiliation card + faculty list for teachers, faculty grid + community section for schools
+- [ ] **Phase 50: Media** - Intro video facade embed, Mapbox GL JS inline map (privacy-gated), events carousel, courses carousel
+
+## Phase Details
+
+### Phase 47: Foundation
+**Goal**: The database, types, privacy layer, and data fetch architecture are all in place — every subsequent phase can read from the correct columns, trust visibility flags, and receive fully resolved props
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: DB-01, DB-02, DB-03, INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05
+**Success Criteria** (what must be TRUE):
+  1. The profiles table has cover_image_url, location_lat, location_lng, and location_place_id columns; a profile-covers Supabase Storage bucket exists; lib/types.ts includes lineage and the four new columns
+  2. A PUBLIC_PROFILE_COLUMNS constant defines the exact SELECT string used for all profile fetches — no select('*') appears anywhere in the profile page data layer
+  3. deriveProfileVisibility() returns correct boolean flags (showMap, showAddress) for all combinations of role (student/teacher/wp) and practice_format (online/in-person/hybrid); students and online-only profiles always receive showMap=false
+  4. The profile page.tsx calls supabase.auth.getUser() server-side and derives isOwnProfile = currentUserId === profileId before passing props to any component
+  5. page.tsx fetches profile data first, then fires fetchMemberEvents() and fetchMemberCourses() (filtered by created_by) in a parallel Promise.all — verified by confirming no sequential awaits in the data fetch block
+**Plans**: TBD
+
+### Phase 48: Hero + Sidebar
+**Goal**: Visitors see a visually complete above-the-fold profile — cover image hero with avatar, name, role badge, and action buttons — alongside a sidebar with membership card, designation badges, social links, and quick stats; own-profile users see an edit button and a completion nudge banner
+**Depends on**: Phase 47
+**Requirements**: HERO-01, HERO-02, HERO-03, HERO-04, HERO-05, HERO-06, SIDE-01, SIDE-02, SIDE-03, SIDE-04, DES-01, DES-02, DES-03
+**Success Criteria** (what must be TRUE):
+  1. A member with a cover image set sees a full-bleed hero banner with a dark overlay; a member without one sees a solid fallback background — both have the 120px circular avatar overlapping the hero bottom edge with a white ring
+  2. The hero displays name, role badge, intro text (up to 250 characters), location with a pin icon (when set), and language pills — all sourced from the profiles row
+  3. Connect and Message buttons appear in the hero for authenticated visitors who are not the profile owner; both buttons are hidden when the viewer is the profile owner
+  4. The profile owner sees an "Edit Profile" button in the hero and — when profile completion is below 100% — a completion nudge banner listing incomplete fields with links to the relevant settings sections
+  5. The sidebar shows a GOYA membership card ("Member since" date), designation badges from user_designations, social link icons (website, Instagram, TikTok, Facebook, YouTube), and quick stats (connections count, events count, profile views as "—") — the layout stacks to a single column on mobile
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 49: Content Sections
+**Goal**: The main content column below the hero shows the member's bio, role-appropriate pill sections with real data, school affiliation for teachers, and faculty/community sections for school profiles
+**Depends on**: Phase 47, Phase 48
+**Requirements**: CONT-02, CONT-03, CONT-04, CONT-05, CONT-06, CONT-07, REL-01, REL-02, REL-03
+**Success Criteria** (what must be TRUE):
+  1. The bio section renders the full profile bio text and is completely absent (no empty card) when bio is null or empty
+  2. Pill sections render only when the underlying field has values — an empty array produces no section at all, not an empty heading
+  3. A teacher's profile shows teaching styles, focus areas, lineage, format, teaching since, and years teaching pills in a section; a student's profile shows practice styles, what they're looking for, practice level, and learning preference; a wellness practitioner's profile shows type, modalities, focus areas, format, years, and complementary badge; a school profile shows scope, focus, programs, lineage, delivery, and established year
+  4. A teacher who belongs to a school sees a "School Affiliation" section with a school card and a list of faculty members from that school
+  5. A school profile shows a faculty grid (up to 6 members with a "View all" link) and a community section with enrolled student count and up to 5 avatar thumbnails
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 50: Media
+**Goal**: Members with an intro video URL see a facade embed (thumbnail + click-to-play, not a live iframe on load), in-person and hybrid members see an inline location map, and all members' published events and courses appear in horizontal carousels
+**Depends on**: Phase 47, Phase 48
+**Requirements**: CONT-01, MED-01, MED-02, MED-03, MED-04
+**Success Criteria** (what must be TRUE):
+  1. A member with a YouTube or Vimeo intro URL sees a video thumbnail with a play button overlay at the top of the main column — clicking the overlay replaces it with the iframe; the full iframe is never loaded on initial page render
+  2. The video section is completely absent when youtube_intro_url is null or empty
+  3. A teacher or wellness practitioner with in-person or hybrid practice_format and non-null location_lat/lng sees an inline Mapbox map pinned to their location; students and members with online-only format see no map element at all (enforced server-side via deriveProfileVisibility())
+  4. A member's published events appear in a horizontal carousel reusing HorizontalCarousel + EventCard from dashboard components; the section is hidden when the member has no published events
+  5. A member's published courses appear in a horizontal carousel reusing HorizontalCarousel + CourseCard; the section is hidden when the member has no published courses
+**Plans**: TBD
 **UI hint**: yes
 
 ## Progress
 
-**Execution Order:** 43 -> 44 -> 45 -> 46
+**Execution Order:** 47 -> 48 -> 49 -> 50
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -421,3 +453,7 @@ Plans:
 | 44. Shared UI Components | 2/2 | Complete | 2026-04-02 |
 | 45. Student + Wellness Practitioner Dashboards | 2/2 | Complete | 2026-04-02 |
 | 46. Teacher + School Dashboards | 2/2 | Complete | 2026-04-02 |
+| 47. Foundation | 0/TBD | Not started | - |
+| 48. Hero + Sidebar | 0/TBD | Not started | - |
+| 49. Content Sections | 0/TBD | Not started | - |
+| 50. Media | 0/TBD | Not started | - |

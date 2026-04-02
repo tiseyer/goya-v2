@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: User Profile Redesign
-status: defining_requirements
+status: ready_to_plan
 stopped_at: null
-last_updated: "2026-04-02T08:00:00.000Z"
-last_activity: 2026-04-02 - Milestone v1.18 started
+last_updated: "2026-04-02T09:00:00.000Z"
+last_activity: 2026-04-02 - Roadmap created for v1.18 (Phases 47-50)
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** v1.17 — Dashboard Redesign
+**Current focus:** v1.18 — User Profile Redesign (Phase 47 ready to plan)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 47 of 50 (Foundation)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-02 — Milestone v1.18 started
+Status: Ready to plan
+Last activity: 2026-04-02 — Roadmap created, Phases 47-50 defined
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -54,19 +54,18 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- School is NOT a separate role — school owners have role='teacher' AND principal_trainer_school_id IS NOT NULL. Any role branch that checks role === 'school' will silently never match.
-- Role branching must live in page.tsx, not layout.tsx — App Router layouts do not re-run on client-side navigation, which breaks impersonation.
-- CSS scrollbar hiding via @utility no-scrollbar in globals.css — do NOT use tailwind-scrollbar-hide plugin (confirmed broken under Tailwind CSS 4, GitHub issue #31).
-- JSONB empty arrays are truthy in JS — isFieldComplete() must use Array.isArray(v) ? v.length > 0 : Boolean(v?.trim()) to avoid inflated profile completion scores.
-- embla-carousel-react for desktop drag-to-scroll on carousels; CSS snap-x for mobile touch natively.
-- Feed DB tables (posts, likes, comments) must NOT be dropped — they are used by the admin panel. Phase 43 deletes only UI component files.
-- All data fetching server-side in page.tsx via Promise.all — role layout components receive data as props and do no internal fetching.
+- School is NOT a separate role — school owners have role='teacher' AND principal_trainer_school_id IS NOT NULL
+- All data fetching server-side in page.tsx via Promise.all — section components receive props, do no internal fetching
+- PUBLIC_PROFILE_COLUMNS constant required — never use select('*') for profile fetches (security)
+- Own-profile detection must use supabase.auth.getUser() server-side — current page.tsx hard-codes isOwnProfile=false, must be fixed in Phase 47
+- deriveProfileVisibility() must gate map/address before any JSX — privacy rules are server-side only
 
 ### Research Notes
 
-- Verify principal_trainer_school_id column name in supabase/migrations/20260376_school_owner_schema.sql before writing school detection condition in Phase 43.
-- Verify embla-carousel-react version at install time: npm info embla-carousel-react (pin to ^8, confirm 9.x is still RC).
-- RLS on schools table: check whether school record is readable by the owner via standard server client or requires service client — validate in Phase 43.
+- Mapbox: static vs GL JS decision needed at Phase 50 plan time — Static Images API is zero-JS, recommended unless interactivity required
+- Video facade: extract lib/video.ts shared utility from existing VideoRenderer.tsx + lesson player patterns
+- profile-covers Supabase Storage bucket: create in Phase 47 alongside migration
+- Confirm practice_format column name and allowed values in profiles table before writing deriveProfileVisibility()
 
 ### Blockers/Concerns
 
@@ -74,10 +73,10 @@ None.
 
 ### Pending Todos
 
-- [ ] Plan Phase 43 via /gsd:plan-phase 43
+- [ ] Plan Phase 47 via /gsd:plan-phase 47
 
 ## Session Continuity
 
 Last session: 2026-04-02
-Stopped at: Completed 46-01-PLAN.md — DashboardTeacher full layout
+Stopped at: Roadmap created — Phases 47-50 defined, all 35 requirements mapped
 Resume file: None
