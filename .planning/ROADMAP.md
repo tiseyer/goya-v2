@@ -372,7 +372,7 @@ Plans:
 
 - [x] **Phase 47: Foundation** - DB migration, types, privacy helper, data fetch architecture (completed 2026-04-02)
 - [x] **Phase 48: Hero + Sidebar** - ProfileHero + ProfileSidebar + two-column layout (completed 2026-04-02)
-- [ ] **Phase 49: Content Sections** - Bio section, role-specific pill sections (4 role types), school affiliation card + faculty list for teachers, faculty grid + community section for schools
+- [x] **Phase 49: Content Sections** - Bio, pills, school affiliation, faculty grid, community section (completed 2026-04-02)
 - [ ] **Phase 50: Media** - Intro video facade embed, Mapbox GL JS inline map (privacy-gated), events carousel, courses carousel
 
 ## Phase Details
@@ -464,5 +464,5 @@ Plans:
 | 46. Teacher + School Dashboards | 2/2 | Complete | 2026-04-02 |
 | 47. Foundation | 2/2 | Complete | 2026-04-02 |
 | 48. Hero + Sidebar | 2/2 | Complete | 2026-04-02 |
-| 49. Content Sections | 0/TBD | Not started | - |
+| 49. Content Sections | 2/2 | Complete | 2026-04-02 |
 | 50. Media | 0/TBD | Not started | - |
