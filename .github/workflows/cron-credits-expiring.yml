@@ -1,0 +1,17 @@
+name: Cron - Credits Expiring
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # 8am UTC daily
+  workflow_dispatch:
+
+jobs:
+  credits-expiring:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger credits expiry check
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://goya-v2.vercel.app/api/cron/credits-expiring

@@ -1,0 +1,17 @@
+name: Cron - Chatbot Cleanup
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 3am UTC daily
+  workflow_dispatch:
+
+jobs:
+  chatbot-cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger chatbot session cleanup
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://goya-v2.vercel.app/api/cron/chatbot-cleanup
