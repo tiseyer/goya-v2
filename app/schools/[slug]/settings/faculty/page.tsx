@@ -26,7 +26,7 @@ export default async function FacultyPage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: faculty } = await (supabase as any)
     .from('school_faculty')
-    .select('id, profile_id, invited_email, position, status, is_principal_trainer, profiles(id, first_name, last_name, avatar_url)')
+    .select('id, profile_id, invited_email, position, status, is_principal_trainer, can_manage, profiles(id, first_name, last_name, avatar_url)')
     .eq('school_id', school.id)
     .order('created_at', { ascending: true })
 

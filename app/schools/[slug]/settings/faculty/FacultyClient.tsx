@@ -5,6 +5,7 @@ import {
   saveFacultyMember,
   removeFacultyMember,
   inviteFacultyByEmail,
+  toggleFacultyCanManage,
 } from '../actions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -15,6 +16,7 @@ interface FacultyRow {
   invited_email: string | null
   position: string | null
   is_principal_trainer: boolean
+  can_manage: boolean
   status: string
   full_name?: string
   avatar_url?: string | null
@@ -32,6 +34,7 @@ interface RawFacultyRow {
   invited_email: string | null
   position: string | null
   is_principal_trainer: boolean
+  can_manage: boolean
   status: string
   profiles?: {
     id: string
@@ -129,6 +132,7 @@ export default function FacultyClient({
       invited_email: f.invited_email,
       position: f.position,
       is_principal_trainer: f.is_principal_trainer,
+      can_manage: f.can_manage ?? false,
       status: f.status,
       full_name: f.profiles
         ? `${f.profiles.first_name ?? ''} ${f.profiles.last_name ?? ''}`.trim()
@@ -217,6 +221,7 @@ export default function FacultyClient({
             avatar_url: selectedMember.avatar_url,
             position: memberPosition.trim(),
             is_principal_trainer: false,
+            can_manage: false,
             status: 'active',
           },
         ])
@@ -255,6 +260,7 @@ export default function FacultyClient({
             invited_email: inviteEmail.trim(),
             position: invitePosition.trim(),
             is_principal_trainer: false,
+            can_manage: false,
             status: 'pending',
           },
         ])
@@ -337,6 +343,31 @@ export default function FacultyClient({
                   )}
                 </div>
                 <StatusBadge status={member.status} />
+                {/* Can manage toggle — allows context switching */}
+                {!member.is_principal_trainer && member.profile_id && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newVal = !member.can_manage
+                      setFacultyList(prev => prev.map(m => m.id === member.id ? { ...m, can_manage: newVal } : m))
+                      startTransition(async () => {
+                        const res = await toggleFacultyCanManage(schoolSlug, member.id, newVal)
+                        if ('error' in res) {
+                          setFacultyList(prev => prev.map(m => m.id === member.id ? { ...m, can_manage: !newVal } : m))
+                          setToast({ message: res.error, type: 'error' })
+                        }
+                      })
+                    }}
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-medium transition-colors ${
+                      member.can_manage
+                        ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                    }`}
+                    title={member.can_manage ? 'Can switch to school context' : 'Cannot switch to school context'}
+                  >
+                    {member.can_manage ? 'Can manage' : 'View only'}
+                  </button>
+                )}
                 {confirmRemoveId === member.id ? (
                   <div className="flex items-center gap-2">
                     <button

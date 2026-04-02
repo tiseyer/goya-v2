@@ -267,6 +267,28 @@ export async function removeFacultyMember(
   return { success: true }
 }
 
+export async function toggleFacultyCanManage(
+  schoolSlug: string,
+  facultyId: string,
+  canManage: boolean,
+): Promise<{ success: true } | { error: string }> {
+  const result = await getOwnedSchool(schoolSlug)
+  if ('error' in result) return result
+
+  const { school } = result
+  const supabase = await createSupabaseServerActionClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('school_faculty')
+    .update({ can_manage: canManage })
+    .eq('id', facultyId)
+    .eq('school_id', school.id)
+
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
 export async function inviteFacultyByEmail(
   schoolSlug: string,
   data: { email: string; position: string },
