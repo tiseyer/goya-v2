@@ -527,6 +527,7 @@ export type Database = {
       courses: {
         Row: {
           access: string | null
+          author_type: string | null
           category_id: string | null
           course_type: string
           created_at: string | null
@@ -540,6 +541,7 @@ export type Database = {
           instructor: string | null
           level: string | null
           rejection_reason: string | null
+          school_author_id: string | null
           short_description: string | null
           status: string | null
           thumbnail_url: string | null
@@ -548,6 +550,7 @@ export type Database = {
         }
         Insert: {
           access?: string | null
+          author_type?: string | null
           category_id?: string | null
           course_type?: string
           created_at?: string | null
@@ -561,6 +564,7 @@ export type Database = {
           instructor?: string | null
           level?: string | null
           rejection_reason?: string | null
+          school_author_id?: string | null
           short_description?: string | null
           status?: string | null
           thumbnail_url?: string | null
@@ -569,6 +573,7 @@ export type Database = {
         }
         Update: {
           access?: string | null
+          author_type?: string | null
           category_id?: string | null
           course_type?: string
           created_at?: string | null
@@ -582,6 +587,7 @@ export type Database = {
           instructor?: string | null
           level?: string | null
           rejection_reason?: string | null
+          school_author_id?: string | null
           short_description?: string | null
           status?: string | null
           thumbnail_url?: string | null
@@ -601,6 +607,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_school_author_id_fkey"
+            columns: ["school_author_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
             referencedColumns: ["id"]
           },
         ]
@@ -873,6 +886,7 @@ export type Database = {
       events: {
         Row: {
           all_day: boolean | null
+          author_type: string | null
           category: string
           created_at: string | null
           created_by: string | null
@@ -895,6 +909,7 @@ export type Database = {
           price: number | null
           registration_required: boolean | null
           rejection_reason: string | null
+          school_author_id: string | null
           spots_remaining: number | null
           spots_total: number | null
           status: string | null
@@ -906,6 +921,7 @@ export type Database = {
         }
         Insert: {
           all_day?: boolean | null
+          author_type?: string | null
           category: string
           created_at?: string | null
           created_by?: string | null
@@ -928,6 +944,7 @@ export type Database = {
           price?: number | null
           registration_required?: boolean | null
           rejection_reason?: string | null
+          school_author_id?: string | null
           spots_remaining?: number | null
           spots_total?: number | null
           status?: string | null
@@ -939,6 +956,7 @@ export type Database = {
         }
         Update: {
           all_day?: boolean | null
+          author_type?: string | null
           category?: string
           created_at?: string | null
           created_by?: string | null
@@ -961,6 +979,7 @@ export type Database = {
           price?: number | null
           registration_required?: boolean | null
           rejection_reason?: string | null
+          school_author_id?: string | null
           spots_remaining?: number | null
           spots_total?: number | null
           status?: string | null
@@ -976,6 +995,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_school_author_id_fkey"
+            columns: ["school_author_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
             referencedColumns: ["id"]
           },
         ]
@@ -1475,6 +1501,7 @@ export type Database = {
           uploaded_by: string | null
           uploaded_by_role: string | null
           width: number | null
+          wp_media_id: number | null
         }
         Insert: {
           alt_text?: string | null
@@ -1494,6 +1521,7 @@ export type Database = {
           uploaded_by?: string | null
           uploaded_by_role?: string | null
           width?: number | null
+          wp_media_id?: number | null
         }
         Update: {
           alt_text?: string | null
@@ -1513,6 +1541,7 @@ export type Database = {
           uploaded_by?: string | null
           uploaded_by_role?: string | null
           width?: number | null
+          wp_media_id?: number | null
         }
         Relationships: [
           {
@@ -1532,6 +1561,8 @@ export type Database = {
           id: string
           read_at: string | null
           sender_id: string
+          sender_school_id: string | null
+          sender_type: string | null
         }
         Insert: {
           content: string
@@ -1540,6 +1571,8 @@ export type Database = {
           id?: string
           read_at?: string | null
           sender_id: string
+          sender_school_id?: string | null
+          sender_type?: string | null
         }
         Update: {
           content?: string
@@ -1548,6 +1581,8 @@ export type Database = {
           id?: string
           read_at?: string | null
           sender_id?: string
+          sender_school_id?: string | null
+          sender_type?: string | null
         }
         Relationships: [
           {
@@ -1564,7 +1599,65 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "messages_sender_school_id_fkey"
+            columns: ["sender_school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      migration_staging: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          migration_group: string
+          migration_notes: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          stripe_subscription_status: string | null
+          supabase_profile_id: string | null
+          updated_at: string | null
+          woo_customer_id: number | null
+          woo_subscription_status: string | null
+          woo_subscription_total: number | null
+          wp_roles: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          migration_group: string
+          migration_notes?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          stripe_subscription_status?: string | null
+          supabase_profile_id?: string | null
+          updated_at?: string | null
+          woo_customer_id?: number | null
+          woo_subscription_status?: string | null
+          woo_subscription_total?: number | null
+          wp_roles?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          migration_group?: string
+          migration_notes?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          stripe_subscription_status?: string | null
+          supabase_profile_id?: string | null
+          updated_at?: string | null
+          woo_customer_id?: number | null
+          woo_subscription_status?: string | null
+          woo_subscription_total?: number | null
+          wp_roles?: Json | null
+        }
+        Relationships: []
       }
       newsletter_subscribers: {
         Row: {
@@ -1985,6 +2078,7 @@ export type Database = {
           certificate_url: string | null
           city: string | null
           country: string | null
+          cover_image_url: string | null
           created_at: string
           designations: string[] | null
           email: string | null
@@ -1999,6 +2093,9 @@ export type Database = {
           languages: string[] | null
           last_name: string | null
           location: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_place_id: string | null
           member_type: string | null
           mrn: string | null
           onboarding_completed: boolean
@@ -2044,6 +2141,7 @@ export type Database = {
           certificate_url?: string | null
           city?: string | null
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string
           designations?: string[] | null
           email?: string | null
@@ -2058,6 +2156,9 @@ export type Database = {
           languages?: string[] | null
           last_name?: string | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_place_id?: string | null
           member_type?: string | null
           mrn?: string | null
           onboarding_completed?: boolean
@@ -2103,6 +2204,7 @@ export type Database = {
           certificate_url?: string | null
           city?: string | null
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string
           designations?: string[] | null
           email?: string | null
@@ -2117,6 +2219,9 @@ export type Database = {
           languages?: string[] | null
           last_name?: string | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_place_id?: string | null
           member_type?: string | null
           mrn?: string | null
           onboarding_completed?: boolean
@@ -2222,6 +2327,7 @@ export type Database = {
       }
       school_faculty: {
         Row: {
+          can_manage: boolean | null
           created_at: string
           id: string
           invite_token: string | null
@@ -2234,6 +2340,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          can_manage?: boolean | null
           created_at?: string
           id?: string
           invite_token?: string | null
@@ -2246,6 +2353,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          can_manage?: boolean | null
           created_at?: string
           id?: string
           invite_token?: string | null

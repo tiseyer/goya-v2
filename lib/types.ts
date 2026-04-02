@@ -105,6 +105,8 @@ export interface Event {
   spots_remaining: number | null;
   featured_image_url: string | null;
   status: EventStatus;
+  author_type: string | null;
+  school_author_id: string | null;
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
@@ -130,6 +132,8 @@ export interface Course {
   gradient_to: string;
   rejection_reason: string | null;
   course_type: string | null;
+  author_type: string | null;
+  school_author_id: string | null;
   status: CourseStatus;
   created_at: string;
   updated_at: string;
@@ -192,6 +196,8 @@ export interface Message {
   id: string;
   conversation_id: string;
   sender_id: string;
+  sender_type: string | null;
+  sender_school_id: string | null;
   content: string;
   read_at: string | null;
   created_at: string;
