@@ -387,7 +387,10 @@ Plans:
   3. deriveProfileVisibility() returns correct boolean flags (showMap, showAddress) for all combinations of role (student/teacher/wp) and practice_format (online/in-person/hybrid); students and online-only profiles always receive showMap=false
   4. The profile page.tsx calls supabase.auth.getUser() server-side and derives isOwnProfile = currentUserId === profileId before passing props to any component
   5. page.tsx fetches profile data first, then fires fetchMemberEvents() and fetchMemberCourses() (filtered by created_by) in a parallel Promise.all — verified by confirming no sequential awaits in the data fetch block
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 47-01-PLAN.md — Migration (4 profile columns + profile-covers bucket) + Profile type updates
+- [ ] 47-02-PLAN.md — Privacy helper, PUBLIC_PROFILE_COLUMNS, own-profile detection, Promise.all fetch
 
 ### Phase 48: Hero + Sidebar
 **Goal**: Visitors see a visually complete above-the-fold profile — cover image hero with avatar, name, role badge, and action buttons — alongside a sidebar with membership card, designation badges, social links, and quick stats; own-profile users see an edit button and a completion nudge banner
