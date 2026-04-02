@@ -402,7 +402,10 @@ Plans:
   3. Connect and Message buttons appear in the hero for authenticated visitors who are not the profile owner; both buttons are hidden when the viewer is the profile owner
   4. The profile owner sees an "Edit Profile" button in the hero and — when profile completion is below 100% — a completion nudge banner listing incomplete fields with links to the relevant settings sections
   5. The sidebar shows a GOYA membership card ("Member since" date), designation badges from user_designations, social link icons (website, Instagram, TikTok, Facebook, YouTube), and quick stats (connections count, events count, profile views as "—") — the layout stacks to a single column on mobile
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 48-01-PLAN.md — ProfileHero component + two-column page layout restructure
+- [ ] 48-02-PLAN.md — ProfileSidebar component (membership card, social icons, quick stats)
 **UI hint**: yes
 
 ### Phase 49: Content Sections
