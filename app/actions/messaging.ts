@@ -5,6 +5,7 @@ import { getSupabaseService } from '@/lib/supabase/service'
 import { logImpersonationAction } from '@/lib/impersonation'
 import { IMPERSONATION_COOKIE } from '@/lib/impersonation'
 import { cookies } from 'next/headers'
+import { parseActiveContext } from '@/lib/active-context'
 
 /**
  * Send a message using the effective user ID (impersonated or real).
@@ -19,10 +20,21 @@ export async function sendMessageAction(
     const effectiveUserId = await getEffectiveUserId()
     const client = await getEffectiveClient()
 
+    // Read active context for attribution
+    const cookieStore = await cookies()
+    const contextCookie = cookieStore.get('goya_active_context')?.value
+    const activeContext = parseActiveContext(contextCookie, effectiveUserId)
+
     // Insert message
     const { error: msgError } = await (client as ReturnType<typeof getSupabaseService>)
       .from('messages')
-      .insert({ conversation_id: conversationId, sender_id: effectiveUserId, content })
+      .insert({
+        conversation_id: conversationId,
+        sender_id: effectiveUserId,
+        content,
+        sender_type: activeContext.type === 'school' ? 'school' : 'personal',
+        sender_school_id: activeContext.type === 'school' ? activeContext.schoolId : null,
+      })
 
     if (msgError) return { success: false, error: msgError.message }
 
@@ -56,7 +68,6 @@ export async function sendMessageAction(
     }
 
     // Log impersonation action if impersonating
-    const cookieStore = await cookies()
     if (cookieStore.get(IMPERSONATION_COOKIE)?.value) {
       await logImpersonationAction('message_sent', { conversationId, content: content.slice(0, 50) })
     }

@@ -1,9 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
 import { writeCourseAuditLog } from '@/lib/courses/audit';
+import { parseActiveContext } from '@/lib/active-context';
 
 const ALLOWED_ROLES = ['teacher', 'wellness_practitioner', 'admin'];
 
@@ -44,6 +46,11 @@ export async function createMemberCourse(formData: MemberCourseFormData) {
   const { user, profile } = await getAuthenticatedUser();
   const service = getSupabaseService() as any;
 
+  // Read active context for school attribution
+  const cookieStore = await cookies();
+  const contextCookie = cookieStore.get('goya_active_context')?.value;
+  const activeContext = parseActiveContext(contextCookie, user.id);
+
   const { data, error } = await service.from('courses').insert({
     title: formData.title,
     category_id: formData.category_id || null,
@@ -59,6 +66,8 @@ export async function createMemberCourse(formData: MemberCourseFormData) {
     status: formData.status,
     course_type: 'member',
     created_by: user.id,
+    author_type: activeContext.type === 'school' ? 'school' : 'personal',
+    school_author_id: activeContext.type === 'school' ? activeContext.schoolId : null,
   }).select('id').single();
 
   if (error) return { success: false, error: error.message };
