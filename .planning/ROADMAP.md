@@ -15,7 +15,7 @@
 - ✅ **v1.15 Course System Redesign** - Phases 36-40 (shipped 2026-04-01)
 - ✅ **v1.16 Admin Color Settings** - Phases 41-42 (shipped 2026-04-01)
 - ✅ **v1.17 Dashboard Redesign** - Phases 43-46 (shipped 2026-04-02)
-- 🔄 **v1.18 User Profile Redesign** - Phases 47-50 (in progress)
+- ✅ **v1.18 User Profile Redesign** - Phases 47-50 (shipped 2026-04-02)
 
 ## Phases
 
@@ -366,14 +366,14 @@ Plans:
 
 </details>
 
-### v1.18 User Profile Redesign (Phases 47-50) — IN PROGRESS
+### ✅ v1.18 User Profile Redesign (Phases 47-50) — SHIPPED 2026-04-02
 
 **Milestone Goal:** Rebuild /members/[id] with cover image hero, role-specific pill sections, intro video embed, school affiliation, faculty grid, events/courses carousels, Mapbox map, sidebar with membership card and social links, and own-profile editing nudge.
 
 - [x] **Phase 47: Foundation** - DB migration, types, privacy helper, data fetch architecture (completed 2026-04-02)
 - [x] **Phase 48: Hero + Sidebar** - ProfileHero + ProfileSidebar + two-column layout (completed 2026-04-02)
 - [x] **Phase 49: Content Sections** - Bio, pills, school affiliation, faculty grid, community section (completed 2026-04-02)
-- [ ] **Phase 50: Media** - Intro video facade embed, Mapbox GL JS inline map (privacy-gated), events carousel, courses carousel
+- [x] **Phase 50: Media** - Video facade, Mapbox map, events + courses carousels (completed 2026-04-02)
 
 ## Phase Details
 
@@ -467,4 +467,4 @@ Plans:
 | 47. Foundation | 2/2 | Complete | 2026-04-02 |
 | 48. Hero + Sidebar | 2/2 | Complete | 2026-04-02 |
 | 49. Content Sections | 2/2 | Complete | 2026-04-02 |
-| 50. Media | 0/TBD | Not started | - |
+| 50. Media | 1/1 | Complete | 2026-04-02 |
