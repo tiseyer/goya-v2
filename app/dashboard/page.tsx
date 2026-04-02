@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useImpersonation } from '@/app/context/ImpersonationContext';
-import FeedView from './FeedView';
 import PageHero from '@/app/components/PageHero';
 import SchoolRegistrationCTA from '@/app/components/SchoolRegistrationCTA';
 
@@ -112,8 +111,6 @@ export default function DashboardPage() {
   const userInitials = profile?.full_name
     ? profile.full_name.trim().split(/\s+/).map((p: string) => p[0]).slice(0, 2).join('').toUpperCase()
     : (user?.email?.[0]?.toUpperCase() ?? '?');
-  const currentUserId = user?.id ?? '';
-  const currentUserRole = profile?.role ?? 'student';
   const { pct, done } = getCompletion(profile);
 
   // Circular SVG progress
@@ -220,13 +217,9 @@ export default function DashboardPage() {
 
           {/* ── MAIN FEED ────────────────────────────────────────────────── */}
           <div>
-            {currentUserId && (
-              <FeedView
-                currentUserId={currentUserId}
-                currentUserRole={currentUserRole}
-                currentUserFirstName={firstName}
-              />
-            )}
+            <div className="flex items-center justify-center p-8 text-slate-400 text-sm">
+              Dashboard redesign in progress
+            </div>
           </div>
 
           {/* ── RIGHT SIDEBAR ─────────────────────────────────────────────── */}
