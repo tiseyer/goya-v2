@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import nextDynamic from 'next/dynamic';
 import { getSupabaseService } from '@/lib/supabase/service';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { PUBLIC_PROFILE_COLUMNS } from '@/lib/members/constants';
@@ -18,12 +17,10 @@ import SchoolAffiliation from './components/SchoolAffiliation';
 import FacultyGrid from './components/FacultyGrid';
 import CommunitySection from './components/CommunitySection';
 import ProfileVideo from './components/ProfileVideo';
+import ProfileMapWrapper from './components/ProfileMapWrapper';
 import { HorizontalCarousel } from '@/app/dashboard/components/HorizontalCarousel';
 import { EventCard } from '@/app/dashboard/components/EventCard';
 import { CourseCard } from '@/app/dashboard/components/CourseCard';
-
-// mapbox-gl is SSR-hostile — must be loaded client-side only
-const ProfileMap = nextDynamic(() => import('./components/ProfileMap'), { ssr: false });
 
 export const dynamic = 'force-dynamic';
 
@@ -342,7 +339,7 @@ export default async function MemberProfilePage({
             {visibility.showMap &&
               profile.location_lat != null &&
               profile.location_lng != null && (
-                <ProfileMap
+                <ProfileMapWrapper
                   lat={profile.location_lat}
                   lng={profile.location_lng}
                 />
