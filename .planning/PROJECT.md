@@ -8,9 +8,19 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: (Planning next)
+## Current Milestone: v1.18 User Profile Redesign
 
-No active milestone. Run `/gsd:new-milestone` to start the next one.
+**Goal:** Rebuild the public member profile page (`/members/[id]`) with hero, role-specific pill sections, intro video, school affiliation, faculty grid, events/courses carousels, Mapbox map, sidebar with membership card and social links, and own-profile editing nudge.
+
+**Target features:**
+- Hero with cover image, 120px avatar, name, role badge, intro text, location, languages, action buttons
+- Intro video embed (YouTube/Vimeo), role-specific pill sections per user type
+- School affiliation for teachers, Faculty grid + Community section for schools
+- Events + Courses carousels reusing dashboard components
+- Mapbox inline map for in-person/hybrid users
+- Sidebar: membership card, designation badges, connect/message, social icons, quick stats
+- Own profile: edit button + completion nudge banner
+- Privacy rules for address visibility (no full address for students or online-only)
 
 ## Current State
 
@@ -278,4 +288,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after v1.17 Dashboard Redesign milestone shipped*
+*Last updated: 2026-04-02 after v1.18 User Profile Redesign milestone started*
