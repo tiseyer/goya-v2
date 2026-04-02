@@ -1,205 +1,132 @@
 # Technology Stack
 
-**Project:** GOYA v2 — v1.17 Dashboard Redesign
+**Project:** GOYA v2 — v1.18 User Profile Redesign (`/members/[id]`)
 **Researched:** 2026-04-01
-**Scope:** Stack additions for horizontal carousels, profile completion scoring UI, and role-specific layouts ONLY. Existing stack (Next.js 16, Tailwind CSS 4, Supabase, framer-motion, recharts, @dnd-kit, lucide-react) is not re-evaluated.
+**Scope:** New capabilities only. Existing stack (Next.js 16, Tailwind CSS 4, Supabase, embla-carousel-react, framer-motion) is validated and excluded.
 
 ---
 
-## Decision Summary
+## Summary Verdict
 
-| Capability | Decision | Rationale |
-|------------|----------|-----------|
-| Horizontal carousels (desktop scroll) | Native CSS — Tailwind snap-x utilities | Already in stack, zero bytes added |
-| Horizontal carousels (mobile swipe) | `embla-carousel-react` ^8.6.0 | Lightest option (~6 KB), SSR-safe, no conflicts with framer-motion |
-| Hide scrollbar on carousel track | `@utility no-scrollbar` in globals.css | tailwind-scrollbar-hide has confirmed v4 compatibility issues |
-| Progress bars | Native Tailwind div | No library needed — CSS width animation is sufficient |
-| Profile completion scoring | Pure TypeScript utility function | Stateless weighted scoring, no library |
-| Role-specific layouts | Conditional rendering in RSC | Standard Next.js pattern, no new dependency |
-| Stat hero count-up animation | framer-motion (already installed) | `animate()` + `useMotionValue` for number interpolation |
+**Zero new dependencies required.** Every capability needed for the profile redesign is already present in the installed packages or achievable with plain HTML/CSS/Tailwind patterns. Do not add libraries.
 
 ---
 
-## New Dependencies to Add
+## Capability Analysis
 
-### embla-carousel-react
+### Mapbox Inline Map
 
-| Field | Value |
-|-------|-------|
-| Package | `embla-carousel-react` |
-| Version | `^8.6.0` (current stable; 9.x is RC, not production-ready) |
-| Peer dependency | `embla-carousel` (installed automatically as a peer) |
-| Bundle impact | ~6 KB gzipped total for both packages |
-| SSR | Supported — hook only initialises after mount |
-| framer-motion conflict | None — Embla delegates to the browser scroll engine; framer-motion operates on transform layers |
+**Verdict:** Use the existing `mapbox-gl@3.20.0` directly. No wrapper library (react-map-gl, etc.) needed.
 
-**Why not framer-motion `drag` instead?** framer-motion is already installed and its `drag` prop can produce swipeable lists. However, it does not respect CSS `scroll-snap-stop` points, requires manual velocity/inertia tuning per device, and fights native scroll physics on Android. The result on low-end devices is observable jank — the opposite of the Apple/Netflix aesthetic goal. Embla adds exactly the missing desktop-drag-to-scroll behaviour on top of the browser's native scroll engine, so physics are native everywhere.
+**Rationale:**
+- `mapbox-gl` is already installed at `^3.20.0` (resolved `3.20.0`). `NEXT_PUBLIC_MAPBOX_TOKEN` is already configured.
+- `app/members/MapPanel.tsx` is a working reference implementation: raw `mapboxgl` API via `useRef<mapboxgl.Map>`, loaded via `dynamic(() => import('./MapPanel'), { ssr: false })` from the parent page. This pattern builds successfully in production today.
+- No `transpilePackages` entry is needed in `next.config.ts` — confirmed absent and working in the existing build.
+- A profile-page inline map is simpler than the full members-directory MapPanel (single marker, no clustering, smaller viewport). The same raw API handles this with fewer lines.
+- `react-map-gl` would add ~120 KB and a dependency update surface for no benefit over the already-working raw approach.
 
-**Why not Swiper?** Swiper ships ~40 KB gzipped and pulls in its own CSS module system. Its CSS custom-property approach conflicts with Tailwind CSS 4's utility-first output. Overkill for a single horizontal card rail.
-
-**Why not pure CSS only?** CSS `scroll-snap` handles touch-swipe on mobile and keyboard navigation natively. The gap is desktop: mouse drag is not a native browser scroll gesture on non-touch screens, so users on desktop cannot drag the carousel. Embla fills exactly that gap.
-
-### Installation
-
-```bash
-npm install embla-carousel-react
-```
-
-`embla-carousel` (core) is installed automatically as a peer dependency.
-
----
-
-## No New Dependencies — Built from Existing Stack
-
-### Scrollbar Hide
-
-Do NOT install `tailwind-scrollbar-hide`. There is an open confirmed issue (reslear/tailwind-scrollbar-hide #31) that the plugin produces no output under Tailwind CSS 4's `@import "tailwindcss"` import model — the `@config` hook it relies on is not supported in v4.
-
-Instead, add this once to `globals.css`:
-
-```css
-@utility no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar { display: none; }
-}
-```
-
-The `@utility` directive is the correct Tailwind CSS 4 mechanism for custom utility classes. Apply the `no-scrollbar` class directly to carousel track elements.
-
-### Progress Bars (Profile Completion)
-
-The profile completion bar is a styled `<div>` with an inline `style={{ width: `${pct}%` }}` inside a fixed-height rounded container. Tailwind already provides the transition utilities needed:
+**Integration pattern (follow MapPanel.tsx exactly):**
 
 ```tsx
-<div className="h-2 w-full rounded-full bg-[var(--goya-border)]">
-  <div
-    className="h-2 rounded-full bg-[var(--goya-primary)] transition-[width] duration-500 ease-out"
-    style={{ width: `${score}%` }}
-  />
-</div>
+// ProfileMap.tsx — 'use client'
+import { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+// Parent: dynamic(() => import('./ProfileMap'), { ssr: false })
 ```
 
-No library. If a spring-physics feel is preferred over CSS easing, `framer-motion`'s `motion.div` with `animate={{ width: `${score}%` }}` is a drop-in replacement — framer-motion is already installed.
+Use a fixed-height container (`h-48` or `h-56`), single marker at the profile coordinates, zoom 11, `interactive: false` (no pan/zoom for inline display), `navigationControl` omitted. Match the existing `goya-map-pin` marker style from MapPanel.
 
-### Profile Completion Scoring
+**Static vs interactive:** Use `interactive: false` for the profile page inline map. The full members directory already provides the interactive experience. Static keeps the embed lightweight and prevents accidental scroll-hijacking inside the page.
 
-A pure TypeScript function in `lib/profile/completion.ts`. Stateless, no imports, computable in a Server Component:
+---
+
+### YouTube / Vimeo Video Embeds
+
+**Verdict:** Plain `<iframe>` with regex ID extraction. No library.
+
+**Rationale:**
+- This pattern is already implemented twice in the codebase:
+  - `app/components/flow-player/elements/VideoRenderer.tsx` — YouTube iframe embed with `extractYouTubeId()` regex
+  - `app/academy/[id]/lesson/[lessonId]/page.tsx` — both `extractVimeoId()` and `extractYouTubeId()` with iframes
+- Copy those extraction utilities into a shared `lib/video.ts` helper. The profile page intro video field stores a URL (YouTube or Vimeo). Detect provider, extract ID, render iframe.
+- Libraries like `react-player` or `@vidstack/react` add significant bundle weight (react-player is ~190 KB gzipped). The existing regex approach is 12 lines and already handles all formats in use on the platform.
+
+**Shared utility to extract (create `lib/video.ts`):**
 
 ```ts
-type FieldCheck = {
-  key: string
-  weight: number
-  label: string
-  href: string
-  complete: boolean
-}
-
-export function calcProfileCompletion(profile: ProfileShape): {
-  score: number        // 0–100, integer
-  checklist: FieldCheck[]
-  missing: FieldCheck[]
-}
+export function extractVideoEmbed(url: string): { provider: 'youtube' | 'vimeo'; id: string } | null
 ```
 
-The 6 weighted fields (avatar, bio, location, website, designation, certification) and their weights are project-defined, not library-defined. No external dependency justified.
+YouTube embed URL: `https://www.youtube.com/embed/{id}?rel=0`
+Vimeo embed URL: `https://player.vimeo.com/video/{id}`
 
-### Role-Specific Layouts
-
-Conditional rendering in a Server Component based on `profile.role`. The authenticated user's profile is already available in the dashboard layout via Supabase. Pattern:
-
-```tsx
-// app/dashboard/page.tsx — Server Component
-if (profile.role === 'teacher')             return <TeacherDashboard profile={profile} />
-if (profile.role === 'school')              return <SchoolDashboard  profile={profile} />
-if (profile.role === 'wellness_practitioner') return <WellnessDashboard profile={profile} />
-return <StudentDashboard profile={profile} />
-```
-
-Co-locate layout components at `app/dashboard/_layouts/`. No new routing library, no new dependency.
-
-### Stat Hero Count-Up Animation
-
-`framer-motion` at `^12.38.0` is already installed. Use `animate()` from `framer-motion/dom` or `useMotionValue` + `useTransform` for a count-up effect on mount:
-
-```tsx
-'use client'
-import { useEffect, useRef } from 'react'
-import { animate } from 'framer-motion'
-
-export function AnimatedNumber({ value }: { value: number }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  useEffect(() => {
-    animate(0, value, {
-      duration: 1.2,
-      ease: 'easeOut',
-      onUpdate: v => { if (ref.current) ref.current.textContent = Math.round(v).toString() }
-    })
-  }, [value])
-  return <span ref={ref}>0</span>
-}
-```
-
-Keep the client component boundary tight — wrap only the number span, not the entire hero section.
+Iframe attrs: `allowFullScreen`, `allow="autoplay; encrypted-media; picture-in-picture"`, `loading="lazy"`, `title="Intro video"`, `className="w-full h-full"`, wrapper `aspect-video rounded-xl overflow-hidden bg-black`.
 
 ---
 
-## Tailwind CSS 4 Carousel Classes (No Config Needed)
+### Pill / Badge UI Components
 
-All scroll-snap utilities work out of the box in Tailwind CSS 4 with no plugin or config file:
+**Verdict:** Pure Tailwind CSS utility classes. No library.
 
-| Class | CSS Property |
-|-------|-------------|
-| `overflow-x-auto` | `overflow-x: auto` |
-| `snap-x` | `scroll-snap-type: x var(--tw-scroll-snap-strictness)` |
-| `snap-mandatory` | `--tw-scroll-snap-strictness: mandatory` |
-| `snap-proximity` | `--tw-scroll-snap-strictness: proximity` |
-| `snap-start` | `scroll-snap-align: start` |
-| `snap-center` | `scroll-snap-align: center` |
-| `scroll-smooth` | `scroll-behavior: smooth` |
-
-**Recommended carousel track classes:** `flex overflow-x-auto snap-x snap-mandatory gap-4 no-scrollbar scroll-smooth pb-2`
-
-**Recommended card classes:** `snap-start shrink-0 w-[280px]` (or `w-[calc(100vw-3rem)]` on mobile for full-width cards)
+**Rationale:**
+- Role badges, designation badges, teaching-style pills, and specialty pills all exist across the codebase as inline Tailwind spans (confirmed in `MapPanel.tsx`, `members/page.tsx`, `members/[id]/page.tsx`).
+- The profile redesign requires the same pattern: `px-3 py-1 rounded-full text-xs font-medium border` with role-specific color classes.
+- The existing `ROLE_HERO` map in `app/members/[id]/page.tsx` already defines role badge color classes. Extend it for the new hero section — do not duplicate.
 
 ---
 
-## Alternatives Considered and Rejected
+## What NOT to Add
 
-| Category | Rejected Option | Reason |
-|----------|-----------------|--------|
-| Carousel | Swiper | ~40 KB gzipped; CSS module system conflicts with Tailwind 4 |
-| Carousel | keen-slider | Smaller community than Embla; no meaningful advantage for this use case |
-| Carousel | react-snap-carousel | Headless-only; less mature ecosystem; Embla is the community standard |
-| Carousel | framer-motion drag | No CSS scroll-snap integration; jank on Android; manual physics tuning |
-| Carousel | Pure CSS only | Desktop drag-to-scroll is not a native browser behaviour; requires JS |
-| Scrollbar hide | tailwind-scrollbar-hide | Open confirmed issue: broken under Tailwind CSS 4 |
-| Progress bar | react-circular-progressbar | Adds a dependency for a shape achievable in ~8 lines of CSS |
-| Animation | CSS `@keyframes` counter | CSS has no native counter animation; JS required regardless |
+| Library | Reason to Skip |
+|---------|----------------|
+| `react-map-gl` | mapbox-gl is already installed and working with the same API surface |
+| `react-player` | iframe regex is already used in 2 places; no streaming/event integration needed |
+| `@vidstack/react` | Overkill for a single embed; adds ~190 KB |
+| Any color picker | Not needed for this milestone |
+| Any icon library addition | `lucide-react` already installed |
 
 ---
 
-## Final Install Command
+## next.config.ts — No Changes Required
 
-```bash
-npm install embla-carousel-react
+Current config has `images.remotePatterns` for `i.pravatar.cc`. For the profile redesign, Supabase Storage avatars and cover images are fetched via existing patterns. If profile cover images can come from Supabase Storage domains, add the Supabase storage hostname to `remotePatterns`:
+
+```ts
+{ protocol: 'https', hostname: '*.supabase.co' }
 ```
 
-This is the only new dependency this milestone requires. Everything else uses existing stack capabilities.
+This is conditional on whether `next/image` is used for cover images (recommended). Not a new dependency — a config entry.
+
+---
+
+## Integration Points
+
+| Capability | Component | Load Strategy | CSS |
+|------------|-----------|---------------|-----|
+| Inline map | `ProfileMap.tsx` (new) | `dynamic(ssr:false)` | `mapbox-gl/dist/mapbox-gl.css` imported inside component |
+| Video embed | `ProfileVideoEmbed.tsx` (new, client) | Normal import (no dynamic needed — just an iframe) | Tailwind only |
+| Pill sections | Inline spans | Server component | Tailwind only |
+| Carousels | Reuse `HorizontalCarousel` + `EventCard` + `CourseCard` from v1.17 dashboard | Server component with client carousel | Existing |
+
+---
+
+## Confidence
+
+| Area | Level | Reason |
+|------|-------|--------|
+| mapbox-gl usage pattern | HIGH | Verified against working MapPanel.tsx in codebase |
+| Video iframe pattern | HIGH | Verified against 2 working implementations in codebase |
+| No new dependencies | HIGH | Cross-checked package.json against all required capabilities |
+| next.config.ts Supabase image domain | MEDIUM | Depends on whether next/image is used for cover images — verify at implementation time |
 
 ---
 
 ## Sources
 
-- [embla-carousel-react npm (v8.6.0 stable)](https://www.npmjs.com/package/embla-carousel-react) — MEDIUM confidence (npm page returned 403; version confirmed via multiple secondary sources)
-- [Embla Carousel official docs — React setup](https://www.embla-carousel.com/docs/get-started/react) — HIGH confidence (fetched directly)
-- [Tailwind CSS scroll-snap-type documentation](https://tailwindcss.com/docs/scroll-snap-type) — HIGH confidence (fetched directly)
-- [tailwind-scrollbar-hide v4 compatibility — Issue #31](https://github.com/reslear/tailwind-scrollbar-hide/issues/31) — HIGH confidence (GitHub issue thread, multiple confirmations)
-- [Tailwind CSS v4 custom @utility directive discussion](https://github.com/tailwindlabs/tailwindcss/discussions/14093) — HIGH confidence
-- [React carousel library comparison 2025/2026](https://enstacked.com/react-carousel-component-libraries/) — LOW confidence (blog post, not primary source; used for bundle size cross-reference only)
-- [framer-motion + Embla conflict report #317](https://github.com/davidjerleke/embla-carousel/issues/317) — MEDIUM confidence (GitHub issue thread confirming they do not conflict when used on separate layers)
-
----
-
-*Stack research for: GOYA v2 — v1.17 Dashboard Redesign*
-*Researched: 2026-04-01*
+- `app/members/MapPanel.tsx` — working mapbox-gl integration reference
+- `app/academy/[id]/lesson/[lessonId]/page.tsx` — working YouTube + Vimeo iframe extraction
+- `app/components/flow-player/elements/VideoRenderer.tsx` — YouTube iframe pattern
+- `package.json` — confirmed installed versions
+- `next.config.ts` — confirmed no transpilePackages needed

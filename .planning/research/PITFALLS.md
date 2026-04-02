@@ -1,431 +1,276 @@
-# Domain Pitfalls
+# Domain Pitfalls: Rich Profile Pages with Maps, Video, and Privacy Rules
 
-**Domain:** Role-specific dashboards with carousels, profile completion scoring, and personalized content added to an existing Next.js 16 + Supabase platform
-**Researched:** 2026-04-02
-**Confidence:** HIGH (codebase inspection of actual `app/dashboard/page.tsx`, `supabase/migrations/`, and `app/components/` + verified external sources)
+**Domain:** Role-specific public member profile pages
+**Project:** GOYA v2 — v1.18 User Profile Redesign
+**Milestone:** Adding rich profiles to existing Next.js 16 App Router + Supabase system
+**Researched:** 2026-04-01
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: `overflow-x: hidden` on the Carousel Container Makes It Unscrollable
-
-**What goes wrong:**
-The instinct to hide the horizontal scrollbar is to add `overflow-x: hidden` to the carousel container. This does hide the scrollbar — but it also prevents any horizontal scrolling entirely. The carousel becomes a static display, not interactive. On mobile, swipe gestures produce no movement. On desktop, the overflow clips card edges visually but no scrolling is possible.
-
-**Why it happens:**
-Developers confuse "hide scrollbar visually" with "hide overflow." They are different operations. `overflow-x: hidden` disables the scroll entirely. Scrollbar visual hiding requires keeping `overflow-x: scroll` (or `overflow-x: auto`) and suppressing the scrollbar UI separately via `::-webkit-scrollbar { display: none }` + `scrollbar-width: none`.
-
-**Consequences:**
-Carousel is non-functional. Cards are clipped. On mobile, swipe does nothing.
-
-**Prevention:**
-Use the scrollbar-hiding pattern that preserves scroll functionality:
-
-```css
-/* On the carousel track element */
-overflow-x: auto;
-scrollbar-width: none;           /* Firefox */
--ms-overflow-style: none;        /* IE/Edge */
-```
-```css
-/* With webkit pseudo-element (CSS-in-JS or global stylesheet) */
-.carousel-track::-webkit-scrollbar {
-  display: none;
-}
-```
-
-In Tailwind CSS 4 with the `scrollbar-hide` plugin or utility this is: `overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none]`. Never use `overflow-x-hidden` on a scroll container.
-
-**Detection:**
-Swipe left on the carousel in mobile viewport. If it does not scroll, the container has `overflow-x: hidden`.
-
-**Phase to address:**
-HorizontalCarousel component phase. Apply correct CSS from the first implementation — this is not a refinement, it is the fundamental requirement.
+Mistakes that cause rewrites, data leaks, or broken privacy guarantees.
 
 ---
 
-### Pitfall 2: Scroll Snap Without `scroll-snap-type` on the Container Does Nothing
+### Pitfall 1: Address/Location Shown to Students and Online-Only Profiles
 
-**What goes wrong:**
-Developers add `scroll-snap-align: start` (or Tailwind's `snap-start`) to each card but forget to add `scroll-snap-type: x mandatory` (or `snap-x snap-mandatory`) to the scroll container. Result: the carousel scrolls freely without snapping — it feels loose on mobile and does not land on a clean card boundary.
+**What goes wrong:** The profile page fetches `city`, `country`, and coordinates unconditionally and renders a Mapbox embed for all users. Students and users with `practice_format = 'online'` must never show a map or a precise location because they have no public physical presence.
 
-**Why it happens:**
-Snap alignment is set on children (cards). Snap type must be set on the parent (scroll container). This split ownership is non-obvious.
+**Why it happens:** The privacy rule is a business logic gate, not a DB-level restriction. RLS cannot express it because the rule depends on the *profile's own fields*, not on the viewer's identity. Developers add the map section and forget to check `practice_format` and `role` before rendering.
 
 **Consequences:**
-Carousel scrolls but cards do not snap to clean positions. On mobile, a fast swipe often leaves the view between two cards.
+- Students' city/country shown on a map pin they did not consent to publish
+- Online-only teachers/WPs implying a studio location that does not exist
+- Potential GDPR violation if location data is treated as personally identifiable
 
 **Prevention:**
-The scroll container needs **both**:
-- `scroll-snap-type: x mandatory` (Tailwind: `snap-x snap-mandatory`)
-- `overflow-x: auto` (must be set; browsers ignore snap on non-scrolling containers)
-
-Each card item needs:
-- `scroll-snap-align: start` (Tailwind: `snap-start`)
-- `flex-shrink: 0` (Tailwind: `shrink-0`) to prevent cards from collapsing
-
-Also add `overscroll-behavior-x: contain` (Tailwind: `overscroll-x-contain`) to prevent the carousel scroll from bubbling to the page and triggering a browser back gesture.
-
-**Detection:**
-Swipe-scroll the carousel. If it doesn't land cleanly on a card boundary, snap-type is missing from the container.
-
-**Phase to address:**
-HorizontalCarousel component phase.
-
----
-
-### Pitfall 3: Profile Completion Scores 100% Due to Empty String Fields
-
-**What goes wrong:**
-The existing `getCompletion()` function in the current dashboard uses the truthiness check `profile?.[f.key]`. In JavaScript, an empty string `""` is falsy — so this check works correctly for empty strings. However, some profile fields are pre-populated with empty strings by the registration trigger or onboarding flow rather than `NULL`. More critically, JSONB array fields (`practice_styles`, `teaching_styles_profile`, `teaching_focus`) default to `'[]'::jsonb` in the DB — an empty array serializes to `[]`, which is truthy in JavaScript. A user with no teaching styles set could score those fields as "complete."
-
-The `full_name` field is also set to `coalesce(new.raw_user_meta_data->>'full_name', '')` in the auth trigger — users who sign up without providing a name get `full_name = ''`, which is falsy and scores correctly. But users who signed up via OAuth may get a placeholder name from the provider that satisfies the truthy check even though it's a provider-generated value the user never personally reviewed.
-
-**Why it happens:**
-DB-level defaults (`'[]'::jsonb`, `''`) diverge from semantic emptiness. A field being non-NULL does not mean the user has meaningfully filled it in.
-
-**Consequences:**
-Profile completion shows 70–80% for newly registered users who have not done anything, undermining the CTA to complete their profile. Trust in the metric is lost.
-
-**Prevention:**
-Adjust the completion check to account for semantic emptiness:
-
 ```typescript
-function isFieldComplete(value: unknown): boolean {
-  if (value === null || value === undefined) return false
-  if (typeof value === 'string') return value.trim().length > 0
-  if (Array.isArray(value)) return value.length > 0
-  return Boolean(value)
-}
+// Derive this server-side before rendering anything map-related
+const showMap =
+  profile.practice_format !== 'online' &&
+  profile.role !== 'student' &&
+  profile.latitude != null &&
+  profile.longitude != null;
 ```
+Build a single `deriveProfileVisibility(profile)` helper that returns all boolean gates at once. Every conditional section reads from this object — never scatters inline checks across JSX.
 
-For JSONB array fields (e.g. `practice_styles`), parse the Supabase response and check `.length > 0`, not just truthiness.
+**Detection:** Add a test account with `role = 'student'` that has `city` set. Manually visit `/members/[that-id]`. If you see a map or location pin, this pitfall has been hit.
 
-**Detection:**
-Register a new test account via email. The profile completion score should be close to 0% before the user fills anything in. If it shows 30%+, there are false positives.
-
-**Phase to address:**
-ProfileCompletionCard phase. Also audit the 6 chosen weighted fields before writing the scoring function — choose fields where DB-level defaults cannot inflate the score.
+**Phase:** Must be addressed in the same phase that introduces the Mapbox embed. Do not defer.
 
 ---
 
-### Pitfall 4: Role Check in Layout Prevents Re-verification on Navigation
+### Pitfall 2: Mapbox GL JS Loaded on Every Profile Page (Bundle + SSR Crash)
 
-**What goes wrong:**
-Doing the role-branching check (which dashboard layout to render — Student, Teacher, School, WP) inside the `/dashboard/layout.tsx` instead of `/dashboard/page.tsx` means the role is only read once when the layout first mounts. Due to Next.js App Router's partial rendering, layout server components do not re-run on client-side navigations within the same layout subtree. If an admin impersonates a different user (GOYA has an impersonation system), or if a user upgrades their role mid-session, the wrong layout stays rendered.
+**What goes wrong:** `mapbox-gl` is ~1.25 MB minified (increased 25% in v3.0). If imported at the top of a Server Component or a Client Component without `dynamic()`, Next.js will either crash the SSR build (because Mapbox accesses `window` during module init) or ship the full library to every profile visitor — even those whose profiles have no map.
 
-**Why it happens:**
-Putting auth/role logic in layouts feels natural — it's "above" all content pages. But in Next.js 15+, the official guidance is explicit: "Be careful when doing checks in Layouts as these don't re-render on navigation. Auth checks should be done close to your data source."
+**Why it happens:** The existing `MapPanel.tsx` is already `'use client'` and uses `useEffect`, but it is a panel component for the member directory, not a single-coordinate inline embed. Copying the pattern to a profile page without `dynamic()` import removes the SSR guard.
 
 **Consequences:**
-Teacher who upgrades to School owner mid-session sees the Teacher layout until they hard-refresh. Admin impersonating a Student sees the Teacher layout if they were previously impersonating a Teacher.
+- Build error: `window is not defined` during `next build`
+- Or: 1.25 MB JS shipped to every profile visitor regardless of whether a map renders
+- LCP regression of 200–800 ms on mobile connections
 
 **Prevention:**
-Put role-branching logic in `page.tsx`, not `layout.tsx`. Read the user's profile in the page's Server Component fetch. Impersonation context resolves at the page level, not the layout level. Pattern:
+- Always load any Mapbox component via `const MapEmbed = dynamic(() => import('./MapEmbed'), { ssr: false })`
+- Wrap the import site in the `showMap` gate so it is never evaluated at all for non-map profiles
+- For a single-pin profile embed (not interactive directory), strongly consider the **Mapbox Static Images API** instead: a plain `<img>` tag with a URL like `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-l+4E87A0(${lng},${lat})/${lng},${lat},13,0/600x200@2x?access_token=...` costs zero JS, loads in 100–425 ms, and is server-renderable. Use GL JS only if the map needs to be interactive.
 
-```typescript
-// app/dashboard/page.tsx (Server Component)
-const profile = await getProfile(userId) // reads cookies/session fresh on every request
-if (profile.role === 'teacher' && profile.principal_trainer_school_id) {
-  return <SchoolDashboard profile={profile} ... />
-}
-if (profile.role === 'teacher') {
-  return <TeacherDashboard profile={profile} ... />
-}
-```
+**Detection:** Run `ANALYZE=1 npm run build` and inspect the client bundle for `mapbox-gl` entries appearing outside a dynamic chunk.
 
-**Detection:**
-Admin impersonates a student, then navigates to `/dashboard`. Layout should reflect student role, not admin role. If it shows the admin/wrong layout, role check is in the layout.
-
-**Phase to address:**
-Dashboard page architecture phase (first phase of the build). This structural decision must be made before any role-specific layout components are written.
+**Phase:** Embed decision (static vs. interactive) must be made before the map section is written — changing from GL JS to Static Image later requires a full rewrite of that component.
 
 ---
 
-### Pitfall 5: N+1 Queries Across 4 Role Layouts Due to Per-Section Data Fetching
+### Pitfall 3: Service Role Client Used for Profile Reads — Bypasses All Column-Level Privacy
 
-**What goes wrong:**
-Each dashboard section (ProfileCompletionCard, StatHero, ConnectionsList, FacultyList, UpcomingEventsCarousel, RecommendedCoursesCarousel) fetches its own data independently. In a Server Component tree, if these are sequential `await` calls (not parallelised), each fetch blocks the next. A teacher dashboard with 6 sections that each make 1 Supabase call takes 6× the latency of a single batched query.
+**What goes wrong:** The current `page.tsx` already uses `getSupabaseService()` to avoid RLS-caused 404s when the viewer's JWT is expired. This pattern is correct for avoiding false 404s, but it requires the developer to manually enforce every privacy rule that RLS would have handled. If a new sensitive column (e.g., `phone`, `email`, `certificate_url`) is added to the `profiles` table and accidentally included in the SELECT, it will be returned and potentially rendered.
 
-The current dashboard already exhibits this — it fetches `supabase.auth.getUser()` then `supabase.from('profiles').select('*')` sequentially in a `useEffect`, not in parallel.
-
-**Why it happens:**
-Component-level data fetching feels clean. Each component "owns" its data. But without `Promise.all()` or a single page-level fetch that passes data down as props, each component adds its own round-trip to the waterfall.
+**Why it happens:** `getSupabaseService()` bypasses RLS entirely. The column allowlist in `.select(...)` is the only barrier. Developers adding new profile fields often extend the SELECT string without auditing what gets rendered.
 
 **Consequences:**
-Dashboard TTFB increases linearly with the number of sections. On a slow connection, users see the page load progressively in sections, each appearing ~100–200ms apart.
+- Phone numbers, private URLs, or email addresses in the HTML source
+- Certificate upload URLs in the DOM — publicly indexable by search engines
 
 **Prevention:**
-Fetch all dashboard data in a single Server Component at the page level, using `Promise.all` for independent queries:
+- Create an explicit `PUBLIC_PROFILE_COLUMNS` constant listing exactly the columns safe to show publicly. Use it in the SELECT — never inline the string.
+- Audit this constant every time a new column is added to `profiles`.
+- Alternative: switch to the SSR Supabase client (`createSupabaseServerClient`) and add a permissive RLS SELECT policy scoped to authenticated users. This re-enables RLS as a second safety net.
 
-```typescript
-// app/dashboard/page.tsx
-const [profile, connections, upcomingEvents, courses] = await Promise.all([
-  getProfile(userId),
-  getConnections(userId),
-  getUpcomingEvents({ limit: 6 }),
-  getEnrolledCourses(userId, { limit: 6 }),
-])
-```
+**Detection:** Search the codebase for `.select(` in the member profile page and cross-reference every column against the Profile type to identify sensitive fields.
 
-Pass data as props to layout components. Only use per-component data fetching for sections behind `<Suspense>` boundaries where streaming makes sense (e.g. a slow personalized recommendations section).
-
-**Detection:**
-Check the Vercel function logs or add timing instrumentation. If total server render time is 800ms+ for a dashboard with 4 independent sections, queries are sequential.
-
-**Phase to address:**
-Data fetching architecture phase. Establish the page-level parallel fetch pattern before building individual section components.
+**Phase:** Define `PUBLIC_PROFILE_COLUMNS` before writing any new fetch logic.
 
 ---
 
-### Pitfall 6: Deleting the Existing Dashboard Code Breaks FeedView and Related Components
+### Pitfall 4: Own-Profile Detection Done Client-Side or Via Props
 
-**What goes wrong:**
-The existing `app/dashboard/page.tsx` imports `FeedView`, `PostComposer`, `FeedPostCard`, `PostActionsMenu`, and `CommentDeleteButton` — all of which live inside `app/dashboard/`. When the dashboard is rebuilt from scratch and these imports are removed from the page, the components themselves still exist as files. They are not dead until removed. If they are also imported anywhere else (other pages, tests), removing them without a grep audit will break those imports.
+**What goes wrong:** Passing `isOwnProfile` as a prop derived from a comparison that was never authenticated. The current `page 2.tsx` has the correct server-side pattern (`profile.id === currentUserId` after `supabase.auth.getUser()`), but the current production `page.tsx` hard-codes `isOwnProfile={false}` — the edit button and completion nudge will never render.
 
-Additionally, `FeedView.tsx` uses `supabase` client-side with posts/likes/comments queries. If any of these tables are referenced elsewhere (admin panel, API routes), they are unrelated to the dashboard delete and must be preserved.
-
-**Why it happens:**
-"Delete existing dashboard UI" scoped to the page component. The co-located component files and their dependencies are not part of the same delete scope in the developer's mental model.
+**Why it happens:** The redesign adds new sections (edit button, completion nudge banner) that gate on own-profile. If the viewer auth check is omitted in the new page, these controls are silently suppressed for everyone.
 
 **Consequences:**
-Build fails on next `vercel build` due to broken imports from non-dashboard pages that reference the deleted components.
+- Members can never access their edit shortcut from their own profile
+- "Edit Profile" button visible to wrong viewers if the comparison uses unreliable data (e.g., URL `id` param)
 
 **Prevention:**
-Before deleting any file in `app/dashboard/`:
-1. Run a codebase-wide grep for each component name: `FeedView`, `FeedPostCard`, `PostComposer`, `PostActionsMenu`, `CommentDeleteButton`.
-2. If referenced only from `app/dashboard/page.tsx` → safe to delete with the page.
-3. If referenced from other pages → extract to `app/components/` before deleting from `app/dashboard/`.
-4. The feed database tables (`posts`, `likes`, `comments`) are referenced in the admin panel and potentially the REST API — those tables must not be dropped.
+- Call `supabase.auth.getUser()` in the server component — never `getSession()` which can return stale data
+- Derive `isOwnProfile = currentUserId === profileId` before passing to any child
+- Never use the URL param `id` alone to infer ownership — always compare against the authenticated UID
 
-**Detection:**
-`npx next build` after deletion. Any `Module not found` error reveals an orphaned import.
+**Detection:** Signed-in as member A, visit `/members/[A's id]`. If no edit button appears, `isOwnProfile` is broken.
 
-**Phase to address:**
-Deletion/cleanup phase before new dashboard build begins. This is the first action — not the last.
+**Phase:** Must be implemented in the hero/action-buttons phase. The own-profile state must be threaded through the entire page.
 
 ---
 
 ## Moderate Pitfalls
 
-### Pitfall 7: Apple/Netflix Aesthetic Becomes Bland Without Depth Cues
+---
 
-**What goes wrong:**
-Apple and Netflix use massive whitespace effectively because their content (product photography, movie posters) provides visual density and hierarchy. A dashboard with text-only stat cards and minimal content becomes aesthetically empty — it reads as an unfinished wireframe rather than a refined interface.
+### Pitfall 5: YouTube/Vimeo Embed Loads 1+ MB Even If User Never Clicks Play
 
-**Why it happens:**
-Developers apply "lots of whitespace, minimal color" without the image content that makes those designs work. The visual weight of a Netflix carousel comes from the poster art, not the surrounding chrome.
+**What goes wrong:** A raw `<iframe src="https://www.youtube.com/embed/...">` loads YouTube's full JS runtime immediately, including tracking scripts. This adds 500 KB–1 MB+ to the profile page even if the visitor never interacts with the video. It also fires third-party cookies on page load, which has GDPR implications.
+
+**Why it happens:** Standard iframe embed is the obvious approach. The performance cost is invisible in development.
 
 **Prevention:**
-- Ensure every carousel card has an image (course thumbnails, event cover photos, member avatars). If data has no image, generate consistent color-coded initials avatars (as the existing dashboard already does for FOLLOWING_PLACEHOLDERS).
-- Use typography contrast as the depth cue: a large bold number (stat hero value) next to a small subdued label creates hierarchy without adding color.
-- Surface colors should not all be `bg-white` — use `bg-slate-50` for the page background and `bg-white` for cards so cards visually lift off the surface.
-- Cards should have subtle `shadow-sm` and `border border-slate-100` to separate from the background. Removing all borders/shadows in the name of "minimalism" makes all sections merge into one flat layer.
+- Use a **facade/lite embed** pattern: render a `<img>` thumbnail from `https://img.youtube.com/vi/[id]/hqdefault.jpg` with a play button overlay. Only inject the `<iframe>` on click via a state toggle.
+- For Vimeo, use `https://vimeo.com/api/oembed.json` to fetch thumbnail on server side.
+- Use `youtube-nocookie.com` domain instead of `youtube.com` for reduced tracking: `https://www.youtube-nocookie.com/embed/[id]`
+- Add `loading="lazy"` to the iframe once it is created.
 
-**Detection:**
-Screenshot the dashboard on a `bg-white` page background with `bg-white` cards and no images. If it looks like a skeleton loader, it needs depth cues.
+**Detection:** Open the profile page with video in Chrome DevTools Network tab filtered to "media". Observe requests firing without user interaction.
 
-**Phase to address:**
-Visual design/card component phase. Establish the surface/card/shadow hierarchy in the base Card component before building all layouts.
+**Phase:** Address in the intro video embed phase. The facade pattern should be the default, not an optimisation to add later.
 
 ---
 
-### Pitfall 8: Horizontal Carousel on iOS Safari — Touch Momentum Scroll Triggers Page Back Navigation
+### Pitfall 6: Sequential Awaits Instead of Promise.all for Multi-Entity Profile Fetches
 
-**What goes wrong:**
-On iOS Safari, a horizontal swipe near the left edge of the screen triggers the browser's "back" gesture (a system-level gesture, not scroll). When a carousel is positioned at the left edge of the viewport (full-width sections), users attempting to scroll the carousel left accidentally navigate away from the page.
+**What goes wrong:** The new profile page fetches: profile, school affiliation, faculty members, events, courses, connections, and potentially designations. If these are chained as sequential awaits (one after another), each round-trip adds 50–200 ms latency. Six sequential queries = 300–1200 ms additional wait time on the server.
 
-Also, iOS 15+ has a bug where scrolling within an embedded element causes the browser toolbar to resize/jump, which shifts the viewport height mid-scroll.
-
-**Why it happens:**
-iOS Safari interprets horizontal swipe gestures at the viewport edge as navigation intent, competing with the carousel's scroll event.
-
-**Prevention:**
-- Add `overscroll-behavior-x: contain` to the carousel container. This tells the browser: horizontal scroll is "contained" to this element and should not propagate to browser-level navigation.
-- Add `-webkit-overflow-scrolling: touch` for iOS momentum scrolling (still needed on older iOS).
-- Carousel should have `touch-action: pan-x` so the browser knows this element handles horizontal gestures.
-- For the iOS toolbar resize issue: use `dvh` (dynamic viewport height) instead of `100vh` in any section using full-height layouts.
-
-**Detection:**
-Test on a real iPhone (not Chrome DevTools device emulation). Swipe left hard from the left side of the carousel. If the browser navigates back, `overscroll-behavior-x: contain` is missing.
-
-**Phase to address:**
-HorizontalCarousel component phase. Test on iOS Safari before marking carousel complete.
-
----
-
-### Pitfall 9: Profile Completion Score Changes Between Renders Due to Client-Side State
-
-**What goes wrong:**
-The existing dashboard calculates completion score on the client inside a `useEffect` after `setProfile(data)`. The score flickers: the page renders with 0% (before data loads), then snaps to the real percentage. If the new dashboard is a Server Component that calculates completion server-side and passes it as a prop, this flicker disappears — but if the ProfileCompletionCard is a Client Component that re-derives the score from local state, any state update (even unrelated) can trigger a re-render and a brief flash of an intermediate value.
-
-**Why it happens:**
-Computing derived state (the score) outside of `useMemo` or server-side in places where re-renders are frequent.
-
-**Prevention:**
-Calculate the profile completion score exactly once, server-side, when the page fetches the profile. Pass the computed `{ pct: number, missingFields: string[] }` as props to `ProfileCompletionCard`. Never re-derive the score in the client component. If the card needs to "update" after the user saves settings in another tab, that requires a full page refresh or a server action revalidation — not real-time client recalculation.
-
-**Detection:**
-Hard refresh the dashboard page. If the profile completion percentage visibly counts up from 0% to the real value, the calculation is happening client-side after data loads.
-
-**Phase to address:**
-ProfileCompletionCard phase. Decide server-vs-client derivation at the start.
-
----
-
-### Pitfall 10: "School" Role Is Not a Separate `role` Value — Schools Are a Teacher Sub-State
-
-**What goes wrong:**
-PROJECT.md describes 4 dashboard layouts including a "School" layout. But in the GOYA schema, `profiles.role` has values: `student`, `teacher`, `wellness_practitioner`, `moderator`, `admin`. There is no `school` role. A teacher who owns a school is identified by `profiles.principal_trainer_school_id IS NOT NULL` (a FK to the schools table), not by a distinct role value.
-
-If the dashboard role-branching code checks `profile.role === 'school'`, it will never match — the School dashboard will never render.
-
-**Why it happens:**
-Product language ("4 role-specific layouts including School") does not align with the DB schema language (`role = 'teacher'` + `principal_trainer_school_id IS NOT NULL`).
+**Why it happens:** Developers write fetches top-to-bottom as they build the page section by section, never refactoring to parallel.
 
 **Consequences:**
-School owners always see the Teacher dashboard. The School-specific sections (FacultyList, school management CTA) never appear.
+- Profile page TTFB of 1–3 seconds on Supabase Postgres in EU region
+- Vercel function timeout risk if any query is slow
 
 **Prevention:**
-The branching condition for the School layout must be:
+- Group all independent fetches into a single `Promise.all([...])` call, matching the pattern already used in `app/dashboard/page.tsx` (v1.17)
+- Only sequential fetches are those where a later query depends on a prior result (e.g., you need `school_id` from the profile before fetching school details)
+- For that dependency, fetch profile first, then fire all dependent queries in parallel
 
 ```typescript
-const isSchoolOwner = profile.role === 'teacher' && 
-                      Boolean(profile.principal_trainer_school_id)
+const [profile, connections] = await Promise.all([fetchProfile(id), fetchConnections(id)])
+const [events, courses, school] = await Promise.all([
+  fetchEvents(profile.id),
+  fetchCourses(profile.id),
+  profile.principal_trainer_school_id ? fetchSchool(profile.principal_trainer_school_id) : null,
+])
 ```
 
-Not `profile.role === 'school'`. Confirm this by checking `supabase/migrations/20260376_school_owner_schema.sql` for the actual column name used to link teachers to schools.
+**Detection:** Add `console.time` / `console.timeEnd` around the data fetching block in development and observe total server time.
 
-**Detection:**
-Log in as a teacher with an approved school. Check `profile.role` — it will be `'teacher'`, not `'school'`. The School dashboard renders only when `principal_trainer_school_id` is also checked.
-
-**Phase to address:**
-Role branching architecture phase. Inspect the profiles schema before writing any role-gate condition.
+**Phase:** Architect the data fetching layer before writing section components. Retrofitting is painful.
 
 ---
 
-### Pitfall 11: Carousel Cards Without `flex-shrink-0` Collapse to Zero Width
+### Pitfall 7: Role-Based Section Sprawl — Four Roles, Many Optional Sections, No Structure
 
-**What goes wrong:**
-In a horizontal flexbox carousel (`display: flex`, `overflow-x: auto`), flex children try to fit within the container by default (`flex-shrink: 1`). Cards shrink to fill the available width instead of maintaining their designed fixed width. On a narrow mobile viewport, all cards in the carousel squeeze down to ~50px wide and become unreadable.
+**What goes wrong:** The profile page has 4 roles (student, teacher, wellness_practitioner, admin/moderator) and many optional sections (intro video, school affiliation, faculty grid, teaching styles, wellness designations, events carousel, courses carousel, map). Without structure, the page component accumulates nested ternaries and grows to 600+ lines with no clear ownership per section.
 
-**Why it happens:**
-Flexbox's default `flex-shrink: 1` behavior is not intuitive for carousels. Developers set a `w-64` or `min-w-[280px]` on cards and expect it to hold, not realising flex-shrink overrides min-width in some browser implementations.
+**Why it happens:** Each section is added one at a time. The first few are inline. By section 6, the JSX is unreadable.
 
 **Prevention:**
-Always set `shrink-0` (Tailwind) or `flex-shrink: 0` on carousel card items. Combine with explicit `w-[280px]` or `min-w-[280px]`. Test on 375px viewport (iPhone SE) — cards should have the designed width, not collapse.
+- Define a `ProfileSection` type listing every possible section with a `shouldShow(profile, viewer)` predicate
+- Compose the page from section components rather than embedding logic inline
+- Follow the v1.17 dashboard pattern: role layouts receive `props`, page component is a thin orchestrator
+- A `deriveProfileSections(profile, viewerContext)` function returns an ordered array of visible section IDs — the JSX maps over it
 
-**Detection:**
-Resize the browser to 375px width. If carousel cards are narrower than intended, `shrink-0` is missing.
+**Detection:** If the profile page component exceeds ~200 lines of JSX, the sections are not properly decomposed.
 
-**Phase to address:**
-HorizontalCarousel component phase.
+**Phase:** Set up section architecture before writing individual sections. Refactoring after is expensive.
+
+---
+
+### Pitfall 8: ConnectButton and MessageButton Rendered on Own Profile
+
+**What goes wrong:** The sidebar shows a Connect button and a Message button. On the viewer's own profile, both should be hidden. The current `page.tsx` hard-codes `isOwnProfile={false}`, meaning the ConnectButton is always shown. On the redesigned page, the same mistake leads to a member seeing "Connect with yourself."
+
+**Why it happens:** `isOwnProfile` state is forgotten or incorrectly wired during the redesign.
+
+**Prevention:**
+- `ConnectButton` already accepts `isOwnProfile` — ensure it is wired with the server-derived value
+- Add a separate guard for `MessageButton`: hide it when `isOwnProfile === true`
+- Also hide the "Message" button when the viewer is not authenticated (same as connect)
+
+**Detection:** Visit your own profile page while signed in. Any action button (Connect, Message) should not appear.
+
+**Phase:** Addressed alongside the hero/sidebar phase when action buttons are added.
 
 ---
 
 ## Minor Pitfalls
 
-### Pitfall 12: Greeting Uses `full_name` Which Is Pre-Populated as Empty String
+---
 
-**What goes wrong:**
-The current dashboard greeting: `profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there'`. The `full_name` column is set to `''` (empty string) by the auth trigger for users who sign up without providing a name. An empty string is falsy in the `||` chain — so this correctly falls through to the email fallback. But the new dashboard may change this to a null-check pattern or rename the column, breaking the fallback.
+### Pitfall 9: Video URL Stored as Raw User Input — Malformed URLs Break the Embed
+
+**What goes wrong:** A member pastes a YouTube playlist URL, a YouTube Shorts URL, or a Vimeo showcase URL. The existing `extractYouTubeId` regex in `app/schools/[slug]/page.tsx` handles the common patterns but may miss `youtube.com/live/[id]` or `youtu.be/[id]?si=[tracking]`.
 
 **Prevention:**
-Keep the defensive fallback chain: `full_name?.trim() || email?.split('@')[0] || 'there'`. Never assume `full_name` is NULL for new users — the trigger sets it to `''`.
+- Extend the regex to cover `/live/`, `/shorts/`, and strip query params before matching
+- Add a graceful fallback: if `getEmbedUrl()` returns null, do not render the iframe section at all — show "Video unavailable" instead of a broken embed
+- Validate URL format at the settings save step, not at render time
 
-**Phase to address:**
-Dashboard greeting/header component phase.
+**Phase:** Address in the intro video section. Reuse and extend the helpers already in `app/schools/[slug]/page.tsx`.
 
 ---
 
-### Pitfall 13: `select('*')` on Profiles Fetches Unused Columns for Personalization
+### Pitfall 10: Mapbox Token Exposed in HTML Source via `NEXT_PUBLIC_` Prefix
 
-**What goes wrong:**
-The current dashboard fetches `supabase.from('profiles').select('*')`. The profiles table has 25+ columns after all the migrations (onboarding fields, school FK, WP registration fields, etc.). For the dashboard, only 6–10 are needed. `select('*')` transfers all columns over the wire unnecessarily and pulls potentially sensitive columns into client memory.
+**What goes wrong:** `NEXT_PUBLIC_MAPBOX_TOKEN` is already in the codebase (used in `MapPanel.tsx`). This is correct for GL JS which must run in the browser. However, if you switch to the Mapbox Static Images API for the profile embed, the token should be used server-side only, meaning it should be `MAPBOX_TOKEN` (no `NEXT_PUBLIC_`) to avoid bundling it into client JS.
 
 **Prevention:**
-Use a named column select in all dashboard queries:
-```typescript
-.select('id, full_name, role, avatar_url, bio, principal_trainer_school_id, member_type')
-```
+- Static Images API: use `process.env.MAPBOX_TOKEN` (server-only) — token never reaches the browser
+- GL JS: `NEXT_PUBLIC_MAPBOX_TOKEN` is unavoidable — use Mapbox's token restriction settings (allowed URLs) to limit blast radius
+- Never use the same token for both server-side Static API calls and client-side GL JS. Use separate restricted tokens.
 
-This also makes TypeScript inference narrower and prevents accidental display of sensitive fields.
-
-**Phase to address:**
-Data fetching architecture phase.
+**Phase:** Decided at the same time as the static vs. interactive map decision.
 
 ---
 
-### Pitfall 14: StatHero Weekly Profile Views Placeholder That Never Gets Replaced
+### Pitfall 11: Cover Image / Avatar Loaded With `<img>` Instead of `next/image` — No Optimisation
 
-**What goes wrong:**
-PROJECT.md notes: "StatHero showing weekly profile views (placeholder until analytics)." Placeholder numbers in dashboards have a known pattern of shipping and then persisting through several milestones because the analytics system needed to populate them is always "next milestone." Users notice fake stats and lose trust in the platform.
+**What goes wrong:** The current `page.tsx` uses raw `<img>` elements for avatar and school logos, bypassing `next/image` optimisation. For the redesigned profile with a large cover image (full-width hero) and a 120px avatar, this means unoptimised images shipped at full resolution.
 
 **Prevention:**
-Render the StatHero with explicit "Coming Soon" or "—" state rather than fake numbers. Use the existing `analytics_enabled` site setting (GOYA already has DB-controlled analytics toggles) to conditionally show the real stat when available. Design the component to gracefully show `null` data from the start.
+- Use `next/image` for all profile images with explicit `width`, `height`, and `priority` for LCP elements (the avatar and cover are above-the-fold)
+- Add Supabase Storage hostname to `next.config.ts` `remotePatterns`
+- The cover image especially needs `priority` since it is the largest contentful paint
 
-**Phase to address:**
-StatHero component phase. Never hardcode numeric placeholder values in a production feature.
+**Detection:** Run Lighthouse on a profile page. An LCP image without `priority` will flag as an opportunity.
+
+**Phase:** Address during hero section implementation.
+
+---
+
+### Pitfall 12: `force-dynamic` on Profile Page Prevents ISR/Caching
+
+**What goes wrong:** The current page uses `export const dynamic = 'force-dynamic'`, which disables all caching. For a public profile page that changes infrequently, this means every visitor triggers a full server render with DB round-trips.
+
+**Why this is minor for now:** GOYA is early-stage with a small member base. At scale this becomes a real cost and latency issue.
+
+**Prevention for future:** Use `revalidate = 60` (ISR) instead of `force-dynamic` once the page is stable. The own-profile detection (`isOwnProfile`) is the main obstacle because it depends on the viewer's session — solve this by rendering the unauthenticated version cached, then hydrating the action buttons client-side based on session state.
+
+**Phase:** Not required for v1.18. Flag as a future optimisation once member count grows.
 
 ---
 
 ## Phase-Specific Warnings
 
 | Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| HorizontalCarousel component | `overflow-x: hidden` disabling scroll; missing snap-type on container; iOS back-gesture conflict | Apply correct CSS from the start; test on real iOS Safari before marking done |
-| ProfileCompletionCard | JSONB `[]` arrays scoring as complete; empty string false negatives; client-side flicker | Semantic `isFieldComplete()` helper; compute score server-side; choose 6 fields where defaults cannot inflate score |
-| Role branching (4 layouts) | `role === 'school'` never matches; role check in layout not page | Check `principal_trainer_school_id`; branch in `page.tsx` not `layout.tsx` |
-| Data fetching (personalized content) | Sequential awaits → waterfall; `select('*')` → oversized response | `Promise.all` all independent queries at page level; named column selects |
-| Deletion of existing dashboard | Orphaned imports from non-dashboard files; feed DB tables are used elsewhere | Grep all component names before delete; preserve table references; verify `next build` passes |
-| Visual design (Apple/Netflix aesthetic) | All-white surfaces with no depth cues; placeholder stat numbers | Surface/card/shadow hierarchy; real or initials-avatar content in carousels; "—" for missing analytics |
-| Carousel card items | Cards collapse to zero width on mobile | `shrink-0` + explicit `w-[N]` on all card items |
-| Greeting / profile name | `full_name = ''` (not NULL) for new users | Defensive `trim() || fallback` chain, not a null check |
-
----
-
-## "Looks Done But Isn't" Checklist
-
-- [ ] **Carousel actually scrolls on mobile:** Open on iPhone. Swipe left on carousel. It should scroll and snap. Does not trigger browser back navigation.
-- [ ] **Scrollbar hidden but scroll functional:** Carousel has no visible scrollbar. Swipe/mouse drag still scrolls. No `overflow-x: hidden` on the scroll container.
-- [ ] **Profile completion accurate on new account:** Register new test account. Profile completion must show near 0% before any fields are filled in. JSONB array fields and empty string fields do not count as complete.
-- [ ] **School owner sees School layout:** Log in as a teacher with `principal_trainer_school_id` set. Dashboard must render School layout, not Teacher layout. Confirm condition checks `principal_trainer_school_id`, not `role === 'school'`.
-- [ ] **Role branch is in page.tsx:** Confirm `app/dashboard/page.tsx` does the role check, not `app/dashboard/layout.tsx`.
-- [ ] **Old dashboard files cleanly deleted:** Run `npx next build`. Zero `Module not found` errors related to removed dashboard components.
-- [ ] **Feed tables not dropped:** `posts`, `likes`, `comments` tables still exist and respond to queries from admin panel.
-- [ ] **Parallel data fetching:** Add `console.time` around dashboard data fetch. Total time should be close to the slowest single query, not the sum of all queries.
-- [ ] **StatHero shows "—" not fake numbers:** If analytics are not yet wired, StatHero displays a "Coming soon" or dash state, not a hardcoded number.
-- [ ] **Cards have fixed width on 375px viewport:** Test on narrow mobile. Carousel cards maintain their designed `w-[N]` width and do not collapse.
-
----
-
-## Recovery Strategies
-
-| Pitfall | Recovery Cost | Recovery Steps |
-|---------|---------------|----------------|
-| `overflow-x: hidden` shipped on carousel | LOW | One-line CSS fix; no data changes |
-| Profile completion scoring inflated by JSONB defaults | LOW | Update scoring function; deploy; no DB migration needed |
-| `role === 'school'` condition never matches — school owners see teacher layout | LOW | Fix condition to check `principal_trainer_school_id`; one deploy |
-| Role check in layout causes stale role after impersonation switch | LOW | Move role check from layout to page; one deploy; no data changes |
-| Feed component files deleted — build broken due to orphaned imports | MEDIUM | Git restore deleted files; extract to `app/components/`; delete originals |
-| N+1 waterfall queries on dashboard load | MEDIUM | Refactor page-level fetch to `Promise.all`; may require extracting data-fetching logic from individual components |
-| StatHero shipped with hardcoded placeholder numbers | LOW | Replace hardcoded values with `null` state; deploy; no DB changes |
+|-------------|----------------|------------|
+| Hero + cover image | LCP regression from unoptimised cover | Use `next/image` with `priority` |
+| Intro video embed | 1 MB JS on page load | Facade/lite embed, load iframe on click only |
+| Mapbox embed | SSR crash, 1.25 MB bundle, privacy for students | `dynamic({ ssr: false })`, or Static Images API, gate on `showMap` |
+| Privacy rules | Address shown to students/online-only | `deriveProfileVisibility()` helper, check before any location render |
+| Service role SELECT | Sensitive column exposure | `PUBLIC_PROFILE_COLUMNS` constant, explicit allowlist |
+| Own-profile detection | Edit/nudge never shown, Connect shown on own profile | `auth.getUser()` server-side, derive `isOwnProfile` before render |
+| Multi-section data fetch | Sequential awaits, high TTFB | `Promise.all` with dependency grouping |
+| Role-specific sections | JSX sprawl, nested ternaries | Section component architecture before writing sections |
 
 ---
 
 ## Sources
 
-- Next.js: auth checks in layouts vs pages (partial rendering, don't re-run on navigation): https://nextjs.org/docs/app/guides/authentication
-- Next.js: common App Router mistakes including layout auth checks: https://vercel.com/blog/common-mistakes-with-the-next-js-app-router-and-how-to-fix-them
-- CSS `overflow-x: hidden` makes container unscrollable (not the scrollbar-hiding pattern): https://blog.logrocket.com/hide-scrollbar-without-impacting-scrolling-css/
-- CSS scroll snap: `scroll-snap-type` must be set on the container, not children: https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Overflow/Carousels
-- Tailwind CSS scroll snap utilities (`snap-x`, `snap-mandatory`, `snap-start`, `overscroll-x-contain`): https://tailwindcss.com/docs/scroll-snap-type
-- `overscroll-behavior-x: contain` prevents iOS Safari back-navigation gesture conflict: https://pqina.nl/blog/how-to-prevent-scrolling-the-page-on-ios-safari/
-- iOS Safari scrollbar hidden while preserving scroll functionality (`-webkit-overflow-scrolling: touch`): https://nolanlawson.com/2019/02/10/building-a-modern-carousel-with-css-scroll-snap-smooth-scrolling-and-pinch-zoom/
-- Supabase + Next.js parallel data fetching with `Promise.all` to avoid waterfall: https://nextjs.org/docs/app/getting-started/fetching-data
-- Codebase inspection: `app/dashboard/page.tsx`, `supabase/migrations/001_profiles.sql`, `supabase/migrations/002_profile_fields.sql`, `supabase/migrations/20260376_school_owner_schema.sql`, `.planning/PROJECT.md`
-
----
-*Pitfalls research for: GOYA v2 — v1.17 Dashboard Redesign (role-specific layouts, carousels, profile completion, personalized content on Next.js 16 + Supabase)*
-*Researched: 2026-04-02*
+- [Mapbox GL JS bundle size increase in v3.0](https://github.com/mapbox/mapbox-gl-js/issues/12995) — MEDIUM confidence (GitHub issue)
+- [Mapbox: improve perceived performance with Static Images](https://docs.mapbox.com/help/tutorials/improve-perceived-performance-with-static/) — HIGH confidence (official docs)
+- [Next.js Videos guide — lazy loading iframes](https://nextjs.org/docs/app/guides/videos) — HIGH confidence (official docs)
+- [YouTube facade/lite embed pattern](https://dev.to/madsstoumann/how-to-embed-youtube-and-vimeo-the-light-way-2pek) — MEDIUM confidence (dev.to)
+- [Supabase RLS security pitfalls](https://dev.to/solobillions/your-supabase-rls-is-probably-wrong-a-security-guide-for-vibe-coders-3l4e) — MEDIUM confidence (community)
+- [Supabase: securing your data](https://supabase.com/docs/guides/database/secure-data) — HIGH confidence (official docs)
+- [React conditional rendering best practices](https://react.wiki/components/conditional-rendering/) — MEDIUM confidence
+- Codebase inspection: `app/members/[id]/page.tsx`, `app/members/[id]/page 2.tsx`, `app/members/MapPanel.tsx`, `app/schools/[slug]/page.tsx`, `lib/types.ts` — HIGH confidence (primary source)
