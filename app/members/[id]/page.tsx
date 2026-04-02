@@ -78,11 +78,15 @@ export default async function MemberProfilePage({
   // doesn't cause a false 404. Middleware already enforces authentication.
   const serviceClient = getSupabaseService();
 
-  const { data: profileData } = await serviceClient
-    .from('profiles')
-    .select(PUBLIC_PROFILE_COLUMNS)
-    .eq('id', id)
-    .single();
+  // Detect whether the param is a UUID or a username/slug
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const isUuid = UUID_REGEX.test(id);
+
+  const query = isUuid
+    ? serviceClient.from('profiles').select(PUBLIC_PROFILE_COLUMNS).eq('id', id).maybeSingle()
+    : serviceClient.from('profiles').select(PUBLIC_PROFILE_COLUMNS).eq('username', id).maybeSingle();
+
+  const { data: profileData } = await query;
 
   if (!profileData) notFound();
 
@@ -91,6 +95,7 @@ export default async function MemberProfilePage({
     full_name: string;
     first_name: string | null;
     last_name: string | null;
+    username: string | null;
     avatar_url: string | null;
     bio: string | null;
     introduction: string | null;
@@ -127,7 +132,7 @@ export default async function MemberProfilePage({
 
   // Fetch viewer's role for ConnectButton role-pair logic
   let viewerRole: string | null = null;
-  if (viewerId && viewerId !== id) {
+  if (viewerId && viewerId !== profile.id) {
     const { data: viewerProfile } = await serviceClient
       .from('profiles')
       .select('member_type')
