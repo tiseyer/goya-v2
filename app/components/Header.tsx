@@ -414,6 +414,7 @@ function UserMenu({
   userInitials,
   userRole,
   userId,
+  userUsername,
   userMemberType,
   userSchoolId,
   avatarUrl,
@@ -429,6 +430,7 @@ function UserMenu({
   userInitials: string;
   userRole?: string;
   userId?: string;
+  userUsername?: string | null;
   userMemberType?: string;
   userSchoolId?: string;
   avatarUrl?: string | null;
@@ -448,7 +450,7 @@ function UserMenu({
   const displayAvatar = isImpersonating ? impersonatedAvatarUrl : avatarUrl;
 
   const menuItems = [
-    { label: 'My Profile',      href: userId ? `/members/${userId}` : '#', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+    { label: 'My Profile',      href: userId ? `/members/${userUsername || userId}` : '#', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
     { label: 'Credits & Hours',  href: '/credits',            icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
     ...(userMemberType === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' }] : []),
     { label: 'Messages',        href: '/messages',           icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
@@ -961,6 +963,7 @@ export default function Header() {
                   userInitials={userInitials}
                   userRole={profile?.role}
                   userId={isImpersonating && targetProfile ? targetProfile.id : profile?.id}
+                  userUsername={isImpersonating && targetProfile ? targetProfile.username : profile?.username}
                   userMemberType={isImpersonating && targetProfile ? (targetProfile.member_type ?? undefined) : profile?.member_type}
                   userSchoolId={schoolSlug ?? undefined}
                   avatarUrl={profile?.avatar_url}
@@ -1110,7 +1113,7 @@ export default function Header() {
             {/* Menu items */}
             <div className="px-3 py-2 space-y-0.5">
               {[
-                { label: 'My Profile', href: (isImpersonating && targetProfile ? targetProfile.id : profile?.id) ? `/members/${isImpersonating && targetProfile ? targetProfile.id : profile?.id}` : '#' },
+                { label: 'My Profile', href: (isImpersonating && targetProfile ? (targetProfile.username || targetProfile.id) : (profile?.username || profile?.id)) ? `/members/${isImpersonating && targetProfile ? (targetProfile.username || targetProfile.id) : (profile?.username || profile?.id)}` : '#' },
                 { label: 'Credits & Hours', href: '/credits' },
                 ...((isImpersonating ? targetProfile?.member_type : profile?.member_type) === 'teacher' ? [{ label: 'Teaching Hours', href: '/teaching-hours' }] : []),
                 { label: 'Messages', href: '/messages' },
