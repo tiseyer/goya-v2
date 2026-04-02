@@ -8,21 +8,17 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: v1.16 Admin Color Settings
+## Current Milestone: (Planning next)
 
-**Goal:** Admin-controlled color configuration system — brand colors, role colors, and maintenance indicator — stored in site_settings and injected globally via CSS variables.
-
-**Target features:**
-- Colors settings page in admin with 3 sections: Brand Colors, Role Colors, Maintenance Indicator
-- Color picker UI with hex input, preview swatch, per-color reset, instant preview
-- Persistence to site_settings as JSON keys (brand_colors, role_colors, maintenance_indicator_color)
-- ThemeProvider component in layout.tsx injecting CSS variables globally from stored settings
-- Save/Reset All controls with instant preview before save
-- Sidebar nav: "Colors" under Settings group
+No active milestone. Run `/gsd:new-milestone` to start the next one.
 
 ## Current State
 
-**As of v1.14 (2026-03-31):** School Owner System milestone shipped. Teachers can register their yoga school on GOYA: select designations → pay via Stripe (€40/year + €99 signup per designation) → complete 9-step onboarding → admin review → public school profile. Schools have a dedicated settings area, admin inbox approve/reject workflow with Resend emails, public profile at /schools/[slug] with designation badges, and faculty invitation system with auto-link on registration.
+**As of v1.16 (2026-04-02):** Admin Color Settings milestone shipped. Admins can configure brand colors (Primary, Accent, Background, Surface, Border, Foreground), role colors (Student, Teacher, Wellness, School, Moderator, Admin), and maintenance indicator color from Admin Settings > Colors tab. ThemeColorProvider server component injects 13 CSS variables globally on every page, with instant preview and per-color reset.
+
+**Previous v1.15 (2026-04-01):** Course System Redesign shipped. Admin course management with course_categories + lessons tables, Categories tab with CRUD, premium card-section course form with duration slider, drag-and-drop lesson management with type-specific forms (Video/Audio/Text), frontend lesson rendering, and member my-courses lesson editor.
+
+**Previous v1.14 (2026-03-31):** School Owner System milestone shipped. Teachers can register their yoga school on GOYA: select designations → pay via Stripe (€40/year + €99 signup per designation) → complete 9-step onboarding → admin review → public school profile. Schools have a dedicated settings area, admin inbox approve/reject workflow with Resend emails, public profile at /schools/[slug] with designation badges, and faculty invitation system with auto-link on registration.
 
 **Previous v1.10 (2026-03-31):** Member Courses milestone shipped. Teachers, WPs, and admins can submit courses via My Courses settings page. Courses go through draft→pending_review→published/rejected workflow. Admin inbox has Courses tab for approve/reject. Public academy has GOYA/Member type filter. Full audit logging via shared utility covering all 10 code paths.
 
@@ -156,6 +152,19 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 - ✓ Public school profile at /schools/[slug] with hero, designation badges, faculty, directory integration — v1.14
 - ✓ Faculty invitation system: Resend email invites, auto-link on registration — v1.14
 
+<!-- v1.15 Course System Redesign milestone -->
+- ✓ course_categories and lessons tables with RLS policies, category backfill migration — v1.15
+- ✓ Admin Courses/Categories tab bar with category CRUD modal and delete guard — v1.15
+- ✓ Premium card-section course form with DB categories, duration slider, auto course_type — v1.15
+- ✓ Drag-and-drop lesson management with type-specific forms (Video/Audio/Text) — v1.15
+- ✓ Frontend lesson rendering (Vimeo/YouTube embed, audio player, text) with category colors — v1.15
+
+<!-- v1.16 Admin Color Settings milestone -->
+- ✓ ThemeColorProvider server component injecting 13 CSS variables from site_settings — v1.16
+- ✓ Admin Colors tab with brand colors (6), role colors (6), maintenance indicator color pickers — v1.16
+- ✓ Instant CSS variable preview, per-color reset, Save All, Reset All — v1.16
+- ✓ Colors entry in admin sidebar Settings group — v1.16
+
 ### Out of Scope
 
 - Notification preferences — out of scope for settings MVP
@@ -207,6 +216,10 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 | FAQ as XML block in system prompt (not pgvector RAG) | Simple concatenation sufficient for <100 items | ✓ FAQ injection — v1.8 |
 | In-memory rate limiter for chatbot | Matches REST API pattern, sufficient for single-instance | ✓ 20/session/hour — v1.8 |
 | Single-row chatbot_config table | Upsert pattern, all config in one place | ✓ chatbot_config — v1.8 |
+| Float sort_order for lessons | Enables single-row drag reorder via midpoint math | ✓ lessons table — v1.15 |
+| ThemeColorProvider as server component | Fetches from site_settings via REST, injects CSS vars on html before body renders | ✓ layout.tsx — v1.16 |
+| site_settings JSON keys for colors | brand_colors, role_colors, maintenance_indicator_color — reuses existing upsert pattern | ✓ ColorsTab — v1.16 |
+| Native HTML color picker + hex input | No third-party color picker library needed — simple, accessible | ✓ ColorsTab — v1.16 |
 
 ## Parallel Workstream: v1.11 Media Library
 
@@ -249,4 +262,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-01 after v1.16 Admin Color Settings milestone started*
+*Last updated: 2026-04-02 after v1.16 Admin Color Settings milestone shipped*

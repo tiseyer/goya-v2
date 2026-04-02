@@ -1,5 +1,19 @@
 # Milestones
 
+## v1.16 Admin Color Settings (Shipped: 2026-04-02)
+
+**Phases completed:** 2 phases (41-42), 2 plans, 4 tasks
+**Files changed:** 7 | **Lines added:** ~521
+
+**Key accomplishments:**
+
+- ThemeColorProvider server component reads brand_colors, role_colors, and maintenance_indicator_color from site_settings and injects 13 CSS variables on every page via layout.tsx
+- ColorsTab admin settings page (361 lines) with 3 sections: Brand Colors (6 pickers), Role Colors (6 pickers), Maintenance Indicator (1 picker)
+- Instant CSS variable preview on every color change before saving, with per-color reset and global Reset All
+- Colors sidebar entry in admin Settings group linking to /admin/settings?tab=colors
+
+---
+
 ## v1.14 School Owner System (Shipped: 2026-03-31)
 
 **Phases completed:** 8 phases, 16 plans, 24 tasks
