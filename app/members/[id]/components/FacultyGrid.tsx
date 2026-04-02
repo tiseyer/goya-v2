@@ -5,7 +5,7 @@ interface FacultyGridProps {
     id: string;
     position: string | null;
     is_principal_trainer: boolean | null;
-    profile: { id: string; full_name: string; avatar_url: string | null } | null;
+    profile: { id: string; full_name: string | null; avatar_url: string | null } | null;
   }>;
   schoolSlug: string | null;
   schoolId: string;
@@ -29,7 +29,8 @@ export default function FacultyGrid({ faculty, schoolSlug, schoolId }: FacultyGr
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {displayFaculty.map((member) => {
           const p = member.profile!;
-          const initial = p.full_name[0]?.toUpperCase() ?? '?';
+          const name = p.full_name ?? '';
+          const initial = name[0]?.toUpperCase() ?? '?';
 
           return (
             <Link
@@ -40,7 +41,7 @@ export default function FacultyGrid({ faculty, schoolSlug, schoolId }: FacultyGr
               <div className="w-12 h-12 rounded-full ring-2 ring-white overflow-hidden bg-slate-200 shrink-0 shadow-sm">
                 {p.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.avatar_url} alt={p.full_name} className="w-full h-full object-cover" />
+                  <img src={p.avatar_url} alt={name} className="w-full h-full object-cover" />
                 ) : (
                   <span className="w-full h-full flex items-center justify-center text-sm font-bold text-white bg-[#345c83]">
                     {initial}
@@ -48,7 +49,7 @@ export default function FacultyGrid({ faculty, schoolSlug, schoolId }: FacultyGr
                 )}
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-800 leading-tight">{p.full_name}</p>
+                <p className="text-sm font-semibold text-slate-800 leading-tight">{name}</p>
                 {member.position && (
                   <p className="text-xs text-slate-500 mt-0.5">{member.position}</p>
                 )}

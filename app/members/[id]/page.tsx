@@ -1,16 +1,21 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { getSupabaseService } from '@/lib/supabase/service';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { PUBLIC_PROFILE_COLUMNS } from '@/lib/members/constants';
 import { deriveProfileVisibility } from '@/lib/members/profileVisibility';
 import { fetchMemberEvents, fetchMemberCourses } from '@/lib/members/queries';
 import { getProfileCompletion } from '@/lib/dashboard/profileCompletion';
+import { fetchSchoolFaculty } from '@/lib/dashboard/queries';
 import ConnectionsSection from '@/app/components/ConnectionsSection';
 import PageContainer from '@/app/components/ui/PageContainer';
 import ProfileHero from './components/ProfileHero';
 import { ROLE_LABEL } from './components/ProfileHero';
 import ProfileSidebar from './components/ProfileSidebar';
+import ProfileBio from './components/ProfileBio';
+import ProfileContentPills from './components/ProfileContentPills';
+import SchoolAffiliation from './components/SchoolAffiliation';
+import FacultyGrid from './components/FacultyGrid';
+import CommunitySection from './components/CommunitySection';
 
 export const dynamic = 'force-dynamic';
 
@@ -99,6 +104,14 @@ export default async function MemberProfilePage({
     location_lng: number | null;
     wellness_designations: string[] | null;
     other_org_names: string[] | null;
+    member_type: string | null;
+    teaching_styles: string[] | null;
+    teaching_focus_arr: string[] | null;
+    lineage: string[] | null;
+    years_teaching: string | null;
+    practice_styles: string[] | null;
+    practice_level: string | null;
+    wellness_focus: string[] | null;
   };
 
   const isOwnProfile = viewerId === profile.id;
@@ -141,6 +154,54 @@ export default async function MemberProfilePage({
 
   const hasContent = memberEvents.length > 0 || memberCourses.length > 0;
 
+  const role = profile.role ?? 'student';
+
+  // ── School faculty for teacher profiles ───────────────────────────────────
+  const schoolFaculty =
+    role === 'teacher' && affiliatedSchools.length > 0
+      ? await fetchSchoolFaculty(serviceClient, affiliatedSchools[0].id, 8)
+      : [];
+
+  // ── School-owned data for school profiles ─────────────────────────────────
+  type SchoolData = {
+    id: string;
+    slug: string | null;
+    practice_styles: string[] | null;
+    programs_offered: string[] | null;
+    lineage: string | null;
+    course_delivery_format: string | null;
+    established_year: number | null;
+  } | null;
+
+  let ownSchool: SchoolData = null;
+  let ownSchoolFaculty: Awaited<ReturnType<typeof fetchSchoolFaculty>> = [];
+  let communityCount = 0;
+  let communityStudents: Array<{ id: string; full_name: string; avatar_url: string | null }> = [];
+
+  if (role === 'school') {
+    const { data: schoolRecord } = await serviceClient
+      .from('schools')
+      .select('id, slug, practice_styles, programs_offered, lineage, course_delivery_format, established_year')
+      .eq('owner_id', profile.id)
+      .eq('status', 'approved')
+      .maybeSingle();
+
+    if (schoolRecord) {
+      ownSchool = schoolRecord as SchoolData;
+      ownSchoolFaculty = await fetchSchoolFaculty(serviceClient, schoolRecord.id, 8);
+
+      // Community: profiles whose faculty_school_ids includes this school
+      const { count, data: communityData } = await serviceClient
+        .from('profiles')
+        .select('id, full_name, avatar_url', { count: 'exact' })
+        .contains('faculty_school_ids', [schoolRecord.id])
+        .limit(5);
+
+      communityCount = count ?? 0;
+      communityStudents = (communityData ?? []) as Array<{ id: string; full_name: string; avatar_url: string | null }>;
+    }
+  }
+
   const profileCompletion = isOwnProfile
     ? getProfileCompletion(profileData as unknown as Record<string, unknown>, hasContent)
     : null;
@@ -150,7 +211,6 @@ export default async function MemberProfilePage({
     profile.full_name ||
     'Unknown Member';
 
-  const role = profile.role ?? 'student';
   const roleLabel = ROLE_LABEL[role] ?? role;
 
   return (
@@ -184,57 +244,55 @@ export default async function MemberProfilePage({
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8">
           {/* Main column — left */}
           <div className="space-y-6">
-            {/* Bio */}
-            {profile.bio && (
-              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
-                <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <span className="w-1 h-4 bg-[#4E87A0] rounded-full" />
-                  About
-                </h2>
-                <p className="text-slate-600 leading-relaxed text-[15px] whitespace-pre-line">{profile.bio}</p>
-              </div>
+            {/* 1. Bio */}
+            <ProfileBio bio={profile.bio} />
+
+            {/* 2. Role-specific content pills */}
+            <ProfileContentPills
+              role={role}
+              teaching_styles={profile.teaching_styles}
+              teaching_focus_arr={profile.teaching_focus_arr}
+              lineage={profile.lineage}
+              practice_format={profile.practice_format}
+              years_teaching={profile.years_teaching}
+              practice_styles={profile.practice_styles}
+              practice_level={profile.practice_level}
+              wellness_designations={profile.wellness_designations}
+              wellness_focus={profile.wellness_focus}
+              school_practice_styles={ownSchool?.practice_styles ?? null}
+              school_programs_offered={ownSchool?.programs_offered ?? null}
+              school_lineage={ownSchool?.lineage ?? null}
+              school_course_delivery_format={ownSchool?.course_delivery_format ?? null}
+              school_established_year={ownSchool?.established_year ?? null}
+            />
+
+            {/* 3. School Affiliation — teacher profiles with affiliated school */}
+            {role === 'teacher' && affiliatedSchools.length > 0 && (
+              <SchoolAffiliation
+                school={affiliatedSchools[0]}
+                faculty={schoolFaculty}
+              />
             )}
 
-            {/* Connections */}
-            <ConnectionsSection profileMemberId={profile.id} />
+            {/* 4. Faculty Grid — school profiles */}
+            {role === 'school' && ownSchoolFaculty.length > 0 && (
+              <FacultyGrid
+                faculty={ownSchoolFaculty}
+                schoolSlug={ownSchool?.slug ?? null}
+                schoolId={ownSchool?.id ?? ''}
+              />
+            )}
 
-            {/* Visit School card(s) — only for Principal Trainers / Faculty of approved schools */}
-            {affiliatedSchools.length > 0 && affiliatedSchools.map(school => (
-              <div key={school.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-[#4E87A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  School
-                </h2>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#4E87A0]/10 flex items-center justify-center overflow-hidden shrink-0">
-                    {school.logo_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={school.logo_url} alt={school.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-sm font-bold text-[#4E87A0]">{school.name[0]?.toUpperCase() ?? '?'}</span>
-                    )}
-                  </div>
-                  <p className="font-semibold text-slate-800 text-sm leading-tight">{school.name}</p>
-                </div>
-                {school.slug ? (
-                  <Link
-                    href={`/schools/${school.slug}`}
-                    className="block w-full text-center px-4 py-2.5 text-sm font-semibold bg-[#4E87A0] text-white rounded-xl hover:bg-[#3d6f87] transition-colors"
-                  >
-                    Visit School
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/schools/${school.id}`}
-                    className="block w-full text-center px-4 py-2.5 text-sm font-semibold bg-[#4E87A0] text-white rounded-xl hover:bg-[#3d6f87] transition-colors"
-                  >
-                    Visit School
-                  </Link>
-                )}
-              </div>
-            ))}
+            {/* 5. Community Section — school profiles */}
+            {role === 'school' && communityCount > 0 && (
+              <CommunitySection
+                studentCount={communityCount}
+                students={communityStudents}
+              />
+            )}
+
+            {/* 6. Connections */}
+            <ConnectionsSection profileMemberId={profile.id} />
           </div>
 
           {/* Sidebar column — right */}

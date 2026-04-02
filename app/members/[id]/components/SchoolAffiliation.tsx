@@ -11,7 +11,7 @@ interface SchoolAffiliationProps {
     id: string;
     position: string | null;
     is_principal_trainer: boolean | null;
-    profile: { id: string; full_name: string; avatar_url: string | null } | null;
+    profile: { id: string; full_name: string | null; avatar_url: string | null } | null;
   }>;
 }
 
@@ -60,17 +60,18 @@ export default function SchoolAffiliation({ school, faculty }: SchoolAffiliation
           <div className="flex items-center gap-2">
             {displayFaculty.map((member) => {
               const p = member.profile!;
-              const initial = p.full_name[0]?.toUpperCase() ?? '?';
+              const name = p.full_name ?? '';
+              const initial = name[0]?.toUpperCase() ?? '?';
               return (
                 <Link
                   key={p.id}
                   href={`/members/${p.id}`}
-                  title={p.full_name}
+                  title={name}
                   className="block w-8 h-8 rounded-full ring-2 ring-white overflow-hidden bg-slate-200 shrink-0 hover:ring-[#4E87A0] transition-all"
                 >
                   {p.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.avatar_url} alt={p.full_name} className="w-full h-full object-cover" />
+                    <img src={p.avatar_url} alt={name} className="w-full h-full object-cover" />
                   ) : (
                     <span className="w-full h-full flex items-center justify-center text-xs font-bold text-white bg-[#345c83]">
                       {initial}
