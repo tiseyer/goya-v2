@@ -216,6 +216,17 @@ export default function HealthTab() {
       <div className={`flex items-center gap-3 px-5 py-4 rounded-xl border ${overallColor}`}>
         <span className="text-lg font-bold">{overallIcon}</span>
         <span className="font-semibold text-sm">{overallLabel}</span>
+        <a
+          href="https://stats.uptimerobot.com/z5lVik8KHL"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#374151] bg-white border border-[#E5E7EB] rounded-lg hover:bg-slate-50 transition-colors"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          System Status Page
+        </a>
       </div>
 
       {/* Maintenance mode warning banner */}
