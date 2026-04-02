@@ -2,7 +2,7 @@ name: Cron - Chatbot Cleanup
 
 on:
   schedule:
-    - cron: '0 3 * * *' # 3am UTC daily
+    - cron: '0 3 * * 0' # Sunday 3am UTC weekly
   workflow_dispatch:
 
 jobs:
