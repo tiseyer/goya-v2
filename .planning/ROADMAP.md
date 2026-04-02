@@ -359,8 +359,11 @@ Plans:
   5. All five card types (TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard) render correctly with shrink-0 set so they do not collapse inside the carousel, and each has a "Show all →" link at the carousel header pointing to the relevant directory page
 **Plans:** 2 plans
 Plans:
-- [ ] 43-01-PLAN.md — Grep audit + delete feed files, create lib/dashboard/queries.ts and profileCompletion.ts
-- [ ] 43-02-PLAN.md — Rewrite page.tsx as async server component with role branching + 4 role layout stubs
+- [ ] 44-01-PLAN.md — Install embla-carousel-react, @utility no-scrollbar, HorizontalCarousel, DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero
+- [ ] 44-02-PLAN.md — TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard
+
+
+
 **UI hint**: yes
 
 ### Phase 45: Student + Wellness Practitioner Dashboards
@@ -415,6 +418,6 @@ Plans:
 | 41. ThemeProvider Infrastructure | 1/1 | Complete | 2026-04-01 |
 | 42. Admin Colors UI | 1/1 | Complete | 2026-04-01 |
 | 43. Feed Cleanup + Data Infrastructure | 2/2 | Complete | 2026-04-02 |
-| 44. Shared UI Components | 0/? | Not started | - |
+| 44. Shared UI Components | 0/2 | Planned | - |
 | 45. Student + Wellness Practitioner Dashboards | 0/? | Not started | - |
 | 46. Teacher + School Dashboards | 0/? | Not started | - |
