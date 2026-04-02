@@ -3,136 +3,133 @@
 **Defined:** 2026-04-02
 **Core Value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## v1.17 Requirements
+## v1.18 Requirements
 
-Requirements for Dashboard Redesign milestone. Each maps to roadmap phases.
+Requirements for User Profile Redesign milestone. Each maps to roadmap phases.
+
+### Database
+
+- [ ] **DB-01**: Migration adds cover_image_url, location_lat, location_lng, location_place_id to profiles table
+- [ ] **DB-02**: Profile type in lib/types.ts updated with new columns + lineage field fix
+- [ ] **DB-03**: profile-covers storage bucket created for cover images
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Dashboard page.tsx is an async server component with parallel data fetching via Promise.all
-- [ ] **INFRA-02**: Role branching renders Student, Teacher, School, or Wellness Practitioner layout based on profile role + school ownership
-- [ ] **INFRA-03**: Teacher with principal_trainer_school_id can switch to "View as School" dashboard mode
-- [ ] **INFRA-04**: HorizontalCarousel component with snap-x scrolling, swipeable on mobile, hidden scrollbar on desktop
-- [ ] **INFRA-05**: Old dashboard feed UI (FeedView, PostComposer, etc.) safely deleted after import audit
+- [ ] **INFRA-01**: Server-side privacy helper deriveProfileVisibility() gates location/map based on role and practice_format
+- [ ] **INFRA-02**: PUBLIC_PROFILE_COLUMNS constant as single source of truth for service-role SELECT
+- [ ] **INFRA-03**: Own-profile detection via auth.getUser() — gates edit button, hides connect/message
+- [ ] **INFRA-04**: Promise.all data fetching for profile + events + courses + connections + school + faculty
+- [ ] **INFRA-05**: fetchMemberEvents() and fetchMemberCourses() query functions filtered by created_by
 
-### Shared Components
+### Hero
 
-- [ ] **COMP-01**: DashboardGreeting shows time-of-day greeting, user name, and role badge
-- [ ] **COMP-02**: ProfileCompletionCard with checklist, progress bar, and deep links to settings (shown when < 100%)
-- [ ] **COMP-03**: StatHero displays a single large metric with placeholder "—" when no data
-- [ ] **COMP-04**: PrimaryActionCard with value line and CTA button (Hormozi principle)
-- [ ] **COMP-05**: TeacherCard for recommended teachers carousel
-- [ ] **COMP-06**: CourseCard for courses carousel
-- [ ] **COMP-07**: EventCard for upcoming events carousel
-- [ ] **COMP-08**: ConnectionCard for recent connections list
-- [ ] **COMP-09**: FacultyCard for school faculty list
+- [ ] **HERO-01**: Cover image behind hero banner if cover_image_url set (absolute positioned, dark overlay)
+- [ ] **HERO-02**: 120px circular avatar with white ring overlapping hero bottom
+- [ ] **HERO-03**: Name, role badge, intro text (250 char), location with pin icon, language pills
+- [ ] **HERO-04**: Action buttons row: Connect + Message (hidden on own profile)
+- [ ] **HERO-05**: Edit profile button visible on own profile only
+- [ ] **HERO-06**: Completion nudge banner below hero on own profile when < 100%
 
-### Student Dashboard
+### Content
 
-- [x] **STU-01**: Greeting + "Ready to practice today?"
-- [x] **STU-02**: Recommended teachers carousel with style-tag matching + "Show all teachers →"
-- [x] **STU-03**: Courses carousel with interest matching + "Show all courses →"
-- [x] **STU-04**: Upcoming events carousel + "Show all events →"
+- [ ] **CONT-01**: Intro video embed (YouTube/Vimeo facade — thumbnail + play click) at top of main column
+- [ ] **CONT-02**: About/Bio section with full text (hidden if no bio)
+- [ ] **CONT-03**: Role-specific pill sections render only when field has values
+- [ ] **CONT-04**: Teacher pills: teaching styles, focus, lineage, format, teaching since, years teaching
+- [ ] **CONT-05**: Student pills: practice styles, what I'm looking for, practice level, learning preference
+- [ ] **CONT-06**: School pills: scope, focus, programs, lineage, delivery, established year
+- [ ] **CONT-07**: Wellness pills: type, modalities, focus areas, format, years, complementary badge
 
-### Teacher Dashboard
+### Relationships
 
-- [ ] **TCH-01**: Greeting + teacher role badge
-- [ ] **TCH-02**: Profile completion card (when < 100%) with 6 weighted fields
-- [ ] **TCH-03**: Stat hero showing weekly profile views (placeholder)
-- [ ] **TCH-04**: Primary CTAs: "Share your next event" + "Add a course link"
-- [ ] **TCH-05**: Recent connections list (max 3) + "View all connections →"
+- [ ] **REL-01**: School affiliation section for teachers (school card + faculty list)
+- [ ] **REL-02**: Faculty grid for school profiles (up to 6, "View all →")
+- [ ] **REL-03**: Enrolled students/community for school profiles (count + 5 avatars)
 
-### School Dashboard
+### Media
 
-- [ ] **SCH-01**: Greeting with school name + "School" badge
-- [ ] **SCH-02**: Profile completion card for school fields
-- [ ] **SCH-03**: Stat hero showing weekly school discovery (placeholder)
-- [ ] **SCH-04**: Primary CTAs: "Add workshops & courses" + "Manage designations"
-- [ ] **SCH-05**: Faculty list (max 5) + "Manage faculty →"
-- [ ] **SCH-06**: Enrolled students list (max 5) + "View all →"
+- [ ] **MED-01**: Mapbox GL JS inline map for in-person/hybrid users with location_lat/lng
+- [ ] **MED-02**: Map hidden for students and online-only profiles (server-side enforced)
+- [ ] **MED-03**: Events carousel reusing HorizontalCarousel + EventCard
+- [ ] **MED-04**: Courses carousel reusing HorizontalCarousel + CourseCard
 
-### Wellness Practitioner Dashboard
+### Sidebar
 
-- [ ] **WP-01**: Greeting + WP role badge
-- [ ] **WP-02**: Profile completion card with WP-specific fields
-- [ ] **WP-03**: Stat hero (placeholder)
-- [ ] **WP-04**: Primary CTAs: "Share your next event" + "Add a course"
-- [ ] **WP-05**: Suggested connections (teachers/schools nearby) + "Explore directory →"
-- [ ] **WP-06**: Upcoming events carousel
+- [ ] **SIDE-01**: Membership card with "GOYA Member since" and designation badges
+- [ ] **SIDE-02**: Connect + Message action buttons (or Enroll/Follow for schools)
+- [ ] **SIDE-03**: Social links icon row (website, Instagram, TikTok, Facebook, YouTube)
+- [ ] **SIDE-04**: Quick stats (profile views placeholder, connections count, events count)
 
 ### Design
 
-- [ ] **DES-01**: Apple/Netflix aesthetic — large white space, bold headers, minimal color, no clutter
-- [ ] **DES-02**: Mobile-first responsive layout — stacked on mobile, side-by-side CTAs on desktop
-- [ ] **DES-03**: Each carousel has "Show all →" link at top right leading to relevant directory page
+- [ ] **DES-01**: Pill design: rounded-full, light blue (#345c83 at 10%) with #345c83 text
+- [ ] **DES-02**: Format pills: green for Online, blue for In-Person, purple for Hybrid
+- [ ] **DES-03**: Two-column layout: main content left, sidebar right (stacks on mobile)
 
 ## Future Requirements
 
-### Dashboard Enhancements (deferred)
+### Profile Enhancements (deferred)
 
-- **DASH-F01**: Real profile view analytics (track views, show actual numbers)
-- **DASH-F02**: Content recommendation algorithm (beyond simple tag matching)
-- **DASH-F03**: Netflix-style content library with categories
-- **DASH-F04**: Notification feed on dashboard
-- **DASH-F05**: Teacher schedule/calendar widget
+- **PROF-F01**: Real profile view tracking and analytics
+- **PROF-F02**: Profile editing UI redesign (settings/profile)
+- **PROF-F03**: Cover image upload in settings
+- **PROF-F04**: Location geocoding from address to lat/lng
+- **PROF-F05**: SEO meta tags and Open Graph for profile sharing
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Real view tracking / analytics | Placeholder "—" for now — analytics wired up in future milestone |
-| Recommendation algorithm | Simple tag matching sufficient for v1.17 |
-| Netflix-style content library | Phase 2 feature |
-| Community feed on dashboard | Explicitly removed per spec — no feed |
-| Dark mode dashboard | Covered by ThemeProvider (v1.16), not dashboard-specific |
+| Profile editing UI | Separate milestone — this milestone is read-only display |
+| Real view tracking | Placeholder "—" for now |
+| Onboarding flow for new fields | Separate milestone |
+| Cover image upload | Needs settings UI — deferred |
+| Location geocoding | Manual lat/lng entry or future geocoding integration |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 43 | Pending |
-| INFRA-02 | Phase 43 | Pending |
-| INFRA-03 | Phase 43 | Pending |
-| INFRA-04 | Phase 44 | Pending |
-| INFRA-05 | Phase 43 | Pending |
-| COMP-01 | Phase 44 | Pending |
-| COMP-02 | Phase 44 | Pending |
-| COMP-03 | Phase 44 | Pending |
-| COMP-04 | Phase 44 | Pending |
-| COMP-05 | Phase 44 | Pending |
-| COMP-06 | Phase 44 | Pending |
-| COMP-07 | Phase 44 | Pending |
-| COMP-08 | Phase 44 | Pending |
-| COMP-09 | Phase 44 | Pending |
-| STU-01 | Phase 45 | Complete |
-| STU-02 | Phase 45 | Complete |
-| STU-03 | Phase 45 | Complete |
-| STU-04 | Phase 45 | Complete |
-| TCH-01 | Phase 46 | Pending |
-| TCH-02 | Phase 46 | Pending |
-| TCH-03 | Phase 46 | Pending |
-| TCH-04 | Phase 46 | Pending |
-| TCH-05 | Phase 46 | Pending |
-| SCH-01 | Phase 46 | Pending |
-| SCH-02 | Phase 46 | Pending |
-| SCH-03 | Phase 46 | Pending |
-| SCH-04 | Phase 46 | Pending |
-| SCH-05 | Phase 46 | Pending |
-| SCH-06 | Phase 46 | Pending |
-| WP-01 | Phase 45 | Pending |
-| WP-02 | Phase 45 | Pending |
-| WP-03 | Phase 45 | Pending |
-| WP-04 | Phase 45 | Pending |
-| WP-05 | Phase 45 | Pending |
-| WP-06 | Phase 45 | Pending |
-| DES-01 | Phase 44 | Pending |
-| DES-02 | Phase 44 | Pending |
-| DES-03 | Phase 44 | Pending |
+| DB-01 | — | Pending |
+| DB-02 | — | Pending |
+| DB-03 | — | Pending |
+| INFRA-01 | — | Pending |
+| INFRA-02 | — | Pending |
+| INFRA-03 | — | Pending |
+| INFRA-04 | — | Pending |
+| INFRA-05 | — | Pending |
+| HERO-01 | — | Pending |
+| HERO-02 | — | Pending |
+| HERO-03 | — | Pending |
+| HERO-04 | — | Pending |
+| HERO-05 | — | Pending |
+| HERO-06 | — | Pending |
+| CONT-01 | — | Pending |
+| CONT-02 | — | Pending |
+| CONT-03 | — | Pending |
+| CONT-04 | — | Pending |
+| CONT-05 | — | Pending |
+| CONT-06 | — | Pending |
+| CONT-07 | — | Pending |
+| REL-01 | — | Pending |
+| REL-02 | — | Pending |
+| REL-03 | — | Pending |
+| MED-01 | — | Pending |
+| MED-02 | — | Pending |
+| MED-03 | — | Pending |
+| MED-04 | — | Pending |
+| SIDE-01 | — | Pending |
+| SIDE-02 | — | Pending |
+| SIDE-03 | — | Pending |
+| SIDE-04 | — | Pending |
+| DES-01 | — | Pending |
+| DES-02 | — | Pending |
+| DES-03 | — | Pending |
 
 **Coverage:**
-- v1.17 requirements: 38 total
-- Mapped to phases: 38
-- Unmapped: 0
+- v1.18 requirements: 35 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 35
 
 ---
 *Requirements defined: 2026-04-02*
