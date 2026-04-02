@@ -377,8 +377,8 @@ Plans:
   4. Empty carousels show a non-blank empty state with a contextual CTA rather than an invisible blank space
 **Plans:** 2 plans
 Plans:
-- [ ] 43-01-PLAN.md — Grep audit + delete feed files, create lib/dashboard/queries.ts and profileCompletion.ts
-- [ ] 43-02-PLAN.md — Rewrite page.tsx as async server component with role branching + 4 role layout stubs
+- [ ] 45-01-PLAN.md — Restore card components + replace DashboardStudent stub with full layout (teachers, courses, events carousels)
+- [ ] 45-02-PLAN.md — Restore ConnectionCard + replace DashboardWellness stub with full layout (completion, stats, CTAs, connections, events)
 **UI hint**: yes
 
 ### Phase 46: Teacher + School Dashboards
