@@ -26,6 +26,10 @@ export interface Profile {
   location: string | null;
   city: string | null;
   country: string | null;
+  cover_image_url: string | null;
+  location_lat: number | null;
+  location_lng: number | null;
+  location_place_id: string | null;
   website: string | null;
   instagram: string | null;
   facebook: string | null;
@@ -52,6 +56,7 @@ export interface Profile {
   years_teaching: string | null;
   teaching_focus_arr: string[] | null;
   influences_arr: string[] | null;
+  lineage: string[] | null;
   other_org_member: boolean | null;
   other_org_names: string[] | null;
   other_org_name_other: string | null;
@@ -59,6 +64,8 @@ export interface Profile {
   other_org_designations: string | null;
   certificate_is_official: boolean | null;
   certificate_url: string | null;
+  principal_trainer_school_id: string | null;
+  faculty_school_ids: string[] | null;
   // Wellness
   wellness_designations: string[] | null;
   wellness_designation_other: string | null;
