@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: milestone
 status: executing
-stopped_at: Completed 47-foundation 47-02-PLAN.md
-last_updated: "2026-04-02T06:19:23.602Z"
+stopped_at: Completed 50-media-01-PLAN.md
+last_updated: "2026-04-02T07:10:40.074Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 5
@@ -70,6 +70,12 @@ Progress: [██████░░░░] 60%
 - [Phase 47-01]: Applied migration via pg client SET SESSION ROLE postgres (project has pre-existing migration history drift blocking db push)
 - [Phase 47-foundation]: PUBLIC_PROFILE_COLUMNS allowlist as sole SELECT string for service-role profile fetches
 - [Phase 47-foundation]: deriveProfileVisibility() enforces privacy server-side with showMap=false for students and online-only profiles
+- [Phase 48-hero-sidebar]: ROLE_LABEL/ROLE_HERO exported from ProfileHero.tsx for reuse by page.tsx and future sidebar
+- [Phase 48-hero-sidebar]: ProfileHero is 'use client' because ConnectButton and MessageButton are client components
+- [Phase 48-hero-sidebar]: Used inline SVG for Instagram/Facebook/YouTube icons — lucide-react v1.7.0 lacks brand icons
+- [Phase 49-content-sections]: ProfileContentPills uses hasContent() guard to return null before rendering any markup when no fields exist
+- [Phase 49-content-sections]: FacultyProfile.full_name typed as string | null to match queries.ts return type
+- [Phase 50-media]: Named import nextDynamic to avoid conflict with page-level export const dynamic
 
 ### Blockers/Concerns
 
@@ -77,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T06:19:23.599Z
-Stopped at: Completed 47-foundation 47-02-PLAN.md
+Last session: 2026-04-02T07:06:46.841Z
+Stopped at: Completed 50-media-01-PLAN.md
 Resume file: None
