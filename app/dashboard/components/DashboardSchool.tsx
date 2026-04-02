@@ -1,48 +1,161 @@
 'use client'
+
 import Link from 'next/link'
 import PageContainer from '@/app/components/ui/PageContainer'
-import { getTimeOfDay, StubSection } from './utils'
+import Card from '@/app/components/ui/Card'
+import { DashboardGreeting } from './DashboardGreeting'
+import { ProfileCompletionCard } from './ProfileCompletionCard'
+import { StatHero } from './StatHero'
+import { PrimaryActionCard } from './PrimaryActionCard'
+import { FacultyCard } from './FacultyCard'
+import { ConnectionCard } from './ConnectionCard'
 import type { SchoolProps } from './types'
 
 export default function DashboardSchool({
-  profile,
   school,
   faculty,
-  events,
-  courses,
   connections,
   completion,
 }: SchoolProps) {
-  const firstName = profile.full_name?.trim().split(' ')[0] || 'there'
+  const schoolName = school.name || 'Your School'
+  const facultySlug = school.slug ?? null
+  const designationsHref = school.slug
+    ? `/schools/${school.slug}/settings?section=designations`
+    : '/dashboard'
+  const facultySettingsHref = facultySlug
+    ? `/schools/${facultySlug}/settings?section=faculty`
+    : '/dashboard'
+
   return (
     <div className="min-h-screen bg-slate-50">
       <PageContainer>
-        <div className="py-8 space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">
-                Good {getTimeOfDay()}, {firstName}
-              </h1>
-              <p className="text-slate-500">{school.name} — School Dashboard</p>
-            </div>
+        <div className="py-8 space-y-8">
+
+          {/* 1. School greeting with "School" badge */}
+          <DashboardGreeting
+            firstName={schoolName}
+            role="school"
+            subtitle="Welcome back."
+          />
+
+          {/* 2. "View as Teacher" toggle pill */}
+          <div>
             <Link
               href="/dashboard"
-              className="text-sm font-semibold text-primary-light hover:underline"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-full transition-colors"
             >
-              &larr; Back to Teacher View
+              <span aria-hidden="true">&larr;</span>
+              View as Teacher
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StubSection title="Upcoming Events" count={events.length} />
-            <StubSection title="Courses" count={courses.length} />
-            <StubSection title="Faculty Members" count={faculty.length} />
+
+          {/* 3. School profile completion card */}
+          {completion.score < 100 && (
+            <div>
+              <p className="text-sm text-slate-500 -mb-4">
+                Help students find and enroll in your school
+              </p>
+              <div className="mt-8">
+                <ProfileCompletionCard completion={completion} />
+              </div>
+            </div>
+          )}
+
+          {/* 4. Stat hero — school discovery */}
+          <Card variant="flat" padding="lg">
+            <StatHero
+              label="students discovered your school this week"
+              value={null}
+            />
+          </Card>
+
+          {/* 5. School CTAs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <PrimaryActionCard
+              headline="Add workshops & courses"
+              description="Help students discover your school's offerings"
+              ctaLabel="Manage courses"
+              ctaHref="/settings/my-courses"
+            />
+            <PrimaryActionCard
+              headline="Manage your designations"
+              description="Keep your school's certifications up to date"
+              ctaLabel="View designations"
+              ctaHref={designationsHref}
+            />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <StubSection title="Connections" count={connections.length} />
-            {completion.score < 100 && (
-              <StubSection title="Profile Completion" count={completion.score} suffix="%" />
+
+          {/* 6. Faculty list — max 5 */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-slate-900">Faculty</h2>
+              <Link
+                href={facultySettingsHref}
+                className="text-sm text-[var(--goya-primary)] hover:underline"
+              >
+                Manage faculty &rarr;
+              </Link>
+            </div>
+            {faculty.length === 0 ? (
+              <Card variant="flat" padding="lg">
+                <p className="text-sm text-slate-500">
+                  No faculty members yet.{' '}
+                  <Link
+                    href={facultySettingsHref}
+                    className="text-[var(--goya-primary)] hover:underline"
+                  >
+                    Add faculty
+                  </Link>
+                </p>
+              </Card>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {faculty.slice(0, 5).map((f) => (
+                  <div
+                    key={f.id}
+                    className="w-full [&>a]:w-full [&>a]:block [&>div]:w-full"
+                  >
+                    <FacultyCard faculty={f} />
+                  </div>
+                ))}
+              </div>
             )}
           </div>
+
+          {/* 7. Enrolled students / community list — max 5 */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-slate-900">Students</h2>
+              <Link
+                href="/members"
+                className="text-sm text-[var(--goya-primary)] hover:underline"
+              >
+                View all &rarr;
+              </Link>
+            </div>
+            {connections.length === 0 ? (
+              <Card variant="flat" padding="lg">
+                <p className="text-sm text-slate-500">
+                  No enrolled students yet.{' '}
+                  <Link href="/members" className="text-[var(--goya-primary)] hover:underline">
+                    Browse the directory
+                  </Link>
+                </p>
+              </Card>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {connections.slice(0, 5).map((c) => (
+                  <div
+                    key={c.connectionId}
+                    className="w-full [&>a]:w-full [&>a]:block [&>div]:w-full"
+                  >
+                    <ConnectionCard connection={c} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
       </PageContainer>
     </div>
