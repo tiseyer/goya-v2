@@ -1,6 +1,10 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getSupabaseService } from '@/lib/supabase/service';
+import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import { PUBLIC_PROFILE_COLUMNS } from '@/lib/members/constants';
+import { deriveProfileVisibility } from '@/lib/members/profileVisibility';
+import { fetchMemberEvents, fetchMemberCourses } from '@/lib/members/queries';
 import ConnectButton from '@/app/components/ConnectButton';
 import ConnectionsSection from '@/app/components/ConnectionsSection';
 import PageContainer from '@/app/components/ui/PageContainer';
@@ -29,49 +33,100 @@ const ROLE_LABEL: Record<string, string> = {
   wellness_practitioner: 'Wellness Practitioner',
 };
 
+/** Extract affiliated school fetch so it can run in Promise.all */
+async function fetchAffiliatedSchools(
+  serviceClient: ReturnType<typeof getSupabaseService>,
+  profile: { principal_trainer_school_id: string | null; faculty_school_ids: string[] | null },
+): Promise<SchoolInfo[]> {
+  if (profile.principal_trainer_school_id) {
+    const { data } = await serviceClient
+      .from('schools')
+      .select('id, name, slug, status, logo_url')
+      .eq('id', profile.principal_trainer_school_id)
+      .eq('status', 'approved')
+      .maybeSingle();
+    return data ? [data as SchoolInfo] : [];
+  } else if (
+    Array.isArray(profile.faculty_school_ids) &&
+    (profile.faculty_school_ids as string[]).length > 0
+  ) {
+    const { data } = await serviceClient
+      .from('schools')
+      .select('id, name, slug, status, logo_url')
+      .in('id', profile.faculty_school_ids as string[])
+      .eq('status', 'approved');
+    return (data as SchoolInfo[]) ?? [];
+  }
+  return [];
+}
+
 export default async function MemberProfilePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  // Own-profile detection: use auth.getUser() (not getSession — security best practice)
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const viewerId = user?.id ?? null;
+
   // Use service role client for profile reads — bypasses RLS so JWT expiry
   // doesn't cause a false 404. Middleware already enforces authentication.
   const serviceClient = getSupabaseService();
 
   const { data: profileData } = await serviceClient
     .from('profiles')
-    .select('id, full_name, first_name, last_name, avatar_url, bio, city, country, role, instagram, youtube, website, facebook, created_at, principal_trainer_school_id, faculty_school_ids')
+    .select(PUBLIC_PROFILE_COLUMNS)
     .eq('id', id)
     .single();
 
   if (!profileData) notFound();
 
-  // Fetch affiliated school(s) for approved school links
-  let affiliatedSchools: SchoolInfo[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const serviceAny = serviceClient as any;
-  if (profileData.principal_trainer_school_id) {
-    const { data } = await serviceAny
-      .from('schools')
-      .select('id, name, slug, status, logo_url')
-      .eq('id', profileData.principal_trainer_school_id)
-      .eq('status', 'approved')
-      .maybeSingle();
-    if (data) affiliatedSchools = [data];
-  } else if (
-    Array.isArray(profileData.faculty_school_ids) &&
-    (profileData.faculty_school_ids as string[]).length > 0
-  ) {
-    const { data } = await serviceAny
-      .from('schools')
-      .select('id, name, slug, status, logo_url')
-      .in('id', profileData.faculty_school_ids as string[])
-      .eq('status', 'approved');
-    if (data) affiliatedSchools = data;
-  }
+  const profile = profileData as unknown as {
+    id: string;
+    full_name: string;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+    bio: string | null;
+    city: string | null;
+    country: string | null;
+    role: string | null;
+    instagram: string | null;
+    youtube: string | null;
+    website: string | null;
+    facebook: string | null;
+    created_at: string;
+    principal_trainer_school_id: string | null;
+    faculty_school_ids: string[] | null;
+    practice_format: 'online' | 'in_person' | 'hybrid' | null;
+    location_lat: number | null;
+    location_lng: number | null;
+  };
 
-  const profile = profileData;
+  const isOwnProfile = viewerId === profile.id;
+
+  // Derive privacy visibility server-side — consumed by Phases 48-50
+  const visibility = deriveProfileVisibility({
+    role: (profile.role ?? 'student') as 'student' | 'teacher' | 'wellness_practitioner' | 'moderator' | 'admin',
+    practice_format: profile.practice_format,
+    location_lat: profile.location_lat,
+    location_lng: profile.location_lng,
+  });
+
+  // Fetch affiliated schools, events, and courses in parallel
+  const [affiliatedSchools, memberEvents, memberCourses] = await Promise.all([
+    fetchAffiliatedSchools(serviceClient, profile),
+    fetchMemberEvents(serviceClient, profile.id),
+    fetchMemberCourses(serviceClient, profile.id),
+  ]);
+
+  // Suppress unused variable warnings until Phases 48-50 consume these
+  void memberEvents;
+  void memberCourses;
+  void visibility;
 
   const displayName =
     [profile.first_name, profile.last_name].filter(Boolean).join(' ') ||
@@ -283,8 +338,8 @@ export default async function MemberProfilePage({
                     memberPhoto={profile.avatar_url ?? ''}
                     firstName={firstName}
                     viewerRole={null}
-                    profileRole={profile.role ?? null}
-                    isOwnProfile={false}
+                    profileRole={profile.role ?? 'student'}
+                    isOwnProfile={isOwnProfile}
                   />
                 </div>
               </div>
