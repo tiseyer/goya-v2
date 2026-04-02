@@ -418,7 +418,10 @@ Plans:
   3. A teacher's profile shows teaching styles, focus areas, lineage, format, teaching since, and years teaching pills in a section; a student's profile shows practice styles, what they're looking for, practice level, and learning preference; a wellness practitioner's profile shows type, modalities, focus areas, format, years, and complementary badge; a school profile shows scope, focus, programs, lineage, delivery, and established year
   4. A teacher who belongs to a school sees a "School Affiliation" section with a school card and a list of faculty members from that school
   5. A school profile shows a faculty grid (up to 6 members with a "View all" link) and a community section with enrolled student count and up to 5 avatar thumbnails
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 49-01-PLAN.md — ProfileBio + ProfilePillSection + role-specific pill rendering
+- [ ] 49-02-PLAN.md — SchoolAffiliation + FacultyGrid + CommunitySection + page wiring
 **UI hint**: yes
 
 ### Phase 50: Media
