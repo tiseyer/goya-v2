@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.17
 milestone_name: Dashboard Redesign
-status: defining_requirements
+status: roadmap_ready
 stopped_at: null
-last_updated: "2026-04-02T08:00:00.000Z"
-last_activity: 2026-04-02 - Milestone v1.17 started
+last_updated: "2026-04-02T00:00:00.000Z"
+last_activity: 2026-04-02 - Roadmap created, Phase 43 ready to plan
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -18,17 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-01)
+See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 **Current focus:** v1.17 — Dashboard Redesign
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 43 — Feed Cleanup + Data Infrastructure (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-02 — Milestone v1.17 started
+Status: Roadmap ready — Phase 43 ready to plan
+Last activity: 2026-04-02 — Roadmap created for v1.17
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -54,8 +54,19 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- site_settings table already used for analytics toggles and API settings — color JSON keys (brand_colors, role_colors, maintenance_indicator_color) follow the same upsert pattern
-- Single-row upsert pattern established for chatbot_config (v1.8) — same approach for site_settings color writes
+- School is NOT a separate role — school owners have role='teacher' AND principal_trainer_school_id IS NOT NULL. Any role branch that checks role === 'school' will silently never match.
+- Role branching must live in page.tsx, not layout.tsx — App Router layouts do not re-run on client-side navigation, which breaks impersonation.
+- CSS scrollbar hiding via @utility no-scrollbar in globals.css — do NOT use tailwind-scrollbar-hide plugin (confirmed broken under Tailwind CSS 4, GitHub issue #31).
+- JSONB empty arrays are truthy in JS — isFieldComplete() must use Array.isArray(v) ? v.length > 0 : Boolean(v?.trim()) to avoid inflated profile completion scores.
+- embla-carousel-react for desktop drag-to-scroll on carousels; CSS snap-x for mobile touch natively.
+- Feed DB tables (posts, likes, comments) must NOT be dropped — they are used by the admin panel. Phase 43 deletes only UI component files.
+- All data fetching server-side in page.tsx via Promise.all — role layout components receive data as props and do no internal fetching.
+
+### Research Notes
+
+- Verify principal_trainer_school_id column name in supabase/migrations/20260376_school_owner_schema.sql before writing school detection condition in Phase 43.
+- Verify embla-carousel-react version at install time: npm info embla-carousel-react (pin to ^8, confirm 9.x is still RC).
+- RLS on schools table: check whether school record is readable by the owner via standard server client or requires service client — validate in Phase 43.
 
 ### Blockers/Concerns
 
@@ -63,10 +74,10 @@ None.
 
 ### Pending Todos
 
-None.
+- [ ] Plan Phase 43 via /gsd:plan-phase 43
 
 ## Session Continuity
 
-Last session: 2026-04-01
-Stopped at: Roadmap created — Phase 41 ready to plan
+Last session: 2026-04-02
+Stopped at: Roadmap created — Phase 43 ready to plan
 Resume file: None

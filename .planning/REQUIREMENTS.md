@@ -90,49 +90,49 @@ Requirements for Dashboard Redesign milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| COMP-01 | — | Pending |
-| COMP-02 | — | Pending |
-| COMP-03 | — | Pending |
-| COMP-04 | — | Pending |
-| COMP-05 | — | Pending |
-| COMP-06 | — | Pending |
-| COMP-07 | — | Pending |
-| COMP-08 | — | Pending |
-| COMP-09 | — | Pending |
-| STU-01 | — | Pending |
-| STU-02 | — | Pending |
-| STU-03 | — | Pending |
-| STU-04 | — | Pending |
-| TCH-01 | — | Pending |
-| TCH-02 | — | Pending |
-| TCH-03 | — | Pending |
-| TCH-04 | — | Pending |
-| TCH-05 | — | Pending |
-| SCH-01 | — | Pending |
-| SCH-02 | — | Pending |
-| SCH-03 | — | Pending |
-| SCH-04 | — | Pending |
-| SCH-05 | — | Pending |
-| SCH-06 | — | Pending |
-| WP-01 | — | Pending |
-| WP-02 | — | Pending |
-| WP-03 | — | Pending |
-| WP-04 | — | Pending |
-| WP-05 | — | Pending |
-| WP-06 | — | Pending |
-| DES-01 | — | Pending |
-| DES-02 | — | Pending |
-| DES-03 | — | Pending |
+| INFRA-01 | Phase 43 | Pending |
+| INFRA-02 | Phase 43 | Pending |
+| INFRA-03 | Phase 43 | Pending |
+| INFRA-04 | Phase 44 | Pending |
+| INFRA-05 | Phase 43 | Pending |
+| COMP-01 | Phase 44 | Pending |
+| COMP-02 | Phase 44 | Pending |
+| COMP-03 | Phase 44 | Pending |
+| COMP-04 | Phase 44 | Pending |
+| COMP-05 | Phase 44 | Pending |
+| COMP-06 | Phase 44 | Pending |
+| COMP-07 | Phase 44 | Pending |
+| COMP-08 | Phase 44 | Pending |
+| COMP-09 | Phase 44 | Pending |
+| STU-01 | Phase 45 | Pending |
+| STU-02 | Phase 45 | Pending |
+| STU-03 | Phase 45 | Pending |
+| STU-04 | Phase 45 | Pending |
+| TCH-01 | Phase 46 | Pending |
+| TCH-02 | Phase 46 | Pending |
+| TCH-03 | Phase 46 | Pending |
+| TCH-04 | Phase 46 | Pending |
+| TCH-05 | Phase 46 | Pending |
+| SCH-01 | Phase 46 | Pending |
+| SCH-02 | Phase 46 | Pending |
+| SCH-03 | Phase 46 | Pending |
+| SCH-04 | Phase 46 | Pending |
+| SCH-05 | Phase 46 | Pending |
+| SCH-06 | Phase 46 | Pending |
+| WP-01 | Phase 45 | Pending |
+| WP-02 | Phase 45 | Pending |
+| WP-03 | Phase 45 | Pending |
+| WP-04 | Phase 45 | Pending |
+| WP-05 | Phase 45 | Pending |
+| WP-06 | Phase 45 | Pending |
+| DES-01 | Phase 44 | Pending |
+| DES-02 | Phase 44 | Pending |
+| DES-03 | Phase 44 | Pending |
 
 **Coverage:**
 - v1.17 requirements: 38 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 38
+- Mapped to phases: 38
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-02*

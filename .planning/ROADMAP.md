@@ -14,6 +14,7 @@
 - ✅ **v1.14 School Owner System** - Phases 28-35 (shipped 2026-03-31)
 - ✅ **v1.15 Course System Redesign** - Phases 36-40 (shipped 2026-04-01)
 - ✅ **v1.16 Admin Color Settings** - Phases 41-42 (shipped 2026-04-01)
+- 🔄 **v1.17 Dashboard Redesign** - Phases 43-46 (active)
 
 ## Phases
 
@@ -252,12 +253,53 @@ Plans:
 
 </details>
 
-### ✅ v1.16 Admin Color Settings (Completed 2026-04-01)
+<details>
+<summary>✅ v1.16 Admin Color Settings (Phases 41-42) - SHIPPED 2026-04-01</summary>
 
 **Milestone Goal:** Admin-controlled color configuration system — brand colors, role colors, and maintenance indicator — stored in site_settings and injected globally via CSS variables.
 
 - [x] **Phase 41: ThemeProvider Infrastructure** - ThemeProvider component, site_settings storage for brand_colors/role_colors/maintenance_indicator_color, global CSS variable injection (completed 2026-04-01)
 - [x] **Phase 42: Admin Colors UI** - Colors page at /admin/settings, 3-section layout, color pickers with hex input, save/reset controls, sidebar nav entry (completed 2026-04-01)
+
+### Phase 41: ThemeProvider Infrastructure
+**Goal**: Color settings are stored in site_settings and injected as CSS variables globally so any page can consume them via CSS custom properties
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: INFRA-01, INFRA-02, BRAND-05, ROLE-03, MAINT-02
+**Success Criteria** (what must be TRUE):
+  1. A ThemeProvider component exists that reads brand_colors and role_colors from site_settings and sets CSS variables on the html element at render time
+  2. ThemeProvider is present in layout.tsx so CSS variables are available on every page of the app without any per-page setup
+  3. brand_colors saved to site_settings as a JSON value under the key "brand_colors" are reflected as CSS variables after a page reload
+  4. role_colors saved to site_settings as a JSON value under the key "role_colors" are reflected as CSS variables after a page reload
+  5. maintenance_indicator_color saved to site_settings under the key "maintenance_indicator_color" is reflected as a CSS variable after a page reload
+**Plans:** 1/1 plans complete
+Plans:
+- [x] 41-01-PLAN.md — Color defaults/types module + ThemeColorProvider server component + layout.tsx integration
+
+### Phase 42: Admin Colors UI
+**Goal**: Admins can view, edit, preview, save, and reset all brand colors, role colors, and the maintenance indicator color from a dedicated Colors page in Admin Settings
+**Depends on**: Phase 41
+**Requirements**: UI-01, UI-02, UI-03, BRAND-01, BRAND-02, BRAND-03, BRAND-04, ROLE-01, ROLE-02, MAINT-01, INFRA-03, INFRA-04, INFRA-05
+**Success Criteria** (what must be TRUE):
+  1. A "Colors" link appears in the admin sidebar under the Settings group and navigates to /admin/settings with the Colors tab active
+  2. The page shows three labeled sections — Brand Colors, Role Colors, and Maintenance Indicator — each with color pickers showing a hex input field and a preview swatch
+  3. Changing any color updates the CSS variables on the page instantly so the admin can see how the color looks before saving
+  4. Clicking "Save" persists all current color values to site_settings; clicking the per-color reset icon restores that single color to its default value
+  5. Clicking "Reset All" restores every color across all three sections to its default value
+**Plans:** 1/1 plans complete
+Plans:
+- [x] 42-01-PLAN.md — ColorsTab component with color pickers, live preview, save/reset + settings page tab + sidebar entry
+**UI hint**: yes
+
+</details>
+
+### v1.17 Dashboard Redesign (Phases 43-46) — Active
+
+**Milestone Goal:** Rebuild /dashboard from scratch with role-specific layouts (Student, Teacher, School-view, Wellness Practitioner), Apple/Netflix aesthetic, horizontal carousels, profile completion scoring, stat heroes, and value-driven CTAs. Delete all existing feed UI.
+
+- [ ] **Phase 43: Feed Cleanup + Data Infrastructure** - Delete old feed UI after import audit, build lib/dashboard/queries.ts + profileCompletion.ts, rewrite page.tsx as async server component with role branch skeleton
+- [ ] **Phase 44: Shared UI Components** - HorizontalCarousel, DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero, and 5 card types (TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard)
+- [ ] **Phase 45: Student + Wellness Practitioner Dashboards** - Full Student and Wellness Practitioner role layouts assembled from Phase 44 components
+- [ ] **Phase 46: Teacher + School Dashboards** - Full Teacher and School-view layouts including school detection, "View as School" toggle, faculty list, connections list, and complex CTA branching
 
 ## Phase Details
 
@@ -285,14 +327,63 @@ Plans:
   3. Changing any color updates the CSS variables on the page instantly so the admin can see how the color looks before saving
   4. Clicking "Save" persists all current color values to site_settings; clicking the per-color reset icon restores that single color to its default value
   5. Clicking "Reset All" restores every color across all three sections to its default value
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [x] 42-01-PLAN.md — ColorsTab component with color pickers, live preview, save/reset + settings page tab + sidebar entry
 **UI hint**: yes
 
+### Phase 43: Feed Cleanup + Data Infrastructure
+**Goal**: The old dashboard feed is safely deleted, lib/dashboard/ contains tested data fetch functions and a profile completion scorer, and page.tsx is a working async server component that routes to the correct role layout stub
+**Depends on**: Nothing (first phase of this milestone)
+**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-05
+**Success Criteria** (what must be TRUE):
+  1. FeedView, PostComposer, FeedPostCard, PostActionsMenu, and CommentDeleteButton are deleted after a codebase-wide grep confirms no non-dashboard pages import them; npx next build passes with no Module not found errors
+  2. lib/dashboard/queries.ts exports fetchUpcomingEvents, fetchRecentCourses, fetchAcceptedConnections, fetchSchoolFaculty, and fetchUserInProgressCourses — all using parallel Promise.all and explicit column selects (no select('*'))
+  3. lib/dashboard/profileCompletion.ts exports a scorer with isFieldComplete() that treats JSONB empty arrays as incomplete; a fresh test account with no fields filled scores 0%
+  4. app/dashboard/page.tsx is an async server component using getEffectiveUserId() + Promise.all, branching to DashboardStudent, DashboardTeacher, DashboardSchool, or DashboardWellness stubs based on role — where school is detected via role='teacher' AND principal_trainer_school_id IS NOT NULL
+  5. Visiting /dashboard as each role (and impersonating a teacher with a school) renders the correct stub without errors
+**Plans**: TBD
+
+### Phase 44: Shared UI Components
+**Goal**: HorizontalCarousel, DashboardGreeting, PrimaryActionCard, ProfileCompletionCard, StatHero, and all five card types exist as reusable components that any role layout can consume
+**Depends on**: Phase 43 (needs page.tsx shell and data interfaces defined)
+**Requirements**: INFRA-04, COMP-01, COMP-02, COMP-03, COMP-04, COMP-05, COMP-06, COMP-07, COMP-08, COMP-09, DES-01, DES-02, DES-03
+**Success Criteria** (what must be TRUE):
+  1. HorizontalCarousel scrolls horizontally with snap-x on mobile touch, mouse drag on desktop (via embla-carousel-react), hidden scrollbar via @utility no-scrollbar, and renders a skeleton state (3 placeholder cards) when the items array is empty
+  2. DashboardGreeting shows a time-of-day salutation, the user's first name, and a role badge styled with the role's CSS variable color
+  3. ProfileCompletionCard renders a progress bar (0–100%), a checklist of the 6 weighted fields, and deep links to the exact settings section for each incomplete field — the card is hidden when completion is 100%
+  4. StatHero displays its metric tile with an explicit "—" when the value is null or undefined; it never shows "0 profile views" for untracked stats
+  5. All five card types (TeacherCard, CourseCard, EventCard, ConnectionCard, FacultyCard) render correctly with shrink-0 set so they do not collapse inside the carousel, and each has a "Show all →" link at the carousel header pointing to the relevant directory page
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 45: Student + Wellness Practitioner Dashboards
+**Goal**: The Student and Wellness Practitioner role layouts are fully assembled — users on those roles see a personalized dashboard with carousels, stat heroes, completion cards, and role-appropriate CTAs
+**Depends on**: Phase 43, Phase 44
+**Requirements**: STU-01, STU-02, STU-03, STU-04, WP-01, WP-02, WP-03, WP-04, WP-05, WP-06
+**Success Criteria** (what must be TRUE):
+  1. A Student visiting /dashboard sees a greeting with "Ready to practice today?", a teachers carousel filtered by style tags, a courses carousel, and an upcoming events carousel — each with a "Show all →" link
+  2. A Wellness Practitioner visiting /dashboard sees a greeting with WP role badge, a profile completion card (when < 100%), a stat hero placeholder, primary CTAs for sharing an event and adding a course, a suggested connections panel linking to the directory, and an upcoming events carousel
+  3. Both layouts are mobile-first: sections stack vertically on small screens, CTAs display side-by-side on desktop
+  4. Empty carousels show a non-blank empty state with a contextual CTA rather than an invisible blank space
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 46: Teacher + School Dashboards
+**Goal**: The Teacher and School-view layouts are fully assembled — teachers see connections, completion, stat heroes, and role CTAs; school-owner teachers can toggle to a school-focused view with faculty list and school-specific CTAs
+**Depends on**: Phase 43, Phase 44
+**Requirements**: TCH-01, TCH-02, TCH-03, TCH-04, TCH-05, SCH-01, SCH-02, SCH-03, SCH-04, SCH-05, SCH-06
+**Success Criteria** (what must be TRUE):
+  1. A Teacher visiting /dashboard sees a greeting with teacher role badge, a profile completion card (when < 100%), a stat hero showing weekly profile views as "—", primary CTAs for sharing an event and adding a course, and a recent connections list (max 3) with a "View all connections →" link
+  2. A teacher who owns a school sees a "View as School" toggle; activating it switches the layout to show the school name in the greeting, a school profile completion card, a school discovery stat hero, school-specific CTAs ("Add workshops & courses", "Manage designations"), a faculty list (max 5) with "Manage faculty →", and an enrolled students list (max 5) with "View all →"
+  3. The "View as School" toggle state is remembered within the session so refreshing does not reset it
+  4. Both layouts are mobile-first: sections stack vertically on small screens, CTAs display side-by-side on desktop
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
-**Execution Order:** 41 -> 42
+**Execution Order:** 43 -> 44 -> 45 -> 46
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -311,3 +402,7 @@ Plans:
 | 40. Wire Lessons to Frontend | 3/3 | Complete | 2026-04-01 |
 | 41. ThemeProvider Infrastructure | 1/1 | Complete | 2026-04-01 |
 | 42. Admin Colors UI | 1/1 | Complete | 2026-04-01 |
+| 43. Feed Cleanup + Data Infrastructure | 0/? | Not started | - |
+| 44. Shared UI Components | 0/? | Not started | - |
+| 45. Student + Wellness Practitioner Dashboards | 0/? | Not started | - |
+| 46. Teacher + School Dashboards | 0/? | Not started | - |
