@@ -74,10 +74,10 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
   const [onlinePlatformUrl, setOnlinePlatformUrl] = useState(event?.online_platform_url ?? '');
   const [description,setDesc]     = useState(event?.description ?? '');
   const [shortDescription, setShortDescription] = useState(event?.short_description ?? '');
-  const [price,     setPrice]     = useState(String(event?.price ?? ''));
-  const [hasPrice,  setHasPrice]  = useState(!!(event && event.price && event.price > 0));
+  const [price,     setPrice]     = useState(isEdit ? String(event?.price ?? '') : '');
+  const [hasPrice,  setHasPrice]  = useState(isEdit ? (event?.price ?? 0) > 0 : false);
   const [spotsTotal,setSpotsTotal]= useState(String(event?.spots_total ?? ''));
-  const [limitedSpots, setLimitedSpots] = useState(event?.unlimited_spots === false);
+  const [limitedSpots, setLimitedSpots] = useState(isEdit ? event?.unlimited_spots === false : false);
   const [externalRegistration, setExternalRegistration] = useState(event?.external_registration ?? false);
   const [eventWebsite, setEventWebsite] = useState(event?.event_website ?? '');
   const [showAttendees, setShowAttendees] = useState(event?.show_attendees ?? false);
