@@ -12,6 +12,8 @@ import {
 import type { SearchResult, SearchCategory } from '@/app/components/search/types';
 import SearchFilterPills from '@/app/components/search/SearchFilterPills';
 import SearchResultRow from '@/app/components/search/SearchResultRow';
+import MatteaSearchHint from '@/app/components/search/MatteaSearchHint';
+import { isQuestion } from '@/lib/search/detect-intent';
 
 // ─── Inline SVG icons ─────────────────────────────────────────────────────────
 
@@ -47,6 +49,11 @@ export default function GlobalSearchOverlay() {
   const [mounted, setMounted] = useState(false);
   const [cache, setCache] = useState<Record<string, SearchResult[]>>({});
 
+  // Mattea AI hint state
+  const [matteaAnswer, setMatteaAnswer] = useState<string | null>(null);
+  const [matteaLoading, setMatteaLoading] = useState(false);
+  const matteaAbortRef = useRef<AbortController | null>(null);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -64,6 +71,8 @@ export default function GlobalSearchOverlay() {
       setSelectedIdx(0);
       setActiveCategory('all');
       setLoading(false);
+      setMatteaAnswer(null);
+      setMatteaLoading(false);
       setTimeout(() => {
         inputRef.current?.focus();
         mobileInputRef.current?.focus();
@@ -127,6 +136,34 @@ export default function GlobalSearchOverlay() {
     }
   }, [cache]);
 
+  // Fetch Mattea hint for question-like queries
+  const fetchMatteaHint = useCallback(async (q: string) => {
+    matteaAbortRef.current?.abort();
+    if (!isQuestion(q)) {
+      setMatteaAnswer(null);
+      setMatteaLoading(false);
+      return;
+    }
+    setMatteaLoading(true);
+    const controller = new AbortController();
+    matteaAbortRef.current = controller;
+    try {
+      const res = await fetch('/api/search/mattea-hint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q.trim() }),
+        signal: controller.signal,
+      });
+      if (!res.ok) { setMatteaAnswer(null); setMatteaLoading(false); return; }
+      const data = await res.json();
+      setMatteaAnswer(data.answer ?? null);
+    } catch {
+      setMatteaAnswer(null);
+    } finally {
+      setMatteaLoading(false);
+    }
+  }, []);
+
   // Debounced input handler
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value;
@@ -134,6 +171,7 @@ export default function GlobalSearchOverlay() {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       fetchResults(val, activeCategory);
+      fetchMatteaHint(val);
     }, 200);
   }
 
@@ -143,19 +181,29 @@ export default function GlobalSearchOverlay() {
     fetchResults(query, cat);
   }
 
+  // Whether the Mattea hint is visible (adds 1 to the navigable items)
+  const showMatteaHint = isQuestion(query) && (matteaLoading || !!matteaAnswer);
+  const matteaOffset = showMatteaHint ? 1 : 0;
+  const totalItems = results.length + matteaOffset;
+
   // Keyboard navigation
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIdx((i) => Math.min(i + 1, results.length - 1));
+      setSelectedIdx((i) => Math.min(i + 1, totalItems - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedIdx((i) => Math.max(i - 1, 0));
     } else if (e.key === 'Enter') {
-      const hit = results[selectedIdx];
-      if (hit) {
-        router.push(hit.href);
+      if (showMatteaHint && selectedIdx === 0) {
+        router.push(`/settings/help?q=${encodeURIComponent(query.trim())}`);
         close();
+      } else {
+        const hit = results[selectedIdx - matteaOffset];
+        if (hit) {
+          router.push(hit.href);
+          close();
+        }
       }
     } else if (e.key === 'Escape') {
       close();
@@ -223,9 +271,20 @@ export default function GlobalSearchOverlay() {
       );
     }
 
-    let flatIndex = 0;
+    let flatIndex = matteaOffset; // Start after Mattea hint if visible
     return (
       <div role="listbox" aria-label="Search results">
+        {/* Mattea AI hint — rendered at the top when query is a question */}
+        {showMatteaHint && (
+          <MatteaSearchHint
+            query={query}
+            answer={matteaAnswer}
+            loading={matteaLoading}
+            isHighlighted={selectedIdx === 0}
+            onSelect={close}
+          />
+        )}
+
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (!items || items.length === 0) return null;

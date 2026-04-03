@@ -16,7 +16,8 @@ const SECTION_INFO: Record<string, { label: string; description: string; color: 
   developer: { label: 'Developer', description: 'Technical documentation', color: 'bg-slate-100 text-slate-700' },
 }
 
-export default async function HelpPage() {
+export default async function HelpPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q: preloadedQuestion } = await searchParams;
   const [tickets, userRole] = await Promise.all([getUserTickets(), getUserRole()])
   const audiences = getAudiencesForRole(userRole)
   const allDocs = getAllDocs()
@@ -72,7 +73,7 @@ export default async function HelpPage() {
 
       {/* Inline Chat Section */}
       <h2 className="text-lg font-semibold text-foreground mt-8 mb-3">Start a Conversation</h2>
-      <InlineChat />
+      <InlineChat initialQuestion={preloadedQuestion} />
 
       {/* Help & Guides Section */}
       <h2 className="text-lg font-semibold text-foreground mt-8 mb-3">Help &amp; Guides</h2>

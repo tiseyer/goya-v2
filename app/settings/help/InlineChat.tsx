@@ -24,7 +24,12 @@ const GREETING_MESSAGE: Message = {
   content: "Namaste! I'm Mattea, your GOYA guide. How can I help you today?",
 }
 
-export default function InlineChat() {
+interface InlineChatProps {
+  initialQuestion?: string;
+}
+
+export default function InlineChat({ initialQuestion }: InlineChatProps) {
+  const initialQuestionSentRef = useRef(false);
   const [messages, setMessages] = useState<Message[]>([GREETING_MESSAGE])
   const [isTyping, setIsTyping] = useState(false)
   const [isStreaming, setIsStreaming] = useState(false)
@@ -81,6 +86,17 @@ export default function InlineChat() {
     initSession()
     return () => { cancelled = true }
   }, [])
+
+  // Auto-submit initial question from ?q= param
+  useEffect(() => {
+    if (!initialQuestion || !sessionId || initialQuestionSentRef.current) return;
+    initialQuestionSentRef.current = true;
+    const timer = setTimeout(() => {
+      handleSend(initialQuestion);
+    }, 500);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuestion, sessionId]);
 
   // Auto-scroll on new messages
   useEffect(() => {
