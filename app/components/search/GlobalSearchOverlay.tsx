@@ -49,9 +49,10 @@ export default function GlobalSearchOverlay() {
   const [mounted, setMounted] = useState(false);
   const [cache, setCache] = useState<Record<string, SearchResult[]>>({});
 
-  // Mattea AI hint state
+  // Mattea AI hint state — separate 1200ms debounce, min 15 chars
   const [matteaAnswer, setMatteaAnswer] = useState<string | null>(null);
   const [matteaLoading, setMatteaLoading] = useState(false);
+  const [matteaDebouncedQuery, setMatteaDebouncedQuery] = useState('');
   const matteaAbortRef = useRef<AbortController | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -73,6 +74,7 @@ export default function GlobalSearchOverlay() {
       setLoading(false);
       setMatteaAnswer(null);
       setMatteaLoading(false);
+      setMatteaDebouncedQuery('');
       setTimeout(() => {
         inputRef.current?.focus();
         mobileInputRef.current?.focus();
@@ -136,42 +138,61 @@ export default function GlobalSearchOverlay() {
     }
   }, [cache]);
 
-  // Fetch Mattea hint for question-like queries
-  const fetchMatteaHint = useCallback(async (q: string) => {
-    matteaAbortRef.current?.abort();
-    if (!isQuestion(q)) {
+  // Mattea 1200ms debounce — separate from normal search debounce
+  const matteaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    // Clear Mattea when query is too short or not a question
+    if (query.trim().length < 15 || !isQuestion(query)) {
       setMatteaAnswer(null);
       setMatteaLoading(false);
+      setMatteaDebouncedQuery('');
+      matteaAbortRef.current?.abort();
+      if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current);
       return;
     }
-    setMatteaLoading(true);
+    // Set 1200ms debounce for Mattea
+    if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current);
+    matteaTimerRef.current = setTimeout(() => {
+      setMatteaDebouncedQuery(query);
+    }, 1200);
+    return () => { if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current); };
+  }, [query]);
+
+  // Fetch Mattea hint when debounced query changes
+  useEffect(() => {
+    if (!matteaDebouncedQuery || matteaDebouncedQuery.trim().length < 15 || !isQuestion(matteaDebouncedQuery)) return;
+
+    matteaAbortRef.current?.abort();
     const controller = new AbortController();
     matteaAbortRef.current = controller;
-    try {
-      const res = await fetch('/api/search/mattea-hint', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q.trim() }),
-        signal: controller.signal,
-      });
-      if (!res.ok) { setMatteaAnswer(null); setMatteaLoading(false); return; }
-      const data = await res.json();
-      setMatteaAnswer(data.answer ?? null);
-    } catch {
-      setMatteaAnswer(null);
-    } finally {
-      setMatteaLoading(false);
-    }
-  }, []);
+    setMatteaLoading(true);
 
-  // Debounced input handler
+    (async () => {
+      try {
+        const res = await fetch('/api/search/mattea-hint', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: matteaDebouncedQuery.trim() }),
+          signal: controller.signal,
+        });
+        if (!res.ok) { setMatteaLoading(false); return; }
+        const data = await res.json();
+        if (data.answer) setMatteaAnswer(data.answer);
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return;
+      } finally {
+        setMatteaLoading(false);
+      }
+    })();
+  }, [matteaDebouncedQuery]);
+
+  // Debounced input handler — normal search only (200ms)
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value;
     setQuery(val);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       fetchResults(val, activeCategory);
-      fetchMatteaHint(val);
     }, 200);
   }
 
@@ -182,7 +203,7 @@ export default function GlobalSearchOverlay() {
   }
 
   // Whether the Mattea hint is visible (adds 1 to the navigable items)
-  const showMatteaHint = isQuestion(query) && (matteaLoading || !!matteaAnswer);
+  const showMatteaHint = query.trim().length >= 15 && isQuestion(query) && (matteaLoading || !!matteaAnswer);
   const matteaOffset = showMatteaHint ? 1 : 0;
   const totalItems = results.length + matteaOffset;
 
