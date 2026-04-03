@@ -1,3 +1,8 @@
+// TODO: Pages that could adopt PageHero:
+// - app/about/page.tsx — has hand-rolled dark hero (bg-[#1a2744]) with pill, text-4xl/5xl/6xl heading, and subtitle
+// - app/standards/page.tsx — same hand-rolled dark hero pattern (bg-[#1a2744]) with pill and text-4xl/5xl heading
+// - app/credits/page.tsx — has an inline page header div with text-2xl sm:text-3xl font-bold heading and subtitle paragraph
+
 import type { ReactNode } from 'react';
 
 interface PageHeroProps {
