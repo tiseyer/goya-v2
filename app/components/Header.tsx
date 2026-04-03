@@ -12,6 +12,7 @@ import { ThemeInline } from '@/app/components/ThemeToggle';
 import type { NotifRecord } from '@/app/context/ConnectionsContext';
 import { useImpersonation } from '@/app/context/ImpersonationContext';
 import { endImpersonation } from '@/app/actions/impersonation';
+import { useSearch } from '@/app/context/SearchContext';
 import { switchContext } from '@/app/actions/context';
 import { getNotifications, markNotificationsRead, getUnreadNotificationCount } from '@/lib/messaging';
 import type { AppNotification } from '@/lib/types';
@@ -75,75 +76,17 @@ function Dropdown({ children }: { children: React.ReactNode }) {
 // ─── Search ───────────────────────────────────────────────────────────────────
 
 function SearchWidget() {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const ref = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  useClickOutside(ref, () => { setOpen(false); setQuery(''); });
-
-  function toggle() {
-    setOpen(o => {
-      if (!o) setTimeout(() => inputRef.current?.focus(), 50);
-      else setQuery('');
-      return !o;
-    });
-  }
-
+  const { open } = useSearch();
   return (
-    <div ref={ref} className="relative flex items-center">
-      {/* Expanding input */}
-      <div className={`overflow-hidden transition-all duration-200 ${open ? 'w-52' : 'w-0'}`}>
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Search GOYA…"
-          className="w-full bg-slate-50 border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-sm text-[#1B3A5C] placeholder:text-[#6B7280] focus:outline-none focus:border-[#4E87A0] focus:ring-1 focus:ring-[#4E87A0]/40 mr-2"
-        />
-      </div>
-
-      {/* Icon button */}
-      <button
-        onClick={toggle}
-        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-          open ? 'bg-[#4E87A0] text-white' : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100'
-        }`}
-        aria-label="Search"
-      >
-        {open ? (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        )}
-      </button>
-
-      {/* Results dropdown */}
-      {open && (
-        <Dropdown>
-          <div className="px-4 py-3 border-b border-[#E5E7EB]">
-            <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest">Search</p>
-          </div>
-          <div className="px-4 py-6 text-center">
-            {query.trim() === '' ? (
-              <p className="text-sm text-[#6B7280]">Start typing to search…</p>
-            ) : (
-              <>
-                <svg className="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <p className="text-sm text-[#6B7280] font-medium">No results yet</p>
-                <p className="text-xs text-slate-400 mt-1">Search is coming soon.</p>
-              </>
-            )}
-          </div>
-        </Dropdown>
-      )}
-    </div>
+    <button
+      onClick={open}
+      className="w-8 h-8 rounded-lg flex items-center justify-center text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-100 transition-colors"
+      aria-label="Search"
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </button>
   );
 }
 

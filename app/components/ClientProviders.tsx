@@ -10,6 +10,7 @@ import { ReactNode } from 'react';
 import FlowPlayerLoader from '@/app/components/flow-player/FlowPlayerLoader';
 import AnalyticsProvider from '@/app/components/AnalyticsProvider';
 import { SearchProvider } from '@/app/context/SearchContext';
+import GlobalSearchOverlay from '@/app/components/search/GlobalSearchOverlay';
 
 export default function ClientProviders({
   children,
@@ -26,7 +27,7 @@ export default function ClientProviders({
             <SearchProvider>
               <ConnectionsProvider>
                 {children}
-                {/* GlobalSearchOverlay will mount here in Plan 02 */}
+                <GlobalSearchOverlay />
                 <FlowPlayerLoader />
                 <AnalyticsProvider />
               </ConnectionsProvider>
