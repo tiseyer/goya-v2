@@ -8,9 +8,18 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: (Planning next)
+## Current Milestone: v1.19 Global Search
 
-No active milestone. Run `/gsd:new-milestone` to start the next one.
+**Goal:** macOS Spotlight-style global search overlay across all platform entities — members, events, courses, and pages — with role-aware results and keyboard navigation.
+
+**Target features:**
+- Search overlay UI component (desktop centered modal + mobile full-screen) with category filter pills, keyboard navigation, grouped results
+- Search API route with per-category Supabase queries (members, events, courses) and static page registry
+- Page registry with role-based visibility (admin/moderator pages hidden from regular users)
+- Header integration (search icon click + Cmd+K / Ctrl+K keyboard shortcut)
+- Debounced input, loading skeletons, result caching, empty/no-result states
+- Admin search extensions: search by email, MRN, subscription/order IDs
+- Contextual result row actions (message icon, map/directions for members with full address)
 
 ## Current State
 
@@ -293,4 +302,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after v1.18 User Profile Redesign milestone shipped*
+*Last updated: 2026-04-03 after v1.19 Global Search milestone started*
