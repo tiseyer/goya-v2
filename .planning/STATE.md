@@ -105,9 +105,10 @@ None.
 | 260403-d6k | Event instructors join table + visibility toggles + Edit/Delete + My Events organizer query | 2026-04-03 | 556eae3, 4b64cef, 0d07005 | [260403-d6k-event-instructors-organizers-join-tables](./quick/260403-d6k-event-instructors-organizers-join-tables/) |
 | 260403-hb7 | Courses parity with Events — admin form, frontend detail, permissions | 2026-04-03 | c0bafdb, 195d6bc, afc9828 | [260403-hb7-courses-parity-with-events-admin-form-fr](./quick/260403-hb7-courses-parity-with-events-admin-form-fr/) |
 | 260403-hp9 | Superuser role + invisible UI masking + admin deletion with double confirmation | 2026-04-03 | 1f4f689, 99772ad, 07fe283, 758b359, d9abf5a | [260403-hp9-add-superuser-role-with-admin-deletion-c](./quick/260403-hp9-add-superuser-role-with-admin-deletion-c/) |
+| 260403-i2j | Admin inline hero editing with variables | 2026-04-03 | d7d307e, 57752d4, a88a3b6 | [260403-i2j-admin-inline-hero-editing-with-variables](./quick/260403-i2j-admin-inline-hero-editing-with-variables/) |
 
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Completed quick task 260403-hp9: Superuser role + admin deletion
+Stopped at: Completed quick task 260403-i2j: Admin inline hero editing with variables
 Resume file: None
