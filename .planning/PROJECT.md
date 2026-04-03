@@ -23,7 +23,9 @@ Members stay professionally connected, credentialed, and engaged through a singl
 
 ## Current State
 
-**As of v1.18 (2026-04-02):** User Profile Redesign shipped. Complete rebuild of /members/[id] with cover image hero, 120px avatar, role badge, intro video (YouTube facade), role-specific pill sections (4 types), school affiliation + faculty grid + community section, Mapbox GL JS map (privacy-gated), events + courses carousels, sidebar with membership card + designations + social icons, own-profile edit button + completion nudge. Server-side privacy enforcement via deriveProfileVisibility().
+**As of v1.19 (2026-04-03):** Global Search shipped. macOS Spotlight-style search overlay (desktop modal + mobile full-screen) with Cmd+K/Ctrl+K shortcut, 6 category filter pills (Members, Events, Courses, Products, Pages, Help), keyboard navigation, debounced API search via /api/search route using service role Supabase client, role-aware page registry, admin extensions (email/MRN search), contextual member actions (message icon, Google Maps directions), result caching, loading skeletons, full dark mode support.
+
+**Previous v1.18 (2026-04-02):** User Profile Redesign shipped. Complete rebuild of /members/[id] with cover image hero, 120px avatar, role badge, intro video (YouTube facade), role-specific pill sections (4 types), school affiliation + faculty grid + community section, Mapbox GL JS map (privacy-gated), events + courses carousels, sidebar with membership card + designations + social icons, own-profile edit button + completion nudge. Server-side privacy enforcement via deriveProfileVisibility().
 
 **Previous v1.17 (2026-04-02):** Dashboard Redesign shipped. Complete rebuild of /dashboard with role-specific layouts (Student, Teacher, School, Wellness Practitioner). Apple/Netflix aesthetic with horizontal carousels (embla + snap-x), profile completion scoring (6-field weighted), stat heroes, value-driven CTAs. "View as School" toggle for school-owner teachers. Old community feed deleted.
 
