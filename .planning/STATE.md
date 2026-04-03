@@ -5,7 +5,7 @@ milestone_name: User Profile Redesign
 status: complete
 stopped_at: null
 last_updated: "2026-04-03T02:00:00.000Z"
-last_activity: 2026-04-03 - Quick task 260403-c2q: Fix events sidebar filter box border colors for dark mode
+last_activity: 2026-04-03 - Quick task 260403-c47: Add nav skeleton loading state to prevent progressive pop-in
 progress:
   total_phases: 4
   completed_phases: 4
@@ -85,9 +85,10 @@ None.
 | 260403-bsn | Fix events page dark background | 2026-04-03 | cb6135d | [260403-bsn-fix-events-page-dark-background](./quick/260403-bsn-fix-events-page-dark-background/) |
 | 260403-c1n | Switch Events and Academy PageHero to variant dark | 2026-04-03 | db08db4 | [260403-c1n-switch-events-and-academy-pagehero-to-va](./quick/260403-c1n-switch-events-and-academy-pagehero-to-va/) |
 | 260403-c2q | Fix events sidebar filter box border colors for dark mode | 2026-04-03 | f3eb53c | [260403-c2q-fix-events-sidebar-filter-box-border-col](./quick/260403-c2q-fix-events-sidebar-filter-box-border-col/) |
+| 260403-c47 | Add nav skeleton loading state to prevent progressive pop-in | 2026-04-03 | 65194b6 | [260403-c47-nav-skeleton-loading-state-to-prevent-pr](./quick/260403-c47-nav-skeleton-loading-state-to-prevent-pr/) |
 
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Completed quick task 260403-c2q: Fix events sidebar filter box border colors for dark mode
+Stopped at: Completed quick task 260403-c47: Add nav skeleton loading state to prevent progressive pop-in
 Resume file: None
