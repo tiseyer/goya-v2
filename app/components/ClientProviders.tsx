@@ -9,6 +9,7 @@ import type { ImpersonationState } from '@/lib/impersonation';
 import { ReactNode } from 'react';
 import FlowPlayerLoader from '@/app/components/flow-player/FlowPlayerLoader';
 import AnalyticsProvider from '@/app/components/AnalyticsProvider';
+import { SearchProvider } from '@/app/context/SearchContext';
 
 export default function ClientProviders({
   children,
@@ -22,11 +23,14 @@ export default function ClientProviders({
       <ImpersonationProvider value={impersonationState}>
         <CookieConsentProvider>
           <CartProvider>
-            <ConnectionsProvider>
-              {children}
-              <FlowPlayerLoader />
-              <AnalyticsProvider />
-            </ConnectionsProvider>
+            <SearchProvider>
+              <ConnectionsProvider>
+                {children}
+                {/* GlobalSearchOverlay will mount here in Plan 02 */}
+                <FlowPlayerLoader />
+                <AnalyticsProvider />
+              </ConnectionsProvider>
+            </SearchProvider>
           </CartProvider>
         </CookieConsentProvider>
       </ImpersonationProvider>
