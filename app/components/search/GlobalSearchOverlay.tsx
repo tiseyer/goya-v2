@@ -48,9 +48,10 @@ export default function GlobalSearchOverlay() {
   const [mounted, setMounted] = useState(false);
   const [cache, setCache] = useState<Record<string, SearchResult[]>>({});
 
-  // Mattea AI hint state — minimal implementation
+  // Mattea AI hint state
   const [matteaAnswer, setMatteaAnswer] = useState<string | null>(null);
   const [matteaLoading, setMatteaLoading] = useState(false);
+  const [showMattea, setShowMattea] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
@@ -71,6 +72,7 @@ export default function GlobalSearchOverlay() {
       setLoading(false);
       setMatteaAnswer(null);
       setMatteaLoading(false);
+      setShowMattea(false);
       setTimeout(() => {
         inputRef.current?.focus();
         mobileInputRef.current?.focus();
@@ -134,12 +136,13 @@ export default function GlobalSearchOverlay() {
     }
   }, [cache]);
 
-  // Mattea: simplest possible — 1200ms debounce on raw query
+  // Mattea: 1200ms debounce on raw query, showMattea state for stable render
   useEffect(() => {
     const q = (query || '').trim();
 
-    // Clear answer if query is very short
+    // Clear everything if query is very short
     if (q.length < 8) {
+      setShowMattea(false);
       setMatteaAnswer(null);
       setMatteaLoading(false);
       return;
@@ -153,6 +156,9 @@ export default function GlobalSearchOverlay() {
 
     if (!isQ) return;
 
+    // Mark as showing immediately (for the loading skeleton)
+    setShowMattea(true);
+
     const timer = setTimeout(async () => {
       setMatteaLoading(true);
       try {
@@ -162,7 +168,10 @@ export default function GlobalSearchOverlay() {
           body: JSON.stringify({ question: q }),
         });
         const data = await res.json();
-        if (data.answer) setMatteaAnswer(data.answer);
+        if (data.answer) {
+          setMatteaAnswer(data.answer);
+          setShowMattea(true);
+        }
       } catch {
         // silent fail
       } finally {
@@ -190,7 +199,7 @@ export default function GlobalSearchOverlay() {
   }
 
   // Whether the Mattea hint is visible (adds 1 to the navigable items)
-  const showMatteaHint = (matteaLoading || !!matteaAnswer);
+  const showMatteaHint = showMattea && (matteaLoading || !!matteaAnswer);
   const matteaOffset = showMatteaHint ? 1 : 0;
   const totalItems = results.length + matteaOffset;
 
