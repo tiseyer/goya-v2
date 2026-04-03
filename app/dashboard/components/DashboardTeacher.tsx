@@ -7,19 +7,23 @@ import PageHero from '@/app/components/PageHero'
 import type { HeroContext } from '@/lib/hero-variables'
 import { getTimeOfDay } from './utils'
 import { ProfileCompletionCard } from './ProfileCompletionCard'
-import { StatHero } from './StatHero'
 import { PrimaryActionCard } from './PrimaryActionCard'
+import { HorizontalCarousel } from './HorizontalCarousel'
+import { CourseCard } from './CourseCard'
+import { EventCard } from './EventCard'
 import { ConnectionCard } from './ConnectionCard'
 import type { TeacherProps } from './types'
 
 export default function DashboardTeacher({
   profile,
+  courses,
+  events,
   connections,
   completion,
   isSchoolOwner,
 }: TeacherProps) {
   const firstName = profile.full_name?.trim().split(' ')[0] || 'there'
-  const recentConnections = connections.slice(0, 3)
+  const recentConnections = connections.slice(0, 6)
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -33,20 +37,12 @@ export default function DashboardTeacher({
         heroContext={{ firstName, fullName: profile.full_name ?? '', role: profile.role ?? '' } as HeroContext}
       />
       <PageContainer>
-        <div className="py-8 space-y-8">
+        <div className="py-10 space-y-16">
 
-          {/* 2. Profile completion nudge (auto-hides at 100%) */}
+          {/* Profile completion nudge (auto-hides at 100%) */}
           <ProfileCompletionCard completion={completion} />
 
-          {/* 4. Stat hero — profile views (placeholder) */}
-          <Card variant="flat" padding="lg">
-            <StatHero
-              label="people viewed your profile this week"
-              value={null}
-            />
-          </Card>
-
-          {/* 5. Primary CTA cards — side by side on desktop, stacked on mobile */}
+          {/* CTA cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <PrimaryActionCard
               headline="Share your next event"
@@ -55,44 +51,67 @@ export default function DashboardTeacher({
               ctaHref="/settings/my-events"
             />
             <PrimaryActionCard
-              headline="Add a course link"
-              description="Share your teachings with the GOYA community"
+              headline={isSchoolOwner ? "Add a school course" : "Add a course"}
+              description="Level up your craft and grow your business"
               ctaLabel="Add course"
               ctaHref="/settings/my-courses"
             />
           </div>
 
-          {/* 6. Recent connections list — max 3 */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-slate-900">Recent connections</h2>
-              <Link
-                href="/settings/connections"
-                className="text-sm text-[var(--goya-primary)] hover:underline"
-              >
-                View all connections
-              </Link>
-            </div>
-
-            {recentConnections.length === 0 ? (
+          {/* Courses — growth */}
+          <HorizontalCarousel
+            title="Level up your craft"
+            showAllHref="/academy"
+            showAllLabel="Explore all courses"
+            emptyState={
               <Card variant="flat" padding="lg">
                 <p className="text-sm text-slate-500">
-                  No connections yet.{' '}
-                  <Link href="/members" className="text-[var(--goya-primary)] hover:underline">
-                    Find teachers and students
+                  Courses from the GOYA community.{' '}
+                  <Link href="/academy" className="text-[var(--goya-primary)] hover:underline">
+                    Explore courses
                   </Link>
                 </p>
               </Card>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {recentConnections.map((c) => (
-                  <div key={c.connectionId} className="w-full [&>a]:w-full [&>a]:block">
-                    <ConnectionCard connection={c} />
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+            }
+          >
+            {courses.length > 0
+              ? courses.map((course) => <CourseCard key={course.id} course={course} />)
+              : null}
+          </HorizontalCarousel>
+
+          {/* Events — connect */}
+          <HorizontalCarousel
+            title="Connect, collaborate, grow"
+            showAllHref="/events"
+            showAllLabel="Browse events"
+            emptyState={
+              <Card variant="flat" padding="lg">
+                <p className="text-sm text-slate-500">
+                  No events yet.{' '}
+                  <Link href="/events" className="text-[var(--goya-primary)] hover:underline">
+                    Browse events
+                  </Link>
+                </p>
+              </Card>
+            }
+          >
+            {events.length > 0
+              ? events.map((event) => <EventCard key={event.id} event={event} />)
+              : null}
+          </HorizontalCarousel>
+
+          {/* Community — connections */}
+          {recentConnections.length > 0 && (
+            <HorizontalCarousel
+              title="Your community"
+              showAllHref="/settings/connections"
+              showAllLabel="View all connections"
+            >
+              {recentConnections.map((c) => (
+                <ConnectionCard key={c.connectionId} connection={c} />
+              ))}
+            </HorizontalCarousel>
+          )}
         </div>
       </PageContainer>
     </div>

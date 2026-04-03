@@ -6,16 +6,28 @@ import Card from '@/app/components/ui/Card'
 import PageHero from '@/app/components/PageHero'
 import type { HeroContext } from '@/lib/hero-variables'
 import { FacultyCard } from './FacultyCard'
-import { ConnectionCard } from './ConnectionCard'
 import { ProfileCompletionCard } from './ProfileCompletionCard'
-import { StatHero } from './StatHero'
 import { PrimaryActionCard } from './PrimaryActionCard'
+import { HorizontalCarousel } from './HorizontalCarousel'
+import { CourseCard } from './CourseCard'
+import { EventCard } from './EventCard'
 import type { SchoolProps } from './types'
+
+function KpiCard({ value, label }: { value: number | string; label: string }) {
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-5 text-center">
+      <p className="text-3xl font-bold text-slate-900">{value}</p>
+      <p className="text-sm text-slate-500 mt-1">{label}</p>
+    </div>
+  )
+}
 
 export default function DashboardSchool({
   profile,
   school,
   faculty,
+  courses,
+  events,
   connections,
   completion,
 }: SchoolProps) {
@@ -40,29 +52,30 @@ export default function DashboardSchool({
         heroContext={{ firstName: schoolName, fullName: profile?.full_name ?? '', role: profile?.role ?? '' } as HeroContext}
       />
       <PageContainer>
-        <div className="py-8 space-y-8">
+        <div className="py-10 space-y-16">
 
-          {/* 2. School profile completion card */}
+          {/* School profile completion card */}
           {completion.score < 100 && (
             <div>
-              <p className="text-sm text-slate-500 -mb-4">
+              <p className="text-sm text-slate-500 mb-4">
                 Help students find and enroll in your school
               </p>
-              <div className="mt-8">
-                <ProfileCompletionCard completion={completion} />
-              </div>
+              <ProfileCompletionCard completion={completion} />
             </div>
           )}
 
-          {/* 4. Stat hero — school discovery */}
-          <Card variant="flat" padding="lg">
-            <StatHero
-              label="students discovered your school this week"
-              value={null}
-            />
-          </Card>
+          {/* KPI cards — school overview */}
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 mb-4">School overview</h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <KpiCard value={faculty.length} label="Active Teachers" />
+              <KpiCard value={connections.length} label="Connected Students" />
+              <KpiCard value={courses.filter(c => c.created_by === profile?.id).length} label="Active Courses" />
+              <KpiCard value="Soon" label="Monthly Revenue" />
+            </div>
+          </div>
 
-          {/* 5. School CTAs */}
+          {/* School CTAs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <PrimaryActionCard
               headline="Add workshops & courses"
@@ -78,10 +91,10 @@ export default function DashboardSchool({
             />
           </div>
 
-          {/* 6. Faculty list — max 5 */}
+          {/* Faculty — horizontal list */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-slate-900">Faculty</h2>
+              <h2 className="text-lg font-bold text-slate-900">Your faculty</h2>
               <Link
                 href={facultySettingsHref}
                 className="text-sm text-[var(--goya-primary)] hover:underline"
@@ -93,21 +106,15 @@ export default function DashboardSchool({
               <Card variant="flat" padding="lg">
                 <p className="text-sm text-slate-500">
                   No faculty members yet.{' '}
-                  <Link
-                    href={facultySettingsHref}
-                    className="text-[var(--goya-primary)] hover:underline"
-                  >
+                  <Link href={facultySettingsHref} className="text-[var(--goya-primary)] hover:underline">
                     Add faculty
                   </Link>
                 </p>
               </Card>
             ) : (
               <div className="flex flex-col gap-3">
-                {faculty.slice(0, 5).map((f) => (
-                  <div
-                    key={f.id}
-                    className="w-full [&>a]:w-full [&>a]:block [&>div]:w-full"
-                  >
+                {faculty.slice(0, 8).map((f) => (
+                  <div key={f.id} className="w-full [&>a]:w-full [&>a]:block [&>div]:w-full">
                     <FacultyCard faculty={f} />
                   </div>
                 ))}
@@ -115,40 +122,47 @@ export default function DashboardSchool({
             )}
           </div>
 
-          {/* 7. Enrolled students / community list — max 5 */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-slate-900">Students</h2>
-              <Link
-                href="/members"
-                className="text-sm text-[var(--goya-primary)] hover:underline"
-              >
-                View all &rarr;
-              </Link>
-            </div>
-            {connections.length === 0 ? (
+          {/* Courses carousel */}
+          <HorizontalCarousel
+            title="Active courses"
+            showAllHref="/academy"
+            showAllLabel="View all courses"
+            emptyState={
               <Card variant="flat" padding="lg">
                 <p className="text-sm text-slate-500">
-                  No enrolled students yet.{' '}
-                  <Link href="/members" className="text-[var(--goya-primary)] hover:underline">
-                    Browse the directory
+                  No courses yet.{' '}
+                  <Link href="/settings/my-courses" className="text-[var(--goya-primary)] hover:underline">
+                    Add your first course
                   </Link>
                 </p>
               </Card>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {connections.slice(0, 5).map((c) => (
-                  <div
-                    key={c.connectionId}
-                    className="w-full [&>a]:w-full [&>a]:block [&>div]:w-full"
-                  >
-                    <ConnectionCard connection={c} />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+            }
+          >
+            {courses.length > 0
+              ? courses.map((course) => <CourseCard key={course.id} course={course} />)
+              : null}
+          </HorizontalCarousel>
 
+          {/* Events carousel */}
+          <HorizontalCarousel
+            title="Upcoming events"
+            showAllHref="/events"
+            showAllLabel="Browse events"
+            emptyState={
+              <Card variant="flat" padding="lg">
+                <p className="text-sm text-slate-500">
+                  No events yet.{' '}
+                  <Link href="/events" className="text-[var(--goya-primary)] hover:underline">
+                    Browse events
+                  </Link>
+                </p>
+              </Card>
+            }
+          >
+            {events.length > 0
+              ? events.map((event) => <EventCard key={event.id} event={event} />)
+              : null}
+          </HorizontalCarousel>
         </div>
       </PageContainer>
     </div>

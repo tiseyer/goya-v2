@@ -6,18 +6,19 @@ import PageHero from '@/app/components/PageHero'
 import type { HeroContext } from '@/lib/hero-variables'
 import { getTimeOfDay } from './utils'
 import { ProfileCompletionCard } from './ProfileCompletionCard'
-import { StatHero } from './StatHero'
 import { PrimaryActionCard } from './PrimaryActionCard'
 import { HorizontalCarousel } from './HorizontalCarousel'
-import { ConnectionCard } from './ConnectionCard'
+import { TeacherCard } from './TeacherCard'
+import { CourseCard } from './CourseCard'
 import { EventCard } from './EventCard'
 import type { DashboardProps } from './types'
 import Link from 'next/link'
 
 export default function DashboardWellness({
   profile,
+  teachers,
   events,
-  connections,
+  courses,
   completion,
 }: DashboardProps) {
   const firstName = profile.full_name?.trim().split(' ')[0] || 'there'
@@ -34,75 +35,88 @@ export default function DashboardWellness({
         heroContext={{ firstName, fullName: profile.full_name ?? '', role: profile.role ?? '' } as HeroContext}
       />
       <PageContainer>
-        <div className="py-8 space-y-8">
+        <div className="py-10 space-y-16">
 
-          {/* 2. Profile completion nudge (hidden at 100%) */}
+          {/* Profile completion nudge (hidden at 100%) */}
           <ProfileCompletionCard completion={completion} />
 
-          {/* 3. Stat hero — profile views */}
-          <Card variant="flat" padding="lg">
-            <StatHero
-              label="people viewed your profile this week"
-              value={null}
-            />
-          </Card>
-
-          {/* 4. Primary CTA cards — side by side on desktop, stacked on mobile */}
+          {/* CTA cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <PrimaryActionCard
               headline="Share your next event"
-              description="Reach students looking for workshops and retreats"
+              description="Reach clients looking for wellness sessions"
               ctaLabel="Create event"
               ctaHref="/settings/my-events"
             />
             <PrimaryActionCard
               headline="Add a course or session"
-              description="Share your teachings with the GOYA community"
+              description="Expand your wellness expertise"
               ctaLabel="Add course"
               ctaHref="/settings/my-courses"
             />
           </div>
 
-          {/* 5. Suggested connections carousel */}
+          {/* Courses — growth */}
           <HorizontalCarousel
-            title="Teachers and schools near you"
-            showAllHref="/members"
-            showAllLabel="Explore directory"
+            title="Expand your wellness expertise"
+            showAllHref="/academy"
+            showAllLabel="Explore all courses"
             emptyState={
               <Card variant="flat" padding="lg">
                 <p className="text-sm text-slate-500">
-                  Connect with teachers and schools in the GOYA community.{' '}
-                  <Link href="/members" className="text-[var(--goya-primary)] hover:underline">
-                    Browse the directory
+                  Courses from the GOYA community.{' '}
+                  <Link href="/academy" className="text-[var(--goya-primary)] hover:underline">
+                    Explore courses
                   </Link>
                 </p>
               </Card>
             }
           >
-            {connections.map((c) => (
-              <ConnectionCard key={c.connectionId} connection={c} />
-            ))}
+            {courses.length > 0
+              ? courses.map((course) => <CourseCard key={course.id} course={course} />)
+              : null}
           </HorizontalCarousel>
 
-          {/* 6. Upcoming events carousel */}
+          {/* Events — wellness & healing */}
           <HorizontalCarousel
-            title="Upcoming events"
+            title="Wellness & healing events"
             showAllHref="/events"
-            showAllLabel="Show all events"
+            showAllLabel="Browse events"
             emptyState={
               <Card variant="flat" padding="lg">
                 <p className="text-sm text-slate-500">
-                  No upcoming events yet.{' '}
+                  No events yet.{' '}
                   <Link href="/events" className="text-[var(--goya-primary)] hover:underline">
-                    Browse all events
+                    Browse events
                   </Link>
                 </p>
               </Card>
             }
           >
-            {events.map((e) => (
-              <EventCard key={e.id} event={e} />
-            ))}
+            {events.length > 0
+              ? events.map((e) => <EventCard key={e.id} event={e} />)
+              : null}
+          </HorizontalCarousel>
+
+          {/* Teachers — community */}
+          <HorizontalCarousel
+            title="Connect with teachers"
+            showAllHref="/members?role=teacher"
+            showAllLabel="Browse teachers"
+            emptyState={
+              <Card variant="flat" padding="lg">
+                <p className="text-sm text-slate-500">
+                  Discover yoga teachers in the community.{' '}
+                  <Link href="/members?role=teacher" className="text-[var(--goya-primary)] hover:underline">
+                    Browse teachers
+                  </Link>
+                </p>
+              </Card>
+            }
+          >
+            {teachers.length > 0
+              ? teachers.map((t) => <TeacherCard key={t.id} teacher={t} />)
+              : null}
           </HorizontalCarousel>
         </div>
       </PageContainer>
