@@ -154,14 +154,17 @@ export default function GlobalSearchOverlay() {
 
     if (!isQ) return;
 
+    const questionText = q; // capture for closure
     const timer = setTimeout(async () => {
       setMatteaLoading(true);
       try {
+        const body = JSON.stringify({ question: questionText });
         const res = await fetch('/api/search/mattea-hint', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: q }),
+          body,
         });
+        if (!res.ok) { setMatteaLoading(false); return; }
         const data = await res.json();
         if (data.answer) {
           setMatteaAnswer(data.answer);
