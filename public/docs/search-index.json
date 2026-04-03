@@ -1,5 +1,14 @@
 [
   {
+    "slug": "admin/admin-hero-editing",
+    "title": "Hero Section Editing",
+    "audience": [
+      "admin"
+    ],
+    "section": "admin",
+    "content": "Hero Section Editing\nAdmins can customize the hero banner (pill, title, and subtitle) on any page that displays a PageHero.\nHow to Edit\nNavigate to any page with a hero banner (Dashboard, Events, Academy, AddOns)\nLook for the small pencil icon in the topright corner of the hero section\nClick the pencil icon to enter edit mode\nEdit the pill text, title, or subtitle directly inline\nUse variable pills at the bottom to insert dynamic content\nClick Save to persist your changes, or Cancel to discard\nAvailable Variables\n Description \n User's first name \n User's full name \n User's role \n Timebased greeting \n Total members \n Total events \nVariables resolve differently for each user viewing the page.\nNotes\nChanges are saved per page (Dashboard, Events, Academy, AddOns)\nIf you clear all fields, the page reverts to its default hero content\nOnly admins can see the edit pencil and make changes\nAll users see the customized content with their own variable values"
+  },
+  {
     "slug": "admin/analytics",
     "title": "Analytics",
     "audience": [
