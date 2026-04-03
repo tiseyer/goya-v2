@@ -291,6 +291,22 @@ Previous: v1.6 Open Gates REST API, v1.3 Subscriptions & Teacher Upgrade, v1.2 S
 
 **Artifacts:** `.planning/workstreams/documentation-system/`
 
+## Parallel Workstream: v1.20 Event Detail & Admin Form Overhaul
+
+**Workstream:** `big-event-update-lol`
+**Goal:** Complete overhaul of admin event form (registration, instructors, organizers, attendees) and public event detail page (sidebar widget, join/leave flow, add-to-calendar, permissions).
+
+**Target features:**
+- Database: short_description, visibility toggles, external registration, unlimited_spots columns + event_attendees & event_instructors join tables
+- Admin form: 3-section registration box, reordered layout, short description, collapsible event history, repositioned View Event button
+- Admin form: Instructors & Organizers boxes with role-filtered member search, Attendees box with manual add/remove
+- Frontend detail: restructured sidebar (price pill, date/time, expandable location, join/leave flow)
+- Add to Calendar: Google, Apple/Outlook (.ics), Outlook Web dropdown
+- Permissions: edit/delete only for organizers + admin/mod
+- My Events: show all events where user is organizer
+
+**Artifacts:** `.planning/workstreams/big-event-update-lol/`
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -302,4 +318,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after v1.19 Global Search milestone started*
+*Last updated: 2026-04-03 after v1.20 Event Detail & Admin Form Overhaul workstream started*
