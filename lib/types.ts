@@ -143,6 +143,11 @@ export interface Course {
   author_type: string | null;
   school_author_id: string | null;
   status: CourseStatus;
+  created_by: string | null;
+  show_organizers: boolean;
+  show_instructors: boolean;
+  show_attendees: boolean;
+  organizer_ids: string[];
   created_at: string;
   updated_at: string;
 }
