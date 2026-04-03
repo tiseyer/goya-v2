@@ -108,6 +108,9 @@ export interface Event {
   author_type: string | null;
   school_author_id: string | null;
   deleted_at: string | null;
+  created_by: string | null;
+  show_organizers: boolean;
+  show_instructors: boolean;
   created_at: string;
   updated_at: string;
 }
