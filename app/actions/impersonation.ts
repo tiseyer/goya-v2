@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { IMPERSONATION_COOKIE, IMPERSONATION_LOG_COOKIE } from '@/lib/impersonation'
 import { logAuditEvent } from '@/lib/audit'
+import { isAdminOrAbove } from '@/lib/roles'
 
 const COOKIE_MAX_AGE = 60 * 60 * 2 // 2 hours
 
@@ -24,7 +25,7 @@ export async function startImpersonation(targetUserId: string) {
     .select('role')
     .eq('id', user.id)
     .single()
-  if (adminProfile?.role !== 'admin') throw new Error('Only admins can impersonate users')
+  if (!isAdminOrAbove(adminProfile?.role)) throw new Error('Only admins can impersonate users')
 
   // Cannot impersonate yourself
   if (user.id === targetUserId) throw new Error('Cannot impersonate yourself')

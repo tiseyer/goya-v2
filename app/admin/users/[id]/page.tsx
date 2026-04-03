@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
+import { isAdminOrAbove } from '@/lib/roles';
 import Badge from '@/app/components/ui/Badge';
 import RemoveConnectionButton from './RemoveConnectionButton';
 import UserFlowsSection from './UserFlowsSection';
@@ -29,7 +30,7 @@ export default async function AdminUserDetailPage({
     .eq('id', adminUser!.id)
     .single();
 
-  const currentUserIsAdmin = adminProfile?.role === 'admin';
+  const currentUserIsAdmin = isAdminOrAbove(adminProfile?.role);
 
   // Fetch the target user's profile (service role bypasses RLS for reliable admin access)
   const serviceClient = getSupabaseService();

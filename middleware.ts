@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { isAdminOrAbove, isAdminOrMod } from '@/lib/roles'
 
 // Public paths that don't require authentication
 const PUBLIC_PATHS = [
@@ -250,7 +251,7 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
     const role = mmProfile?.role ?? 'member'
-    if (role !== 'admin' && role !== 'moderator') {
+    if (!isAdminOrMod(role)) {
       return NextResponse.redirect(new URL('/maintenance', request.url))
     }
   }
@@ -266,7 +267,7 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (impersonatorProfile?.role !== 'admin') {
+    if (!isAdminOrAbove(impersonatorProfile?.role)) {
       // Non-admin has impersonation cookie — security violation, clear and redirect
       const cleanResponse = NextResponse.redirect(new URL('/', request.url))
       cleanResponse.cookies.delete('goya_impersonating')
@@ -313,9 +314,9 @@ export async function middleware(request: NextRequest) {
     // Admin paths: check role
     if (isAdminPath) {
       const role = profile?.role ?? 'member'
-      const isAdminOrMod = role === 'admin' || role === 'moderator'
+      const hasAdminAccess = isAdminOrMod(role)
 
-      if (!isAdminOrMod) {
+      if (!hasAdminAccess) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
       }
     }
@@ -353,7 +354,7 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
     const pvRole = pvProfile?.role ?? 'member'
-    if (pvRole !== 'admin' && pvRole !== 'moderator') {
+    if (!isAdminOrMod(pvRole)) {
       const pages = await getPageVisibility()
       if (pages) {
         const redirect = getPageRedirect(pathname, pages)

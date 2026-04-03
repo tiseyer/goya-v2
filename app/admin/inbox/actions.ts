@@ -8,6 +8,7 @@ import type { SupportTicket, TicketStatus } from '@/lib/chatbot/types'
 import { writeEventAuditLog } from '@/lib/events/audit'
 import { writeCourseAuditLog } from '@/lib/courses/audit'
 import { logAuditEvent } from '@/lib/audit'
+import { isAdminOrAbove, isAdminOrMod } from '@/lib/roles'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -28,7 +29,7 @@ export async function approveUpgradeRequest(
     .eq('id', user.id)
     .single()
 
-  if (!adminProfile || adminProfile.role !== 'admin') {
+  if (!adminProfile || !isAdminOrAbove(adminProfile.role)) {
     return { success: false, error: 'Unauthorized' }
   }
 
@@ -142,7 +143,7 @@ export async function rejectUpgradeRequest(
     .eq('id', user.id)
     .single()
 
-  if (!adminProfile || adminProfile.role !== 'admin') {
+  if (!adminProfile || !isAdminOrAbove(adminProfile.role)) {
     return { success: false, error: 'Unauthorized' }
   }
 
@@ -228,7 +229,7 @@ export async function approveCreditEntry(
 
   if (
     !adminProfile ||
-    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+    !isAdminOrMod(adminProfile.role)
   ) {
     return { success: false, error: 'Unauthorized' }
   }
@@ -276,7 +277,7 @@ export async function rejectCreditEntry(
 
   if (
     !adminProfile ||
-    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+    !isAdminOrMod(adminProfile.role)
   ) {
     return { success: false, error: 'Unauthorized' }
   }
@@ -511,7 +512,7 @@ export async function approveEvent(
 
   if (
     !adminProfile ||
-    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+    !isAdminOrMod(adminProfile.role)
   ) {
     return { success: false, error: 'Unauthorized' }
   }
@@ -587,7 +588,7 @@ export async function rejectEvent(
 
   if (
     !adminProfile ||
-    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+    !isAdminOrMod(adminProfile.role)
   ) {
     return { success: false, error: 'Unauthorized' }
   }
@@ -673,7 +674,7 @@ export async function approveCourse(
 
   if (
     !adminProfile ||
-    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+    !isAdminOrMod(adminProfile.role)
   ) {
     return { success: false, error: 'Unauthorized' }
   }
@@ -749,7 +750,7 @@ export async function rejectCourse(
 
   if (
     !adminProfile ||
-    (adminProfile.role !== 'admin' && adminProfile.role !== 'moderator')
+    !isAdminOrMod(adminProfile.role)
   ) {
     return { success: false, error: 'Unauthorized' }
   }
