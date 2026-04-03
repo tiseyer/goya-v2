@@ -146,7 +146,7 @@ export default function PageHero({
     }
   };
 
-  // Admin pencil/saved indicator (shared between variants)
+  // Admin pencil/X/saved indicator (shared between variants)
   const adminControl = isAdmin && pageSlug ? (
     <div className="absolute top-4 right-4 z-10">
       {saved ? (
@@ -156,7 +156,22 @@ export default function PageHero({
           </svg>
           Saved
         </div>
-      ) : !editing ? (
+      ) : editing ? (
+        <button
+          type="button"
+          onClick={handleCancel}
+          className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
+            variant === 'dark'
+              ? 'bg-white/10 hover:bg-white/20 text-white/60 hover:text-white'
+              : 'bg-slate-200/80 hover:bg-slate-300 text-slate-500 hover:text-slate-700'
+          }`}
+          title="Cancel editing"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      ) : (
         <button
           type="button"
           onClick={handleEdit}
@@ -171,55 +186,7 @@ export default function PageHero({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 012.828 2.828L11.828 15.828a2 2 0 01-1.414.586H8v-2.414a2 2 0 01.586-1.414z" />
           </svg>
         </button>
-      ) : null}
-    </div>
-  ) : null;
-
-  // Edit toolbar — absolutely positioned at bottom of hero so it doesn't affect height
-  const editToolbar = editing ? (
-    <div className="absolute bottom-3 left-0 right-0 z-10 flex flex-col items-center gap-2">
-      <div className="flex flex-wrap gap-1.5 justify-center">
-        {HERO_VARIABLES.map(v => (
-          <button
-            key={v.key}
-            type="button"
-            onClick={() => insertVariable(v.key)}
-            title={v.description}
-            className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors border ${
-              variant === 'dark'
-                ? 'bg-white/15 hover:bg-white/25 text-white/80 border-white/20'
-                : 'bg-[#4E87A0]/10 hover:bg-[#4E87A0]/20 text-[#4E87A0] border-[#4E87A0]/20'
-            }`}
-          >
-            {v.key}
-          </button>
-        ))}
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={handleCancel}
-          className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-colors border ${
-            variant === 'dark'
-              ? 'text-white/70 hover:text-white border-white/20 hover:border-white/40'
-              : 'text-slate-500 hover:text-slate-700 border-slate-200 hover:border-slate-300'
-          }`}
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={saving}
-          className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-colors disabled:opacity-50 ${
-            variant === 'dark'
-              ? 'bg-white text-[#1B3A5C] hover:bg-white/90'
-              : 'bg-[#1B3A5C] text-white hover:bg-[#243560]'
-          }`}
-        >
-          {saving ? 'Saving...' : 'Save'}
-        </button>
-      </div>
+      )}
     </div>
   ) : null;
 
@@ -246,6 +213,32 @@ export default function PageHero({
 
     return (
       <section className="relative h-[220px] bg-primary overflow-hidden">
+        {editing && (
+          <div className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-1 p-2 bg-black/30 backdrop-blur-sm rounded-r-xl">
+            <span className="text-white/50 text-xs mb-1">Variables</span>
+            {HERO_VARIABLES.map(v => (
+              <button
+                key={v.key}
+                type="button"
+                onClick={() => insertVariable(v.key)}
+                title={v.description}
+                className="text-xs bg-white/20 hover:bg-white/40 text-white px-2 py-1 rounded font-mono whitespace-nowrap transition-colors"
+              >
+                {v.key}
+              </button>
+            ))}
+          </div>
+        )}
+        {editing && (
+          <div className="fixed top-4 right-4 z-50 flex gap-2">
+            <button type="button" onClick={handleCancel} className="px-4 py-2 text-sm bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-colors">
+              Cancel
+            </button>
+            <button type="button" onClick={handleSave} disabled={saving} className="px-4 py-2 text-sm bg-white text-[#345c83] hover:bg-white/90 rounded-lg font-medium transition-colors disabled:opacity-50">
+              {saving ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        )}
         {/* Dot-grid texture */}
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -298,8 +291,6 @@ export default function PageHero({
             )
           )}
         </div>
-
-        {editToolbar}
       </section>
     );
   }
@@ -326,6 +317,32 @@ export default function PageHero({
 
   return (
     <section className="relative h-[220px] bg-surface-muted border-b border-slate-200 overflow-hidden">
+      {editing && (
+        <div className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-1 p-2 bg-black/30 backdrop-blur-sm rounded-r-xl">
+          <span className="text-white/50 text-xs mb-1">Variables</span>
+          {HERO_VARIABLES.map(v => (
+            <button
+              key={v.key}
+              type="button"
+              onClick={() => insertVariable(v.key)}
+              title={v.description}
+              className="text-xs bg-white/20 hover:bg-white/40 text-white px-2 py-1 rounded font-mono whitespace-nowrap transition-colors"
+            >
+              {v.key}
+            </button>
+          ))}
+        </div>
+      )}
+      {editing && (
+        <div className="fixed top-4 right-4 z-50 flex gap-2">
+          <button type="button" onClick={handleCancel} className="px-4 py-2 text-sm bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-colors">
+            Cancel
+          </button>
+          <button type="button" onClick={handleSave} disabled={saving} className="px-4 py-2 text-sm bg-white text-[#345c83] hover:bg-white/90 rounded-lg font-medium transition-colors disabled:opacity-50">
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      )}
       {/* Subtle background glow */}
       <div className="absolute pointer-events-none inset-x-0 top-0 h-[220px] overflow-hidden" aria-hidden="true">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-primary opacity-[0.03] rounded-full blur-3xl" />
@@ -367,8 +384,6 @@ export default function PageHero({
           )
         )}
       </div>
-
-      {editToolbar}
     </section>
   );
 }
