@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { isAdminOrMod } from '@/lib/roles';
 
 interface NavItem {
   href: string;
@@ -85,7 +86,7 @@ export default function SettingsShell({ children, userRole }: { children: React.
 
   // Fetch chatbot maintenance mode status for Help item indicator
   useEffect(() => {
-    if (userRole !== 'admin' && userRole !== 'moderator') return;
+    if (!isAdminOrMod(userRole)) return;
     fetch('/api/chatbot/config')
       .then(res => res.ok ? res.json() : null)
       .then(data => {

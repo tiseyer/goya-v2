@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
 import AdminShell from '@/app/admin/components/AdminShell'
+import { isAdminOrAbove } from '@/lib/roles'
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString('en-US', {
@@ -43,7 +44,7 @@ export default async function ImpersonationLogPage() {
     .eq('id', user.id)
     .single()
 
-  if (profile?.role !== 'admin') redirect('/admin/dashboard')
+  if (!isAdminOrAbove(profile?.role)) redirect('/admin/dashboard')
 
   const { data: logs } = await (getSupabaseService() as any)
     .from('impersonation_log')

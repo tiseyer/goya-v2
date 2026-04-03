@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
+import { isAdminOrMod } from '@/lib/roles';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
     .single();
 
   const role = profile?.role ?? 'student';
-  const isAdmin = role === 'admin' || role === 'moderator';
+  const isAdmin = isAdminOrMod(role);
   const limit = 20;
 
   const results: Record<string, unknown[]> = {

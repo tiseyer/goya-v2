@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import PageHero from '@/app/components/PageHero'
 import SchoolRegistrationCTA from '@/app/components/SchoolRegistrationCTA'
+import { isAdminOrMod, isAdminOrAbove } from '@/lib/roles'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -126,7 +127,7 @@ export default async function AddonsPage() {
 
   // 5. Filter with visibility logic — admins/mods see everything
   const role = profile?.role ?? 'student'
-  const isStaff = role === 'admin' || role === 'moderator'
+  const isStaff = isAdminOrMod(role)
   const userCtx = {
     role,
     designations: (profile?.designations ?? []) as string[],
@@ -194,7 +195,7 @@ export default async function AddonsPage() {
       </div>
 
       {/* School Registration Banner — teachers without a school */}
-      {(role === 'teacher' || role === 'admin') && !isSchoolOwner && (
+      {(role === 'teacher' || isAdminOrAbove(role)) && !isSchoolOwner && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
           <SchoolRegistrationCTA variant="banner" />
         </div>

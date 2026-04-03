@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getEffectiveUserId } from '@/lib/supabase/getEffectiveUserId';
 import { getSupabaseService } from '@/lib/supabase/service';
+import { isAdminOrMod } from '@/lib/roles';
 import type { Course, UserCourseProgress } from '@/lib/types';
 import type { Lesson } from '@/lib/courses/lessons';
 import { enrollAndStart } from './actions';
@@ -91,7 +92,7 @@ export default async function CourseOverviewPage({
         .select('role')
         .eq('id', user.id)
         .single();
-      if (authProfile?.role === 'admin' || authProfile?.role === 'moderator') {
+      if (isAdminOrMod(authProfile?.role)) {
         canManage = true;
       }
     }

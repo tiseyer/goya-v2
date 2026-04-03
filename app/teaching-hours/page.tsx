@@ -7,6 +7,7 @@ import { getUserCreditTotals, checkUserMeetsRequirements } from '@/lib/credits';
 import CreditHistory from '@/app/credits/components/CreditHistory';
 import CreditSubmissionFormToggle from '@/app/credits/components/CreditSubmissionFormToggle';
 import { isSandboxActive } from '@/lib/site-settings';
+import { isAdminOrAbove, isAdminOrMod } from '@/lib/roles';
 
 export default async function TeachingHoursPage() {
   const userId = await getEffectiveUserId();
@@ -18,13 +19,13 @@ export default async function TeachingHoursPage() {
     .eq('id', userId)
     .single();
 
-  if (profile?.member_type !== 'teacher' && profile?.role !== 'admin') {
+  if (profile?.member_type !== 'teacher' && !isAdminOrAbove(profile?.role)) {
     redirect('/credits');
   }
 
   // Credit hours sandbox: hide from non-admin users
   const teachingRole = profile?.role ?? 'member';
-  if (teachingRole !== 'admin' && teachingRole !== 'moderator') {
+  if (!isAdminOrMod(teachingRole)) {
     const sandboxed = await isSandboxActive('credit_hours_sandbox');
     if (sandboxed) redirect('/dashboard');
   }

@@ -2,6 +2,7 @@
 
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
+import { isAdminOrMod } from '@/lib/roles';
 
 interface MemberSearchResult {
   id: string;
@@ -47,7 +48,7 @@ export async function searchMembers(
     callerRole = profile?.role ?? 'student';
   }
 
-  const isPrivileged = callerRole === 'admin' || callerRole === 'moderator';
+  const isPrivileged = isAdminOrMod(callerRole);
 
   if (isPrivileged) {
     // Admin/moderator: search all profiles by name

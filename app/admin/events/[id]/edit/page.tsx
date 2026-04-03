@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
 import type { Event } from '@/lib/types';
 import EventForm from '../../components/EventForm';
+import { isAdminOrAbove } from '@/lib/roles';
 
 interface AuditEntry {
   id: string;
@@ -50,7 +51,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
     .eq('id', user!.id)
     .single();
   const userRole = (profileRow?.role as string) ?? 'moderator';
-  const isAdmin = userRole === 'admin';
+  const isAdmin = isAdminOrAbove(userRole);
 
   // Fetch audit log (service role to bypass RLS — admin-only section)
   let auditEntries: AuditEntryWithProfile[] = [];

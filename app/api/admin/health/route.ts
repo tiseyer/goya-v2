@@ -3,6 +3,7 @@ import { getSupabaseService } from '@/lib/supabase/service'
 import { runAllChecks } from '@/lib/health-checks'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { isAdminOrAbove } from '@/lib/roles'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,7 +33,7 @@ async function getAdminUser() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || profile.role !== 'admin') return null
+  if (!profile || !isAdminOrAbove(profile.role as string)) return null
   return user
 }
 

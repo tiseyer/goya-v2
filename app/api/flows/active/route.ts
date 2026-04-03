@@ -3,6 +3,7 @@ import { getEffectiveUserId } from '@/lib/supabase/getEffectiveUserId';
 import { getActiveFlowForUser } from '@/lib/flows/engine';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { FlowTriggerType } from '@/lib/flows/types';
+import { isAdminOrMod } from '@/lib/roles';
 
 export async function GET(request: Request) {
   let userId: string;
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
     supabase.from('profiles').select('role').eq('id', userId).single(),
   ]);
   const role = profile?.role ?? 'member';
-  if (sandboxRow?.value === 'true' && role !== 'admin' && role !== 'moderator') {
+  if (sandboxRow?.value === 'true' && !isAdminOrMod(role)) {
     return NextResponse.json({ flow: null }, { status: 200 });
   }
 

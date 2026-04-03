@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
 import type { Course } from '@/lib/types';
+import { isAdminOrAbove } from '@/lib/roles';
 import CourseForm from '../../components/CourseForm';
 import { fetchCategories } from '../../category-actions';
 import { fetchLessons } from '../../lesson-actions';
@@ -69,7 +70,7 @@ export default async function EditCoursePage({
     .eq('id', user!.id)
     .single();
   const userRole = (profileRow?.role as string) ?? 'moderator';
-  const isAdmin = userRole === 'admin';
+  const isAdmin = isAdminOrAbove(userRole);
 
   // Fetch audit log (service role to bypass RLS -- admin-only section)
   let auditEntries: AuditEntryWithProfile[] = [];

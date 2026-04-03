@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState } from 'react';
+import { isAdminOrAbove } from '@/lib/roles';
 
 const CATEGORIES = ['Workshop', 'Teacher Training', 'Dharma Talk', 'Conference', 'Yoga Sequence', 'Music Playlist', 'Research'];
 const FORMATS    = ['Online', 'In Person', 'Hybrid'];
@@ -40,7 +41,7 @@ export default function AdminEventsFilters({ userRole }: Props) {
   const [eventType, setEventType] = useState(searchParams.get('type')     ?? '');
   const [sort,      setSort]      = useState(searchParams.get('sort')     ?? 'date_asc');
 
-  const isAdmin = userRole === 'admin';
+  const isAdmin = isAdminOrAbove(userRole);
 
   const allStatuses = isAdmin
     ? [...BASE_STATUSES, { value: 'deleted', label: 'Deleted (trash)' }]

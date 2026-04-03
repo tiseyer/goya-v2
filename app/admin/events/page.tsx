@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { Event } from '@/lib/types';
+import { isAdminOrAbove } from '@/lib/roles';
 import AdminEventsFilters from './AdminEventsFilters';
 import AdminEventActions from './AdminEventActions';
 import CategoryManager from './categories/CategoryManager';
@@ -64,7 +65,7 @@ export default async function AdminEventsPage({
     .eq('id', user!.id)
     .single();
   const userRole = (profileRow?.role as string) ?? 'moderator';
-  const isAdmin  = userRole === 'admin';
+  const isAdmin  = isAdminOrAbove(userRole);
 
   // ── Tabs ──────────────────────────────────────────────────────────────────
   const tabs = [

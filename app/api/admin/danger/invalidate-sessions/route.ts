@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
+import { isAdminOrAbove } from '@/lib/roles'
 
 async function requireAdmin() {
   const supabase = await createSupabaseServerClient()
@@ -11,7 +12,7 @@ async function requireAdmin() {
     .select('role')
     .eq('id', user.id)
     .single()
-  if (!profile || profile.role !== 'admin') return { error: 'Forbidden', status: 403 }
+  if (!profile || !isAdminOrAbove(profile.role as string)) return { error: 'Forbidden', status: 403 }
   return { user }
 }
 

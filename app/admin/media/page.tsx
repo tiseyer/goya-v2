@@ -5,6 +5,7 @@
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getFolders } from './actions';
 import MediaPageClient from './MediaPageClient';
+import { isAdminOrAbove } from '@/lib/roles';
 
 export default async function AdminMediaPage({
   searchParams,
@@ -38,7 +39,7 @@ export default async function AdminMediaPage({
   const currentUserRole = profile?.role ?? 'moderator';
   const currentUserEmail = user?.email ?? '';
   const currentUserName = profile?.full_name ?? '';
-  const isAdmin = currentUserRole === 'admin';
+  const isAdmin = isAdminOrAbove(currentUserRole);
 
   return (
     <MediaPageClient

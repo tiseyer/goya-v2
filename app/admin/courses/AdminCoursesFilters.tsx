@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { fetchCategories } from './category-actions';
 import type { CourseCategory } from '@/lib/courses/categories';
+import { isAdminOrAbove } from '@/lib/roles';
 const BASE_STATUSES: Array<{ value: string; label: string }> = [
   { value: 'published',      label: 'Published'      },
   { value: 'draft',          label: 'Draft'           },
@@ -45,7 +46,7 @@ export default function AdminCoursesFilters({ userRole }: Props) {
     fetchCategories().then(({ data }) => setDbCategories(data));
   }, []);
 
-  const isAdmin = userRole === 'admin';
+  const isAdmin = isAdminOrAbove(userRole);
 
   const allStatuses = isAdmin
     ? [...BASE_STATUSES, { value: 'deleted', label: 'Deleted (trash)' }]
