@@ -4,8 +4,8 @@ milestone: v1.18
 milestone_name: User Profile Redesign
 status: complete
 stopped_at: null
-last_updated: "2026-04-03T01:31:00.000Z"
-last_activity: 2026-04-03 - Quick task 260403-bpe: Standardize page hero sections with reusable PageHero
+last_updated: "2026-04-03T02:00:00.000Z"
+last_activity: 2026-04-03 - Quick task 260403-c2q: Fix events sidebar filter box border colors for dark mode
 progress:
   total_phases: 4
   completed_phases: 4
@@ -84,9 +84,10 @@ None.
 | 260403-bpe | Standardize page hero sections with reusable PageHero | 2026-04-03 | cbae423, 7ddf829 | [260403-bpe-standardize-page-hero-sections-with-reus](./quick/260403-bpe-standardize-page-hero-sections-with-reus/) |
 | 260403-bsn | Fix events page dark background | 2026-04-03 | cb6135d | [260403-bsn-fix-events-page-dark-background](./quick/260403-bsn-fix-events-page-dark-background/) |
 | 260403-c1n | Switch Events and Academy PageHero to variant dark | 2026-04-03 | db08db4 | [260403-c1n-switch-events-and-academy-pagehero-to-va](./quick/260403-c1n-switch-events-and-academy-pagehero-to-va/) |
+| 260403-c2q | Fix events sidebar filter box border colors for dark mode | 2026-04-03 | f3eb53c | [260403-c2q-fix-events-sidebar-filter-box-border-col](./quick/260403-c2q-fix-events-sidebar-filter-box-border-col/) |
 
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Completed quick task 260403-c1n: Switch Events and Academy PageHero to variant dark
+Stopped at: Completed quick task 260403-c2q: Fix events sidebar filter box border colors for dark mode
 Resume file: None
