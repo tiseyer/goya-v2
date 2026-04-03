@@ -345,6 +345,115 @@ export default function ColorsTab() {
         />
       </Section>
 
+      {/* ── Live Preview ─────────────────────────────────────────────────── */}
+      <div className="border-t border-[#E5E7EB] pt-6">
+        <div className="mb-4">
+          <h2 className="text-base font-semibold text-[#1B3A5C]">Live Preview</h2>
+          <p className="text-sm text-[#6B7280] mt-0.5">Changes update in real time</p>
+        </div>
+
+        <div className="space-y-4">
+          {/* 1. Hero strip */}
+          <div
+            className="rounded-xl overflow-hidden p-6 text-center relative"
+            style={{ backgroundColor: brandColors.primary }}
+          >
+            <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '28px 28px' }} />
+            <div className="relative">
+              <span className="inline-block px-3 py-1 bg-white/15 border border-white/20 rounded-full text-white text-xs font-semibold mb-2">Upcoming Events</span>
+              <h3 className="text-2xl font-black text-white">Hero Section Preview</h3>
+              <p className="text-white/70 text-sm mt-1">Subtitle text uses primary blue as background</p>
+            </div>
+          </div>
+
+          {/* 2. Buttons row */}
+          <div className="flex flex-wrap gap-3">
+            <span
+              className="px-4 py-2 text-white text-sm font-semibold rounded-lg cursor-default"
+              style={{ backgroundColor: brandColors.primary }}
+            >
+              Primary Button
+            </span>
+            <span
+              className="px-4 py-2 text-sm font-semibold rounded-lg cursor-default"
+              style={{ border: `1px solid ${brandColors.border}`, color: brandColors.foreground }}
+            >
+              Secondary Button
+            </span>
+            <span
+              className="px-4 py-2 text-white text-sm font-semibold rounded-lg cursor-default"
+              style={{ backgroundColor: brandColors.accent }}
+            >
+              Destructive Button
+            </span>
+          </div>
+
+          {/* 3. Typography */}
+          <div className="space-y-1">
+            <h3 className="text-lg font-bold" style={{ color: brandColors.foreground }}>Heading Text</h3>
+            <p className="text-sm" style={{ color: brandColors.foreground }}>Body text in the foreground color. This shows how regular content appears.</p>
+            <p className="text-sm" style={{ color: brandColors.foreground, opacity: 0.5 }}>Muted secondary text at 50% opacity.</p>
+          </div>
+
+          {/* 4. Surface & Border card */}
+          <div
+            className="rounded-lg p-4"
+            style={{ backgroundColor: brandColors.surface, border: `1px solid ${brandColors.border}` }}
+          >
+            <p className="text-sm" style={{ color: brandColors.foreground }}>Content card with Surface background and Border color</p>
+          </div>
+
+          {/* 5. Role pills */}
+          <div>
+            <p className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Role badges:</p>
+            <div className="flex flex-wrap gap-2">
+              {(Object.keys(roleColors) as (keyof RoleColors)[]).map((key) => (
+                <span
+                  key={key}
+                  className="px-3 py-1 text-white text-xs font-semibold rounded-full cursor-default"
+                  style={{ backgroundColor: roleColors[key] }}
+                >
+                  {ROLE_LABELS[key]}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* 6. Maintenance indicator */}
+          <div>
+            <p className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Maintenance mode indicator:</p>
+            <div
+              className="rounded-lg px-4 py-2.5 text-sm font-semibold text-white flex items-center gap-2"
+              style={{ backgroundColor: maintenanceColor }}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              Platform is currently undergoing maintenance
+            </div>
+          </div>
+
+          {/* 7. Free badge + price badge */}
+          <div>
+            <p className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Event badges:</p>
+            <div className="flex gap-3">
+              <span
+                className="px-3 py-1 text-white text-sm font-bold rounded-full cursor-default"
+                style={{ backgroundColor: brandColors.primary }}
+              >
+                Free
+              </span>
+              <span
+                className="px-3 py-1 text-sm font-bold rounded-full cursor-default"
+                style={{ backgroundColor: brandColors.surface, border: `1px solid ${brandColors.border}`, color: brandColors.foreground }}
+              >
+                $25
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Reset All button */}
       <div className="flex justify-end">
         <button
