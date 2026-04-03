@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import PageContainer from '@/app/components/ui/PageContainer'
 import Card from '@/app/components/ui/Card'
-import { DashboardGreeting } from './DashboardGreeting'
+import PageHero from '@/app/components/PageHero'
+import { getTimeOfDay } from './utils'
 import { HorizontalCarousel } from './HorizontalCarousel'
 import { TeacherCard } from './TeacherCard'
 import { CourseCard } from './CourseCard'
@@ -24,14 +25,14 @@ export default function DashboardStudent({
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <PageHero
+        variant="dark"
+        pill="Student"
+        title={`Good ${getTimeOfDay()}, ${firstName}.`}
+        subtitle="Ready to practice today?"
+      />
       <PageContainer>
         <div className="py-8 space-y-8">
-          {/* 1. Greeting */}
-          <DashboardGreeting
-            firstName={firstName}
-            role="student"
-            subtitle="Ready to practice today?"
-          />
 
           {/* 2. Teachers carousel */}
           <HorizontalCarousel

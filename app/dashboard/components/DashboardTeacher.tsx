@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import PageContainer from '@/app/components/ui/PageContainer'
 import Card from '@/app/components/ui/Card'
-import { DashboardGreeting } from './DashboardGreeting'
+import PageHero from '@/app/components/PageHero'
+import { getTimeOfDay } from './utils'
 import { ProfileCompletionCard } from './ProfileCompletionCard'
 import { StatHero } from './StatHero'
 import { PrimaryActionCard } from './PrimaryActionCard'
@@ -21,14 +22,14 @@ export default function DashboardTeacher({
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <PageHero
+        variant="dark"
+        pill="Teacher"
+        title={`Good ${getTimeOfDay()}, ${firstName}.`}
+        subtitle="What will you teach today?"
+      />
       <PageContainer>
         <div className="py-8 space-y-8">
-          {/* 1. Greeting with Teacher badge */}
-          <DashboardGreeting
-            firstName={firstName}
-            role="teacher"
-            subtitle="Welcome back."
-          />
 
           {/* 2. Profile completion nudge (auto-hides at 100%) */}
           <ProfileCompletionCard completion={completion} />

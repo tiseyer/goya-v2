@@ -3,12 +3,12 @@
 import Link from 'next/link'
 import PageContainer from '@/app/components/ui/PageContainer'
 import Card from '@/app/components/ui/Card'
-import { DashboardGreeting } from './DashboardGreeting'
+import PageHero from '@/app/components/PageHero'
+import { FacultyCard } from './FacultyCard'
+import { ConnectionCard } from './ConnectionCard'
 import { ProfileCompletionCard } from './ProfileCompletionCard'
 import { StatHero } from './StatHero'
 import { PrimaryActionCard } from './PrimaryActionCard'
-import { FacultyCard } from './FacultyCard'
-import { ConnectionCard } from './ConnectionCard'
 import type { SchoolProps } from './types'
 
 export default function DashboardSchool({
@@ -28,15 +28,14 @@ export default function DashboardSchool({
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <PageHero
+        variant="dark"
+        pill="School Owner"
+        title={`Welcome, ${schoolName}.`}
+        subtitle="Manage your school and students."
+      />
       <PageContainer>
         <div className="py-8 space-y-8">
-
-          {/* 1. School greeting with "School" badge */}
-          <DashboardGreeting
-            firstName={schoolName}
-            role="school"
-            subtitle="Welcome back."
-          />
 
           {/* 2. School profile completion card */}
           {completion.score < 100 && (

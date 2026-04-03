@@ -2,7 +2,8 @@
 
 import PageContainer from '@/app/components/ui/PageContainer'
 import Card from '@/app/components/ui/Card'
-import { DashboardGreeting } from './DashboardGreeting'
+import PageHero from '@/app/components/PageHero'
+import { getTimeOfDay } from './utils'
 import { ProfileCompletionCard } from './ProfileCompletionCard'
 import { StatHero } from './StatHero'
 import { PrimaryActionCard } from './PrimaryActionCard'
@@ -22,14 +23,14 @@ export default function DashboardWellness({
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <PageHero
+        variant="dark"
+        pill="Wellness Practitioner"
+        title={`Good ${getTimeOfDay()}, ${firstName}.`}
+        subtitle="Ready to support your clients?"
+      />
       <PageContainer>
         <div className="py-8 space-y-8">
-          {/* 1. Greeting */}
-          <DashboardGreeting
-            firstName={firstName}
-            role="wellness_practitioner"
-            subtitle="Welcome back."
-          />
 
           {/* 2. Profile completion nudge (hidden at 100%) */}
           <ProfileCompletionCard completion={completion} />
