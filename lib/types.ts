@@ -1,4 +1,4 @@
-export type UserRole = 'student' | 'teacher' | 'wellness_practitioner' | 'moderator' | 'admin';
+export type UserRole = 'student' | 'teacher' | 'wellness_practitioner' | 'moderator' | 'admin' | 'superuser';
 export type SubscriptionStatus = 'member' | 'guest';
 export type MemberType = 'student' | 'teacher' | 'wellness_practitioner';
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
