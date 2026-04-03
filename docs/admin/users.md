@@ -3,7 +3,7 @@ title: Users
 audience: ["admin"]
 section: admin
 order: 3
-last_updated: "2026-04-01"
+last_updated: "2026-04-03"
 ---
 
 # Users
@@ -54,6 +54,19 @@ Each user card shows a role badge:
 | **member** | Standard platform user |
 
 Member types (e.g. **Yoga Teacher**, **Wellness Practitioner**, **Student**) appear as a secondary label within the user's profile row or detail page.
+
+## Deleting Users
+
+Select one or more users using the checkboxes in the table. A floating action bar appears at the bottom of the screen. Click **Delete Selected** to open the confirmation dialog, which lists the users to be deleted.
+
+**Deleting regular users:** Confirm the dialog — the deletion is immediate and cannot be undone.
+
+**Deleting admin accounts:** Only the platform owner can delete admin accounts. If admin accounts are selected:
+
+- Regular admins see them annotated as "admin — will be skipped". Admin accounts are excluded from deletion for regular admins.
+- The platform owner sees them annotated as "admin — extra confirmation required". After the first dialog, a **second confirmation dialog** appears listing each admin account to be deleted. You must type `DELETE ADMIN` exactly into the text field before the confirm button becomes active.
+
+**The platform owner account cannot be deleted by anyone.** It appears as "cannot be deleted" in the dialog and is always skipped.
 
 ## User Detail Page
 
