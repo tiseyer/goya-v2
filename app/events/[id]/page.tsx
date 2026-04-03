@@ -89,7 +89,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
   // Fetch attendee profiles if show_attendees is true
   let attendeeProfiles: { id: string; full_name: string | null; avatar_url: string | null }[] = [];
-  if (ev.show_attendees !== false) {
+  if (ev.show_attendees === true) {
     const { data: attendeeRows } = await supabase
       .from('event_attendees')
       .select('profiles!event_attendees_profile_id_fkey(id, full_name, avatar_url)')
@@ -211,7 +211,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             </div>
 
             {/* Attendees section */}
-            {ev.show_attendees !== false && attendeeProfiles.length > 0 && (
+            {ev.show_attendees === true && attendeeProfiles.length > 0 && (
               <EventAttendeesSection attendees={attendeeProfiles} />
             )}
           </div>

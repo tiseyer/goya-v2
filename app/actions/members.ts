@@ -57,9 +57,10 @@ export async function searchMembers(
       .neq('id', user.id)
       .limit(limit);
 
-    // Filter by role if specified (e.g. instructor/organizer pickers exclude students)
+    // Filter by role if specified (case-insensitive to handle seed data variations)
     if (options.roleFilter && options.roleFilter.length > 0) {
-      q = q.in('role', options.roleFilter);
+      const roleOr = options.roleFilter.map(r => `role.ilike.${r}`).join(',');
+      q = q.or(roleOr);
     }
 
     // Exclude already-selected IDs
@@ -109,9 +110,10 @@ export async function searchMembers(
     .ilike('full_name', searchTerm)
     .limit(limit);
 
-  // Apply role filter if specified
+  // Apply role filter if specified (case-insensitive)
   if (options.roleFilter && options.roleFilter.length > 0) {
-    connQ = connQ.in('role', options.roleFilter);
+    const roleOr = options.roleFilter.map(r => `role.ilike.${r}`).join(',');
+    connQ = connQ.or(roleOr);
   }
 
   const { data, error } = await connQ;

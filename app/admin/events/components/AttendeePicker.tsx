@@ -144,7 +144,9 @@ export default function AttendeePicker({
       .from('event_attendees')
       .insert({ event_id: eventId, profile_id: member.id });
 
-    if (!error) {
+    if (error) {
+      console.error('Failed to add attendee:', error.message, { eventId, profileId: member.id });
+    } else {
       setAttendees(prev => [...prev, member]);
       setAddedId(member.id);
       setTimeout(() => setAddedId(null), 2000);

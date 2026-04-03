@@ -83,7 +83,7 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
   const [limitedSpots, setLimitedSpots] = useState(event?.unlimited_spots === false);
   const [externalRegistration, setExternalRegistration] = useState(event?.external_registration ?? false);
   const [eventWebsite, setEventWebsite] = useState(event?.event_website ?? '');
-  const [showAttendees, setShowAttendees] = useState(event?.show_attendees ?? true);
+  const [showAttendees, setShowAttendees] = useState(event?.show_attendees ?? false);
 
   // Organizer state — stored IDs exclude the current user (added in payload)
   const [organizerIds, setOrganizerIds] = useState<string[]>(
@@ -633,11 +633,11 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
           <label className="flex items-center gap-2 cursor-pointer mt-3">
             <input
               type="checkbox"
-              checked={!showAttendees}
-              onChange={e => setShowAttendees(!e.target.checked)}
+              checked={showAttendees}
+              onChange={e => setShowAttendees(e.target.checked)}
               className="w-4 h-4 rounded accent-[#4E87A0]"
             />
-            <span className="text-xs text-foreground-secondary">Don&apos;t show attendees on event page</span>
+            <span className="text-xs text-foreground-secondary">Show attendees on event page</span>
           </label>
         </FormSection>
       )}
