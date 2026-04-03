@@ -1,7 +1,7 @@
 // Search types and mock data for the Global Search Overlay
 // No 'use client' directive — this is a pure types/data file.
 
-export type SearchCategory = 'members' | 'events' | 'courses' | 'pages';
+export type SearchCategory = 'members' | 'events' | 'courses' | 'pages' | 'help';
 
 export interface SearchResult {
   id: string;
@@ -14,13 +14,14 @@ export interface SearchResult {
   score?: number;
 }
 
-export const CATEGORY_ORDER = ['members', 'events', 'courses', 'pages'] as const;
+export const CATEGORY_ORDER = ['members', 'events', 'courses', 'pages', 'help'] as const;
 
 export const CATEGORY_LABELS: Record<SearchCategory, string> = {
   members: 'Members',
   events: 'Events',
   courses: 'Courses',
   pages: 'Pages',
+  help: 'Help',
 };
 
 export const MOCK_RESULTS: SearchResult[] = [

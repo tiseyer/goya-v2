@@ -56,6 +56,16 @@ function IconMapPin({ size = 16, className = '', title: titleProp }: { size?: nu
   );
 }
 
+function IconHelpCircle({ size = 20, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+  );
+}
+
 function IconArrowRight({ size = 16, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -98,6 +108,8 @@ export default function SearchResultRow({ result, isHighlighted, isBestMatch, on
     leftIcon = <IconCalendar size={20} className="text-slate-400 flex-shrink-0" />;
   } else if (result.category === 'courses') {
     leftIcon = <IconBookOpen size={20} className="text-slate-400 flex-shrink-0" />;
+  } else if (result.category === 'help') {
+    leftIcon = <IconHelpCircle size={20} className="text-slate-400 flex-shrink-0" />;
   } else {
     leftIcon = <IconFileText size={20} className="text-slate-400 flex-shrink-0" />;
   }

@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/app/context/SearchContext';
 import {
-  MOCK_RESULTS,
   CATEGORY_ORDER,
   CATEGORY_LABELS,
   groupByCategory,
@@ -42,9 +41,11 @@ export default function GlobalSearchOverlay() {
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [activeCategory, setActiveCategory] = useState<SearchCategory | 'all'>('all');
   const [mounted, setMounted] = useState(false);
+  const [cache, setCache] = useState<Record<string, SearchResult[]>>({});
 
   const inputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +63,7 @@ export default function GlobalSearchOverlay() {
       setResults([]);
       setSelectedIdx(0);
       setActiveCategory('all');
+      setLoading(false);
       setTimeout(() => {
         inputRef.current?.focus();
         mobileInputRef.current?.focus();
@@ -79,22 +81,47 @@ export default function GlobalSearchOverlay() {
     return () => document.removeEventListener('keydown', handleDocKeyDown);
   }, [isOpen, close]);
 
-  // Filter results (shared logic)
-  const filterResults = useCallback((q: string, cat: SearchCategory | 'all') => {
-    const trimmed = q.trim().toLowerCase();
+  // Fetch results from API
+  const fetchResults = useCallback(async (q: string, cat: SearchCategory | 'all') => {
+    const trimmed = q.trim();
     if (trimmed.length < 2) {
       setResults([]);
       setSelectedIdx(0);
+      setLoading(false);
       return;
     }
-    const filtered = MOCK_RESULTS.filter(
-      (r) =>
-        r.title.toLowerCase().includes(trimmed) &&
-        (cat === 'all' || r.category === cat)
-    );
-    setResults(filtered);
-    setSelectedIdx(0);
-  }, []);
+
+    const cacheKey = `${trimmed}:${cat}`;
+    if (cache[cacheKey]) {
+      setResults(cache[cacheKey]);
+      setSelectedIdx(0);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const catParam = cat === 'all' ? 'members,events,courses,pages,help' : cat;
+      const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}&categories=${catParam}`);
+      if (!res.ok) {
+        setResults([]);
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      const allResults: SearchResult[] = [];
+      for (const key of Object.keys(data.results)) {
+        allResults.push(...(data.results[key] as SearchResult[]));
+      }
+      setResults(allResults);
+      setSelectedIdx(0);
+      setCache(prev => ({ ...prev, [cacheKey]: allResults }));
+    } catch {
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [cache]);
 
   // Debounced input handler
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -102,14 +129,14 @@ export default function GlobalSearchOverlay() {
     setQuery(val);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      filterResults(val, activeCategory);
+      fetchResults(val, activeCategory);
     }, 200);
   }
 
-  // Category change: update immediately
+  // Category change: fetch immediately
   function handleCategoryChange(cat: SearchCategory | 'all') {
     setActiveCategory(cat);
-    filterResults(query, cat);
+    fetchResults(query, cat);
   }
 
   // Keyboard navigation
@@ -154,14 +181,29 @@ export default function GlobalSearchOverlay() {
         </div>
       );
     }
-    if (query.trim().length < 2) {
+    if (query.trim().length > 0 && query.trim().length < 2) {
       return (
         <div className="flex items-center justify-center py-12">
           <p className="text-sm text-slate-400">Keep typing...</p>
         </div>
       );
     }
-    if (results.length === 0) {
+    if (loading) {
+      return (
+        <div className="px-4 py-6 space-y-3">
+          {[160, 200, 140, 180].map((w, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-slate-100 animate-pulse shrink-0" />
+              <div className="space-y-1.5">
+                <div className="h-3.5 bg-slate-100 rounded animate-pulse" style={{ width: `${w}px` }} />
+                <div className="h-2.5 bg-slate-50 rounded animate-pulse" style={{ width: `${w * 0.7}px` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    if (results.length === 0 && query.trim().length >= 2) {
       return (
         <div className="flex flex-col items-center justify-center py-12 gap-1">
           <p className="text-sm font-medium text-slate-600">No results for &ldquo;{query}&rdquo;</p>
@@ -218,18 +260,18 @@ export default function GlobalSearchOverlay() {
         onChange={handleInput}
         onKeyDown={handleKeyDown}
         placeholder="Search members, events, courses, pages..."
-        className="flex-1 outline-none text-base text-slate-900 placeholder:text-slate-400 bg-transparent"
+        className="flex-1 outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent text-base text-slate-900 placeholder:text-slate-400 bg-transparent"
         aria-label="Search GOYA"
         autoComplete="off"
       />
       {query.length > 0 && (
         <button
           onClick={clearQuery}
-          className="text-slate-400 hover:text-slate-600 transition-colors"
+          className="text-gray-400 hover:text-gray-600 text-sm transition-colors"
           aria-label="Clear search"
           tabIndex={-1}
         >
-          <IconX size={16} />
+          Clear
         </button>
       )}
       {!isMobile && (
