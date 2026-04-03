@@ -477,7 +477,7 @@ Plans:
 
 ### Phases
 
-- [ ] **Phase 51: Search Overlay UI** - SearchOverlay component: desktop modal + mobile full-screen, category filter pills, keyboard navigation, grouped result rows with contextual actions
+- [x] **Phase 51: Search Overlay UI** - SearchOverlay component: desktop modal + mobile full-screen, category filter pills, keyboard navigation, grouped result rows with contextual actions (completed 2026-04-03)
 - [ ] **Phase 52: Search API + Page Registry** - /api/search route with per-category Supabase queries (members, events, courses) + static page registry with role-based visibility
 - [ ] **Phase 53: Header Integration** - Wire SearchOverlay into the nav header (search icon click + Cmd+K / Ctrl+K keyboard shortcut)
 - [ ] **Phase 54: Performance + Polish** - Debounced input (200ms), loading skeletons, result caching keyed by query string, empty/no-result states
@@ -498,7 +498,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 51-01-PLAN.md — Search types, mock data, SearchContext, and ClientProviders wiring
-- [ ] 51-02-PLAN.md — GlobalSearchOverlay component, sub-components, Header integration
+- [x] 51-02-PLAN.md — GlobalSearchOverlay component, sub-components, Header integration
 **UI hint**: yes
 
 ### Phase 52: Search API + Page Registry
@@ -540,7 +540,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 51. Search Overlay UI | 1/2 | In Progress|  |
+| 51. Search Overlay UI | 2/2 | Complete   | 2026-04-03 |
 | 52. Search API + Page Registry | 0/TBD | Not started | - |
 | 53. Header Integration | 0/TBD | Not started | - |
 | 54. Performance + Polish | 0/TBD | Not started | - |
