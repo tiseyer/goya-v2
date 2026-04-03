@@ -100,6 +100,7 @@ export default function AcademyPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <PageHero
+        variant="dark"
         pill="GOYA Academy"
         title="Course Library"
         subtitle="Workshops, sequences, dharma talks, and research — curated for the serious yoga practitioner."
