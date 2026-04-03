@@ -325,7 +325,7 @@ export default function EventsPage() {
       />
 
       {/* ── Mobile filter bar ──────────────────────────────────────────────── */}
-      <div className="lg:hidden sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-4 py-2.5 space-y-2">
+      <div className="lg:hidden sticky top-0 z-20 bg-white/95 dark:bg-[#0F1117]/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 px-4 py-2.5 space-y-2">
         {/* Type filter row */}
         <div className="flex rounded-full border border-slate-200 overflow-hidden">
           {([['all', 'All'], ['goya', 'GOYA'], ['member', 'Member']] as const).map(([key, label]) => (

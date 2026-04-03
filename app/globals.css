@@ -208,6 +208,7 @@ html:not(.no-transitions) body * {
 .dark .bg-\[\#F9FAFB\] { background-color: var(--background-secondary) !important; }
 .dark .bg-\[\#F3F4F6\] { background-color: var(--background-tertiary) !important; }
 .dark .bg-\[\#FAFAFA\] { background-color: var(--background-secondary) !important; }
+.dark .bg-\[\#F8FAFC\] { background-color: var(--background) !important; }
 
 /* Hover on hex backgrounds */
 .dark .hover\:bg-\[\#F3F4F6\]:hover { background-color: var(--background-tertiary) !important; }
