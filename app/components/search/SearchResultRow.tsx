@@ -66,6 +66,16 @@ function IconHelpCircle({ size = 20, className = '' }: { size?: number; classNam
   );
 }
 
+function IconShoppingBag({ size = 20, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
+  );
+}
+
 function IconArrowRight({ size = 16, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -108,6 +118,13 @@ export default function SearchResultRow({ result, isHighlighted, isBestMatch, on
     leftIcon = <IconCalendar size={20} className="text-slate-400 flex-shrink-0" />;
   } else if (result.category === 'courses') {
     leftIcon = <IconBookOpen size={20} className="text-slate-400 flex-shrink-0" />;
+  } else if (result.category === 'products') {
+    if (result.avatarUrl) {
+      // eslint-disable-next-line @next/next/no-img-element
+      leftIcon = <img src={result.avatarUrl} alt={result.title} className="w-8 h-8 rounded object-cover flex-shrink-0" />;
+    } else {
+      leftIcon = <IconShoppingBag size={20} className="text-slate-400 flex-shrink-0" />;
+    }
   } else if (result.category === 'help') {
     leftIcon = <IconHelpCircle size={20} className="text-slate-400 flex-shrink-0" />;
   } else {

@@ -1,26 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import { getSupabaseService } from '@/lib/supabase/service';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get('q')?.trim() ?? '';
-  const categories = searchParams.get('categories')?.split(',').filter(Boolean) ?? ['members', 'events', 'courses', 'pages', 'help'];
+  const categories = searchParams.get('categories')?.split(',').filter(Boolean) ?? ['members', 'events', 'courses', 'pages', 'help', 'products'];
 
   if (q.length < 2) {
-    return NextResponse.json({ results: { members: [], events: [], courses: [], pages: [], help: [] }, total: 0 });
+    return NextResponse.json({ results: { members: [], events: [], courses: [], pages: [], help: [], products: [] }, total: 0 });
   }
 
-  const supabase = await createSupabaseServerClient();
-
-  // Check auth
-  const { data: { user } } = await supabase.auth.getUser();
+  // Auth check via cookie-based client
+  const authClient = await createSupabaseServerClient();
+  const { data: { user } } = await authClient.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Get user profile for role
+  // Use service role client for data queries (bypasses RLS)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: profile } = await (supabase as any)
+  const db = getSupabaseService() as any;
+
+  // Get user profile for role
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -36,26 +39,30 @@ export async function GET(req: NextRequest) {
     courses: [],
     pages: [],
     help: [],
+    products: [],
   };
 
   // Members search
   if (categories.includes('members')) {
-    let memberQuery = (supabase as any) // eslint-disable-line @typescript-eslint/no-explicit-any
-      .from('profiles')
-      .select('id, full_name, avatar_url, role, city, country, street_address')
-      .ilike('full_name', `%${q}%`)
-      .limit(limit);
+    let memberQuery;
 
     // Admin can also search by email and mrn
     if (isAdmin && (q.includes('@') || /^\d+$/.test(q))) {
-      memberQuery = (supabase as any) // eslint-disable-line @typescript-eslint/no-explicit-any
+      memberQuery = db
         .from('profiles')
         .select('id, full_name, avatar_url, role, city, country, street_address, email, mrn')
         .or(`full_name.ilike.%${q}%,email.ilike.%${q}%,mrn.ilike.%${q}%`)
         .limit(limit);
+    } else {
+      memberQuery = db
+        .from('profiles')
+        .select('id, full_name, avatar_url, role, city, country, street_address')
+        .ilike('full_name', `%${q}%`)
+        .limit(limit);
     }
 
-    const { data: members } = await memberQuery;
+    const { data: members, error: membersErr } = await memberQuery;
+    if (membersErr) console.error('[search] members error:', membersErr.message);
     if (members) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       results.members = members.map((m: any) => ({
@@ -72,13 +79,14 @@ export async function GET(req: NextRequest) {
 
   // Events search
   if (categories.includes('events')) {
-    const { data: events } = await (supabase as any) // eslint-disable-line @typescript-eslint/no-explicit-any
+    const { data: events, error: eventsErr } = await db
       .from('events')
       .select('id, title, start_date, format, category')
       .or(`title.ilike.%${q}%,description.ilike.%${q}%`)
       .eq('status', 'published')
       .limit(limit);
 
+    if (eventsErr) console.error('[search] events error:', eventsErr.message);
     if (events) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       results.events = events.map((e: any) => ({
@@ -93,13 +101,14 @@ export async function GET(req: NextRequest) {
 
   // Courses search
   if (categories.includes('courses')) {
-    const { data: courses } = await (supabase as any) // eslint-disable-line @typescript-eslint/no-explicit-any
+    const { data: courses, error: coursesErr } = await db
       .from('courses')
       .select('id, title, thumbnail_url')
       .or(`title.ilike.%${q}%,description.ilike.%${q}%`)
       .eq('status', 'published')
       .limit(limit);
 
+    if (coursesErr) console.error('[search] courses error:', coursesErr.message);
     if (courses) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       results.courses = courses.map((c: any) => ({
@@ -115,13 +124,14 @@ export async function GET(req: NextRequest) {
 
   // Help articles (FAQ) search
   if (categories.includes('help')) {
-    const { data: faqs } = await (supabase as any) // eslint-disable-line @typescript-eslint/no-explicit-any
+    const { data: faqs, error: faqsErr } = await db
       .from('faq_items')
       .select('id, question, answer')
       .ilike('question', `%${q}%`)
       .eq('status', 'published')
       .limit(limit);
 
+    if (faqsErr) console.error('[search] faqs error:', faqsErr.message);
     if (faqs) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       results.help = faqs.map((f: any) => ({
@@ -130,6 +140,29 @@ export async function GET(req: NextRequest) {
         title: f.question,
         subtitle: f.answer ? (f.answer.length > 100 ? f.answer.slice(0, 100) + '…' : f.answer) : '',
         href: '/settings/help',
+      }));
+    }
+  }
+
+  // Products search
+  if (categories.includes('products')) {
+    const { data: products, error: productsErr } = await db
+      .from('products')
+      .select('id, name, description, price_display, image_path, slug')
+      .or(`name.ilike.%${q}%,description.ilike.%${q}%`)
+      .eq('is_active', true)
+      .limit(limit);
+
+    if (productsErr) console.error('[search] products error:', productsErr.message);
+    if (products) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      results.products = products.map((p: any) => ({
+        id: p.id,
+        category: 'products',
+        title: p.name,
+        subtitle: p.price_display || 'Free',
+        href: '/add-ons',
+        avatarUrl: p.image_path,
       }));
     }
   }

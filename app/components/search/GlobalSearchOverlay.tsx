@@ -101,7 +101,7 @@ export default function GlobalSearchOverlay() {
 
     setLoading(true);
     try {
-      const catParam = cat === 'all' ? 'members,events,courses,pages,help' : cat;
+      const catParam = cat === 'all' ? 'members,events,courses,products,pages,help' : cat;
       const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}&categories=${catParam}`);
       if (!res.ok) {
         setResults([]);
@@ -260,7 +260,8 @@ export default function GlobalSearchOverlay() {
         onChange={handleInput}
         onKeyDown={handleKeyDown}
         placeholder="Search members, events, courses, pages..."
-        className="flex-1 outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent text-base text-slate-900 placeholder:text-slate-400 bg-transparent"
+        className="flex-1 border-0 outline-none ring-0 shadow-none focus:outline-none focus:ring-0 focus:border-0 focus:shadow-none focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0 text-base text-slate-900 placeholder:text-slate-400 bg-transparent"
+        style={{ outline: 'none', boxShadow: 'none' }}
         aria-label="Search GOYA"
         autoComplete="off"
       />
