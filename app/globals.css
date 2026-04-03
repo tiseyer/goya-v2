@@ -346,6 +346,38 @@ html:not(.no-transitions) body * {
   &::-webkit-scrollbar { display: none; }
 }
 
+/* ─── Mattea Search Hint animations ────────────────────────────────── */
+@keyframes mattea-breathe {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scaleY(0.85);
+    box-shadow: 0 0 6px 1px rgba(52, 92, 131, 0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+    box-shadow: 0 0 14px 3px rgba(52, 92, 131, 0.6);
+  }
+}
+
+.mattea-border-animate {
+  animation: mattea-breathe 2.8s ease-in-out infinite;
+}
+
+@keyframes mattea-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.mattea-skeleton-line {
+  background: linear-gradient(90deg, #e2eaf2 25%, #c8d9ea 50%, #e2eaf2 75%);
+  background-size: 800px 100%;
+  animation: mattea-shimmer 1.6s infinite linear;
+  border-radius: 4px;
+  height: 14px;
+  margin-bottom: 8px;
+}
+
 /* ─── Print styles for documentation ────────────────────────────────── */
 @media print {
   body { background: white !important; }
