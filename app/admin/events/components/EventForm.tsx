@@ -92,6 +92,7 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
 
   const [saving,  setSaving]  = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   /* ── Role-aware status options ─────────────────────────────────────────── */
   const statusOptions = useMemo(() => {
@@ -155,6 +156,7 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
     e.preventDefault();
     setSaving(true);
     setErrorMsg('');
+    setSuccessMsg('');
 
     try {
       let imageUrl: string | null = currentImageUrl;
@@ -224,18 +226,20 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         const { error } = await supabase.from('events').update(payload).eq('id', event.id);
         if (error) throw new Error(error.message);
         await logAdminEventAction(event.id, 'edited', { title: payload.title, status: payload.status });
+        setSuccessMsg('Event saved successfully.');
+        setTimeout(() => setSuccessMsg(''), 3000);
       } else {
         const { data: inserted, error } = await supabase.from('events').insert(payload).select('id').single();
         if (error) throw new Error(error.message);
         if (inserted) {
           await logAdminEventAction(inserted.id, 'created', { title: payload.title, status: payload.status });
         }
+        router.push('/admin/events');
+        router.refresh();
       }
-
-      router.push('/admin/events');
-      router.refresh();
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'An unexpected error occurred.');
+    } finally {
       setSaving(false);
     }
   }
@@ -250,6 +254,12 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
       {errorMsg && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
           {errorMsg}
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-lg">
+          {successMsg}
         </div>
       )}
 
