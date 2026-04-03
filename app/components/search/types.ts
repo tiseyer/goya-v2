@@ -11,6 +11,9 @@ export interface SearchResult {
   href: string;
   avatarUrl?: string;
   has_full_address?: boolean;
+  city?: string | null;
+  country?: string | null;
+  location?: string | null;
   score?: number;
 }
 

@@ -127,14 +127,29 @@ export default function SearchResultRow({ result, isHighlighted, onClick }: Sear
     leftIcon = <IconFileText size={20} className="text-slate-400 flex-shrink-0" />;
   }
 
+  // Build Google Maps URL from address data
+  const mapsUrl = result.category === 'members' && result.has_full_address
+    ? `https://maps.google.com/?q=${encodeURIComponent(
+        [result.location, result.city, result.country].filter(Boolean).join(', ')
+      )}`
+    : null;
+
   // Right action icons
   let rightIcons: React.ReactNode;
   if (result.category === 'members') {
     rightIcons = (
       <div className="flex items-center gap-1 ml-auto">
         <IconMessageCircle size={16} className="text-slate-400 hover:text-[#345c83] transition-colors" title="Send message" />
-        {result.has_full_address === true && (
-          <IconMapPin size={16} className="text-slate-400 hover:text-[#345c83] transition-colors" title="Get directions" />
+        {mapsUrl && (
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            title="Get directions"
+          >
+            <IconMapPin size={16} className="text-slate-400 hover:text-[#345c83] transition-colors" />
+          </a>
         )}
       </div>
     );

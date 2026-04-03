@@ -69,10 +69,13 @@ export async function GET(req: NextRequest) {
         id: m.id,
         category: 'members',
         title: m.full_name || [m.first_name, m.last_name].filter(Boolean).join(' ') || 'Unknown',
-        subtitle: [m.role, m.city, m.country].filter(Boolean).join(' · '),
+        subtitle: [formatRole(m.role), m.city, m.country].filter(Boolean).join(' · '),
         href: `/members/${m.id}`,
         avatarUrl: m.avatar_url,
-        has_full_address: Boolean(m.location && m.city && m.country),
+        has_full_address: Boolean(m.city && m.country),
+        city: m.city || null,
+        country: m.country || null,
+        location: m.location || null,
       }));
     }
   }
@@ -186,6 +189,13 @@ export async function GET(req: NextRequest) {
   const total = Object.values(results).reduce((sum, arr) => sum + (arr as unknown[]).length, 0);
 
   return NextResponse.json({ results, total });
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function formatRole(role: string | null): string {
+  if (!role) return '';
+  return role.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
 // ─── Page Registry ───────────────────────────────────────────────────────────

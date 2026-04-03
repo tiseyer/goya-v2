@@ -158,6 +158,13 @@ export default function GlobalSearchOverlay() {
     }
   }
 
+  // Auto-scroll highlighted result into view
+  useEffect(() => {
+    if (!isOpen || results.length === 0) return;
+    const el = document.querySelector('[role="option"][aria-selected="true"]');
+    if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [selectedIdx, isOpen, results.length]);
+
   // Clear query
   function clearQuery() {
     setQuery('');
