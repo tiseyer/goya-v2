@@ -28,9 +28,9 @@ export default async function MyEventsPage() {
   const { data: events } = await supabase
     .from('events')
     .select('*')
-    .eq('created_by', user.id)
     .eq('event_type', 'member')
     .neq('status', 'deleted')
+    .or(`created_by.eq.${user.id},organizer_ids.cs.{${user.id}}`)
     .order('created_at', { ascending: false });
 
   return (

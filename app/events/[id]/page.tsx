@@ -32,6 +32,17 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
   const ev = event as Event;
 
+  // Fetch auth user and determine manage permission
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  let canManage = false;
+  if (authUser) {
+    if (ev.organizer_ids?.includes(authUser.id)) canManage = true;
+    if (!canManage) {
+      const { data: authProfile } = await supabase.from('profiles').select('role').eq('id', authUser.id).single();
+      if (authProfile && (authProfile.role === 'admin' || authProfile.role === 'moderator')) canManage = true;
+    }
+  }
+
   // Fetch organizer profiles if organizer_ids are present
   let organizers: { id: string; full_name: string | null; avatar_url: string | null; username: string | null }[] = [];
   if (ev.organizer_ids && ev.organizer_ids.length > 0) {
@@ -40,6 +51,20 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
       .select('id, full_name, avatar_url, username')
       .in('id', ev.organizer_ids);
     organizers = orgProfiles ?? [];
+  }
+
+  // Fetch instructor profiles from join table
+  let instructors: { id: string; full_name: string | null; avatar_url: string | null; username: string | null }[] = [];
+  const { data: instructorRows } = await supabase
+    .from('event_instructors')
+    .select('profile_id')
+    .eq('event_id', ev.id);
+  if (instructorRows && instructorRows.length > 0) {
+    const { data: instrProfiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, username')
+      .in('id', instructorRows.map(r => r.profile_id));
+    instructors = instrProfiles ?? [];
   }
   const isPast = new Date(ev.date) < new Date();
   const dateFormatted = new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', {
@@ -192,6 +217,21 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
           {/* RIGHT: Booking card */}
           <div>
+            {/* Edit / Delete — visible to organizers and admin/moderator */}
+            {canManage && (
+              <div className="flex gap-2 mb-4">
+                <Link
+                  href={`/admin/events/${ev.id}/edit`}
+                  className="flex-1 text-center py-2.5 px-4 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary-dark transition-colors"
+                >
+                  Edit Event
+                </Link>
+                <button className="py-2.5 px-4 border border-red-200 text-red-600 text-sm font-semibold rounded-xl hover:bg-red-50 transition-colors cursor-pointer">
+                  Delete
+                </button>
+              </div>
+            )}
+
             <div className="sticky top-24 bg-white rounded-2xl border border-slate-200/80 shadow-lg p-6 space-y-5">
 
               {/* Price */}
@@ -255,8 +295,34 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
             </div>
 
-            {/* Instructor widget */}
-            {ev.instructor && (
+            {/* Instructor widget — profile-based (join table) */}
+            {instructors.length > 0 && ev.show_instructors !== false && (
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 mt-4">
+                <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  {instructors.length === 1 ? 'Instructor' : 'Instructors'}
+                </h3>
+                <div className="space-y-3">
+                  {instructors.map((inst) => (
+                    <Link key={inst.id} href={`/members/${inst.username ?? inst.id}`} className="flex items-center gap-3 group">
+                      {inst.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={inst.avatar_url} alt={inst.full_name ?? 'Instructor'} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-primary-light/15 flex items-center justify-center text-primary font-bold text-xs shrink-0">
+                          {(inst.full_name ?? '?')[0].toUpperCase()}
+                        </div>
+                      )}
+                      <p className="text-sm font-medium text-primary-dark group-hover:text-primary transition-colors">
+                        {inst.full_name ?? 'Unknown'}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Instructor fallback — text-based (pre-migration events) */}
+            {instructors.length === 0 && ev.instructor && (
               <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 mt-4">
                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Instructor</h3>
                 <div className="flex items-center gap-3">
@@ -269,7 +335,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             )}
 
             {/* Organizers widget */}
-            {organizers.length > 0 && (
+            {organizers.length > 0 && ev.show_organizers !== false && (
               <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 mt-4">
                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Organizers</h3>
                 <div className="space-y-3">
