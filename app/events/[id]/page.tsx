@@ -31,6 +31,16 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   if (!event) notFound();
 
   const ev = event as Event;
+
+  // Fetch organizer profiles if organizer_ids are present
+  let organizers: { id: string; full_name: string | null; avatar_url: string | null; username: string | null }[] = [];
+  if (ev.organizer_ids && ev.organizer_ids.length > 0) {
+    const { data: orgProfiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, username')
+      .in('id', ev.organizer_ids);
+    organizers = orgProfiles ?? [];
+  }
   const isPast = new Date(ev.date) < new Date();
   const dateFormatted = new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
@@ -176,18 +186,6 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                 </div>
               </div>
 
-              {/* Instructor */}
-              {ev.instructor && (
-                <div className="flex items-center gap-4 p-6">
-                  <div className="w-9 h-9 rounded-full bg-primary-dark flex items-center justify-center text-white font-bold text-sm shrink-0">
-                    {ev.instructor[0].toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Instructor</p>
-                    <p className="font-semibold text-primary-dark text-sm">{ev.instructor}</p>
-                  </div>
-                </div>
-              )}
             </div>
 
           </div>
@@ -256,6 +254,51 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               </div>
 
             </div>
+
+            {/* Instructor widget */}
+            {ev.instructor && (
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 mt-4">
+                <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Instructor</h3>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-primary-dark flex items-center justify-center text-white font-bold text-sm shrink-0">
+                    {ev.instructor[0].toUpperCase()}
+                  </div>
+                  <p className="font-semibold text-primary-dark text-sm">{ev.instructor}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Organizers widget */}
+            {organizers.length > 0 && (
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 mt-4">
+                <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Organizers</h3>
+                <div className="space-y-3">
+                  {organizers.map((org) => (
+                    <Link
+                      key={org.id}
+                      href={`/members/${org.username ?? org.id}`}
+                      className="flex items-center gap-3 group"
+                    >
+                      {org.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={org.avatar_url}
+                          alt={org.full_name ?? 'Organizer'}
+                          className="w-8 h-8 rounded-full object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-primary-light/15 flex items-center justify-center text-primary font-bold text-xs shrink-0">
+                          {(org.full_name ?? '?')[0].toUpperCase()}
+                        </div>
+                      )}
+                      <p className="text-sm font-medium text-primary-dark group-hover:text-primary transition-colors">
+                        {org.full_name ?? 'Unknown'}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
