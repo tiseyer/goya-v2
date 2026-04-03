@@ -944,31 +944,22 @@ export default function Header() {
   }
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null);
-      if (data.user) {
-        supabase.from('profiles').select('*').eq('id', data.user.id).single()
-          .then(({ data: p }) => {
-            setProfile(p);
-            setAuthLoading(false);
-            checkMaintenance(p?.role);
-            fetchSchoolContext(data.user!.id, p?.role);
-          });
-      } else {
-        setAuthLoading(false);
-      }
-    });
+    // Use onAuthStateChange as the single source of truth to avoid race
+    // conditions between getUser() and the auth listener that cause nav
+    // items to pop in progressively.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         supabase.from('profiles').select('*').eq('id', session.user.id).single()
           .then(({ data: p }) => {
             setProfile(p);
+            setAuthLoading(false);
             checkMaintenance(p?.role);
             fetchSchoolContext(session.user!.id, p?.role);
           });
       } else {
         setProfile(null);
+        setAuthLoading(false);
         setMaintenanceActive(false);
         setAvailableSchools([]);
         setActiveSchoolId(null);
