@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import SwitchToButton from './SwitchToButton'
+import { displayRole, isAdminOrAbove, isSuperuser } from '@/lib/roles'
 
 export type UserRow = {
   id: string
@@ -43,6 +44,8 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
   const router = useRouter()
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [showModal, setShowModal] = useState(false)
+  const [showAdminConfirm, setShowAdminConfirm] = useState(false)
+  const [adminConfirmText, setAdminConfirmText] = useState('')
   const [deleting, setDeleting] = useState(false)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
@@ -65,6 +68,8 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
   }
 
   const selectedUsers = users.filter(u => selected.has(u.id))
+  const hasAdminTargets = selectedUsers.some(u => u.role === 'admin')
+  const callerIsSuperuser = isSuperuser(adminRole)
 
   async function handleBulkDelete() {
     setDeleting(true)
@@ -92,6 +97,16 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
       setTimeout(() => setToast(null), 5000)
     } finally {
       setDeleting(false)
+    }
+  }
+
+  function handleDeleteClick() {
+    // If caller is superuser and there are admin targets, require second confirmation
+    if (callerIsSuperuser && hasAdminTargets) {
+      setShowModal(false)
+      setShowAdminConfirm(true)
+    } else {
+      handleBulkDelete()
     }
   }
 
@@ -132,99 +147,102 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F1F5F9]">
-              {users.map(user => (
-                <tr key={user.id} className={`hover:bg-slate-50 transition-colors ${selected.has(user.id) ? 'bg-blue-50/50' : ''}`}>
-                  <td className="px-3 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selected.has(user.id)}
-                      onChange={() => toggleOne(user.id)}
-                      className="accent-[#1B3A5C] rounded"
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="group/avatar relative w-8 h-8 rounded-full bg-[#00B5A3] flex items-center justify-center text-white text-[10px] font-black shrink-0 overflow-hidden">
-                        {user.avatar_url ? (
-                          <>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
-                            {/* Hover preview */}
-                            <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[120px] h-[120px] rounded-xl overflow-hidden shadow-xl border border-slate-200 bg-white opacity-0 scale-95 transition-all duration-200 group-hover/avatar:opacity-100 group-hover/avatar:scale-100 z-50">
+              {users.map(user => {
+                const displayedRole = displayRole(user.role)
+                return (
+                  <tr key={user.id} className={`hover:bg-slate-50 transition-colors ${selected.has(user.id) ? 'bg-blue-50/50' : ''}`}>
+                    <td className="px-3 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selected.has(user.id)}
+                        onChange={() => toggleOne(user.id)}
+                        className="accent-[#1B3A5C] rounded"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="group/avatar relative w-8 h-8 rounded-full bg-[#00B5A3] flex items-center justify-center text-white text-[10px] font-black shrink-0 overflow-hidden">
+                          {user.avatar_url ? (
+                            <>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
-                            </div>
-                          </>
-                        ) : (
-                          getInitials(user.full_name, user.email)
-                        )}
+                              {/* Hover preview */}
+                              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[120px] h-[120px] rounded-xl overflow-hidden shadow-xl border border-slate-200 bg-white opacity-0 scale-95 transition-all duration-200 group-hover/avatar:opacity-100 group-hover/avatar:scale-100 z-50">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                              </div>
+                            </>
+                          ) : (
+                            getInitials(user.full_name, user.email)
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-[#1B3A5C] truncate max-w-[160px]">
+                            {user.full_name || '—'}
+                          </p>
+                          {user.username && (
+                            <p className="text-xs text-[#6B7280] truncate max-w-[160px]">@{user.username}</p>
+                          )}
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-[#1B3A5C] truncate max-w-[160px]">
-                          {user.full_name || '—'}
-                        </p>
-                        {user.username && (
-                          <p className="text-xs text-[#6B7280] truncate max-w-[160px]">@{user.username}</p>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm text-[#374151] truncate max-w-[200px] block">{user.email}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap items-center gap-1">
-                      <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full capitalize ${ROLE_BADGE[user.role] ?? 'bg-slate-100 text-slate-600'}`}>
-                        {user.role?.replace(/_/g, ' ') ?? '—'}
-                      </span>
-                      {user.wp_roles && user.wp_roles.length > 0 && user.wp_roles.map((wr: string) => (
-                        <span key={wr} className="inline-block text-[9px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-400">
-                          {wr.replace(/_/g, ' ')}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-sm text-[#374151] truncate max-w-[200px] block">{user.email}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-1">
+                        <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full capitalize ${ROLE_BADGE[displayedRole] ?? 'bg-slate-100 text-slate-600'}`}>
+                          {displayedRole.replace(/_/g, ' ')}
                         </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    {user.subscription_status === 'member' ? (
-                      <span className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#00B5A3] text-white">Member</span>
-                    ) : (
-                      <span className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full border border-[#E5E7EB] text-[#6B7280]">Guest</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {user.is_verified ? (
-                      <svg className="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l3-3z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 12H4" />
-                      </svg>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm text-[#6B7280] flex items-center gap-1.5">
-                      {formatDate(user.wp_registered_at || user.created_at)}
-                      {user.wp_registered_at && (
-                        <span className="text-[9px] font-semibold px-1 py-0.5 rounded bg-slate-100 text-slate-400">WP</span>
+                        {user.wp_roles && user.wp_roles.length > 0 && user.wp_roles.map((wr: string) => (
+                          <span key={wr} className="inline-block text-[9px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-400">
+                            {wr.replace(/_/g, ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {user.subscription_status === 'member' ? (
+                        <span className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#00B5A3] text-white">Member</span>
+                      ) : (
+                        <span className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full border border-[#E5E7EB] text-[#6B7280]">Guest</span>
                       )}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/admin/users/${user.id}`}
-                        className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#374151] hover:text-[#1B3A5C] hover:border-[#1B3A5C] transition-colors"
-                      >
-                        View
-                      </Link>
-                      {adminRole === 'admin' && user.role !== 'admin' && user.role !== 'moderator' && (
-                        <SwitchToButton userId={user.id} />
+                    </td>
+                    <td className="px-4 py-3">
+                      {user.is_verified ? (
+                        <svg className="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l3-3z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 12H4" />
+                        </svg>
                       )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-sm text-[#6B7280] flex items-center gap-1.5">
+                        {formatDate(user.wp_registered_at || user.created_at)}
+                        {user.wp_registered_at && (
+                          <span className="text-[9px] font-semibold px-1 py-0.5 rounded bg-slate-100 text-slate-400">WP</span>
+                        )}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/admin/users/${user.id}`}
+                          className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#E5E7EB] text-[#374151] hover:text-[#1B3A5C] hover:border-[#1B3A5C] transition-colors"
+                        >
+                          View
+                        </Link>
+                        {isAdminOrAbove(adminRole) && !isAdminOrAbove(user.role) && user.role !== 'moderator' && (
+                          <SwitchToButton userId={user.id} />
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -249,7 +267,7 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
         </div>
       )}
 
-      {/* Confirmation Modal */}
+      {/* First Confirmation Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4">
@@ -258,12 +276,23 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
               This will permanently delete these users from Supabase Auth and their profiles. This cannot be undone.
             </p>
             <div className="max-h-40 overflow-y-auto space-y-1">
-              {selectedUsers.slice(0, 10).map(u => (
-                <p key={u.id} className="text-xs text-slate-500">
-                  <span className="font-medium text-slate-700">{u.full_name || '—'}</span> — {u.email}
-                  {u.role === 'admin' && <span className="ml-1 text-red-500 font-medium">(admin — will be skipped)</span>}
-                </p>
-              ))}
+              {selectedUsers.slice(0, 10).map(u => {
+                const uRole = u.role as string
+                return (
+                  <p key={u.id} className="text-xs text-slate-500">
+                    <span className="font-medium text-slate-700">{u.full_name || '—'}</span> — {u.email}
+                    {uRole === 'superuser' && (
+                      <span className="ml-1 text-red-500 font-medium">(cannot be deleted)</span>
+                    )}
+                    {uRole === 'admin' && !callerIsSuperuser && (
+                      <span className="ml-1 text-red-500 font-medium">(admin — will be skipped)</span>
+                    )}
+                    {uRole === 'admin' && callerIsSuperuser && (
+                      <span className="ml-1 text-orange-500 font-medium">(admin — extra confirmation required)</span>
+                    )}
+                  </p>
+                )
+              })}
               {selectedUsers.length > 10 && (
                 <p className="text-xs text-slate-400">+ {selectedUsers.length - 10} more</p>
               )}
@@ -276,7 +305,7 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
                 Cancel
               </button>
               <button
-                onClick={handleBulkDelete}
+                onClick={handleDeleteClick}
                 disabled={deleting}
                 className="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-lg flex items-center gap-2"
               >
@@ -287,6 +316,53 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
                   </svg>
                 )}
                 Delete permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Second Confirmation Modal — admin deletion (superuser only) */}
+      {showAdminConfirm && (
+        <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4">
+            <h3 className="text-lg font-bold text-red-700">Confirm admin deletion</h3>
+            <p className="text-sm text-slate-600">
+              You are about to permanently delete an admin account. This cannot be undone.
+            </p>
+            <div className="max-h-32 overflow-y-auto space-y-1 bg-red-50 rounded-lg p-3">
+              {selectedUsers.filter(u => (u.role as string) === 'admin').map(u => (
+                <p key={u.id} className="text-xs text-red-800 font-medium">
+                  {u.full_name || '—'} — {u.email}
+                </p>
+              ))}
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700 block mb-1.5">
+                Type <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-red-700">DELETE ADMIN</span> to confirm
+              </label>
+              <input
+                type="text"
+                value={adminConfirmText}
+                onChange={(e) => setAdminConfirmText(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                placeholder="DELETE ADMIN"
+                autoFocus
+              />
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={() => { setShowAdminConfirm(false); setAdminConfirmText('') }}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 border border-slate-200 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setShowAdminConfirm(false); setAdminConfirmText(''); handleBulkDelete() }}
+                disabled={adminConfirmText !== 'DELETE ADMIN' || deleting}
+                className="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
+              >
+                Confirm deletion
               </button>
             </div>
           </div>

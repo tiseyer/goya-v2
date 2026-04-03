@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useImpersonation } from '@/app/context/ImpersonationContext';
 import { updateProfile } from './actions';
 import { ThemeCards } from '@/app/components/ThemeToggle';
+import { displayRole } from '@/lib/roles';
 
 const INPUT = 'w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2dd4bf]/40 focus:border-[#2dd4bf] transition-colors placeholder:text-slate-400';
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide';
@@ -410,7 +411,7 @@ export default function SettingsGeneralPage() {
             <div>
               <label className={LABEL}>Role</label>
               <span className={`inline-block text-xs font-semibold px-3 py-1.5 rounded-full capitalize ${ROLE_BADGE[profile?.role ?? 'student'] ?? 'bg-slate-100 text-slate-700'}`}>
-                {(profile?.role ?? 'student').replace('_', ' ')}
+                {displayRole(profile?.role ?? 'student').replace('_', ' ')}
               </span>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateUserProfile } from '../actions'
 import ResetOnboardingButton from './ResetOnboardingButton'
+import { displayRole } from '@/lib/roles'
 
 export type UserProfile = {
   id: string
@@ -175,7 +176,7 @@ function ProfileInfoBox({ profile, isAdmin }: { profile: UserProfile; isAdmin: b
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ReadOnlyField label="Full Name" value={fullName} />
           <ReadOnlyField label="Username" value={username ? `@${username}` : null} />
-          <ReadOnlyField label="Role" value={role.replace(/_/g, ' ')} />
+          <ReadOnlyField label="Role" value={displayRole(role).replace(/_/g, ' ')} />
           <ReadOnlyField label="Member Type" value={memberType.replace(/_/g, ' ')} />
           <ReadOnlyField label="MRN" value={profile.mrn} />
         </div>

@@ -6,7 +6,7 @@ import type { CreditStatus } from '@/lib/credits';
 import AdminUsersTable from './AdminUsersTable';
 import AdminUsersFilters from './AdminUsersFilters';
 import AdminUsersPagination from './AdminUsersPagination';
-import CreateUserButton from './CreateUserButton';
+import CreateUserButton from './CreateUserButton'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -52,7 +52,12 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
     query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,username.ilike.%${search}%,mrn.ilike.%${search}%`);
   }
   if (role) {
-    query = query.eq('role', role);
+    if (role === 'admin') {
+      // Include superuser accounts when filtering by admin — they display as admin in UI
+      query = query.in('role', ['admin', 'superuser']);
+    } else {
+      query = query.eq('role', role);
+    }
   }
   if (verified === 'true')  query = query.eq('is_verified', true);
   if (verified === 'false') query = query.eq('is_verified', false);

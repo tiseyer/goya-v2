@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import FloatingButton from './FloatingButton'
 import ChatPanel from './ChatPanel'
 import { getCurrentUserId, getAnonymousId, getCurrentUserRole } from '@/lib/chatbot/chat-actions'
+import { isAdminOrMod } from '@/lib/roles'
 
 interface ChatbotConfig {
   is_active: boolean
@@ -81,7 +82,7 @@ export default function ChatWidget() {
   // Don't render while loading config
   if (loading || !config) return null
 
-  const isAdmin = userRole === 'admin' || userRole === 'moderator'
+  const isAdmin = isAdminOrMod(userRole)
   const maintenanceMode = config.chatbot_maintenance_mode
 
   // Determine visibility and badge

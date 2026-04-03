@@ -16,6 +16,7 @@ import { useSearch } from '@/app/context/SearchContext';
 import { switchContext } from '@/app/actions/context';
 import { getNotifications, markNotificationsRead, getUnreadNotificationCount } from '@/lib/messaging';
 import type { AppNotification } from '@/lib/types';
+import { isAdminOrMod, displayRole } from '@/lib/roles';
 
 interface ContextSchool {
   id: string
@@ -578,7 +579,7 @@ function UserMenu({
           </div>
 
           {/* Settings + Admin Settings — admin/moderator, hidden when impersonating */}
-          {!isImpersonating && !isSchoolContext && (userRole === 'admin' || userRole === 'moderator') && (
+          {!isImpersonating && !isSchoolContext && isAdminOrMod(userRole) && (
             <div className="border-t border-[#E5E7EB] py-1.5">
               <MenuItem href="/settings" icon={ICON_SETTINGS} label="Settings" />
               <MenuItem href="/admin" icon={ICON_SETTINGS} label="Admin Settings" />
@@ -586,7 +587,7 @@ function UserMenu({
           )}
 
           {/* Settings — regular users in personal context, hidden when impersonating */}
-          {!isImpersonating && !isSchoolContext && userRole !== 'admin' && userRole !== 'moderator' && (
+          {!isImpersonating && !isSchoolContext && !isAdminOrMod(userRole) && (
             <div className="border-t border-[#E5E7EB] py-1.5">
               <MenuItem href="/settings" icon={ICON_SETTINGS} label="Settings" />
             </div>
@@ -631,7 +632,7 @@ function UserMenu({
 
           {/* Theme quick switch */}
           <div className="border-t border-[#E5E7EB] px-4 py-2">
-            <ThemeInline isAdmin={userRole === 'admin' || userRole === 'moderator'} />
+            <ThemeInline isAdmin={isAdminOrMod(userRole)} />
           </div>
 
           {/* Logout */}
@@ -823,7 +824,7 @@ export default function Header() {
   const { isImpersonating, targetProfile, adminProfile } = useImpersonation();
 
   function checkMaintenance(role: string | undefined) {
-    if (role !== 'admin' && role !== 'moderator') return;
+    if (!isAdminOrMod(role)) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     supabase
       .from('site_settings')
@@ -1023,7 +1024,7 @@ export default function Header() {
                 <SearchWidget />
                 <MessagesWidget />
                 <CartWidget />
-                {(profile?.role === 'admin' || profile?.role === 'moderator') && maintenanceActive && (
+                {isAdminOrMod(profile?.role) && maintenanceActive && (
                   <Link
                     href="/admin/settings"
                     className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg hover:bg-amber-100 transition-colors"
@@ -1283,7 +1284,7 @@ export default function Header() {
                             {item.label}
                           </Link>
                         ))}
-                        {!isImpersonating && (profile?.role === 'admin' || profile?.role === 'moderator') && (
+                        {!isImpersonating && isAdminOrMod(profile?.role) && (
                           <>
                             <Link href="/settings" onClick={() => setProfileOpen(false)}
                               className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors">
@@ -1295,7 +1296,7 @@ export default function Header() {
                             </Link>
                           </>
                         )}
-                        {!isImpersonating && profile?.role !== 'admin' && profile?.role !== 'moderator' && (
+                        {!isImpersonating && !isAdminOrMod(profile?.role) && (
                           <Link href="/settings" onClick={() => setProfileOpen(false)}
                             className="block px-4 py-3 rounded-xl text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50 text-sm transition-colors">
                             Settings
