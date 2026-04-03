@@ -30,7 +30,7 @@ export default function PageHero({ pill, pillIcon, title, subtitle, customPill, 
 
   if (isDark) {
     return (
-      <section className="flex items-center justify-center w-full h-[240px] sm:h-[260px] md:h-[280px] bg-primary relative overflow-hidden">
+      <section className="flex items-center justify-center w-full h-[240px] sm:h-[260px] md:h-[280px] bg-[#345c83] dark:bg-[#162636] relative overflow-hidden">
         {/* Subtle dot-grid texture overlay */}
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -41,7 +41,7 @@ export default function PageHero({ pill, pillIcon, title, subtitle, customPill, 
           aria-hidden="true"
         />
         {/* Soft glow top-right */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 dark:bg-primary-light/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true" />
         {/* Background glow center */}
         <div className="absolute pointer-events-none inset-x-0 top-0 h-[280px] overflow-hidden" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-white opacity-[0.05] rounded-full blur-3xl" />
