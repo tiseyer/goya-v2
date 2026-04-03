@@ -3,7 +3,7 @@ title: Courses
 audience: ["admin"]
 section: admin
 order: 5
-last_updated: "2026-04-01"
+last_updated: "2026-04-03"
 ---
 
 # Courses
@@ -108,11 +108,13 @@ When viewing deleted courses, the table background becomes red-tinted.
 
 ## Adding a New Course
 
-Click **Add New Course** in the top-right corner to open `/admin/courses/new`. The form is divided into three sections:
+Click **Add New Course** in the top-right corner to open `/admin/courses/new`. The form is divided into sections:
 
-- **Basic Info** — Title (required), Category (dropdown from the database, with a colour indicator), Level, Access, and Instructor.
+- **Basic Info** — Title (required), Category (dropdown from the database, with a colour indicator), Level, and Access.
 - **Content** — Short description (200-char limit with counter), full description, thumbnail URL, and card gradient pickers with a live preview.
 - **Settings** — Status (Published/Draft) and a Duration slider from 5 minutes to 10 hours in 5-minute steps, displayed as "Xh Ym".
+- **Instructors** — Add up to 5 instructors (teacher, wellness practitioner, or school owner accounts). Toggle "Don't show instructors on course page" to hide the widget from the public view.
+- **Organizers** — Add up to 4 co-organizers (you are always slot 1). Organizers can edit the course. Toggle "Don't show organizers on course page" to hide the widget.
 
 GOYA courses do not go through the review queue. After saving a new course, you are taken directly to the **Lessons** tab of the edit page to begin adding lesson content.
 
@@ -122,8 +124,12 @@ Click the **Edit** action on any course row to open `/admin/courses/[id]`. From 
 
 - Edit all course fields
 - Change the status
+- Manage instructors and organizers (profile-based pickers)
+- Manage enrolled attendees (add/remove members; visible in edit mode only)
+- Toggle visibility of instructors, organizers, and attendees on the public course page
 - Manage lessons in the **Lessons** section below the course form
-- View the audit history timeline showing every change made to the course record
+- View the collapsible audit history timeline showing every change made to the course record
+- Click **View Course** (top-right of the page) to open the public course detail page in a new tab
 
 ### Lessons Section
 
