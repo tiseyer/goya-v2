@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import { getSupabaseService } from '@/lib/supabase/service';
 import type { Course } from '@/lib/types';
@@ -65,7 +65,7 @@ export default async function EditCoursePage({
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profileRow } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, full_name, avatar_url, email')
     .eq('id', user!.id)
     .single();
   const userRole = (profileRow?.role as string) ?? 'moderator';
@@ -86,12 +86,24 @@ export default async function EditCoursePage({
 
   return (
     <div className="p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1B3A5C]">Edit Course</h1>
-        <p className="text-sm text-[#6B7280] mt-0.5 truncate max-w-md">{(data as Course).title}</p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B3A5C]">Edit Course</h1>
+          <p className="text-sm text-[#6B7280] mt-0.5 truncate max-w-md">{(data as Course).title}</p>
+        </div>
+        <Link href={`/academy/${id}`} className="text-sm text-primary hover:text-primary-dark font-medium shrink-0">
+          View Course
+        </Link>
       </div>
 
-      <CourseForm course={data as Course} categories={categories} />
+      <CourseForm
+        course={data as Course}
+        categories={categories}
+        userRole={userRole}
+        currentUserId={user!.id}
+        currentUserName={profileRow?.full_name ?? profileRow?.email ?? user!.email ?? ''}
+        currentUserAvatar={profileRow?.avatar_url ?? null}
+      />
 
       {/* Lessons section — dynamically imported to avoid dnd-kit SSR issues */}
       <div className="mt-8">
@@ -100,9 +112,14 @@ export default async function EditCoursePage({
 
       {/* Audit History -- Admin only */}
       {isAdmin && auditEntries.length > 0 && (
-        <div className="mt-10 max-w-3xl">
-          <h2 className="text-lg font-bold text-[#1B3A5C] mb-4">Course History</h2>
-          <div className="relative pl-6 border-l-2 border-[#E5E7EB]">
+        <details className="mt-10 max-w-3xl">
+          <summary className="text-lg font-bold text-[#1B3A5C] cursor-pointer select-none list-none flex items-center gap-2">
+            Course History
+            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div className="mt-4 relative pl-6 border-l-2 border-[#E5E7EB]">
             {auditEntries.map((entry) => {
               const actionInfo = ACTION_LABELS[entry.action] ?? ACTION_LABELS.edited;
               const performer = entry.profiles?.full_name || entry.profiles?.email || 'System';
@@ -193,7 +210,7 @@ export default async function EditCoursePage({
               );
             })}
           </div>
-        </div>
+        </details>
       )}
     </div>
   );
