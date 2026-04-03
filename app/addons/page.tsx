@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import PageHero from '@/app/components/PageHero'
+import type { HeroContext } from '@/lib/hero-variables'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -81,10 +82,10 @@ export default async function AddonsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in')
 
-  // 2. Get profile with role and designations
+  // 2. Get profile with role, designations, and name
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, designations')
+    .select('role, designations, full_name')
     .eq('id', user.id)
     .single()
 
@@ -119,6 +120,12 @@ export default async function AddonsPage() {
     ? ((products ?? []) as Product[])
     : ((products ?? []) as Product[]).filter(p => isProductVisible(p, userCtx))
 
+  const addonsHeroCtx: HeroContext = {
+    firstName: profile?.full_name?.split(' ')[0] ?? '',
+    fullName: profile?.full_name ?? '',
+    role,
+  }
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -126,6 +133,9 @@ export default async function AddonsPage() {
         pill="Brightcoms"
         title="All Add-Ons & Upgrades"
         subtitle="Enhance your GOYA profile with verified designation badges, continuing education credits, and more."
+        pageSlug="addons"
+        isAdmin={role === 'admin'}
+        heroContext={addonsHeroCtx}
       />
 
       {/* Toolbar */}

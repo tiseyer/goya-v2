@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import type { Event, EventCategory } from '@/lib/types';
 import PageHero from '@/app/components/PageHero';
+import type { HeroContext } from '@/lib/hero-variables';
 
 const ALL_CATEGORIES: Array<'All' | EventCategory> = [
   'All', 'Workshop', 'Teacher Training', 'Dharma Talk', 'Conference',
@@ -59,6 +60,8 @@ export default function EventsPage() {
   const [categoryFilter, setCategoryFilter] = useState<'All' | EventCategory>('All');
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [heroCtx, setHeroCtx] = useState<HeroContext>({});
 
   useEffect(() => {
     supabase
@@ -72,6 +75,30 @@ export default function EventsPage() {
         setEvents((data as Event[]) ?? []);
         setLoading(false);
       });
+  }, []);
+
+  useEffect(() => {
+    async function loadAdmin() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role, full_name')
+        .eq('id', user.id)
+        .single();
+      if (profile) {
+        setIsAdmin(profile.role === 'admin');
+        const firstName = profile.full_name?.split(' ')[0] ?? '';
+        setHeroCtx({
+          firstName,
+          fullName: profile.full_name ?? '',
+          role: profile.role
+            ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1)
+            : '',
+        });
+      }
+    }
+    loadAdmin();
   }, []);
 
   const eventDates = useMemo(() => new Set(events.map(e => e.date)), [events]);
@@ -104,6 +131,9 @@ export default function EventsPage() {
         pill="Events"
         title="Events"
         subtitle="Workshops, teacher trainings, dharma talks, and conferences from the global GOYA community."
+        pageSlug="events"
+        isAdmin={isAdmin}
+        heroContext={heroCtx}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import FeedView from './FeedView';
 import PageHero from '@/app/components/PageHero';
+import type { HeroContext } from '@/lib/hero-variables';
 
 // ─── Profile completion ───────────────────────────────────────────────────────
 
@@ -94,6 +95,13 @@ export default function DashboardPage() {
   }
 
   const firstName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
+  const heroCtx: HeroContext = {
+    firstName,
+    fullName: profile?.full_name ?? '',
+    role: profile?.role
+      ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1)
+      : '',
+  };
   const userInitials = profile?.full_name
     ? profile.full_name.trim().split(/\s+/).map((p: string) => p[0]).slice(0, 2).join('').toUpperCase()
     : (user?.email?.[0]?.toUpperCase() ?? '?');
@@ -112,6 +120,9 @@ export default function DashboardPage() {
         pill="GOYA Dashboard"
         title={`Welcome back, ${firstName}`}
         subtitle="Your yoga community hub."
+        pageSlug="dashboard"
+        isAdmin={profile?.role === 'admin'}
+        heroContext={heroCtx}
       />
 
       {/* 3-column layout */}
