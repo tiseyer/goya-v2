@@ -1,5 +1,5 @@
 'use client';
-
+// GlobalSearchOverlay v2.1 — 9 useState hooks, no showMattea state
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
