@@ -37,27 +37,23 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
   // Fetch current admin's role
   const { data: { user: authUser } } = await supabase.auth.getUser();
   const { data: adminProfile } = authUser
-    ? await supabase.from('profiles').select('role').eq('id', authUser.id).single()
+    ? await supabase.from('profiles').select('role, is_superuser').eq('id', authUser.id).single()
     : { data: null };
   const adminRole = adminProfile?.role ?? undefined;
+  const adminIsSuperuser = adminProfile?.is_superuser === true;
 
   // Build query — when credit status filter is active, fetch a larger pool then filter in-app
   const isCreditFiltered = creditStatus === 'green' || creditStatus === 'yellow' || creditStatus === 'red';
 
   let query = supabase
     .from('profiles')
-    .select('id, email, full_name, username, role, subscription_status, is_verified, created_at, avatar_url, member_type, wp_roles, wp_registered_at', { count: 'exact' });
+    .select('id, email, full_name, username, role, is_superuser, subscription_status, is_verified, created_at, avatar_url, member_type, wp_roles, wp_registered_at', { count: 'exact' });
 
   if (search) {
     query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,username.ilike.%${search}%,mrn.ilike.%${search}%`);
   }
   if (role) {
-    if (role === 'admin') {
-      // Include superuser accounts when filtering by admin — they display as admin in UI
-      query = query.in('role', ['admin', 'superuser']);
-    } else {
-      query = query.eq('role', role);
-    }
+    query = query.eq('role', role);
   }
   if (verified === 'true')  query = query.eq('is_verified', true);
   if (verified === 'false') query = query.eq('is_verified', false);
@@ -159,7 +155,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Search
       </div>
 
       {/* Table */}
-      <AdminUsersTable users={users ?? []} adminRole={adminRole} />
+      <AdminUsersTable users={users ?? []} adminRole={adminRole} adminIsSuperuser={adminIsSuperuser} />
 
       {/* Pagination */}
       <Suspense>

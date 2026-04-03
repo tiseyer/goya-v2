@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import SwitchToButton from './SwitchToButton'
-import { displayRole, isAdminOrAbove, isSuperuser } from '@/lib/roles'
+import { displayRole, isAdminOrAbove } from '@/lib/roles'
 
 export type UserRow = {
   id: string
@@ -12,6 +12,7 @@ export type UserRow = {
   full_name: string | null
   username: string | null
   role: string
+  is_superuser?: boolean
   subscription_status: string | null
   is_verified: boolean
   created_at: string
@@ -40,7 +41,7 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]; adminRole?: string }) {
+export default function AdminUsersTable({ users, adminRole, adminIsSuperuser = false }: { users: UserRow[]; adminRole?: string; adminIsSuperuser?: boolean }) {
   const router = useRouter()
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [showModal, setShowModal] = useState(false)
@@ -69,7 +70,7 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
 
   const selectedUsers = users.filter(u => selected.has(u.id))
   const hasAdminTargets = selectedUsers.some(u => u.role === 'admin')
-  const callerIsSuperuser = isSuperuser(adminRole)
+  const callerIsSuperuser = adminIsSuperuser
 
   async function handleBulkDelete() {
     setDeleting(true)
@@ -276,23 +277,20 @@ export default function AdminUsersTable({ users, adminRole }: { users: UserRow[]
               This will permanently delete these users from Supabase Auth and their profiles. This cannot be undone.
             </p>
             <div className="max-h-40 overflow-y-auto space-y-1">
-              {selectedUsers.slice(0, 10).map(u => {
-                const uRole = u.role as string
-                return (
+              {selectedUsers.slice(0, 10).map(u => (
                   <p key={u.id} className="text-xs text-slate-500">
                     <span className="font-medium text-slate-700">{u.full_name || '—'}</span> — {u.email}
-                    {uRole === 'superuser' && (
+                    {u.is_superuser && (
                       <span className="ml-1 text-red-500 font-medium">(cannot be deleted)</span>
                     )}
-                    {uRole === 'admin' && !callerIsSuperuser && (
+                    {u.role === 'admin' && !u.is_superuser && !callerIsSuperuser && (
                       <span className="ml-1 text-red-500 font-medium">(admin — will be skipped)</span>
                     )}
-                    {uRole === 'admin' && callerIsSuperuser && (
+                    {u.role === 'admin' && !u.is_superuser && callerIsSuperuser && (
                       <span className="ml-1 text-orange-500 font-medium">(admin — extra confirmation required)</span>
                     )}
                   </p>
-                )
-              })}
+              ))}
               {selectedUsers.length > 10 && (
                 <p className="text-xs text-slate-400">+ {selectedUsers.length - 10} more</p>
               )}

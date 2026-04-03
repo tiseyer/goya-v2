@@ -215,7 +215,7 @@ export default function EventsPage() {
       supabase.from('profiles').select('role, full_name').eq('id', user.id).single()
         .then(({ data: profile }) => {
           if (profile) {
-            setIsAdmin(profile.role === 'admin' || profile.role === 'superuser');
+            setIsAdmin(profile.role === 'admin');
             setHeroCtx({
               firstName: profile.full_name?.split(' ')[0] ?? '',
               fullName: profile.full_name ?? '',

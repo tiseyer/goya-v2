@@ -36,7 +36,7 @@ export default function DashboardSchool({
         title={`Welcome, ${schoolName}.`}
         subtitle="Manage your school and students."
         pageSlug="dashboard"
-        isAdmin={profile?.role === 'admin' || profile?.role === 'superuser'}
+        isAdmin={profile?.role === 'admin'}
         heroContext={{ firstName: schoolName, fullName: profile?.full_name ?? '', role: profile?.role ?? '' } as HeroContext}
       />
       <PageContainer>

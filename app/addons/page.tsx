@@ -161,7 +161,7 @@ export default async function AddonsPage() {
         title="All Add-Ons & Upgrades"
         subtitle="Enhance your GOYA profile with verified designation badges, continuing education credits, and more."
         pageSlug="add-ons"
-        isAdmin={role === 'admin' || role === 'superuser'}
+        isAdmin={role === 'admin'}
         heroContext={{
           firstName: (profile?.full_name as string | null)?.split(' ')[0] ?? '',
           fullName: (profile?.full_name as string | null) ?? '',

@@ -30,7 +30,7 @@ export default function DashboardWellness({
         title={`Good ${getTimeOfDay()}, ${firstName}.`}
         subtitle="Ready to support your clients?"
         pageSlug="dashboard"
-        isAdmin={profile.role === 'admin' || profile.role === 'superuser'}
+        isAdmin={profile.role === 'admin'}
         heroContext={{ firstName, fullName: profile.full_name ?? '', role: profile.role ?? '' } as HeroContext}
       />
       <PageContainer>

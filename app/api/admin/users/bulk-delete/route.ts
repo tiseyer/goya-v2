@@ -2,7 +2,7 @@ import 'server-only'
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getSupabaseService } from '@/lib/supabase/service'
-import { isAdminOrAbove, isSuperuser } from '@/lib/roles'
+import { isAdminOrAbove } from '@/lib/roles'
 
 export async function POST(request: Request) {
   // Auth check — admin only
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, is_superuser')
     .eq('id', user.id)
     .single()
 
@@ -43,21 +43,20 @@ export async function POST(request: Request) {
   // Safety: apply role-based deletion rules — check roles first
   const { data: profiles } = await serviceClient
     .from('profiles')
-    .select('id, role, email')
+    .select('id, role, email, is_superuser')
     .in('id', safeIds)
 
-  const callerIsSuperuser = isSuperuser(profile?.role as string)
+  const callerIsSuperuser = profile?.is_superuser === true
 
   const undeletableIds = new Set(
     (profiles ?? []).filter(p => {
-      const pRole = p.role as string
       // Superusers are NEVER deletable by anyone
-      if (pRole === 'superuser') {
+      if (p.is_superuser) {
         skippedUsers.push(`${p.email ?? 'unknown'} (cannot be deleted)`)
         return true
       }
       // Admins only deletable by superuser
-      if (pRole === 'admin' && !callerIsSuperuser) {
+      if ((p.role as string) === 'admin' && !callerIsSuperuser) {
         skippedUsers.push(`${p.email ?? 'unknown'} (admin — skipped)`)
         return true
       }

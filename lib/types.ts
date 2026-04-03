@@ -1,4 +1,4 @@
-export type UserRole = 'student' | 'teacher' | 'wellness_practitioner' | 'moderator' | 'admin' | 'superuser';
+export type UserRole = 'student' | 'teacher' | 'wellness_practitioner' | 'moderator' | 'admin';
 export type SubscriptionStatus = 'member' | 'guest';
 export type MemberType = 'student' | 'teacher' | 'wellness_practitioner';
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
@@ -20,6 +20,7 @@ export interface Profile {
   username: string | null;
   mrn: string | null;
   role: UserRole;
+  is_superuser: boolean;
   avatar_url: string | null;
   bio: string | null;
   introduction: string | null;

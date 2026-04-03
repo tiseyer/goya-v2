@@ -2179,6 +2179,7 @@ export type Database = {
           id: string
           influences_arr: string[] | null
           instagram: string | null
+          is_superuser: boolean
           is_verified: boolean
           languages: string[] | null
           last_name: string | null
@@ -2242,6 +2243,7 @@ export type Database = {
           id: string
           influences_arr?: string[] | null
           instagram?: string | null
+          is_superuser?: boolean
           is_verified?: boolean
           languages?: string[] | null
           last_name?: string | null
@@ -2305,6 +2307,7 @@ export type Database = {
           id?: string
           influences_arr?: string[] | null
           instagram?: string | null
+          is_superuser?: boolean
           is_verified?: boolean
           languages?: string[] | null
           last_name?: string | null

@@ -32,7 +32,7 @@ export default function DashboardStudent({
         title={`Good ${getTimeOfDay()}, ${firstName}.`}
         subtitle="Ready to practice today?"
         pageSlug="dashboard"
-        isAdmin={profile.role === 'admin' || profile.role === 'superuser'}
+        isAdmin={profile.role === 'admin'}
         heroContext={{ firstName, fullName: profile.full_name ?? '', role: profile.role ?? '' } as HeroContext}
       />
       <PageContainer>
