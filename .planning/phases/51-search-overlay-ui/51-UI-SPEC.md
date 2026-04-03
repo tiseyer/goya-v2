@@ -1,7 +1,8 @@
 ---
 phase: 51
 slug: search-overlay-ui
-status: draft
+status: approved
+reviewed_at: 2026-04-03
 shadcn_initialized: false
 preset: none
 created: 2026-04-03
@@ -60,7 +61,7 @@ All sizes use Geist Sans (--font-sans). Source: design-system/MASTER.md section 
 | Search input text | 16px (text-base) | 400 (regular) | 1.5 | `text-base text-foreground` |
 | Result title | 14px (text-sm) | 500 (medium) | 1.4 | `text-sm font-medium text-foreground` |
 | Result subtitle (city, role, meta) | 12px (text-xs) | 400 (regular) | 1.4 | `text-xs text-slate-500` |
-| Category group header | 10px (text-[10px]) | 600 (semibold) | 1.2 | `text-[10px] font-semibold text-slate-400 uppercase tracking-wide` |
+| Category group header | 10px (text-[10px]) | 500 (medium) | 1.2 | `text-[10px] font-medium text-slate-400 uppercase tracking-wide` |
 | Keyboard hint bar | 10px (text-[10px]) | 400 (regular) | 1.0 | `text-[10px] text-slate-400` |
 | Filter pill label | 12px (text-xs) | 500 (medium) | 1.0 | `text-xs font-medium` |
 | Input placeholder | 16px (text-base) | 400 (regular) | 1.5 | `placeholder:text-slate-400` |
@@ -76,7 +77,7 @@ Source: design-system/MASTER.md + CONTEXT.md decisions (category group headers s
 | Dominant (60%) | #ffffff | `bg-white` / `bg-surface` | Overlay panel background, result rows, desktop modal |
 | Secondary (30%) | #f8f9fa | `bg-surface-muted` / `bg-slate-50` | Hovered result row background, keyboard hint bar background |
 | Accent (10%) | #345c83 | `bg-primary` / `text-primary` | Active filter pill background, highlighted/top result row, active keyboard-nav row left border |
-| Destructive | #831618 | `text-accent` | Not used in this phase — no destructive actions |
+| Destructive | #831618 | `text-destructive` | Not used in this phase — no destructive actions |
 
 Accent reserved for:
 1. Active filter pill: `bg-primary text-white` (selected category pill only)
@@ -174,8 +175,8 @@ Z-index: backdrop at `z-[9999]`, panel container at `z-[10000]` — matches Flow
 - Category icon (for non-member rows): 20px lucide icon in `text-slate-400`
 
 ### Member Row Contextual Action Icons
-- Message icon: `MessageCircle` (lucide-react, 16px) — `text-slate-400 hover:text-primary transition-colors` — always shown for member rows
-- Map/directions icon: `MapPin` (lucide-react, 16px) — `text-slate-400 hover:text-primary transition-colors` — shown only when `has_full_address === true` (source: REQUIREMENTS.md SRCH-06, CONTEXT.md specifics)
+- Message icon: `MessageCircle` (lucide-react, 16px) — `text-slate-400 hover:text-primary transition-colors` — always shown for member rows — `title="Send message"` tooltip for sighted users
+- Map/directions icon: `MapPin` (lucide-react, 16px) — `text-slate-400 hover:text-primary transition-colors` — shown only when `has_full_address === true` (source: REQUIREMENTS.md SRCH-06, CONTEXT.md specifics) — `title="Get directions"` tooltip for sighted users
 - Icons grouped right: `flex items-center gap-1 ml-auto`
 
 ### Keyboard Navigation

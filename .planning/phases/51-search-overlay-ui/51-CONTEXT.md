@@ -23,7 +23,7 @@ Build the GlobalSearch overlay component — a macOS Spotlight-style search UI t
 - Backdrop: `bg-black/40 backdrop-blur-sm` (per user spec)
 - Overlay animation: scale + fade (0.95→1.0, opacity 0→1, 200ms) — matches FlowPlayerModal
 - Result row avatars: 32px (`w-8 h-8`) — compact, matches header avatar size
-- Category group headers: small uppercase label (`text-xs font-semibold text-slate-400 uppercase tracking-wide`)
+- Category group headers: small uppercase label (`text-[10px] font-medium text-slate-400 uppercase tracking-wide`) — changed from semibold to medium per typography constraint (max 2 weights)
 
 ### Mobile Layout & Interaction
 - Mobile input anchoring: CSS `flex-col-reverse` — input visually at bottom, results scroll above naturally
