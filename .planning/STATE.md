@@ -95,6 +95,7 @@ None.
 | 260403-cuh | Fix admin event edit save button stuck in Saving state | 2026-04-03 | 473908b | [260403-cuh-fix-admin-event-edit-save-button-stuck-i](./quick/260403-cuh-fix-admin-event-edit-save-button-stuck-i/) |
 | 260403-cxz | Move instructor to sidebar and add organizers widget | 2026-04-03 | 444c23a | [260403-cxz-move-instructor-to-sidebar-and-add-organ](./quick/260403-cxz-move-instructor-to-sidebar-and-add-organ/) |
 | 260403-d8m | Add View Event button to admin event edit page | 2026-04-03 | db7091b, ce3078b | [260403-d8m-add-view-event-button-to-admin-event-edi](./quick/260403-d8m-add-view-event-button-to-admin-event-edi/) |
+| 260403-d6k | Event instructors join table + visibility toggles + Edit/Delete + My Events organizer query | 2026-04-03 | 556eae3, 4b64cef, 0d07005 | [260403-d6k-event-instructors-organizers-join-tables](./quick/260403-d6k-event-instructors-organizers-join-tables/) |
 
 ## Session Continuity
 
