@@ -80,6 +80,69 @@ export default async function CourseOverviewPage({
 
   const isEnrolled = !!progress;
 
+  // canManage check: organizer_ids OR admin/moderator role
+  let canManage = false;
+  if (user) {
+    if (course.organizer_ids?.includes(user.id)) {
+      canManage = true;
+    } else {
+      const { data: authProfile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      if (authProfile?.role === 'admin' || authProfile?.role === 'moderator') {
+        canManage = true;
+      }
+    }
+  }
+
+  // Fetch organizer profiles
+  let organizers: { id: string; full_name: string | null; avatar_url: string | null; username: string | null }[] = [];
+  if (course.organizer_ids && course.organizer_ids.length > 0) {
+    const { data: orgProfiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, username')
+      .in('id', course.organizer_ids);
+    organizers = orgProfiles ?? [];
+  }
+
+  // Fetch instructor profiles from join table
+  let instructors: { id: string; full_name: string | null; avatar_url: string | null; username: string | null }[] = [];
+  const { data: instructorRows } = await supabase
+    .from('course_instructors')
+    .select('profile_id')
+    .eq('course_id', id);
+  if (instructorRows && instructorRows.length > 0) {
+    const { data: instrProfiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, username')
+      .in('id', instructorRows.map(r => r.profile_id));
+    instructors = instrProfiles ?? [];
+  }
+
+  // Fetch attendee count + first 20 profiles (if show_attendees)
+  const { count: attendeeCount } = await supabase
+    .from('course_attendees')
+    .select('*', { count: 'exact', head: true })
+    .eq('course_id', id);
+  let attendees: { id: string; full_name: string | null; avatar_url: string | null; username: string | null }[] = [];
+  if (course.show_attendees) {
+    const { data: attData } = await supabase
+      .from('course_attendees')
+      .select('profile_id')
+      .eq('course_id', id)
+      .order('created_at', { ascending: true })
+      .limit(20);
+    if (attData && attData.length > 0) {
+      const { data: attProfiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, username')
+        .in('id', attData.map(r => r.profile_id));
+      attendees = attProfiles ?? [];
+    }
+  }
+
   // Bind server action to this course id
   const boundEnroll = enrollAndStart.bind(null, id);
 
@@ -137,7 +200,7 @@ export default async function CourseOverviewPage({
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-5 text-sm text-white/75">
-            {course.instructor && (
+            {course.instructor && instructors.length === 0 && (
               <span className="flex items-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -243,17 +306,119 @@ export default async function CourseOverviewPage({
                 </p>
               )}
             </div>
+
+            {/* Attendees section */}
+            {course.show_attendees && attendees.length > 0 && (
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold text-[#1B3A5C]">Attendees</h2>
+                  <span className="text-xs text-slate-400 font-medium">{attendeeCount ?? 0} enrolled</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {attendees.map((att) => (
+                    <Link key={att.id} href={`/members/${att.username ?? att.id}`} className="flex items-center gap-2 group">
+                      {att.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={att.avatar_url} alt={att.full_name ?? 'Attendee'} className="w-7 h-7 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full bg-primary-light/15 flex items-center justify-center text-primary font-bold text-[10px] shrink-0">
+                          {(att.full_name ?? '?')[0].toUpperCase()}
+                        </div>
+                      )}
+                      <p className="text-xs font-medium text-primary-dark group-hover:text-primary transition-colors truncate">
+                        {att.full_name ?? 'Member'}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+                {(attendeeCount ?? 0) > 20 && (
+                  <p className="text-xs text-slate-400 mt-3">and {(attendeeCount ?? 0) - 20} more...</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* RIGHT column — sticky card */}
           <div>
             <div className="sticky top-24">
+              {/* Edit button for organizers and admin/moderator */}
+              {canManage && (
+                <div className="mb-4">
+                  <Link
+                    href={`/admin/courses/${id}/edit`}
+                    className="block text-center py-2.5 px-4 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary-dark transition-colors"
+                  >
+                    Edit Course
+                  </Link>
+                </div>
+              )}
+
               <CourseEnrollCard
                 course={course}
                 userId={effectiveUserId ?? user?.id ?? null}
                 progress={progress}
                 enrollAction={boundEnroll}
               />
+
+              {/* Instructor widget — profile-based (join table) */}
+              {instructors.length > 0 && course.show_instructors !== false && (
+                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 mt-4">
+                  <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                    {instructors.length === 1 ? 'Instructor' : 'Instructors'}
+                  </h3>
+                  <div className="space-y-3">
+                    {instructors.map((inst) => (
+                      <Link key={inst.id} href={`/members/${inst.username ?? inst.id}`} className="flex items-center gap-3 group">
+                        {inst.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={inst.avatar_url} alt={inst.full_name ?? 'Instructor'} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-primary-light/15 flex items-center justify-center text-primary font-bold text-xs shrink-0">
+                            {(inst.full_name ?? '?')[0].toUpperCase()}
+                          </div>
+                        )}
+                        <p className="text-sm font-medium text-primary-dark group-hover:text-primary transition-colors">
+                          {inst.full_name ?? 'Unknown'}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Instructor fallback — text-based (pre-migration courses) */}
+              {instructors.length === 0 && course.instructor && course.show_instructors !== false && (
+                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 mt-4">
+                  <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Instructor</h3>
+                  <p className="text-sm font-medium text-primary-dark">{course.instructor}</p>
+                </div>
+              )}
+
+              {/* Organizer widget */}
+              {organizers.length > 0 && course.show_organizers !== false && (
+                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 mt-4">
+                  <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                    {organizers.length === 1 ? 'Organizer' : 'Organizers'}
+                  </h3>
+                  <div className="space-y-3">
+                    {organizers.map((org) => (
+                      <Link key={org.id} href={`/members/${org.username ?? org.id}`} className="flex items-center gap-3 group">
+                        {org.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={org.avatar_url} alt={org.full_name ?? 'Organizer'} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-primary-light/15 flex items-center justify-center text-primary font-bold text-xs shrink-0">
+                            {(org.full_name ?? '?')[0].toUpperCase()}
+                          </div>
+                        )}
+                        <p className="text-sm font-medium text-primary-dark group-hover:text-primary transition-colors">
+                          {org.full_name ?? 'Unknown'}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -29,7 +29,7 @@ export default async function MyCoursesPage() {
     supabase
       .from('courses')
       .select('*')
-      .eq('created_by', user.id)
+      .or(`created_by.eq.${user.id},organizer_ids.cs.{${user.id}}`)
       .eq('course_type', 'member')
       .neq('status', 'deleted')
       .order('created_at', { ascending: false }),
