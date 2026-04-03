@@ -256,8 +256,8 @@ export default function GlobalSearchOverlay() {
   const inputBar = (isMobile: boolean) => (
     <div className={`flex items-center gap-3 ${
       isMobile
-        ? 'mx-3 px-4 py-3 bg-white dark:bg-slate-800 rounded-xl'
-        : 'px-4 py-3 border-b border-slate-100'
+        ? 'mx-3 px-4 py-3 bg-white dark:bg-transparent rounded-xl'
+        : 'px-4 py-3 border-b border-slate-100 dark:border-slate-700'
     }`}>
       <IconSearch
         size={20}
@@ -313,7 +313,7 @@ export default function GlobalSearchOverlay() {
                 role="dialog"
                 aria-modal="true"
                 aria-label="Search"
-                className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl pointer-events-auto overflow-hidden"
+                className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl pointer-events-auto overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Input bar */}
@@ -331,7 +331,7 @@ export default function GlobalSearchOverlay() {
                 </div>
 
                 {/* Keyboard hints */}
-                <div className="px-4 py-2 border-t border-slate-100 bg-slate-50 flex items-center gap-4 text-[10px] text-slate-400">
+                <div className="px-4 py-2 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center gap-4 text-[10px] text-slate-400 dark:text-slate-500">
                   <span><kbd className="font-mono">↑↓</kbd> navigate</span>
                   <span><kbd className="font-mono">↵</kbd> open</span>
                   <span><kbd className="font-mono">Esc</kbd> close</span>
