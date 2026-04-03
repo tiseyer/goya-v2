@@ -288,17 +288,6 @@ export default function GlobalSearchOverlay() {
     let flatIndex = matteaOffset; // Start after Mattea hint if visible
     return (
       <div role="listbox" aria-label="Search results">
-        {/* Mattea AI hint — v2 no-gating: renders when answer or loading */}
-        {(matteaLoading || matteaAnswer !== null) && (
-          <MatteaSearchHint
-            query={query}
-            answer={matteaAnswer}
-            loading={matteaLoading}
-            isHighlighted={selectedIdx === 0}
-            onSelect={close}
-          />
-        )}
-
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (!items || items.length === 0) return null;
@@ -402,6 +391,17 @@ export default function GlobalSearchOverlay() {
                   onSelect={handleCategoryChange}
                 />
 
+                {/* Mattea AI hint — outside renderResults to avoid early-return skip */}
+                {(matteaLoading || matteaAnswer !== null) && (
+                  <MatteaSearchHint
+                    query={query}
+                    answer={matteaAnswer}
+                    loading={matteaLoading}
+                    isHighlighted={selectedIdx === 0}
+                    onSelect={close}
+                  />
+                )}
+
                 {/* Results */}
                 <div className="max-h-[60vh] overflow-y-auto">
                   {renderResults()}
@@ -438,6 +438,17 @@ export default function GlobalSearchOverlay() {
 
               {/* Divider */}
               <div className="mx-4 border-t border-slate-200 dark:border-slate-700" />
+
+              {/* Mattea AI hint — mobile */}
+              {(matteaLoading || matteaAnswer !== null) && (
+                <MatteaSearchHint
+                  query={query}
+                  answer={matteaAnswer}
+                  loading={matteaLoading}
+                  isHighlighted={selectedIdx === 0}
+                  onSelect={close}
+                />
+              )}
 
               {/* Results (scrollable, fills remaining space) */}
               <div className="flex-1 overflow-y-auto">
