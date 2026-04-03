@@ -22,27 +22,26 @@ export async function POST(req: Request) {
 
     const key = question.trim().toLowerCase()
 
-    // Check cache
+    // Check cache — return cached answer as a single-chunk stream
     const cached = cache.get(key)
     if (cached && Date.now() - cached.ts < CACHE_TTL) {
-      return NextResponse.json({ answer: cached.answer })
+      return new Response(cached.answer, {
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      })
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const supabase = getSupabaseService() as any
 
-    // Load chatbot config
     const { data: config, error: configErr } = await supabase
       .from('chatbot_config')
       .select('selected_key_id, is_active')
       .single()
 
     if (configErr || !config?.is_active || !config.selected_key_id) {
-      console.error('[mattea-hint] Config issue:', { configErr, config })
       return NextResponse.json({ answer: null })
     }
 
-    // Get AI provider key
     const { data: secretRow, error: secretErr } = await supabase
       .from('admin_secrets')
       .select('encrypted_value, iv, provider, model')
@@ -50,7 +49,6 @@ export async function POST(req: Request) {
       .single()
 
     if (secretErr || !secretRow) {
-      console.error('[mattea-hint] Secret issue:', { secretErr })
       return NextResponse.json({ answer: null })
     }
 
@@ -58,7 +56,6 @@ export async function POST(req: Request) {
     const provider = secretRow.provider as string
     const model = secretRow.model as string
 
-    // Load FAQ context for better answers
     const { data: faqRows } = await supabase
       .from('faq_items')
       .select('question, answer')
@@ -72,43 +69,69 @@ export async function POST(req: Request) {
     }
 
     const systemPrompt = SYSTEM_PROMPT + faqContext
+    const encoder = new TextEncoder()
 
-    let answer: string | null = null
+    // Stream the AI response
+    const stream = new ReadableStream({
+      async start(controller) {
+        let fullContent = ''
 
-    try {
-      if (provider === 'openai') {
-        const openai = new OpenAI({ apiKey })
-        const completion = await openai.chat.completions.create({
-          model,
-          max_tokens: 150,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: question.trim() },
-          ],
-        })
-        answer = completion.choices[0]?.message?.content?.trim() ?? null
-      } else if (provider === 'anthropic') {
-        const anthropic = new Anthropic({ apiKey })
-        const response = await anthropic.messages.create({
-          model,
-          max_tokens: 150,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: question.trim() }],
-        })
-        const block = response.content[0]
-        answer = block.type === 'text' ? block.text.trim() : null
-      }
-    } catch (aiErr) {
-      console.error('[mattea-hint] AI call error:', aiErr)
-      return NextResponse.json({ answer: null })
-    }
+        try {
+          if (provider === 'openai') {
+            const openai = new OpenAI({ apiKey })
+            const completion = await openai.chat.completions.create({
+              model,
+              max_tokens: 150,
+              stream: true,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: question.trim() },
+              ],
+            })
 
-    // Cache successful answers
-    if (answer) {
-      cache.set(key, { answer, ts: Date.now() })
-    }
+            for await (const chunk of completion) {
+              const token = chunk.choices[0]?.delta?.content ?? ''
+              if (token) {
+                fullContent += token
+                controller.enqueue(encoder.encode(token))
+              }
+            }
+          } else if (provider === 'anthropic') {
+            const anthropic = new Anthropic({ apiKey })
+            const streamObj = await anthropic.messages.create({
+              model,
+              max_tokens: 150,
+              stream: true,
+              system: systemPrompt,
+              messages: [{ role: 'user', content: question.trim() }],
+            })
 
-    return NextResponse.json({ answer })
+            for await (const event of streamObj) {
+              if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+                const token = event.delta.text
+                if (token) {
+                  fullContent += token
+                  controller.enqueue(encoder.encode(token))
+                }
+              }
+            }
+          }
+
+          // Cache the full answer
+          if (fullContent) {
+            cache.set(key, { answer: fullContent, ts: Date.now() })
+          }
+        } catch (err) {
+          console.error('[mattea-hint] Stream error:', err)
+        } finally {
+          controller.close()
+        }
+      },
+    })
+
+    return new Response(stream, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    })
   } catch (err) {
     console.error('[mattea-hint] Unexpected error:', err)
     return NextResponse.json({ answer: null })

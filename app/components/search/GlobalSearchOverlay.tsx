@@ -157,21 +157,42 @@ export default function GlobalSearchOverlay() {
     const questionText = q; // capture for closure
     const timer = setTimeout(async () => {
       setMatteaLoading(true);
+      setMatteaAnswer(null);
       try {
-        const body = JSON.stringify({ question: questionText });
         const res = await fetch('/api/search/mattea-hint', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body,
+          body: JSON.stringify({ question: questionText }),
         });
-        if (!res.ok) { setMatteaLoading(false); return; }
-        const data = await res.json();
-        if (data.answer) {
-          setMatteaAnswer(data.answer);
+
+        if (!res.ok || !res.body) { setMatteaLoading(false); return; }
+
+        // Check if response is JSON (cached) or stream
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const data = await res.json();
+          if (data.answer) setMatteaAnswer(data.answer);
+          setMatteaLoading(false);
+          return;
+        }
+
+        // Stream text tokens
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = '';
+        setMatteaAnswer('');
+        setMatteaLoading(false);
+
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          fullText += chunk;
+          setMatteaAnswer(fullText);
         }
       } catch {
         // silent fail
-      } finally {
         setMatteaLoading(false);
       }
     }, 1200);
