@@ -247,7 +247,9 @@ export default function GlobalSearchOverlay() {
   if (!mounted) return null;
 
   const inputBar = (isMobile: boolean) => (
-    <div className={`flex items-center gap-3 ${isMobile ? 'border-t border-slate-200 px-4 py-3' : 'px-4 py-3 border-b border-slate-100'}`}>
+    <div className={`flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-4 py-3 border-b border-slate-100'}`}
+      style={isMobile ? { background: 'rgba(255,255,255,0.85)', borderRadius: '12px', margin: '0 12px' } : undefined}
+    >
       <IconSearch
         size={20}
         className={query ? 'text-[#345c83]' : 'text-slate-400'}
@@ -274,15 +276,13 @@ export default function GlobalSearchOverlay() {
           Clear
         </button>
       )}
-      {!isMobile && (
-        <button
-          onClick={close}
-          className="text-slate-400 hover:text-slate-600 transition-colors"
-          aria-label="Close search"
-        >
-          <IconX size={20} />
-        </button>
-      )}
+      <button
+        onClick={close}
+        className="text-slate-400 hover:text-slate-600 transition-colors"
+        aria-label="Close search"
+      >
+        <IconX size={20} />
+      </button>
     </div>
   );
 
@@ -333,31 +333,33 @@ export default function GlobalSearchOverlay() {
 
           {/* ── Mobile layout (hidden on desktop) ── */}
           <div className="sm:hidden">
-            <div className="fixed inset-0 z-[10000] bg-white flex flex-col-reverse">
-              {/* Close button */}
-              <button
-                onClick={close}
-                className="absolute top-3 right-4 z-10 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors"
-                aria-label="Close search"
-              >
-                <IconX size={20} />
-              </button>
+            <div
+              className="fixed inset-0 z-[10000] flex flex-col"
+              style={{
+                background: 'rgba(255, 255, 255, 0.15)',
+                backdropFilter: 'blur(40px)',
+                WebkitBackdropFilter: 'blur(40px)',
+                paddingTop: 'env(safe-area-inset-top)',
+              }}
+            >
+              {/* Input bar at top */}
+              <div className="pt-3">
+                {inputBar(true)}
+              </div>
 
-              {/* Input bar at visual bottom (last in DOM = first visual in flex-col-reverse) */}
-              {inputBar(true)}
+              {/* Filter pills */}
+              <SearchFilterPills
+                activeCategory={activeCategory}
+                onSelect={handleCategoryChange}
+                isMobile
+              />
 
-              {/* Above input: scrollable content */}
-              <div className="flex-1 overflow-y-auto flex flex-col">
-                {/* Filter pills */}
-                <SearchFilterPills
-                  activeCategory={activeCategory}
-                  onSelect={handleCategoryChange}
-                />
+              {/* Divider */}
+              <div className="mx-4 border-t border-white/20" />
 
-                {/* Results */}
-                <div>
-                  {renderResults()}
-                </div>
+              {/* Results (scrollable, fills remaining space) */}
+              <div className="flex-1 overflow-y-auto">
+                {renderResults()}
               </div>
             </div>
           </div>

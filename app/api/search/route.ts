@@ -50,13 +50,13 @@ export async function GET(req: NextRequest) {
     if (isAdmin && (q.includes('@') || /^\d+$/.test(q))) {
       memberQuery = db
         .from('profiles')
-        .select('id, full_name, first_name, last_name, avatar_url, role, city, country, street_address, email, mrn')
+        .select('id, full_name, first_name, last_name, avatar_url, role, city, country, location, email, mrn')
         .or(`full_name.ilike.%${q}%,first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%,mrn.ilike.%${q}%`)
         .limit(limit);
     } else {
       memberQuery = db
         .from('profiles')
-        .select('id, full_name, first_name, last_name, avatar_url, role, city, country, street_address')
+        .select('id, full_name, first_name, last_name, avatar_url, role, city, country, location')
         .or(`full_name.ilike.%${q}%,first_name.ilike.%${q}%,last_name.ilike.%${q}%`)
         .limit(limit);
     }
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
         subtitle: [m.role, m.city, m.country].filter(Boolean).join(' · '),
         href: `/members/${m.id}`,
         avatarUrl: m.avatar_url,
-        has_full_address: Boolean(m.street_address && m.city && m.country),
+        has_full_address: Boolean(m.location && m.city && m.country),
       }));
     }
   }
