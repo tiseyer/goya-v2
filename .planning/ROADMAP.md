@@ -497,7 +497,7 @@ Plans:
   6. When the overlay opens (by any method), the search input is immediately focused and ready to receive keyboard input
 **Plans**: 2 plans
 Plans:
-- [ ] 51-01-PLAN.md — Search types, mock data, SearchContext, and ClientProviders wiring
+- [x] 51-01-PLAN.md — Search types, mock data, SearchContext, and ClientProviders wiring
 - [ ] 51-02-PLAN.md — GlobalSearchOverlay component, sub-components, Header integration
 **UI hint**: yes
 
@@ -540,7 +540,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 51. Search Overlay UI | 0/2 | Not started | - |
+| 51. Search Overlay UI | 1/2 | In Progress|  |
 | 52. Search API + Page Registry | 0/TBD | Not started | - |
 | 53. Header Integration | 0/TBD | Not started | - |
 | 54. Performance + Polish | 0/TBD | Not started | - |

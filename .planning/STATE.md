@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.19
-milestone_name: Global Search
-status: active
-stopped_at: null
-last_updated: "2026-04-03T12:00:00.000Z"
-last_activity: 2026-04-03 - Roadmap created (phases 51-54)
+milestone: v1.18
+milestone_name: User Profile Redesign
+status: executing
+stopped_at: Completed 51-01-PLAN.md
+last_updated: "2026-04-03T03:26:27.449Z"
+last_activity: 2026-04-03
 progress:
   total_phases: 4
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 4
+  total_plans: 7
+  completed_plans: 7
   percent: 0
 ---
 
@@ -21,20 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
-**Current focus:** v1.19 — Global Search
+**Current focus:** Phase 51 — Search Overlay UI
 
 ## Current Position
 
-Phase: Phase 51 — Search Overlay UI (not started)
-Plan: —
-Status: Roadmap defined, ready to plan Phase 51
-Last activity: 2026-04-03 — Roadmap created (phases 51-54)
+Phase: 51 (Search Overlay UI) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-04-03
 
 Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0 (this milestone)
 - Average duration: —
 - Total execution time: —
@@ -49,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 | 54. Performance + Polish | TBD | — | — |
 
 *Updated after each plan completion*
+| Phase 51 P01 | 1m 32s | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -62,6 +64,8 @@ Recent decisions affecting current work:
 - PUBLIC_PROFILE_COLUMNS constant required — never use select('*') for profile fetches (security)
 - Own-profile detection must use supabase.auth.getUser() server-side
 - deriveProfileVisibility() must gate map/address before any JSX — privacy rules are server-side only
+- [Phase 51]: SearchProvider wraps ConnectionsProvider so both Header and GlobalSearchOverlay have access to search state
+- [Phase 51]: triggerRef captures document.activeElement on open and restores focus on close (a11y return-focus-on-close)
 
 ### Research Notes
 
@@ -99,6 +103,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-03
-Stopped at: Roadmap created for v1.19 Global Search (phases 51-54)
+Last session: 2026-04-03T03:26:27.446Z
+Stopped at: Completed 51-01-PLAN.md
 Resume file: None

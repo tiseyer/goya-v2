@@ -9,14 +9,14 @@ Requirements for Global Search milestone. Each maps to roadmap phases.
 
 ### Search Overlay UI
 
-- [ ] **SRCH-01**: User can open a centered search overlay by clicking the search icon in the nav header
+- [x] **SRCH-01**: User can open a centered search overlay by clicking the search icon in the nav header
 - [ ] **SRCH-02**: User can close the overlay via Esc key, X button, or clicking outside the backdrop
 - [ ] **SRCH-03**: User sees category filter pills (All / Members / Events / Courses / Pages) that toggle search scope
 - [ ] **SRCH-04**: User can navigate results with arrow keys and open highlighted result with Enter
 - [ ] **SRCH-05**: User sees results grouped by category with best match highlighted at top
 - [ ] **SRCH-06**: User sees contextual action icons on result rows (message icon for members, map/directions icon for members with full address)
 - [ ] **SRCH-07**: User on mobile sees a full-screen overlay with input at bottom and horizontally scrollable filter pills
-- [ ] **SRCH-08**: Opening the overlay (via click or keyboard shortcut) auto-focuses the search input, ready to type immediately
+- [x] **SRCH-08**: Opening the overlay (via click or keyboard shortcut) auto-focuses the search input, ready to type immediately
 
 ### Search API
 
@@ -65,14 +65,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SRCH-01 | Phase 51 | Pending |
+| SRCH-01 | Phase 51 | Complete |
 | SRCH-02 | Phase 51 | Pending |
 | SRCH-03 | Phase 51 | Pending |
 | SRCH-04 | Phase 51 | Pending |
 | SRCH-05 | Phase 51 | Pending |
 | SRCH-06 | Phase 51 | Pending |
 | SRCH-07 | Phase 51 | Pending |
-| SRCH-08 | Phase 51 | Pending |
+| SRCH-08 | Phase 51 | Complete |
 | SAPI-01 | Phase 52 | Pending |
 | SAPI-02 | Phase 52 | Pending |
 | SAPI-03 | Phase 52 | Pending |
