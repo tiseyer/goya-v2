@@ -86,9 +86,10 @@ None.
 | 260403-c1n | Switch Events and Academy PageHero to variant dark | 2026-04-03 | db08db4 | [260403-c1n-switch-events-and-academy-pagehero-to-va](./quick/260403-c1n-switch-events-and-academy-pagehero-to-va/) |
 | 260403-c2q | Fix events sidebar filter box border colors for dark mode | 2026-04-03 | f3eb53c | [260403-c2q-fix-events-sidebar-filter-box-border-col](./quick/260403-c2q-fix-events-sidebar-filter-box-border-col/) |
 | 260403-c47 | Add nav skeleton loading state to prevent progressive pop-in | 2026-04-03 | 65194b6 | [260403-c47-nav-skeleton-loading-state-to-prevent-pr](./quick/260403-c47-nav-skeleton-loading-state-to-prevent-pr/) |
+| 260403-c7w | Fix nav auth race condition causing progressive pop-in | 2026-04-03 | bf9024c | [260403-c7w-fix-nav-items-progressive-loading-with-s](./quick/260403-c7w-fix-nav-items-progressive-loading-with-s/) |
 
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Completed quick task 260403-c47: Add nav skeleton loading state to prevent progressive pop-in
+Stopped at: Completed quick task 260403-c7w: Fix nav auth race condition
 Resume file: None
