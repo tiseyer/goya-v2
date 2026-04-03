@@ -76,24 +76,76 @@ export interface InProgressCourseRow {
   } | null
 }
 
+export interface TeacherRow {
+  id: string
+  full_name: string | null
+  avatar_url: string | null
+  teaching_styles: string[] | null
+  location: string | null
+  username: string | null
+  bio: string | null
+}
+
 // ─── Fetch functions ──────────────────────────────────────────────────────────
 
 /**
- * Fetches upcoming published events ordered by date ascending.
+ * Fetches teachers for discovery — prefers those with avatars.
+ */
+export async function fetchTeachers(
+  supabase: SupabaseClient,
+  limit = 12,
+): Promise<TeacherRow[]> {
+  // First try teachers with avatars
+  const { data: withAvatars } = await supabase
+    .from('profiles')
+    .select('id, full_name, avatar_url, teaching_styles, location, username, bio')
+    .eq('role', 'teacher')
+    .not('avatar_url', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (withAvatars && withAvatars.length >= 4) {
+    return withAvatars as TeacherRow[]
+  }
+
+  // Fall back to all teachers
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, full_name, avatar_url, teaching_styles, location, username, bio')
+    .eq('role', 'teacher')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  return (data ?? []) as TeacherRow[]
+}
+
+/**
+ * Fetches upcoming published events. Falls back to recent past events if none upcoming.
  */
 export async function fetchUpcomingEvents(
   supabase: SupabaseClient,
   limit = 8,
 ): Promise<EventRow[]> {
   const today = new Date().toISOString().split('T')[0]
-  const { data } = await supabase
+  const { data: upcoming } = await supabase
     .from('events')
     .select('id, title, date, end_date, location, is_online, format, status, slug, categories')
     .eq('status', 'published')
     .gte('date', today)
     .order('date', { ascending: true })
     .limit(limit)
-  return (data ?? []) as EventRow[]
+
+  if (upcoming && upcoming.length > 0) {
+    return upcoming as EventRow[]
+  }
+
+  // Fallback: recent past events
+  const { data: recent } = await supabase
+    .from('events')
+    .select('id, title, date, end_date, location, is_online, format, status, slug, categories')
+    .eq('status', 'published')
+    .order('date', { ascending: false })
+    .limit(limit)
+  return (recent ?? []) as EventRow[]
 }
 
 /**

@@ -14,15 +14,11 @@ import type { DashboardProps } from './types'
 
 export default function DashboardStudent({
   profile,
+  teachers,
   events,
   courses,
-  connections,
 }: DashboardProps) {
   const firstName = profile.full_name?.trim().split(' ')[0] || 'there'
-
-  const teacherConnections = connections.filter(
-    (c) => c.profile.role === 'teacher'
-  )
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -36,11 +32,11 @@ export default function DashboardStudent({
         heroContext={{ firstName, fullName: profile.full_name ?? '', role: profile.role ?? '' } as HeroContext}
       />
       <PageContainer>
-        <div className="py-8 space-y-8">
+        <div className="py-10 space-y-16">
 
-          {/* 2. Teachers carousel */}
+          {/* Teachers — discovery */}
           <HorizontalCarousel
-            title="Teachers that might suit you"
+            title="Find your perfect yoga guide"
             showAllHref="/members?role=teacher"
             showAllLabel="Show all teachers"
             emptyState={
@@ -54,28 +50,21 @@ export default function DashboardStudent({
               </Card>
             }
           >
-            {teacherConnections.length > 0
-              ? teacherConnections.map((c) => (
+            {teachers.length > 0
+              ? teachers.map((t) => (
                   <TeacherCard
-                    key={c.connectionId}
-                    teacher={{
-                      id: c.profile.id,
-                      full_name: c.profile.full_name,
-                      avatar_url: c.profile.avatar_url,
-                      teaching_styles: null,
-                      location: null,
-                      username: c.profile.username,
-                    }}
+                    key={t.id}
+                    teacher={t}
                   />
                 ))
               : null}
           </HorizontalCarousel>
 
-          {/* 3. Courses carousel */}
+          {/* Courses — growth */}
           <HorizontalCarousel
-            title="Courses you might enjoy"
+            title="Keep practicing, keep growing"
             showAllHref="/academy"
-            showAllLabel="Show all courses"
+            showAllLabel="Explore all courses"
             emptyState={
               <Card variant="flat" padding="lg">
                 <p className="text-sm text-slate-500">
@@ -94,15 +83,15 @@ export default function DashboardStudent({
               : null}
           </HorizontalCarousel>
 
-          {/* 4. Events carousel */}
+          {/* Events — community */}
           <HorizontalCarousel
-            title="Upcoming events"
+            title="Join the community"
             showAllHref="/events"
-            showAllLabel="Show all events"
+            showAllLabel="Browse events"
             emptyState={
               <Card variant="flat" padding="lg">
                 <p className="text-sm text-slate-500">
-                  No upcoming events yet — check back soon.{' '}
+                  No events yet — check back soon.{' '}
                   <Link href="/events" className="text-[var(--goya-primary)] hover:underline">
                     Browse events
                   </Link>

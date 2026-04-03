@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import { getEffectiveUserId, getEffectiveClient } from '@/lib/supabase/getEffectiveUserId'
 import { getUserCreditTotals } from '@/lib/credits'
 import {
+  fetchTeachers,
   fetchUpcomingEvents,
   fetchRecentCourses,
   fetchAcceptedConnections,
@@ -43,8 +44,9 @@ export default async function DashboardPage() {
   const viewAsSchool = activeContext.type === 'school'
 
   // 4. Parallel data fetch via Promise.all
-  const [events, courses, connections, creditTotals, inProgressCourses] =
+  const [teachers, events, courses, connections, creditTotals, inProgressCourses] =
     await Promise.all([
+      fetchTeachers(supabase),
       fetchUpcomingEvents(supabase),
       fetchRecentCourses(supabase),
       fetchAcceptedConnections(supabase, userId),
@@ -83,6 +85,7 @@ export default async function DashboardPage() {
   // 7. Shared props for all role layouts
   const sharedProps = {
     profile,
+    teachers,
     events,
     courses,
     connections,

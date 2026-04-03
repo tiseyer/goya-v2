@@ -1,6 +1,7 @@
 import type { CreditTotals } from '@/lib/credits'
 import type { ProfileCompletionResult } from '@/lib/dashboard/profileCompletion'
 import type {
+  TeacherRow,
   EventRow,
   CourseRow,
   AcceptedConnection,
@@ -26,6 +27,7 @@ export interface DashboardProfile {
 
 export interface DashboardProps {
   profile: DashboardProfile
+  teachers: TeacherRow[]
   events: EventRow[]
   courses: CourseRow[]
   connections: AcceptedConnection[]
