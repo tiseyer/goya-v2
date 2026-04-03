@@ -982,6 +982,7 @@ export type Database = {
           rejection_reason: string | null
           school_author_id: string | null
           short_description: string | null
+          show_attendees: boolean
           show_instructors: boolean
           show_organizers: boolean
           spots_remaining: number | null
@@ -1023,6 +1024,7 @@ export type Database = {
           rejection_reason?: string | null
           school_author_id?: string | null
           short_description?: string | null
+          show_attendees?: boolean
           show_instructors?: boolean
           show_organizers?: boolean
           spots_remaining?: number | null
@@ -1064,6 +1066,7 @@ export type Database = {
           rejection_reason?: string | null
           school_author_id?: string | null
           short_description?: string | null
+          show_attendees?: boolean
           show_instructors?: boolean
           show_organizers?: boolean
           spots_remaining?: number | null

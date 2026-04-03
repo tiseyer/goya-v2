@@ -115,6 +115,7 @@ export interface Event {
   external_registration: boolean;
   event_website: string | null;
   unlimited_spots: boolean;
+  show_attendees: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -74,12 +74,16 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
   const [onlinePlatformUrl, setOnlinePlatformUrl] = useState(event?.online_platform_url ?? '');
   const [description,setDesc]     = useState(event?.description ?? '');
   const [shortDescription, setShortDescription] = useState(event?.short_description ?? '');
-  const [price,     setPrice]     = useState(String(event?.price ?? '0'));
-  const [isFree,    setIsFree]    = useState(event?.is_free   ?? true);
+  const [price,     setPrice]     = useState(String(event?.price ?? ''));
+  const [hasPrice,  setHasPrice]  = useState(() => {
+    const p = event?.price;
+    return p !== null && p !== undefined && p > 0;
+  });
   const [spotsTotal,setSpotsTotal]= useState(String(event?.spots_total ?? ''));
-  const [unlimitedSpots, setUnlimitedSpots] = useState(event?.unlimited_spots ?? true);
+  const [limitedSpots, setLimitedSpots] = useState(event?.unlimited_spots === false);
   const [externalRegistration, setExternalRegistration] = useState(event?.external_registration ?? false);
   const [eventWebsite, setEventWebsite] = useState(event?.event_website ?? '');
+  const [showAttendees, setShowAttendees] = useState(event?.show_attendees ?? true);
 
   // Organizer state — stored IDs exclude the current user (added in payload)
   const [organizerIds, setOrganizerIds] = useState<string[]>(
@@ -225,15 +229,16 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         online_platform_url:  format === 'Online' || format === 'Hybrid' ? onlinePlatformUrl.trim() || null : null,
         description:        description.trim() || null,
         short_description:  shortDescription.trim() || null,
-        price:              isFree ? 0 : parseFloat(price) || 0,
-        is_free:            isFree,
-        unlimited_spots:    unlimitedSpots,
-        spots_total:        unlimitedSpots ? null : (spotsTotal ? parseInt(spotsTotal, 10) : null),
+        price:              hasPrice ? (parseFloat(price) || 0) : null,
+        is_free:            !hasPrice,
+        unlimited_spots:    !limitedSpots,
+        spots_total:        limitedSpots ? (spotsTotal ? parseInt(spotsTotal, 10) : null) : null,
         external_registration: externalRegistration,
         event_website:      externalRegistration ? (eventWebsite.trim() || null) : null,
         featured_image_url: imageUrl,
         show_organizers:    showOrganizers,
         show_instructors:   showInstructors,
+        show_attendees:     showAttendees,
         organizer_ids: currentUserId
           ? [currentUserId, ...organizerIds].filter(Boolean)
           : organizerIds,
@@ -526,12 +531,12 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
           <div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
-                type="checkbox" checked={isFree} onChange={e => setIsFree(e.target.checked)}
+                type="checkbox" checked={hasPrice} onChange={e => setHasPrice(e.target.checked)}
                 className="w-4 h-4 rounded accent-primary"
               />
-              <span className="text-sm text-foreground">This event is free</span>
+              <span className="text-sm text-foreground">This event has a price</span>
             </label>
-            <AnimatedField show={!isFree}>
+            <AnimatedField show={hasPrice}>
               <div className="pt-2 pl-6">
                 <label className={LABEL}>Price</label>
                 <div className="relative max-w-[180px]">
@@ -552,12 +557,12 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
           <div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
-                type="checkbox" checked={unlimitedSpots} onChange={e => setUnlimitedSpots(e.target.checked)}
+                type="checkbox" checked={limitedSpots} onChange={e => setLimitedSpots(e.target.checked)}
                 className="w-4 h-4 rounded accent-primary"
               />
-              <span className="text-sm text-foreground">Unlimited spots available</span>
+              <span className="text-sm text-foreground">Limited spot availability</span>
             </label>
-            <AnimatedField show={!unlimitedSpots}>
+            <AnimatedField show={limitedSpots}>
               <div className="pt-2 pl-6 max-w-[180px]">
                 <label className={LABEL}>Total Spots</label>
                 <input
@@ -583,11 +588,11 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         <label className="flex items-center gap-2 cursor-pointer mt-3">
           <input
             type="checkbox"
-            checked={showInstructors}
-            onChange={e => setShowInstructors(e.target.checked)}
+            checked={!showInstructors}
+            onChange={e => setShowInstructors(!e.target.checked)}
             className="w-4 h-4 rounded accent-[#4E87A0]"
           />
-          <span className="text-xs text-foreground-secondary">Show instructors on event page</span>
+          <span className="text-xs text-foreground-secondary">Don&apos;t show instructors on event page</span>
         </label>
       </FormSection>
 
@@ -606,11 +611,11 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
           <label className="flex items-center gap-2 cursor-pointer mt-3">
             <input
               type="checkbox"
-              checked={showOrganizers}
-              onChange={e => setShowOrganizers(e.target.checked)}
+              checked={!showOrganizers}
+              onChange={e => setShowOrganizers(!e.target.checked)}
               className="w-4 h-4 rounded accent-[#4E87A0]"
             />
-            <span className="text-xs text-foreground-secondary">Show organizers on event page</span>
+            <span className="text-xs text-foreground-secondary">Don&apos;t show organizers on event page</span>
           </label>
         </FormSection>
       )}
@@ -620,11 +625,20 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         <FormSection title="Attendees" description="Members who have joined this event.">
           <AttendeePicker
             eventId={event.id}
-            unlimitedSpots={unlimitedSpots}
-            spotsTotal={unlimitedSpots ? null : (spotsTotal ? parseInt(spotsTotal, 10) : null)}
+            unlimitedSpots={!limitedSpots}
+            spotsTotal={limitedSpots ? (spotsTotal ? parseInt(spotsTotal, 10) : null) : null}
             currentUserRole={userRole ?? 'admin'}
             currentUserId={currentUserId ?? ''}
           />
+          <label className="flex items-center gap-2 cursor-pointer mt-3">
+            <input
+              type="checkbox"
+              checked={!showAttendees}
+              onChange={e => setShowAttendees(!e.target.checked)}
+              className="w-4 h-4 rounded accent-[#4E87A0]"
+            />
+            <span className="text-xs text-foreground-secondary">Don&apos;t show attendees on event page</span>
+          </label>
         </FormSection>
       )}
 

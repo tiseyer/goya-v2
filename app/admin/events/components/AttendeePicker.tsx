@@ -259,7 +259,7 @@ export default function AttendeePicker({
               <button
                 key={member.id}
                 type="button"
-                onClick={() => handleAdd(member)}
+                onMouseDown={(e) => { e.preventDefault(); handleAdd(member); }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-primary-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
               >
                 <div className="w-7 h-7 rounded-full bg-primary-light/20 flex items-center justify-center overflow-hidden shrink-0">

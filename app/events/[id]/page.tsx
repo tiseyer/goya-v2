@@ -6,6 +6,7 @@ import { CATEGORY_BADGE } from '@/app/components/ui/Badge';
 import PageContainer from '@/app/components/ui/PageContainer';
 import EventViewTracker from './EventViewTracker';
 import EventSidebarClient from './EventSidebarClient';
+import EventAttendeesSection from './EventAttendeesSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -85,6 +86,22 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
     .from('event_attendees')
     .select('id', { count: 'exact', head: true })
     .eq('event_id', ev.id);
+
+  // Fetch attendee profiles if show_attendees is true
+  let attendeeProfiles: { id: string; full_name: string | null; avatar_url: string | null }[] = [];
+  if (ev.show_attendees !== false) {
+    const { data: attendeeRows } = await supabase
+      .from('event_attendees')
+      .select('profiles!event_attendees_profile_id_fkey(id, full_name, avatar_url)')
+      .eq('event_id', ev.id)
+      .limit(100);
+    if (attendeeRows) {
+      attendeeProfiles = attendeeRows.map((row: Record<string, unknown>) => {
+        const p = row.profiles as { id: string; full_name: string | null; avatar_url: string | null } | null;
+        return { id: p?.id ?? '', full_name: p?.full_name ?? 'Unknown', avatar_url: p?.avatar_url ?? null };
+      });
+    }
+  }
 
   const isPast = new Date(ev.date) < new Date();
   const dateFormatted = new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', {
@@ -192,6 +209,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                 {ev.description || 'Full details coming soon.'}
               </p>
             </div>
+
+            {/* Attendees section */}
+            {ev.show_attendees !== false && attendeeProfiles.length > 0 && (
+              <EventAttendeesSection attendees={attendeeProfiles} />
+            )}
           </div>
 
           {/* RIGHT: Sidebar */}

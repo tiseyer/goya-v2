@@ -102,12 +102,19 @@ export async function searchMembers(
 
   // Query profiles for connected users matching the search term
   const idsArray = Array.from(connectedIds);
-  const { data, error } = await (service as any)
+  let connQ = (service as any)
     .from('profiles')
     .select('id, full_name, avatar_url')
     .in('id', idsArray)
     .ilike('full_name', searchTerm)
     .limit(limit);
+
+  // Apply role filter if specified
+  if (options.roleFilter && options.roleFilter.length > 0) {
+    connQ = connQ.in('role', options.roleFilter);
+  }
+
+  const { data, error } = await connQ;
 
   if (error) {
     console.error('searchMembers (connections) error:', error);

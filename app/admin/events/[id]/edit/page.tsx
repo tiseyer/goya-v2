@@ -134,7 +134,7 @@ function EventHistoryCollapsible({ auditEntries }: { auditEntries: AuditEntryWit
     <details className="mt-10 max-w-3xl group">
       <summary className="flex items-center gap-2 cursor-pointer list-none select-none">
         <svg
-          className="w-4 h-4 text-[#6B7280] transition-transform duration-200 group-open:rotate-90"
+          className="w-4 h-4 text-slate-400 transition-transform duration-200 group-open:rotate-90"
           fill="none" stroke="currentColor" viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -162,10 +162,10 @@ function EventHistoryCollapsible({ auditEntries }: { auditEntries: AuditEntryWit
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={actionInfo.icon} />
                   </svg>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm text-[#374151]">
+                    <p className="text-sm text-gray-500">
                       <span className="font-semibold">{actionInfo.label}</span>
                       {' by '}
-                      <span className="font-medium text-[#1B3A5C]">{performer}</span>
+                      <span className="font-medium text-gray-500">{performer}</span>
                       {entry.performed_by_role && (
                         <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 ml-1.5 capitalize">
                           {entry.performed_by_role}
@@ -175,7 +175,7 @@ function EventHistoryCollapsible({ auditEntries }: { auditEntries: AuditEntryWit
                     <p className="text-xs text-[#9CA3AF] mt-0.5">{formatDate(entry.created_at)}</p>
 
                     {entry.action === 'edited' && entry.changes && (
-                      <div className="mt-2 text-xs text-[#6B7280] space-y-0.5">
+                      <div className="mt-2 text-xs text-slate-400 space-y-0.5">
                         {Object.entries(entry.changes).map(([field, value]) => {
                           const change = value as { old?: unknown; new?: unknown } | unknown;
                           if (change && typeof change === 'object' && 'old' in change && 'new' in change) {
@@ -196,7 +196,7 @@ function EventHistoryCollapsible({ auditEntries }: { auditEntries: AuditEntryWit
                       const newStatus = changes.new_status ? String(changes.new_status) : null;
                       const rejectionReason = changes.rejection_reason ? String(changes.rejection_reason) : null;
                       return (
-                        <div className="mt-2 text-xs text-[#6B7280]">
+                        <div className="mt-2 text-xs text-slate-400">
                           {oldStatus && (
                             <p>
                               Status changed from{' '}
