@@ -30,6 +30,8 @@ export default function PageHero({
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [contentReady, setContentReady] = useState(!pageSlug); // true immediately if no slug (no fetch needed)
+  const [showFallback, setShowFallback] = useState(!pageSlug);
 
   // Raw template strings from DB (null = use prop defaults as templates)
   const [rawPill, setRawPill] = useState<string | null>(null);
@@ -50,14 +52,21 @@ export default function PageHero({
   // Fetch custom content on mount
   useEffect(() => {
     if (!pageSlug) return;
+    const timer = setTimeout(() => setShowFallback(true), 800);
     fetch(`/api/page-hero/${pageSlug}`)
       .then(r => r.json())
       .then((data: { pill: string | null; title: string | null; subtitle: string | null }) => {
         if (data.pill !== null) { setRawPill(data.pill); setSavedPill(data.pill); }
         if (data.title !== null) { setRawTitle(data.title); setSavedTitle(data.title); }
         if (data.subtitle !== null) { setRawSubtitle(data.subtitle); setSavedSubtitle(data.subtitle); }
+        setContentReady(true);
+        clearTimeout(timer);
       })
-      .catch(() => {/* silently use defaults */});
+      .catch(() => {
+        setContentReady(true);
+        clearTimeout(timer);
+      });
+    return () => clearTimeout(timer);
   }, [pageSlug]);
 
   // Template strings (raw with variables) — used in edit mode and as source for resolution
@@ -69,6 +78,8 @@ export default function PageHero({
     if (!heroContext) return text;
     return resolveHeroVariables(text, heroContext);
   }, [heroContext]);
+
+  const isVisible = contentReady || showFallback;
 
   // Display strings — resolved variables for end users
   const displayPill = resolve(templatePill);
@@ -250,7 +261,7 @@ export default function PageHero({
         )}
         {/* Dot-grid texture */}
         <div
-          className="absolute inset-0 opacity-[0.04]"
+          className="absolute inset-0 opacity-[0.08]"
           style={{
             backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
             backgroundSize: '28px 28px',
@@ -266,7 +277,7 @@ export default function PageHero({
 
         {adminControl}
 
-        <div className="relative h-full flex flex-col items-center justify-start pt-8 text-center px-4 max-w-3xl mx-auto">
+        <div className={`relative h-full flex flex-col items-center justify-start pt-8 text-center px-4 max-w-3xl mx-auto transition-opacity duration-200 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
           {darkPillContent && <div className="mb-4">{darkPillContent}</div>}
 
           {editing ? (
@@ -349,7 +360,7 @@ export default function PageHero({
 
       {adminControl}
 
-      <div className="relative h-full flex flex-col items-center justify-start pt-8 text-center px-4 max-w-3xl mx-auto">
+      <div className={`relative h-full flex flex-col items-center justify-start pt-8 text-center px-4 max-w-3xl mx-auto transition-opacity duration-200 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         {lightPillContent && <div className="mb-4">{lightPillContent}</div>}
 
         {editing ? (
