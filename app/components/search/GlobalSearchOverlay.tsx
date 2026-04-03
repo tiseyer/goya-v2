@@ -36,7 +36,7 @@ function IconX({ size = 20, className = '' }: { size?: number; className?: strin
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function GlobalSearchOverlay() {
-  const { isOpen, close } = useSearch();
+  const { isOpen, open, close } = useSearch();
   const router = useRouter();
 
   const [query, setQuery] = useState('');
@@ -71,15 +71,19 @@ export default function GlobalSearchOverlay() {
     }
   }, [isOpen]);
 
-  // Escape key listener on document
+  // Global keyboard shortcuts: Cmd+K / Ctrl+K to open, Escape to close
   useEffect(() => {
-    if (!isOpen) return;
     function handleDocKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') close();
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        if (isOpen) { close(); } else { open(); }
+        return;
+      }
+      if (e.key === 'Escape' && isOpen) close();
     }
     document.addEventListener('keydown', handleDocKeyDown);
     return () => document.removeEventListener('keydown', handleDocKeyDown);
-  }, [isOpen, close]);
+  }, [isOpen, close, open]);
 
   // Fetch results from API
   const fetchResults = useCallback(async (q: string, cat: SearchCategory | 'all') => {
@@ -332,6 +336,7 @@ export default function GlobalSearchOverlay() {
 
                 {/* Keyboard hints */}
                 <div className="px-4 py-2 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center gap-4 text-[10px] text-slate-400 dark:text-slate-500">
+                  <span><kbd className="font-mono">⌘K</kbd> toggle</span>
                   <span><kbd className="font-mono">↑↓</kbd> navigate</span>
                   <span><kbd className="font-mono">↵</kbd> open</span>
                   <span><kbd className="font-mono">Esc</kbd> close</span>
