@@ -104,15 +104,21 @@ export default function PageHero({
           subtitle: rawSubtitle || null,
         }),
       });
-      if (res.ok) {
-        setSavedPill(rawPill);
-        setSavedTitle(rawTitle);
-        setSavedSubtitle(rawSubtitle);
-        setEditing(false);
-        setFocusedField(null);
-        setSaved(true);
-        setTimeout(() => setSaved(false), 1500);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('[PageHero] Save failed:', res.status, err);
+        return; // keep editor open on error
       }
+      // Success — update snapshot and close editor
+      setSavedPill(rawPill);
+      setSavedTitle(rawTitle);
+      setSavedSubtitle(rawSubtitle);
+      setEditing(false);
+      setFocusedField(null);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+    } catch (err) {
+      console.error('[PageHero] Save error:', err);
     } finally {
       setSaving(false);
     }
@@ -239,7 +245,7 @@ export default function PageHero({
     ) : null);
 
     return (
-      <section className="relative h-[280px] bg-primary overflow-hidden">
+      <section className="relative h-[220px] bg-primary overflow-hidden">
         {/* Dot-grid texture */}
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -252,13 +258,13 @@ export default function PageHero({
         {/* Soft glow top-right */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true" />
         {/* Background glow center */}
-        <div className="absolute pointer-events-none inset-x-0 top-0 h-[280px] overflow-hidden" aria-hidden="true">
+        <div className="absolute pointer-events-none inset-x-0 top-0 h-[220px] overflow-hidden" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-white opacity-[0.05] rounded-full blur-3xl" />
         </div>
 
         {adminControl}
 
-        <div className="relative h-full flex flex-col items-center justify-center text-center px-4 max-w-3xl mx-auto">
+        <div className="relative h-full flex flex-col items-center justify-start pt-8 text-center px-4 max-w-3xl mx-auto">
           {darkPillContent && <div className="mb-4">{darkPillContent}</div>}
 
           {editing ? (
@@ -319,15 +325,15 @@ export default function PageHero({
   ) : null);
 
   return (
-    <section className="relative h-[280px] bg-surface-muted border-b border-slate-200 overflow-hidden">
+    <section className="relative h-[220px] bg-surface-muted border-b border-slate-200 overflow-hidden">
       {/* Subtle background glow */}
-      <div className="absolute pointer-events-none inset-x-0 top-0 h-[280px] overflow-hidden" aria-hidden="true">
+      <div className="absolute pointer-events-none inset-x-0 top-0 h-[220px] overflow-hidden" aria-hidden="true">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-primary opacity-[0.03] rounded-full blur-3xl" />
       </div>
 
       {adminControl}
 
-      <div className="relative h-full flex flex-col items-center justify-center text-center px-4 max-w-3xl mx-auto">
+      <div className="relative h-full flex flex-col items-center justify-start pt-8 text-center px-4 max-w-3xl mx-auto">
         {lightPillContent && <div className="mb-4">{lightPillContent}</div>}
 
         {editing ? (
