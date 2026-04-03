@@ -417,7 +417,7 @@ export default function EventsPage() {
           <aside className="hidden lg:flex flex-col gap-4">
 
             {/* Mini calendar */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm p-5">
               <MiniCalendar
                 calYear={calYear}
                 calMonth={calMonth}
@@ -431,7 +431,7 @@ export default function EventsPage() {
             </div>
 
             {/* Event type filter */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm p-5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Event Type</p>
               <div className="flex flex-col gap-0.5">
                 {([['all', 'All Events'], ['goya', 'GOYA Events'], ['member', 'Member Events']] as const).map(([key, label]) => {
@@ -444,7 +444,7 @@ export default function EventsPage() {
                         'flex items-center gap-2.5 text-left px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer',
                         isActive
                           ? 'bg-primary-dark text-white'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary-dark',
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary-dark dark:text-slate-300 dark:hover:bg-white/5',
                       ].join(' ')}
                     >
                       {key !== 'all' && (
@@ -461,7 +461,7 @@ export default function EventsPage() {
             </div>
 
             {/* Format filter */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm p-5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Format</p>
               <div className="flex flex-col gap-0.5">
                 {([['all', 'All Events'], ['Online', 'Online'], ['In Person', 'In Person']] as [string, string][]).map(([key, label]) => {
@@ -474,7 +474,7 @@ export default function EventsPage() {
                         'flex items-center gap-2.5 text-left px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer',
                         isActive
                           ? 'bg-primary-dark text-white'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary-dark',
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary-dark dark:text-slate-300 dark:hover:bg-white/5',
                       ].join(' ')}
                     >
                       {key !== 'all' && (
@@ -491,7 +491,7 @@ export default function EventsPage() {
 
               {/* Location filter — only shown when In Person selected */}
               {formatFilter === 'In Person' && (
-                <div className="mt-3 border-t border-slate-100 pt-3">
+                <div className="mt-3 border-t border-slate-100 dark:border-white/10 pt-3">
                   <LocationFilter
                     onLocationChange={setFilterLocation}
                     onRadiusChange={setFilterRadius}
@@ -502,7 +502,7 @@ export default function EventsPage() {
             </div>
 
             {/* Category filter */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm p-5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Category</p>
               <div className="flex flex-col gap-0.5">
                 {categoryList.map(({ name: cat, color }) => {
@@ -516,7 +516,7 @@ export default function EventsPage() {
                         'flex items-center gap-2.5 text-left px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer',
                         isActive
                           ? 'bg-primary-dark text-white'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary-dark',
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary-dark dark:text-slate-300 dark:hover:bg-white/5',
                       ].join(' ')}
                     >
                       {cat !== 'All' && (
