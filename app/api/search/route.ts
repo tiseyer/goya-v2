@@ -50,14 +50,14 @@ export async function GET(req: NextRequest) {
     if (isAdmin && (q.includes('@') || /^\d+$/.test(q))) {
       memberQuery = db
         .from('profiles')
-        .select('id, full_name, avatar_url, role, city, country, street_address, email, mrn')
-        .or(`full_name.ilike.%${q}%,email.ilike.%${q}%,mrn.ilike.%${q}%`)
+        .select('id, full_name, first_name, last_name, avatar_url, role, city, country, street_address, email, mrn')
+        .or(`full_name.ilike.%${q}%,first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%,mrn.ilike.%${q}%`)
         .limit(limit);
     } else {
       memberQuery = db
         .from('profiles')
-        .select('id, full_name, avatar_url, role, city, country, street_address')
-        .ilike('full_name', `%${q}%`)
+        .select('id, full_name, first_name, last_name, avatar_url, role, city, country, street_address')
+        .or(`full_name.ilike.%${q}%,first_name.ilike.%${q}%,last_name.ilike.%${q}%`)
         .limit(limit);
     }
 
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
       results.members = members.map((m: any) => ({
         id: m.id,
         category: 'members',
-        title: m.full_name || 'Unknown',
+        title: m.full_name || [m.first_name, m.last_name].filter(Boolean).join(' ') || 'Unknown',
         subtitle: [m.role, m.city, m.country].filter(Boolean).join(' · '),
         href: `/members/${m.id}`,
         avatarUrl: m.avatar_url,

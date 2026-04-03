@@ -88,17 +88,13 @@ function IconArrowRight({ size = 16, className = '' }: { size?: number; classNam
 interface SearchResultRowProps {
   result: SearchResult;
   isHighlighted: boolean;
-  isBestMatch: boolean;
   onClick: () => void;
 }
 
-export default function SearchResultRow({ result, isHighlighted, isBestMatch, onClick }: SearchResultRowProps) {
-  const showAccent = isHighlighted || (isBestMatch && !isHighlighted);
-
+export default function SearchResultRow({ result, isHighlighted, onClick }: SearchResultRowProps) {
   const containerClass = [
     'flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-l-2',
-    showAccent ? 'bg-[#345c83]/5 border-[#345c83]' : 'border-transparent',
-    !isHighlighted ? 'hover:bg-slate-50' : '',
+    isHighlighted ? 'bg-[#345c83]/5 border-[#345c83]' : 'border-transparent hover:bg-slate-50',
   ].join(' ');
 
   // Left avatar/icon

@@ -230,7 +230,6 @@ export default function GlobalSearchOverlay() {
                     key={result.id}
                     result={result}
                     isHighlighted={idx === selectedIdx}
-                    isBestMatch={idx === 0}
                     onClick={() => {
                       router.push(result.href);
                       close();
