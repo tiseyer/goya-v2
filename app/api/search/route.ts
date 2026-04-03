@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
   };
 
   // Members search
+  // Note: duplicate names may appear if seed data contains multiple profiles with the same full_name
   if (categories.includes('members')) {
     let memberQuery;
 

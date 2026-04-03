@@ -94,7 +94,7 @@ interface SearchResultRowProps {
 export default function SearchResultRow({ result, isHighlighted, onClick }: SearchResultRowProps) {
   const containerClass = [
     'flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-l-2',
-    isHighlighted ? 'bg-[#345c83]/5 border-[#345c83]' : 'border-transparent hover:bg-slate-50',
+    isHighlighted ? 'bg-[#345c83]/5 dark:bg-[#345c83]/15 border-[#345c83]' : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-800',
   ].join(' ');
 
   // Left avatar/icon
@@ -105,7 +105,7 @@ export default function SearchResultRow({ result, isHighlighted, onClick }: Sear
       leftIcon = <img src={result.avatarUrl} alt={result.title} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />;
     } else {
       leftIcon = (
-        <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-medium flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center text-xs font-medium flex-shrink-0">
           {result.title[0]?.toUpperCase() ?? '?'}
         </div>
       );
@@ -166,9 +166,9 @@ export default function SearchResultRow({ result, isHighlighted, onClick }: Sear
     >
       {leftIcon}
       <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-sm font-medium text-slate-900 truncate">{result.title}</span>
+        <span className="text-sm font-medium text-gray-900 dark:text-white truncate">{result.title}</span>
         {result.subtitle && (
-          <span className="text-xs text-slate-500 truncate">{result.subtitle}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{result.subtitle}</span>
         )}
       </div>
       {rightIcons}

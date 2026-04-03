@@ -182,16 +182,16 @@ export default function GlobalSearchOverlay() {
     if (query === '') {
       return (
         <div className="flex flex-col items-center justify-center py-16 gap-2">
-          <IconSearch size={40} className="text-slate-300" />
-          <p className="text-sm font-medium text-slate-700">Search GOYA</p>
-          <p className="text-xs text-slate-400">Find members, events, courses, and pages.</p>
+          <IconSearch size={40} className="text-slate-300 dark:text-slate-600" />
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Search GOYA</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">Find members, events, courses, and pages.</p>
         </div>
       );
     }
     if (query.trim().length > 0 && query.trim().length < 2) {
       return (
         <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-slate-400">Keep typing...</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500">Keep typing...</p>
         </div>
       );
     }
@@ -200,10 +200,10 @@ export default function GlobalSearchOverlay() {
         <div className="px-4 py-6 space-y-3">
           {[160, 200, 140, 180].map((w, i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-slate-100 animate-pulse shrink-0" />
+              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 animate-pulse shrink-0" />
               <div className="space-y-1.5">
-                <div className="h-3.5 bg-slate-100 rounded animate-pulse" style={{ width: `${w}px` }} />
-                <div className="h-2.5 bg-slate-50 rounded animate-pulse" style={{ width: `${w * 0.7}px` }} />
+                <div className="h-3.5 bg-slate-100 dark:bg-slate-700 rounded animate-pulse" style={{ width: `${w}px` }} />
+                <div className="h-2.5 bg-slate-50 dark:bg-slate-800 rounded animate-pulse" style={{ width: `${w * 0.7}px` }} />
               </div>
             </div>
           ))}
@@ -213,8 +213,8 @@ export default function GlobalSearchOverlay() {
     if (results.length === 0 && query.trim().length >= 2) {
       return (
         <div className="flex flex-col items-center justify-center py-12 gap-1">
-          <p className="text-sm font-medium text-slate-600">No results for &ldquo;{query}&rdquo;</p>
-          <p className="text-xs text-slate-400">Try a different search term.</p>
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-300">No results for &ldquo;{query}&rdquo;</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">Try a different search term.</p>
         </div>
       );
     }
@@ -227,7 +227,7 @@ export default function GlobalSearchOverlay() {
           if (!items || items.length === 0) return null;
           return (
             <div key={cat}>
-              <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wide px-4 pt-3 pb-1">
+              <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide px-4 pt-3 pb-1">
                 {CATEGORY_LABELS[cat]}
               </p>
               {items.map((result) => {
@@ -254,12 +254,14 @@ export default function GlobalSearchOverlay() {
   if (!mounted) return null;
 
   const inputBar = (isMobile: boolean) => (
-    <div className={`flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-4 py-3 border-b border-slate-100'}`}
-      style={isMobile ? { background: 'rgba(255,255,255,0.85)', borderRadius: '12px', margin: '0 12px' } : undefined}
-    >
+    <div className={`flex items-center gap-3 ${
+      isMobile
+        ? 'mx-3 px-4 py-3 bg-white dark:bg-slate-800 rounded-xl'
+        : 'px-4 py-3 border-b border-slate-100'
+    }`}>
       <IconSearch
         size={20}
-        className={query ? 'text-[#345c83]' : 'text-slate-400'}
+        className={query ? 'text-[#345c83]' : 'text-slate-400 dark:text-slate-500'}
       />
       <input
         ref={isMobile ? mobileInputRef : inputRef}
@@ -268,7 +270,7 @@ export default function GlobalSearchOverlay() {
         onChange={handleInput}
         onKeyDown={handleKeyDown}
         placeholder="Search members, events, courses, pages..."
-        className="flex-1 border-0 outline-none ring-0 shadow-none focus:outline-none focus:ring-0 focus:border-0 focus:shadow-none focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0 text-base text-slate-900 placeholder:text-slate-400 bg-transparent"
+        className="flex-1 border-0 outline-none ring-0 shadow-none focus:outline-none focus:ring-0 focus:border-0 focus:shadow-none focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-transparent"
         style={{ outline: 'none', boxShadow: 'none' }}
         aria-label="Search GOYA"
         autoComplete="off"
@@ -276,7 +278,7 @@ export default function GlobalSearchOverlay() {
       {query.length > 0 && (
         <button
           onClick={clearQuery}
-          className="text-gray-400 hover:text-gray-600 text-sm transition-colors"
+          className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-sm transition-colors"
           aria-label="Clear search"
           tabIndex={-1}
         >
@@ -285,7 +287,7 @@ export default function GlobalSearchOverlay() {
       )}
       <button
         onClick={close}
-        className="text-slate-400 hover:text-slate-600 transition-colors"
+        className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
         aria-label="Close search"
       >
         <IconX size={20} />
@@ -341,13 +343,8 @@ export default function GlobalSearchOverlay() {
           {/* ── Mobile layout (hidden on desktop) ── */}
           <div className="sm:hidden">
             <div
-              className="fixed inset-0 z-[10000] flex flex-col"
-              style={{
-                background: 'rgba(255, 255, 255, 0.15)',
-                backdropFilter: 'blur(40px)',
-                WebkitBackdropFilter: 'blur(40px)',
-                paddingTop: 'env(safe-area-inset-top)',
-              }}
+              className="fixed inset-0 z-[10000] flex flex-col bg-gray-50 dark:bg-slate-900"
+              style={{ paddingTop: 'env(safe-area-inset-top)' }}
             >
               {/* Input bar at top */}
               <div className="pt-3">
@@ -362,7 +359,7 @@ export default function GlobalSearchOverlay() {
               />
 
               {/* Divider */}
-              <div className="mx-4 border-t border-white/20" />
+              <div className="mx-4 border-t border-slate-200 dark:border-slate-700" />
 
               {/* Results (scrollable, fills remaining space) */}
               <div className="flex-1 overflow-y-auto">
