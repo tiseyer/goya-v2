@@ -193,8 +193,8 @@ export default function GlobalSearchOverlay() {
   }
 
   // Whether the Mattea hint is visible (adds 1 to the navigable items)
-  const showMatteaHint = matteaLoading || matteaAnswer !== null;
-  const matteaOffset = showMatteaHint ? 1 : 0;
+  const hasMatteaHint = matteaLoading || matteaAnswer !== null;
+  const matteaOffset = hasMatteaHint ? 1 : 0;
   const totalItems = results.length + matteaOffset;
 
   // Keyboard navigation
@@ -206,7 +206,7 @@ export default function GlobalSearchOverlay() {
       e.preventDefault();
       setSelectedIdx((i) => Math.max(i - 1, 0));
     } else if (e.key === 'Enter') {
-      if (showMatteaHint && selectedIdx === 0) {
+      if (hasMatteaHint && selectedIdx === 0) {
         router.push(`/settings/help?q=${encodeURIComponent(query.trim())}`);
         close();
       } else {
@@ -285,8 +285,8 @@ export default function GlobalSearchOverlay() {
     let flatIndex = matteaOffset; // Start after Mattea hint if visible
     return (
       <div role="listbox" aria-label="Search results">
-        {/* Mattea AI hint — rendered at the top when query is a question */}
-        {showMatteaHint && (
+        {/* Mattea AI hint — v2 no-gating: renders when answer or loading */}
+        {(matteaLoading || matteaAnswer !== null) && (
           <MatteaSearchHint
             query={query}
             answer={matteaAnswer}
