@@ -17,7 +17,7 @@ export default function CategoryForm({ category, categories, onSave, onCancel }:
   const [name, setName] = useState(category?.name ?? '');
   const [slug, setSlug] = useState(category?.slug ?? '');
   const [description, setDescription] = useState(category?.description ?? '');
-  const [color, setColor] = useState(category?.color ?? '#345c83');
+  const [color, setColor] = useState(category?.color ?? '#6E88B0');
   const [parentId, setParentId] = useState(category?.parent_id ?? '');
   const [sortOrder, setSortOrder] = useState(String(category?.sort_order ?? 0));
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(isEdit);

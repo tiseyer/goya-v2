@@ -42,7 +42,7 @@ export function CourseCard({ course }: CourseCardProps) {
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[var(--goya-primary-100,#d6e7f1)] to-[var(--goya-primary-200,#b0cfe8)]">
               {/* Placeholder icon */}
               <svg
-                className="w-10 h-10 text-[var(--goya-primary,#345c83)] opacity-40"
+                className="w-10 h-10 text-[var(--goya-primary,#6E88B0)] opacity-40"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

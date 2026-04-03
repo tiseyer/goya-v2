@@ -175,7 +175,7 @@ export default function EventSidebarClient({
       {/* Price */}
       <div>
         {event.is_free ? (
-          <span className="inline-block px-3 py-1 bg-[#345c83] text-white text-sm font-bold rounded-full">
+          <span className="inline-block px-3 py-1 bg-[#6E88B0] text-white text-sm font-bold rounded-full">
             Free
           </span>
         ) : (
@@ -319,7 +319,7 @@ export default function EventSidebarClient({
               href={event.event_website}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full text-center py-3.5 px-6 bg-[#345c83] hover:bg-[#2a4d6e] text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md"
+              className="block w-full text-center py-3.5 px-6 bg-[#6E88B0] hover:bg-[#2a4d6e] text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md"
             >
               Register Externally
             </a>
@@ -328,7 +328,7 @@ export default function EventSidebarClient({
               type="button"
               onClick={handleJoin}
               disabled={joining || !isAuthenticated}
-              className="block w-full text-center py-3.5 px-6 bg-[#345c83] hover:bg-[#2a4d6e] text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-60 cursor-pointer"
+              className="block w-full text-center py-3.5 px-6 bg-[#6E88B0] hover:bg-[#2a4d6e] text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-60 cursor-pointer"
             >
               {joining ? 'Joining...' : 'Join for Free'}
             </button>
@@ -343,7 +343,7 @@ export default function EventSidebarClient({
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 3000);
               }}
-              className="block w-full text-center py-3.5 px-6 bg-[#345c83] hover:bg-[#2a4d6e] text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md cursor-pointer"
+              className="block w-full text-center py-3.5 px-6 bg-[#6E88B0] hover:bg-[#2a4d6e] text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md cursor-pointer"
             >
               Get Access — ${event.price}
             </button>

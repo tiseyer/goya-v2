@@ -128,7 +128,7 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
       {/* Loading spinner while range change re-fetches */}
       {isPending && (
         <div className="flex items-center justify-center py-8">
-          <div className="w-5 h-5 border-2 border-slate-300 border-t-[#345c83] rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-slate-300 border-t-[#6E88B0] rounded-full animate-spin" />
         </div>
       )}
 
@@ -171,8 +171,8 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
                 <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                   <defs>
                     <linearGradient id="visitorsGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="#345c83" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="#345c83" stopOpacity={0}    />
+                      <stop offset="5%"  stopColor="#6E88B0" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#6E88B0" stopOpacity={0}    />
                     </linearGradient>
                   </defs>
                   <XAxis
@@ -195,7 +195,7 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1B3A5C',
+                      backgroundColor: '#2c2420',
                       border: 'none',
                       borderRadius: '8px',
                       fontSize: '12px',
@@ -221,7 +221,7 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
                   <Area
                     type="monotone"
                     dataKey="sessions"
-                    stroke="#345c83"
+                    stroke="#6E88B0"
                     strokeWidth={2}
                     fill="url(#visitorsGradient)"
                   />
@@ -358,7 +358,7 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-2">
                         <div
-                          className="bg-[#345c83] h-2 rounded-full transition-all"
+                          className="bg-[#6E88B0] h-2 rounded-full transition-all"
                           style={{ width: `${Math.min(pct, 100)}%` }}
                         />
                       </div>
@@ -380,7 +380,7 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
 
 export default function VisitorsAnalyticsClient(props: VisitorsAnalyticsClientProps) {
   return (
-    <Suspense fallback={<div className="h-40 flex items-center justify-center"><div className="w-5 h-5 border-2 border-slate-300 border-t-[#345c83] rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="h-40 flex items-center justify-center"><div className="w-5 h-5 border-2 border-slate-300 border-t-[#6E88B0] rounded-full animate-spin" /></div>}>
       <VisitorsAnalyticsInner {...props} />
     </Suspense>
   )

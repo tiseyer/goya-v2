@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
-const INPUT = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#345c83]/20 focus:border-[#345c83] transition-colors';
+const INPUT = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6E88B0]/20 focus:border-[#6E88B0] transition-colors';
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide';
 
 export default function ForgotPasswordPage() {
@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
           </p>
           {sent ? (
             <div className="text-center py-4">
-              <div className="w-16 h-16 bg-[#345c83] rounded-full flex items-center justify-center mx-auto mb-5">
+              <div className="w-16 h-16 bg-[#6E88B0] rounded-full flex items-center justify-center mx-auto mb-5">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
               </p>
               <button
                 onClick={() => { setSent(false); setEmail(''); }}
-                className="text-[#345c83] text-sm font-semibold hover:underline"
+                className="text-[#6E88B0] text-sm font-semibold hover:underline"
               >
                 Send to a different email
               </button>
@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading || !email.trim()}
-                className="w-full py-3 bg-[#345c83] text-white font-bold rounded-xl hover:bg-[#1e3a52] transition-colors disabled:opacity-60"
+                className="w-full py-3 bg-[#6E88B0] text-white font-bold rounded-xl hover:bg-[#1e3a52] transition-colors disabled:opacity-60"
               >
                 {loading ? 'Sending\u2026' : 'Send reset link'}
               </button>
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         <p className="text-center text-slate-400 text-xs mt-6">
-          <Link href="/sign-in" className="text-[#345c83] hover:underline font-semibold">
+          <Link href="/sign-in" className="text-[#6E88B0] hover:underline font-semibold">
             &larr; Back to sign in
           </Link>
         </p>

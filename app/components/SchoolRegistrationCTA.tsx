@@ -26,14 +26,14 @@ export default function SchoolRegistrationCTA({ variant }: SchoolRegistrationCTA
     return (
       <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6 flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-[#345c83]">Register Your School on GOYA</p>
+          <p className="text-sm font-semibold text-[#6E88B0]">Register Your School on GOYA</p>
           <p className="text-sm text-[#6B7280] mt-1">
             List your school, manage designations, and connect with students.
           </p>
         </div>
         <Link
           href="/schools/create"
-          className="flex items-center gap-1.5 whitespace-nowrap bg-[#345c83] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#2a4d6e] transition-colors"
+          className="flex items-center gap-1.5 whitespace-nowrap bg-[#6E88B0] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#2a4d6e] transition-colors"
         >
           Register Your School
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
@@ -46,7 +46,7 @@ export default function SchoolRegistrationCTA({ variant }: SchoolRegistrationCTA
 
   // banner
   return (
-    <div className="bg-[#345c83] rounded-xl p-6 text-white">
+    <div className="bg-[#6E88B0] rounded-xl p-6 text-white">
       <h3 className="text-lg font-bold mb-1">Own a Yoga School?</h3>
       <p className="text-sm opacity-90 mb-4">
         List your school on GOYA, manage designations, and connect with students.

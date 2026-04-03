@@ -1,17 +1,17 @@
 import type { BrandColors, RoleColors } from './types';
 
 export const DEFAULT_BRAND_COLORS: BrandColors = {
-  primary: '#345c83',
+  primary: '#6E88B0',
   accent: '#831618',
-  background: '#ffffff',
-  surface: '#ffffff',
-  border: '#e2e8f0',
-  foreground: '#1e293b',
+  background: '#F2E0D0',
+  surface: '#f8efe6',
+  border: '#dccfc5',
+  foreground: '#2c2420',
 };
 
 export const DEFAULT_ROLE_COLORS: RoleColors = {
   student: '#6366f1',     // indigo
-  teacher: '#345c83',     // GOYA primary blue
+  teacher: '#6E88B0',     // GOYA Blue Mirage
   wellness: '#059669',    // emerald
   school: '#d97706',      // amber
   moderator: '#7c3aed',   // violet

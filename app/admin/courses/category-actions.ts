@@ -44,7 +44,7 @@ export async function createCategory(
       name: formData.name.trim(),
       slug: formData.slug.trim(),
       description: formData.description.trim() || null,
-      color: formData.color || '#345c83',
+      color: formData.color || '#6E88B0',
       parent_id: formData.parent_id || null,
     })
     .select()
@@ -82,7 +82,7 @@ export async function updateCategory(
       name: formData.name.trim(),
       slug: formData.slug.trim(),
       description: formData.description.trim() || null,
-      color: formData.color || '#345c83',
+      color: formData.color || '#6E88B0',
       parent_id: formData.parent_id || null,
     })
     .eq('id', id)

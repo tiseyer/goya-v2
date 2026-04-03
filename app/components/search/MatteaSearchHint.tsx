@@ -73,12 +73,12 @@ export default function MatteaSearchHint({ query, answer, loading, isHighlighted
     >
       <div className="flex items-start gap-3">
         {/* Avatar — 40px */}
-        <div className="w-10 h-10 rounded-full bg-[#345c83]/10 dark:bg-[#345c83]/20 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+        <div className="w-10 h-10 rounded-full bg-[#6E88B0]/10 dark:bg-[#6E88B0]/20 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
           {config.avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={config.avatarUrl} alt={config.name} className="w-full h-full object-cover" />
           ) : (
-            <Sparkles size={18} className="text-[#345c83] dark:text-blue-300" />
+            <Sparkles size={18} className="text-[#6E88B0] dark:text-blue-300" />
           )}
         </div>
 
@@ -103,7 +103,7 @@ export default function MatteaSearchHint({ query, answer, loading, isHighlighted
             <button
               onClick={handleContinue}
               type="button"
-              className="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium bg-[#345c83] text-white hover:bg-[#2a4a6b] transition-colors"
+              className="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium bg-[#6E88B0] text-white hover:bg-[#2a4a6b] transition-colors"
             >
               <Reply size={14} />
               {german ? 'Antworten' : 'Reply'}

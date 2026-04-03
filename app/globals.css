@@ -8,39 +8,39 @@
 
 /* ─── GOYA Brand Tokens — Light Mode ─────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --background-secondary: #f8f9fa;
-  --background-tertiary: #f1f5f9;
-  --foreground: #1e293b;
-  --foreground-secondary: #64748b;
-  --foreground-tertiary: #94a3b8;
+  --background: #F2E0D0;
+  --background-secondary: #f8efe6;
+  --background-tertiary: #efe3d8;
+  --foreground: #2c2420;
+  --foreground-secondary: #7a6b63;
+  --foreground-tertiary: #a89a92;
 
-  /* Primary Blue family */
-  --goya-primary:       #345c83;
-  --goya-primary-light: #4a7aab;
-  --goya-primary-dark:  #2a4d6e;
-  --goya-primary-50:    #eef4f9;
-  --goya-primary-100:   #d6e7f1;
-  --goya-primary-200:   #afd0e4;
+  /* Primary Blue Mirage family */
+  --goya-primary:       #6E88B0;
+  --goya-primary-light: #8ea8c8;
+  --goya-primary-dark:  #4d6d91;
+  --goya-primary-50:    rgba(110, 136, 176, 0.08);
+  --goya-primary-100:   rgba(110, 136, 176, 0.15);
+  --goya-primary-200:   rgba(110, 136, 176, 0.25);
 
   /* Accent Red (use sparingly) */
   --goya-accent:        #831618;
   --goya-accent-light:  #a91c1f;
   --goya-accent-50:     #fef2f2;
 
-  /* Surfaces */
-  --goya-surface:       #ffffff;
-  --goya-surface-muted: #f8f9fa;
-  --goya-surface-warm:  #f5f4f2;
+  /* Surfaces — Warm tones */
+  --goya-surface:       #f8efe6;
+  --goya-surface-muted: #efe3d8;
+  --goya-surface-warm:  #F2E0D0;
 
-  /* Borders */
-  --goya-border:        #e2e8f0;
-  --goya-border-muted:  #f0f4f8;
+  /* Borders — Warm borders */
+  --goya-border:        #dccfc5;
+  --goya-border-muted:  #e8ddd5;
 
-  /* Sidebar */
-  --sidebar-bg:         #1B3A5C;
-  --sidebar-fg:         #e2e8f0;
-  --sidebar-active-bg:  rgba(255, 255, 255, 0.12);
+  /* Sidebar — warm amber background with Blue Mirage text */
+  --sidebar-bg:         #2c2420;
+  --sidebar-fg:         #F2E0D0;
+  --sidebar-active-bg:  rgba(110, 136, 176, 0.15);
   --sidebar-active-fg:  #ffffff;
 }
 
@@ -113,11 +113,19 @@
   --color-goya-border:    var(--goya-border);
   --color-goya-border-muted: var(--goya-border-muted);
 
-  /* GOYA shadow scale (neumorphic soft UI) */
-  --shadow-soft:     0 1px 3px 0 rgba(52,92,131,0.07), 0 1px 2px -1px rgba(52,92,131,0.05);
-  --shadow-card:     0 2px 8px -2px rgba(52,92,131,0.10), 0 4px 20px -4px rgba(52,92,131,0.07);
-  --shadow-elevated: 0 4px 16px -4px rgba(52,92,131,0.14), 0 8px 32px -8px rgba(52,92,131,0.10);
-  --shadow-inset:    inset 0 2px 6px rgba(52,92,131,0.06), inset 0 1px 2px rgba(52,92,131,0.04);
+  /* Text color tokens */
+  --color-text-primary: var(--foreground);
+  --color-text-muted: var(--foreground-secondary);
+  --color-text-on-primary: #ffffff;
+
+  /* Primary muted for softer blue usage */
+  --color-primary-muted: #a8bed4;
+
+  /* GOYA shadow scale (Blue Mirage tinted) */
+  --shadow-soft:     0 1px 3px 0 rgba(110,136,176,0.07), 0 1px 2px -1px rgba(110,136,176,0.05);
+  --shadow-card:     0 2px 8px -2px rgba(110,136,176,0.10), 0 4px 20px -4px rgba(110,136,176,0.07);
+  --shadow-elevated: 0 4px 16px -4px rgba(110,136,176,0.14), 0 8px 32px -8px rgba(110,136,176,0.10);
+  --shadow-inset:    inset 0 2px 6px rgba(110,136,176,0.06), inset 0 1px 2px rgba(110,136,176,0.04);
 }
 
 /* Dark mode shadows */
@@ -146,7 +154,7 @@ html:not(.no-transitions) body * {
   transition: background-color 200ms ease, border-color 200ms ease;
 }
 
-/* ─── Light mode overrides: remap old navy #1B3A5C → new primary #345c83 ── */
+/* ─── Light mode overrides: remap old navy #1B3A5C → new primary #6E88B0 ── */
 /* ~100+ components hardcode bg-[#1B3A5C] for buttons. Rather than editing    */
 /* every file, remap the old navy to the new primary palette via CSS.         */
 
@@ -168,10 +176,71 @@ html:not(.no-transitions) body * {
 .border-\[\#1B3A5C\] { border-color: var(--goya-primary) !important; }
 .border-\[\#1a2744\] { border-color: var(--goya-primary) !important; }
 
+/* Old primary #345c83 → new Blue Mirage #6E88B0 */
+.bg-\[\#345c83\] { background-color: var(--goya-primary) !important; }
+.text-\[\#345c83\] { color: var(--goya-primary) !important; }
+.border-\[\#345c83\] { border-color: var(--goya-primary) !important; }
+.ring-\[\#345c83\]\/20 { --tw-ring-color: rgba(110, 136, 176, 0.20) !important; }
+.focus\:ring-\[\#345c83\]\/20:focus { --tw-ring-color: rgba(110, 136, 176, 0.20) !important; }
+.focus\:border-\[\#345c83\]:focus { border-color: var(--goya-primary) !important; }
+.hover\:bg-\[\#345c83\]:hover { background-color: var(--goya-primary) !important; }
+.border-t-\[\#345c83\] { border-top-color: var(--goya-primary) !important; }
+.shadow-\[\#345c83\]\/30 { --tw-shadow-color: rgba(110, 136, 176, 0.30) !important; }
+.shadow-lg.shadow-\[\#345c83\]\/30 { --tw-shadow-color: rgba(110, 136, 176, 0.30) !important; }
+.border-\[\#345c83\].border-2 { border-color: var(--goya-primary) !important; }
+.bg-\[\#345c83\]\/5 { background-color: rgba(110, 136, 176, 0.05) !important; }
+.bg-\[\#345c83\]\/10 { background-color: rgba(110, 136, 176, 0.10) !important; }
+.bg-\[\#345c83\]\/20 { background-color: rgba(110, 136, 176, 0.20) !important; }
+.ring-4.ring-\[\#345c83\]\/20 { --tw-ring-color: rgba(110, 136, 176, 0.20) !important; }
+.hover\:bg-\[\#345c83\]\/10:hover { background-color: rgba(110, 136, 176, 0.10) !important; }
+.bg-\[\#eef4f9\] { background-color: var(--goya-primary-50) !important; }
+
 /* Old teal #4E87A0 backgrounds → new primary-light */
 .bg-\[\#4E87A0\] { background-color: var(--goya-primary-light) !important; }
 .hover\:bg-\[\#4E87A0\]:hover { background-color: var(--goya-primary-light) !important; }
 .hover\:bg-\[\#3A7190\]:hover { background-color: var(--goya-primary) !important; }
+
+/* ─── Color-Two: Warm Light Mode Overrides ─────────────────────────────── */
+/* Remap hardcoded cool-tone Tailwind classes to warm amber palette.       */
+/* These apply in light mode only (no .dark prefix).                       */
+
+:root .bg-white { background-color: var(--goya-surface) !important; }
+:root .bg-slate-50 { background-color: var(--background-secondary) !important; }
+:root .bg-gray-50 { background-color: var(--background-secondary) !important; }
+:root .bg-slate-100 { background-color: var(--background-tertiary) !important; }
+:root .bg-gray-100 { background-color: var(--background-tertiary) !important; }
+
+:root .text-slate-900 { color: var(--foreground) !important; }
+:root .text-slate-800 { color: var(--foreground) !important; }
+:root .text-slate-700 { color: #5a4d46 !important; }
+:root .text-slate-600 { color: var(--foreground-secondary) !important; }
+:root .text-slate-500 { color: var(--foreground-secondary) !important; }
+:root .text-gray-900 { color: var(--foreground) !important; }
+:root .text-gray-800 { color: var(--foreground) !important; }
+:root .text-gray-700 { color: #5a4d46 !important; }
+:root .text-gray-600 { color: var(--foreground-secondary) !important; }
+:root .text-gray-500 { color: var(--foreground-secondary) !important; }
+
+:root .border-slate-200 { border-color: var(--goya-border) !important; }
+:root .border-slate-300 { border-color: var(--goya-border) !important; }
+:root .border-gray-200 { border-color: var(--goya-border) !important; }
+:root .border-gray-300 { border-color: var(--goya-border) !important; }
+
+:root .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--goya-border) !important; }
+:root .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--goya-border) !important; }
+
+:root .ring-slate-200 { --tw-ring-color: var(--goya-border) !important; }
+
+:root .hover\:bg-slate-50:hover { background-color: var(--background-secondary) !important; }
+:root .hover\:bg-slate-100:hover { background-color: var(--background-tertiary) !important; }
+:root .hover\:bg-gray-50:hover { background-color: var(--background-secondary) !important; }
+:root .hover\:bg-gray-100:hover { background-color: var(--background-tertiary) !important; }
+
+/* Old hex light backgrounds → warm */
+:root .bg-\[\#F9FAFB\] { background-color: var(--background-secondary) !important; }
+:root .bg-\[\#F3F4F6\] { background-color: var(--background-tertiary) !important; }
+:root .bg-\[\#FAFAFA\] { background-color: var(--background-secondary) !important; }
+:root .bg-\[\#F8FAFC\] { background-color: var(--background) !important; }
 
 /* ─── Dark mode overrides for hardcoded Tailwind utilities ───────────────── */
 /* These cover the ~128 files using bg-white, bg-slate-50, text-[#1B3A5C] etc. */

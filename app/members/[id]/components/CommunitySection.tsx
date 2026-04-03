@@ -40,7 +40,7 @@ export default function CommunitySection({ studentCount, students }: CommunitySe
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="w-full h-full flex items-center justify-center text-xs font-bold text-white bg-[#345c83]">
+                  <span className="w-full h-full flex items-center justify-center text-xs font-bold text-white bg-[#6E88B0]">
                     {initial}
                   </span>
                 )}

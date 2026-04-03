@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Analytics } from '@/lib/analytics/events';
 
-const INPUT = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#345c83]/20 focus:border-[#345c83] transition-colors';
+const INPUT = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6E88B0]/20 focus:border-[#6E88B0] transition-colors';
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide';
 
 export default function SignInPage() {
@@ -102,7 +102,7 @@ export default function SignInPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Password</span>
-                <Link href="/forgot-password" className="text-[10px] text-[#345c83] hover:underline font-semibold uppercase tracking-wide">
+                <Link href="/forgot-password" className="text-[10px] text-[#6E88B0] hover:underline font-semibold uppercase tracking-wide">
                   Forgot password?
                 </Link>
               </div>
@@ -119,14 +119,14 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#345c83] text-white font-bold rounded-xl hover:bg-[#1e3a52] transition-colors disabled:opacity-60"
+              className="w-full py-3 bg-[#6E88B0] text-white font-bold rounded-xl hover:bg-[#1e3a52] transition-colors disabled:opacity-60"
             >
               {loading ? 'Signing in\u2026' : 'Sign In'}
             </button>
           </form>
           <p className="text-center text-slate-500 text-sm mt-6">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-[#345c83] font-semibold hover:underline">Join GOYA</Link>
+            <Link href="/register" className="text-[#6E88B0] font-semibold hover:underline">Join GOYA</Link>
           </p>
         </div>
 

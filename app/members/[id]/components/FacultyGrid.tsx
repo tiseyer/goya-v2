@@ -43,7 +43,7 @@ export default function FacultyGrid({ faculty, schoolSlug, schoolId }: FacultyGr
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={p.avatar_url} alt={name} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="w-full h-full flex items-center justify-center text-sm font-bold text-white bg-[#345c83]">
+                  <span className="w-full h-full flex items-center justify-center text-sm font-bold text-white bg-[#6E88B0]">
                     {initial}
                   </span>
                 )}

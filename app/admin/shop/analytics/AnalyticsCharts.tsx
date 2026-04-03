@@ -51,7 +51,7 @@ export default function AnalyticsCharts({ chartData }: Props) {
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#1B3A5C',
+                    backgroundColor: '#2c2420',
                     border: 'none',
                     borderRadius: '8px',
                     fontSize: '12px',
@@ -94,8 +94,8 @@ export default function AnalyticsCharts({ chartData }: Props) {
               <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <defs>
                   <linearGradient id="ordersGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#345c83" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#345c83" stopOpacity={0}    />
+                    <stop offset="5%"  stopColor="#6E88B0" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#6E88B0" stopOpacity={0}    />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -113,7 +113,7 @@ export default function AnalyticsCharts({ chartData }: Props) {
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#1B3A5C',
+                    backgroundColor: '#2c2420',
                     border: 'none',
                     borderRadius: '8px',
                     fontSize: '12px',
@@ -130,7 +130,7 @@ export default function AnalyticsCharts({ chartData }: Props) {
                 <Area
                   type="monotone"
                   dataKey="orders"
-                  stroke="#345c83"
+                  stroke="#6E88B0"
                   strokeWidth={2}
                   fill="url(#ordersGradient)"
                   dot={false}

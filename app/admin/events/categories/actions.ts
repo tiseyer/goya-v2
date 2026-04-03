@@ -32,7 +32,7 @@ export async function createCategory(formData: FormData): Promise<{ success: boo
   const name = (formData.get('name') as string)?.trim();
   const slug = (formData.get('slug') as string)?.trim() || generateSlug(name);
   const description = (formData.get('description') as string)?.trim() || null;
-  const color = (formData.get('color') as string)?.trim() || '#345c83';
+  const color = (formData.get('color') as string)?.trim() || '#6E88B0';
   const parent_id = (formData.get('parent_id') as string) || null;
   const sort_order = parseInt(formData.get('sort_order') as string) || 0;
 
@@ -62,7 +62,7 @@ export async function updateCategory(id: string, formData: FormData): Promise<{ 
   const name = (formData.get('name') as string)?.trim();
   const slug = (formData.get('slug') as string)?.trim();
   const description = (formData.get('description') as string)?.trim() || null;
-  const color = (formData.get('color') as string)?.trim() || '#345c83';
+  const color = (formData.get('color') as string)?.trim() || '#6E88B0';
   const parent_id = (formData.get('parent_id') as string) || null;
   const sort_order = parseInt(formData.get('sort_order') as string) || 0;
 

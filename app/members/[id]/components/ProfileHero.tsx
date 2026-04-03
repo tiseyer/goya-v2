@@ -83,7 +83,7 @@ export default function ProfileHero({
     <div>
       {/* ── Hero Banner ─────────────────────────────────────────────────────── */}
       <div
-        className={`relative overflow-hidden h-[200px] sm:h-[240px] ${!profile.cover_image_url ? 'bg-[#345c83]' : ''}`}
+        className={`relative overflow-hidden h-[200px] sm:h-[240px] ${!profile.cover_image_url ? 'bg-[#6E88B0]' : ''}`}
       >
         {profile.cover_image_url && (
           <>
@@ -122,7 +122,7 @@ export default function ProfileHero({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-3xl font-bold text-white bg-[#345c83] w-full h-full flex items-center justify-center">
+              <span className="text-3xl font-bold text-white bg-[#6E88B0] w-full h-full flex items-center justify-center">
                 {displayName[0]?.toUpperCase() ?? '?'}
               </span>
             )}
@@ -156,7 +156,7 @@ export default function ProfileHero({
             {hasLanguages && profile.languages!.map((lang) => (
               <span
                 key={lang}
-                className="rounded-full bg-[#345c83]/10 text-[#345c83] px-3 py-1 text-sm"
+                className="rounded-full bg-[#6E88B0]/10 text-[#6E88B0] px-3 py-1 text-sm"
               >
                 {lang}
               </span>

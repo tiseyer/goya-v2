@@ -16,7 +16,7 @@ interface CategoryModalProps {
 const INPUT_CLS = 'w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm text-[#374151] focus:outline-none focus:ring-2 focus:ring-[#00B5A3] placeholder-[#9CA3AF]';
 const LABEL_CLS = 'block text-sm font-semibold text-[#374151] mb-1';
 
-const DEFAULT_COLOR = '#345c83';
+const DEFAULT_COLOR = '#6E88B0';
 
 export default function CategoryModal({
   open,
@@ -196,7 +196,7 @@ export default function CategoryModal({
                 type="text"
                 value={color}
                 onChange={e => setColor(e.target.value)}
-                placeholder="#345c83"
+                placeholder="#6E88B0"
                 maxLength={7}
                 className={`${INPUT_CLS} flex-1`}
               />

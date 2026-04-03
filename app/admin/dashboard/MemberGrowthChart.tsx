@@ -78,7 +78,7 @@ export default function MemberGrowthChart() {
       <div className="h-[300px]">
         {loading ? (
           <div className="h-full flex items-center justify-center">
-            <div className="w-5 h-5 border-2 border-slate-300 border-t-[#345c83] rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-slate-300 border-t-[#6E88B0] rounded-full animate-spin" />
           </div>
         ) : data.length === 0 ? (
           <div className="h-full flex items-center justify-center text-sm text-slate-400">
@@ -89,8 +89,8 @@ export default function MemberGrowthChart() {
             <AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
               <defs>
                 <linearGradient id="memberGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#345c83" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#345c83" stopOpacity={0}    />
+                  <stop offset="5%"  stopColor="#6E88B0" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="#6E88B0" stopOpacity={0}    />
                 </linearGradient>
               </defs>
               <XAxis
@@ -110,7 +110,7 @@ export default function MemberGrowthChart() {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#1B3A5C',
+                  backgroundColor: '#2c2420',
                   border: 'none',
                   borderRadius: '8px',
                   fontSize: '12px',
@@ -129,7 +129,7 @@ export default function MemberGrowthChart() {
               <Area
                 type="monotone"
                 dataKey="count"
-                stroke="#345c83"
+                stroke="#6E88B0"
                 strokeWidth={2}
                 fill="url(#memberGradient)"
               />

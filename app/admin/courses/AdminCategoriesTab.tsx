@@ -147,7 +147,7 @@ export default function AdminCategoriesTab() {
                     <td className="px-4 py-3">
                       <div
                         className="w-6 h-6 rounded-full border border-[#E5E7EB]"
-                        style={{ backgroundColor: cat.color ?? '#345c83' }}
+                        style={{ backgroundColor: cat.color ?? '#6E88B0' }}
                       />
                     </td>
                     {/* Name */}

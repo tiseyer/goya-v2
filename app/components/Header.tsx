@@ -499,9 +499,9 @@ function UserMenu({
         aria-label="User menu"
       >
         {displayAvatar ? (
-          <img src={displayAvatar} alt="" className={`w-7 h-7 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : isSchoolContext ? 'ring-2 ring-[#345c83]' : ''}`} />
+          <img src={displayAvatar} alt="" className={`w-7 h-7 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : isSchoolContext ? 'ring-2 ring-[#6E88B0]' : ''}`} />
         ) : (
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : isSchoolContext ? 'bg-[#345c83]' : 'bg-[#4E87A0]'}`}>
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : isSchoolContext ? 'bg-[#6E88B0]' : 'bg-[#4E87A0]'}`}>
             <span className="text-white text-[10px] font-black">{displayInitials}</span>
           </div>
         )}
@@ -516,9 +516,9 @@ function UserMenu({
           {/* Active identity header */}
           <div className="px-4 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
             {displayAvatar ? (
-              <img src={displayAvatar} alt="" className={`w-10 h-10 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : isSchoolContext ? 'ring-2 ring-[#345c83]' : ''}`} />
+              <img src={displayAvatar} alt="" className={`w-10 h-10 rounded-full object-cover shrink-0 ${isImpersonating ? 'ring-2 ring-amber-500' : isSchoolContext ? 'ring-2 ring-[#6E88B0]' : ''}`} />
             ) : (
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : isSchoolContext ? 'bg-[#345c83]' : 'bg-[#4E87A0]'}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : isSchoolContext ? 'bg-[#6E88B0]' : 'bg-[#4E87A0]'}`}>
                 <span className="text-white text-xs font-black">{displayInitials}</span>
               </div>
             )}
@@ -559,7 +559,7 @@ function UserMenu({
                     {school.logo_url ? (
                       <img src={school.logo_url} alt="" className="w-6 h-6 rounded-full object-cover shrink-0" />
                     ) : (
-                      <div className="w-6 h-6 rounded-full bg-[#345c83] flex items-center justify-center shrink-0">
+                      <div className="w-6 h-6 rounded-full bg-[#6E88B0] flex items-center justify-center shrink-0">
                         <span className="text-white text-[8px] font-black">{school.name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()}</span>
                       </div>
                     )}
@@ -1201,7 +1201,7 @@ export default function Header() {
               return (
                 <>
                   <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : mobileIsSchool ? 'bg-[#345c83]' : 'bg-[#4E87A0]'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isImpersonating ? 'bg-amber-500' : mobileIsSchool ? 'bg-[#6E88B0]' : 'bg-[#4E87A0]'}`}>
                       <span className="text-white text-xs font-black">{mobileInitials}</span>
                     </div>
                     <div>
@@ -1237,7 +1237,7 @@ export default function Header() {
                             onClick={() => { handleSwitchContext(`school:${school.id}`); setProfileOpen(false); }}
                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#374151] hover:bg-slate-50 text-sm transition-colors"
                           >
-                            <div className="w-6 h-6 rounded-full bg-[#345c83] flex items-center justify-center shrink-0">
+                            <div className="w-6 h-6 rounded-full bg-[#6E88B0] flex items-center justify-center shrink-0">
                               <span className="text-white text-[8px] font-black">{school.name.split(/\s+/).map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()}</span>
                             </div>
                             {school.name}
