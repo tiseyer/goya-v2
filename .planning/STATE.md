@@ -107,9 +107,10 @@ None.
 | 260403-hp9 | Superuser role + invisible UI masking + admin deletion with double confirmation | 2026-04-03 | 1f4f689, 99772ad, 07fe283, 758b359, d9abf5a | [260403-hp9-add-superuser-role-with-admin-deletion-c](./quick/260403-hp9-add-superuser-role-with-admin-deletion-c/) |
 | 260403-i2j | Admin inline hero editing with variables | 2026-04-03 | d7d307e, 57752d4, a88a3b6 | [260403-i2j-admin-inline-hero-editing-with-variables](./quick/260403-i2j-admin-inline-hero-editing-with-variables/) |
 | 260403-lkf | Fix PageHero save — correct page_hero_content schema and regenerate types | 2026-04-03 | 323d3d1, 720be3c | [260403-lkf-fix-pagehero-save-create-missing-page-he](./quick/260403-lkf-fix-pagehero-save-create-missing-page-he/) |
+| 260403-ly5 | Fix PageHero edit mode layout — variables and buttons to fixed panels | 2026-04-03 | 5434734 | [260403-ly5-fix-pagehero-edit-mode-layout-variables-](./quick/260403-ly5-fix-pagehero-edit-mode-layout-variables-/) |
 
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Completed quick task 260403-lkf: Fix PageHero save — correct page_hero_content schema
+Stopped at: Completed quick task 260403-ly5: Fix PageHero edit mode layout — variables and buttons to fixed panels
 Resume file: None
