@@ -495,7 +495,10 @@ Plans:
   4. Pressing the down arrow moves highlight to the next result, up arrow moves to the previous, and pressing Enter on a highlighted result navigates to it
   5. Results are visually grouped by category with the best match shown at the top; member rows show a message icon, and members with a full address show a map/directions icon
   6. When the overlay opens (by any method), the search input is immediately focused and ready to receive keyboard input
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 51-01-PLAN.md — Search types, mock data, SearchContext, and ClientProviders wiring
+- [ ] 51-02-PLAN.md — GlobalSearchOverlay component, sub-components, Header integration
 **UI hint**: yes
 
 ### Phase 52: Search API + Page Registry
@@ -520,7 +523,6 @@ Plans:
   2. The keyboard shortcut does not interfere with browser-native Ctrl+K behavior (address bar) — the event is captured and prevented from propagating
   3. The search icon in the nav header opens the same overlay that the keyboard shortcut opens — both triggers share one SearchOverlay instance mounted at layout level
 **Plans**: TBD
-**UI hint**: yes
 
 ### Phase 54: Performance + Polish
 **Goal**: The search experience is snappy and honest — input is debounced so the API is not hammered on every keystroke, results are cached so repeated queries are instant, and every non-result state shows a clear, helpful message
@@ -531,7 +533,6 @@ Plans:
   2. Typing the same query a second time does not trigger a new API call — the cached results are displayed immediately from component state
   3. An empty input shows a contextual placeholder state ("Search members, events, courses, pages…"); a query with no results shows a "No results for '[query]'" message; a query that is too short (< 2 characters) shows a "Keep typing…" prompt
 **Plans**: TBD
-**UI hint**: yes
 
 ## Progress
 
@@ -539,7 +540,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 51. Search Overlay UI | 0/TBD | Not started | - |
+| 51. Search Overlay UI | 0/2 | Not started | - |
 | 52. Search API + Page Registry | 0/TBD | Not started | - |
 | 53. Header Integration | 0/TBD | Not started | - |
 | 54. Performance + Polish | 0/TBD | Not started | - |
