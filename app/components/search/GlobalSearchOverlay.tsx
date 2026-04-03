@@ -52,9 +52,9 @@ export default function GlobalSearchOverlay() {
   // Mattea AI hint state
   const [matteaAnswer, setMatteaAnswer] = useState<string | null>(null);
   const [matteaLoading, setMatteaLoading] = useState(false);
-  const [lastMatteaQuery, setLastMatteaQuery] = useState('');
   const matteaAbortRef = useRef<AbortController | null>(null);
   const matteaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastFetchedQuestion = useRef('');
 
   const inputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
@@ -75,7 +75,7 @@ export default function GlobalSearchOverlay() {
       setLoading(false);
       setMatteaAnswer(null);
       setMatteaLoading(false);
-      setLastMatteaQuery('');
+      lastFetchedQuestion.current = '';
       setTimeout(() => {
         inputRef.current?.focus();
         mobileInputRef.current?.focus();
@@ -139,49 +139,63 @@ export default function GlobalSearchOverlay() {
     }
   }, [cache]);
 
-  // Mattea: single effect with 1200ms debounce, min 15 chars, abort on change
+  // Mattea: 1200ms debounce, min 15 chars, ref-based dedup, abort on change
   useEffect(() => {
-    if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current);
+    // Clear pending timer on every keystroke
+    if (matteaTimerRef.current) {
+      clearTimeout(matteaTimerRef.current);
+      matteaTimerRef.current = null;
+    }
 
-    // If query is not a question or too short, clear (but keep answer if >= 10 chars)
+    // If query is too short or not a question, conditionally clear
     if (!isQuestion(query) || query.trim().length < 15) {
-      if (query.trim().length < 10) {
+      if (query.trim().length < 8) {
         setMatteaAnswer(null);
         setMatteaLoading(false);
+        lastFetchedQuestion.current = '';
       }
       return;
     }
 
-    // Fire Mattea after 1200ms of no typing
+    // Set 1200ms timer — fires after user stops typing
     matteaTimerRef.current = setTimeout(async () => {
-      const trimmed = query.trim();
-      if (trimmed === lastMatteaQuery) return;
+      const question = query.trim();
 
+      // Don't re-fetch same question (ref avoids stale closure)
+      if (question === lastFetchedQuestion.current) return;
+
+      // Cancel any in-flight request
       if (matteaAbortRef.current) matteaAbortRef.current.abort();
       matteaAbortRef.current = new AbortController();
+
       setMatteaLoading(true);
+      lastFetchedQuestion.current = question;
 
       try {
         const res = await fetch('/api/search/mattea-hint', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: trimmed }),
+          body: JSON.stringify({ question }),
           signal: matteaAbortRef.current.signal,
         });
+
         if (!res.ok) { setMatteaLoading(false); return; }
+
         const data = await res.json();
         if (data.answer) {
           setMatteaAnswer(data.answer);
-          setLastMatteaQuery(trimmed);
         }
       } catch (err: unknown) {
         if (err instanceof Error && err.name === 'AbortError') return;
+        console.error('[Mattea] Fetch error:', err);
       } finally {
         setMatteaLoading(false);
       }
     }, 1200);
 
-    return () => { if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current); };
+    return () => {
+      if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 

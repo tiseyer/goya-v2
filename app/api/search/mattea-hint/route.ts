@@ -5,44 +5,52 @@ import { decrypt } from '@/lib/secrets/encryption'
 import { getSupabaseService } from '@/lib/supabase/service'
 
 const SYSTEM_PROMPT =
-  'You are Mattea, the GOYA support assistant. Answer the following question in 2-3 sentences maximum. Be direct and helpful. If you don\'t know the answer, say so briefly. Do not use markdown formatting. Do not introduce yourself.'
+  "You are Mattea, the GOYA support assistant. Answer the following question in 2-3 sentences maximum. Be direct and helpful. If you don't know the answer, say so briefly. Do not use markdown formatting. Do not introduce yourself."
 
 // Simple in-memory cache (60s TTL)
-const cache = new Map<string, { answer: string; expires: number }>()
+const cache = new Map<string, { answer: string; ts: number }>()
+const CACHE_TTL = 60_000
 
 export async function POST(req: Request) {
   try {
-    const { question } = (await req.json()) as { question?: string }
-    if (!question || question.trim().length < 4) {
+    const body = await req.json()
+    const question = body?.question
+
+    if (!question || typeof question !== 'string' || question.trim().length < 4) {
       return NextResponse.json({ answer: null })
     }
 
-    const cacheKey = question.trim().toLowerCase()
-    const cached = cache.get(cacheKey)
-    if (cached && cached.expires > Date.now()) {
+    const key = question.trim().toLowerCase()
+
+    // Check cache
+    const cached = cache.get(key)
+    if (cached && Date.now() - cached.ts < CACHE_TTL) {
       return NextResponse.json({ answer: cached.answer })
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const supabase = getSupabaseService() as any
 
-    // Load chatbot config to get the AI provider key
-    const { data: config } = await supabase
+    // Load chatbot config
+    const { data: config, error: configErr } = await supabase
       .from('chatbot_config')
       .select('selected_key_id, is_active')
       .single()
 
-    if (!config?.is_active || !config.selected_key_id) {
+    if (configErr || !config?.is_active || !config.selected_key_id) {
+      console.error('[mattea-hint] Config issue:', { configErr, config })
       return NextResponse.json({ answer: null })
     }
 
-    const { data: secretRow } = await supabase
+    // Get AI provider key
+    const { data: secretRow, error: secretErr } = await supabase
       .from('admin_secrets')
       .select('encrypted_value, iv, provider, model')
       .eq('id', config.selected_key_id)
       .single()
 
-    if (!secretRow) {
+    if (secretErr || !secretRow) {
+      console.error('[mattea-hint] Secret issue:', { secretErr })
       return NextResponse.json({ answer: null })
     }
 
@@ -50,7 +58,7 @@ export async function POST(req: Request) {
     const provider = secretRow.provider as string
     const model = secretRow.model as string
 
-    // Load FAQ context
+    // Load FAQ context for better answers
     const { data: faqRows } = await supabase
       .from('faq_items')
       .select('question, answer')
@@ -65,55 +73,44 @@ export async function POST(req: Request) {
 
     const systemPrompt = SYSTEM_PROMPT + faqContext
 
-    // Call AI with 3s timeout
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 3000)
-
     let answer: string | null = null
 
     try {
       if (provider === 'openai') {
         const openai = new OpenAI({ apiKey })
-        const completion = await openai.chat.completions.create(
-          {
-            model,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: question },
-            ],
-            max_tokens: 150,
-          },
-          { signal: controller.signal },
-        )
+        const completion = await openai.chat.completions.create({
+          model,
+          max_tokens: 150,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: question.trim() },
+          ],
+        })
         answer = completion.choices[0]?.message?.content?.trim() ?? null
       } else if (provider === 'anthropic') {
         const anthropic = new Anthropic({ apiKey })
-        const response = await anthropic.messages.create(
-          {
-            model,
-            max_tokens: 150,
-            system: systemPrompt,
-            messages: [{ role: 'user', content: question }],
-          },
-          { signal: controller.signal },
-        )
+        const response = await anthropic.messages.create({
+          model,
+          max_tokens: 150,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: question.trim() }],
+        })
         const block = response.content[0]
         answer = block.type === 'text' ? block.text.trim() : null
       }
-    } catch {
-      // Timeout or API error — return null gracefully
+    } catch (aiErr) {
+      console.error('[mattea-hint] AI call error:', aiErr)
       return NextResponse.json({ answer: null })
-    } finally {
-      clearTimeout(timeout)
     }
 
-    // Cache for 60s
+    // Cache successful answers
     if (answer) {
-      cache.set(cacheKey, { answer, expires: Date.now() + 60_000 })
+      cache.set(key, { answer, ts: Date.now() })
     }
 
     return NextResponse.json({ answer })
-  } catch {
+  } catch (err) {
+    console.error('[mattea-hint] Unexpected error:', err)
     return NextResponse.json({ answer: null })
   }
 }
