@@ -134,7 +134,8 @@ export default function GlobalSearchOverlay() {
     }
   }, [cache]);
 
-  // Mattea: 1200ms debounce on raw query, renders when matteaAnswer or matteaLoading is set
+  // Mattea AI hint — fires 1200ms after user stops typing a question (>= 15 chars)
+  // Render condition: matteaLoading || matteaAnswer !== null (no gating)
   useEffect(() => {
     const q = (query || '').trim();
 
