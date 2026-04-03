@@ -146,7 +146,7 @@ export default function PageHero({
     }
   };
 
-  // Admin pencil/X/saved indicator (shared between variants)
+  // Admin pencil / save+cancel / saved indicator (shared between variants)
   const adminControl = isAdmin && pageSlug ? (
     <div className="absolute top-4 right-4 z-10">
       {saved ? (
@@ -157,20 +157,39 @@ export default function PageHero({
           Saved
         </div>
       ) : editing ? (
-        <button
-          type="button"
-          onClick={handleCancel}
-          className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
-            variant === 'dark'
-              ? 'bg-white/10 hover:bg-white/20 text-white/60 hover:text-white'
-              : 'bg-slate-200/80 hover:bg-slate-300 text-slate-500 hover:text-slate-700'
-          }`}
-          title="Cancel editing"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Save button */}
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className={`w-8 h-8 flex items-center justify-center rounded-full transition-all disabled:opacity-50 ${
+              variant === 'dark'
+                ? 'bg-white/20 hover:bg-green-500/30 text-white/80 hover:text-white'
+                : 'bg-slate-200/80 hover:bg-green-100 text-slate-500 hover:text-green-600'
+            }`}
+            title="Save changes"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+          {/* Cancel button */}
+          <button
+            type="button"
+            onClick={handleCancel}
+            className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
+              variant === 'dark'
+                ? 'bg-white/10 hover:bg-white/20 text-white/60 hover:text-white'
+                : 'bg-slate-200/80 hover:bg-slate-300 text-slate-500 hover:text-slate-700'
+            }`}
+            title="Cancel editing"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       ) : (
         <button
           type="button"
@@ -193,7 +212,7 @@ export default function PageHero({
   // ─── Dark variant ─────────────────────────────────────────────────────────
 
   if (variant === 'dark') {
-    const darkPillContent = customPill ?? (templatePill ? (
+    const darkPillContent = customPill ?? ((editing || templatePill) ? (
       <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1 text-white/80 text-xs font-medium">
         {pillIcon}
         {editing
@@ -214,29 +233,19 @@ export default function PageHero({
     return (
       <section className="relative h-[220px] bg-primary overflow-hidden">
         {editing && (
-          <div className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-1 p-2 bg-black/30 backdrop-blur-sm rounded-r-xl">
-            <span className="text-white/50 text-xs mb-1">Variables</span>
+          <div className="absolute bottom-2 left-2 z-10 flex flex-wrap gap-1 p-2 bg-black/20 backdrop-blur-sm rounded-xl max-w-[280px]">
+            <span className="text-white/50 text-[10px] font-medium w-full mb-0.5">Variables</span>
             {HERO_VARIABLES.map(v => (
               <button
                 key={v.key}
                 type="button"
                 onClick={() => insertVariable(v.key)}
                 title={v.description}
-                className="text-xs bg-white/20 hover:bg-white/40 text-white px-2 py-1 rounded font-mono whitespace-nowrap transition-colors"
+                className="text-[10px] bg-white/20 hover:bg-white/40 text-white px-1.5 py-0.5 rounded font-mono whitespace-nowrap transition-colors"
               >
                 {v.key}
               </button>
             ))}
-          </div>
-        )}
-        {editing && (
-          <div className="fixed top-4 right-4 z-50 flex gap-2">
-            <button type="button" onClick={handleCancel} className="px-4 py-2 text-sm bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-colors">
-              Cancel
-            </button>
-            <button type="button" onClick={handleSave} disabled={saving} className="px-4 py-2 text-sm bg-white text-[#345c83] hover:bg-white/90 rounded-lg font-medium transition-colors disabled:opacity-50">
-              {saving ? 'Saving...' : 'Save'}
-            </button>
           </div>
         )}
         {/* Dot-grid texture */}
@@ -297,7 +306,7 @@ export default function PageHero({
 
   // ─── Light variant (default) ──────────────────────────────────────────────
 
-  const lightPillContent = customPill ?? (templatePill ? (
+  const lightPillContent = customPill ?? ((editing || templatePill) ? (
     <div className="inline-flex items-center gap-2 bg-primary/8 border border-primary/15 rounded-full px-3.5 py-1 text-primary text-xs font-semibold tracking-wide">
       {pillIcon}
       {editing
@@ -318,29 +327,19 @@ export default function PageHero({
   return (
     <section className="relative h-[220px] bg-surface-muted border-b border-slate-200 overflow-hidden">
       {editing && (
-        <div className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-1 p-2 bg-black/30 backdrop-blur-sm rounded-r-xl">
-          <span className="text-white/50 text-xs mb-1">Variables</span>
+        <div className="absolute bottom-2 left-2 z-10 flex flex-wrap gap-1 p-2 bg-slate-800/20 backdrop-blur-sm rounded-xl max-w-[280px]">
+          <span className="text-slate-600/50 text-[10px] font-medium w-full mb-0.5">Variables</span>
           {HERO_VARIABLES.map(v => (
             <button
               key={v.key}
               type="button"
               onClick={() => insertVariable(v.key)}
               title={v.description}
-              className="text-xs bg-white/20 hover:bg-white/40 text-white px-2 py-1 rounded font-mono whitespace-nowrap transition-colors"
+              className="text-[10px] bg-slate-600/20 hover:bg-slate-600/40 text-slate-700 px-1.5 py-0.5 rounded font-mono whitespace-nowrap transition-colors"
             >
               {v.key}
             </button>
           ))}
-        </div>
-      )}
-      {editing && (
-        <div className="fixed top-4 right-4 z-50 flex gap-2">
-          <button type="button" onClick={handleCancel} className="px-4 py-2 text-sm bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-colors">
-            Cancel
-          </button>
-          <button type="button" onClick={handleSave} disabled={saving} className="px-4 py-2 text-sm bg-white text-[#345c83] hover:bg-white/90 rounded-lg font-medium transition-colors disabled:opacity-50">
-            {saving ? 'Saving...' : 'Save'}
-          </button>
         </div>
       )}
       {/* Subtle background glow */}
