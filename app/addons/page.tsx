@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import PageHero from '@/app/components/PageHero'
+import type { HeroContext } from '@/lib/hero-variables'
 import SchoolRegistrationCTA from '@/app/components/SchoolRegistrationCTA'
 import { isAdminOrMod, isAdminOrAbove } from '@/lib/roles'
 
@@ -87,7 +88,7 @@ export default async function AddonsPage() {
   // 2. Get profile with role and designations
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, designations')
+    .select('role, designations, full_name')
     .eq('id', user.id)
     .single()
 
@@ -159,6 +160,13 @@ export default async function AddonsPage() {
         pill="Brightcoms"
         title="All Add-Ons & Upgrades"
         subtitle="Enhance your GOYA profile with verified designation badges, continuing education credits, and more."
+        pageSlug="add-ons"
+        isAdmin={role === 'admin' || role === 'superuser'}
+        heroContext={{
+          firstName: (profile?.full_name as string | null)?.split(' ')[0] ?? '',
+          fullName: (profile?.full_name as string | null) ?? '',
+          role: role ? role.charAt(0).toUpperCase() + role.slice(1) : '',
+        } as HeroContext}
       />
 
       {/* Toolbar */}

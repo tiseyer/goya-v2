@@ -3,6 +3,7 @@
 import PageContainer from '@/app/components/ui/PageContainer'
 import Card from '@/app/components/ui/Card'
 import PageHero from '@/app/components/PageHero'
+import type { HeroContext } from '@/lib/hero-variables'
 import { getTimeOfDay } from './utils'
 import { ProfileCompletionCard } from './ProfileCompletionCard'
 import { StatHero } from './StatHero'
@@ -28,6 +29,9 @@ export default function DashboardWellness({
         pill="Wellness Practitioner"
         title={`Good ${getTimeOfDay()}, ${firstName}.`}
         subtitle="Ready to support your clients?"
+        pageSlug="dashboard"
+        isAdmin={profile.role === 'admin' || profile.role === 'superuser'}
+        heroContext={{ firstName, fullName: profile.full_name ?? '', role: profile.role ?? '' } as HeroContext}
       />
       <PageContainer>
         <div className="py-8 space-y-8">

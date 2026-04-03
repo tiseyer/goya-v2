@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import type { Event, EventCategory, EventCategoryRow } from '@/lib/types';
 import PageHero from '@/app/components/PageHero';
+import type { HeroContext } from '@/lib/hero-variables';
 import { CATEGORY_BADGE, CATEGORY_DOT, FORMAT_BADGE } from '@/app/components/ui/Badge';
 import LocationFilter, { haversine } from './LocationFilter';
 
@@ -204,6 +205,26 @@ export default function EventsPage() {
   const [loading,           setLoading]           = useState(true);
   const [dateSheetOpen,     setDateSheetOpen]     = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
+  const [isAdmin,           setIsAdmin]           = useState(false);
+  const [heroCtx,           setHeroCtx]           = useState<HeroContext>({});
+
+  // Fetch admin status for hero editing
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase.from('profiles').select('role, full_name').eq('id', user.id).single()
+        .then(({ data: profile }) => {
+          if (profile) {
+            setIsAdmin(profile.role === 'admin' || profile.role === 'superuser');
+            setHeroCtx({
+              firstName: profile.full_name?.split(' ')[0] ?? '',
+              fullName: profile.full_name ?? '',
+              role: profile.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : '',
+            });
+          }
+        });
+    });
+  }, []);
 
   // Fetch events
   useEffect(() => {
@@ -323,6 +344,9 @@ export default function EventsPage() {
         pill="Events"
         title="Events"
         subtitle="Workshops, teacher trainings, dharma talks, and conferences from the global GOYA community."
+        pageSlug="events"
+        isAdmin={isAdmin}
+        heroContext={heroCtx}
       />
 
       {/* ── Mobile filter bar ──────────────────────────────────────────────── */}

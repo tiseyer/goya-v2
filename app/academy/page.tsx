@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import type { Course, UserCourseProgress } from '@/lib/types';
 import PageHero from '@/app/components/PageHero';
+import type { HeroContext } from '@/lib/hero-variables';
 
 type CategoryRow = { id: string; name: string; slug: string; color: string };
 
@@ -40,6 +41,8 @@ export default function AcademyPage() {
   const [loading,        setLoading]        = useState(true);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | 'All'>('All');
   const [progressFilter, setProgressFilter] = useState<ProgressFilter>('All');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [heroCtx, setHeroCtx] = useState<HeroContext>({});
 
   useEffect(() => {
     async function load() {
@@ -72,6 +75,23 @@ export default function AcademyPage() {
           .select('*')
           .eq('user_id', user.id);
         setProgress((progressData as UserCourseProgress[]) ?? []);
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, full_name')
+          .eq('id', user.id)
+          .single();
+        if (profile) {
+          setIsAdmin(profile.role === 'admin');
+          const firstName = profile.full_name?.split(' ')[0] ?? '';
+          setHeroCtx({
+            firstName,
+            fullName: profile.full_name ?? '',
+            role: profile.role
+              ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1)
+              : '',
+          });
+        }
       }
 
       setLoading(false);
@@ -104,6 +124,9 @@ export default function AcademyPage() {
         pill="GOYA Academy"
         title="Course Library"
         subtitle="Workshops, sequences, dharma talks, and research — curated for the serious yoga practitioner."
+        pageSlug="academy"
+        isAdmin={isAdmin}
+        heroContext={heroCtx}
       />
 
       {/* Filter bars */}

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import PageContainer from '@/app/components/ui/PageContainer'
 import Card from '@/app/components/ui/Card'
 import PageHero from '@/app/components/PageHero'
+import type { HeroContext } from '@/lib/hero-variables'
 import { FacultyCard } from './FacultyCard'
 import { ConnectionCard } from './ConnectionCard'
 import { ProfileCompletionCard } from './ProfileCompletionCard'
@@ -12,6 +13,7 @@ import { PrimaryActionCard } from './PrimaryActionCard'
 import type { SchoolProps } from './types'
 
 export default function DashboardSchool({
+  profile,
   school,
   faculty,
   connections,
@@ -33,6 +35,9 @@ export default function DashboardSchool({
         pill="School Owner"
         title={`Welcome, ${schoolName}.`}
         subtitle="Manage your school and students."
+        pageSlug="dashboard"
+        isAdmin={profile?.role === 'admin' || profile?.role === 'superuser'}
+        heroContext={{ firstName: schoolName, fullName: profile?.full_name ?? '', role: profile?.role ?? '' } as HeroContext}
       />
       <PageContainer>
         <div className="py-8 space-y-8">
