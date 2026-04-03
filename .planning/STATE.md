@@ -83,9 +83,10 @@ None.
 | 260402-jts | Fix dashboard to show full v1.17 redesign (carousels) | 2026-04-02 | 17b17ff, 555da57 | [260402-jts-fix-dashboard-to-show-full-v1-17-redesig](./quick/260402-jts-fix-dashboard-to-show-full-v1-17-redesig/) |
 | 260403-bpe | Standardize page hero sections with reusable PageHero | 2026-04-03 | cbae423, 7ddf829 | [260403-bpe-standardize-page-hero-sections-with-reus](./quick/260403-bpe-standardize-page-hero-sections-with-reus/) |
 | 260403-bsn | Fix events page dark background | 2026-04-03 | cb6135d | [260403-bsn-fix-events-page-dark-background](./quick/260403-bsn-fix-events-page-dark-background/) |
+| 260403-c1n | Switch Events and Academy PageHero to variant dark | 2026-04-03 | db08db4 | [260403-c1n-switch-events-and-academy-pagehero-to-va](./quick/260403-c1n-switch-events-and-academy-pagehero-to-va/) |
 
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Completed quick task 260403-bsn: Fix events page dark background
+Stopped at: Completed quick task 260403-c1n: Switch Events and Academy PageHero to variant dark
 Resume file: None
