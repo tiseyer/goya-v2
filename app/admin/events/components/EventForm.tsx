@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -9,6 +9,7 @@ import type { Event, EventStatus } from '@/lib/types';
 import { logAdminEventAction } from '@/app/admin/events/actions';
 import { registerMediaItemAction } from '@/app/actions/media';
 import OrganizerPicker from '@/app/components/OrganizerPicker';
+import InstructorPicker from '@/app/components/InstructorPicker';
 
 const GooglePlacesAutocomplete = dynamic(() => import('@/app/components/GooglePlacesAutocomplete'), { ssr: false });
 
@@ -64,7 +65,7 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
   const [allDay,    setAllDay]    = useState(event?.all_day   ?? false);
   const [timeStart, setTimeStart] = useState(event?.time_start?.slice(0,5) ?? '');
   const [timeEnd,   setTimeEnd]   = useState(event?.time_end?.slice(0,5)   ?? '');
-  const [instructor,setInstructor]= useState(event?.instructor ?? '');
+  // instructor text field removed — using InstructorPicker instead
   const [location,  setLocation]  = useState(event?.location  ?? '');
   const [locationLat, setLocationLat] = useState<number | null>(event?.location_lat ?? null);
   const [locationLng, setLocationLng] = useState<number | null>(event?.location_lng ?? null);
@@ -82,6 +83,18 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
   const [organizerIds, setOrganizerIds] = useState<string[]>(
     () => (event?.organizer_ids ?? []).filter(id => id !== currentUserId)
   );
+  const [showOrganizers, setShowOrganizers] = useState(event?.show_organizers ?? true);
+
+  // Instructor state — profile-based join table
+  const [instructorIds, setInstructorIds] = useState<string[]>([]);
+  const [showInstructors, setShowInstructors] = useState(event?.show_instructors ?? true);
+
+  // Load existing instructor IDs from join table on edit
+  useEffect(() => {
+    if (!event?.id) return;
+    supabase.from('event_instructors').select('profile_id').eq('event_id', event.id)
+      .then(({ data }) => { if (data) setInstructorIds(data.map(r => r.profile_id)); });
+  }, [event?.id]);
 
   // Image state
   const [currentImageUrl, setCurrentImageUrl] = useState(event?.featured_image_url ?? null);
@@ -203,7 +216,6 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         all_day:            allDay,
         time_start:         allDay ? null : timeStart,
         time_end:           allDay ? null : timeEnd,
-        instructor:         instructor.trim() || null,
         location:           location.trim()   || null,
         location_lat:       format !== 'Online' ? locationLat : null,
         location_lng:       format !== 'Online' ? locationLng : null,
@@ -217,6 +229,8 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         spots_remaining:    spotsRem   ? parseInt(spotsRem, 10)   : null,
         website_url:        websiteUrl.trim() || null,
         featured_image_url: imageUrl,
+        show_organizers:    showOrganizers,
+        show_instructors:   showInstructors,
         organizer_ids: currentUserId
           ? [currentUserId, ...organizerIds].filter(Boolean)
           : organizerIds,
@@ -225,6 +239,11 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
       if (isEdit) {
         const { error } = await supabase.from('events').update(payload).eq('id', event.id);
         if (error) throw new Error(error.message);
+        // Sync event_instructors join table
+        await supabase.from('event_instructors').delete().eq('event_id', event.id);
+        if (instructorIds.length > 0) {
+          await supabase.from('event_instructors').insert(instructorIds.map(pid => ({ event_id: event.id, profile_id: pid })));
+        }
         await logAdminEventAction(event.id, 'edited', { title: payload.title, status: payload.status });
         setSuccessMsg('Event saved successfully.');
         setTimeout(() => setSuccessMsg(''), 3000);
@@ -232,6 +251,10 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         const { data: inserted, error } = await supabase.from('events').insert(payload).select('id').single();
         if (error) throw new Error(error.message);
         if (inserted) {
+          // Sync event_instructors join table for new event
+          if (instructorIds.length > 0) {
+            await supabase.from('event_instructors').insert(instructorIds.map(pid => ({ event_id: inserted.id, profile_id: pid })));
+          }
           await logAdminEventAction(inserted.id, 'created', { title: payload.title, status: payload.status });
         }
         router.push('/admin/events');
@@ -350,14 +373,8 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
       </FormSection>
 
       {/* ── Location ────────────────────────────────────────────────────── */}
-      <FormSection title="Location" description="Where the event takes place and who leads it.">
+      <FormSection title="Location" description="Where the event takes place.">
         <div className="space-y-4">
-          {/* Instructor — always visible */}
-          <div>
-            <label className={LABEL}>Instructor</label>
-            <input type="text" value={instructor} onChange={e => setInstructor(e.target.value)} className={INPUT} placeholder="Instructor name" />
-          </div>
-
           {/* In Person / Hybrid: Google Places autocomplete (LOC-03) */}
           <AnimatedField show={format !== 'Online'}>
             <div className="pt-1">
@@ -403,6 +420,25 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
             </div>
           </AnimatedField>
         </div>
+      </FormSection>
+
+      {/* ── Instructors ─────────────────────────────────────────────────── */}
+      <FormSection title="Instructors" description="Add instructors leading this event.">
+        <InstructorPicker
+          value={instructorIds}
+          onChange={setInstructorIds}
+          currentUserRole={userRole ?? 'admin'}
+          currentUserId={currentUserId ?? ''}
+        />
+        <label className="flex items-center gap-2 cursor-pointer mt-3">
+          <input
+            type="checkbox"
+            checked={showInstructors}
+            onChange={e => setShowInstructors(e.target.checked)}
+            className="w-4 h-4 rounded accent-[#4E87A0]"
+          />
+          <span className="text-xs text-foreground-secondary">Show instructors on event page</span>
+        </label>
       </FormSection>
 
       {/* ── Registration ────────────────────────────────────────────────── */}
@@ -546,6 +582,15 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
             value={organizerIds}
             onChange={setOrganizerIds}
           />
+          <label className="flex items-center gap-2 cursor-pointer mt-3">
+            <input
+              type="checkbox"
+              checked={showOrganizers}
+              onChange={e => setShowOrganizers(e.target.checked)}
+              className="w-4 h-4 rounded accent-[#4E87A0]"
+            />
+            <span className="text-xs text-foreground-secondary">Show organizers on event page</span>
+          </label>
         </FormSection>
       )}
 
