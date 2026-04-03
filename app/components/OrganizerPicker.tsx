@@ -125,6 +125,7 @@ export default function OrganizerPicker({
             userId: currentUserId,
             excludeIds,
             limit: 10,
+            roleFilter: ['teacher', 'wellness_practitioner'],
           });
           setResults(data);
           setShowDropdown(data.length > 0);

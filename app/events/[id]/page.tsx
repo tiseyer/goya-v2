@@ -5,6 +5,7 @@ import type { Event } from '@/lib/types';
 import { CATEGORY_BADGE } from '@/app/components/ui/Badge';
 import PageContainer from '@/app/components/ui/PageContainer';
 import EventViewTracker from './EventViewTracker';
+import EventSidebarClient from './EventSidebarClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,15 +36,27 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   // Fetch auth user and determine manage permission
   const { data: { user: authUser } } = await supabase.auth.getUser();
   let canManage = false;
+  let isAttending = false;
+  let authUserRole: string | null = null;
+
   if (authUser) {
     if (ev.organizer_ids?.includes(authUser.id)) canManage = true;
     if (!canManage) {
       const { data: authProfile } = await supabase.from('profiles').select('role').eq('id', authUser.id).single();
-      if (authProfile && (authProfile.role === 'admin' || authProfile.role === 'moderator')) canManage = true;
+      authUserRole = authProfile?.role ?? null;
+      if (authUserRole === 'admin' || authUserRole === 'moderator') canManage = true;
     }
+    // Check if user is attending
+    const { data: attendeeRow } = await supabase
+      .from('event_attendees')
+      .select('id')
+      .eq('event_id', ev.id)
+      .eq('profile_id', authUser.id)
+      .maybeSingle();
+    isAttending = !!attendeeRow;
   }
 
-  // Fetch organizer profiles if organizer_ids are present
+  // Fetch organizer profiles
   let organizers: { id: string; full_name: string | null; avatar_url: string | null; username: string | null }[] = [];
   if (ev.organizer_ids && ev.organizer_ids.length > 0) {
     const { data: orgProfiles } = await supabase
@@ -66,14 +79,26 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
       .in('id', instructorRows.map(r => r.profile_id));
     instructors = instrProfiles ?? [];
   }
+
+  // Get attendee count
+  const { count: attendeeCount } = await supabase
+    .from('event_attendees')
+    .select('id', { count: 'exact', head: true })
+    .eq('event_id', ev.id);
+
   const isPast = new Date(ev.date) < new Date();
   const dateFormatted = new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
-  const dateShort = new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-  });
   const catBadge = CATEGORY_BADGE[ev.category] ?? 'bg-slate-100 text-slate-600 border-slate-200';
+
+  // Build location string for calendar links
+  let locationString = '';
+  if (ev.format === 'Online') {
+    locationString = ev.online_platform_name ? `Online via ${ev.online_platform_name}` : 'Online';
+  } else if (ev.location) {
+    locationString = ev.location;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -81,7 +106,6 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       {ev.featured_image_url ? (
-        /* Image hero */
         <div className="relative pt-16">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -91,7 +115,6 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             width={1200}
             height={320}
           />
-          {/* Gradient overlay — stronger at bottom */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 pb-8">
             <PageContainer>
@@ -119,9 +142,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
       ) : (
-        /* Gradient hero (no image) */
         <div className="bg-primary relative overflow-hidden flex items-center h-[240px] sm:h-[260px] md:h-[280px]">
-          {/* Subtle background texture */}
           <div
             className="absolute inset-0 opacity-[0.04]"
             style={{
@@ -129,7 +150,6 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               backgroundSize: '28px 28px',
             }}
           />
-          {/* Soft glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
           <PageContainer className="relative">
@@ -159,63 +179,22 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
       {/* ── Main content ─────────────────────────────────────────────────── */}
       <PageContainer className="py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_308px] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
 
-          {/* LEFT: Details */}
-          <div className="space-y-4">
+          {/* LEFT: Content */}
+          <div className="space-y-6">
+            {/* Featured image in content area (if not in hero — show here for mobile/consistency) */}
 
             {/* About */}
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
               <h2 className="text-base font-bold text-primary-dark mb-3">About This Event</h2>
-              <p className="text-slate-700 leading-relaxed text-sm">
+              <p className="text-slate-700 leading-relaxed text-sm whitespace-pre-line">
                 {ev.description || 'Full details coming soon.'}
               </p>
             </div>
-
-            {/* Event details: Date, Location, Instructor combined */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm divide-y divide-slate-100">
-
-              {/* Date & Time */}
-              <div className="flex items-start gap-4 p-6">
-                <div className="w-9 h-9 bg-primary-light/10 rounded-xl flex items-center justify-center text-primary-light shrink-0 mt-0.5">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Date &amp; Time</p>
-                  <p className="font-semibold text-primary-dark text-sm">{dateFormatted}</p>
-                  <p className="text-slate-500 text-xs mt-0.5">{fmtTime(ev.time_start)} – {fmtTime(ev.time_end)}</p>
-                </div>
-              </div>
-
-              {/* Location */}
-              <div className="flex items-start gap-4 p-6">
-                <div className="w-9 h-9 bg-primary-light/10 rounded-xl flex items-center justify-center text-primary-light shrink-0 mt-0.5">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Location</p>
-                  {ev.format === 'Online' ? (
-                    <>
-                      <p className="font-semibold text-primary-dark text-sm">Online Event</p>
-                      <p className="text-slate-500 text-xs mt-0.5">{ev.location || 'Online via Zoom'}</p>
-                      <p className="text-slate-400 text-xs mt-0.5">Link provided after registration</p>
-                    </>
-                  ) : (
-                    <p className="font-semibold text-primary-dark text-sm">{ev.location || '—'}</p>
-                  )}
-                </div>
-              </div>
-
-            </div>
-
           </div>
 
-          {/* RIGHT: Booking card */}
+          {/* RIGHT: Sidebar */}
           <div>
             {/* Edit / Delete — visible to organizers and admin/moderator */}
             {canManage && (
@@ -227,75 +206,46 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                   Edit Event
                 </Link>
                 <button className="py-2.5 px-4 border border-red-200 text-red-600 text-sm font-semibold rounded-xl hover:bg-red-50 transition-colors cursor-pointer">
-                  Delete
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
                 </button>
               </div>
             )}
 
-            <div className="sticky top-24 bg-white rounded-2xl border border-slate-200/80 shadow-lg p-6 space-y-5">
+            {/* Main sidebar card with client interactivity */}
+            <EventSidebarClient
+              event={{
+                id: ev.id,
+                title: ev.title,
+                date: ev.date,
+                end_date: ev.end_date,
+                time_start: ev.time_start,
+                time_end: ev.time_end,
+                all_day: ev.all_day,
+                is_free: ev.is_free,
+                price: ev.price,
+                format: ev.format,
+                location: ev.location,
+                online_platform_name: ev.online_platform_name,
+                external_registration: ev.external_registration,
+                event_website: ev.event_website,
+                unlimited_spots: ev.unlimited_spots,
+                spots_total: ev.spots_total,
+                short_description: ev.short_description,
+                description: ev.description,
+              }}
+              isPast={isPast}
+              isAttending={isAttending}
+              isAuthenticated={!!authUser}
+              currentUserId={authUser?.id ?? null}
+              attendeeCount={attendeeCount ?? 0}
+              locationString={locationString}
+              dateFormatted={dateFormatted}
+              timeFormatted={ev.all_day ? 'All day' : `${fmtTime(ev.time_start)} – ${fmtTime(ev.time_end)}`}
+            />
 
-              {/* Price */}
-              <div>
-                {ev.is_free ? (
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-black text-emerald-600">Free</span>
-                  </div>
-                ) : (
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-lg font-semibold text-slate-400 -mb-1">$</span>
-                    <span className="text-4xl font-black text-primary-dark tabular-nums">{ev.price}</span>
-                  </div>
-                )}
-                {ev.spots_remaining !== null && ev.spots_remaining !== undefined && (
-                  <div className={[
-                    'flex items-center gap-1.5 mt-2 text-xs font-semibold',
-                    ev.spots_remaining < 10 ? 'text-amber-500' : 'text-slate-400',
-                  ].join(' ')}>
-                    {ev.spots_remaining < 10 && (
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                    )}
-                    {ev.spots_remaining} spots remaining
-                  </div>
-                )}
-              </div>
-
-              {/* Date summary */}
-              <div className="flex items-center gap-2.5 py-3.5 border-t border-b border-slate-100 text-sm text-slate-700">
-                <svg className="w-4 h-4 text-primary-light shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className="font-medium text-slate-700">{dateShort}</span>
-                {ev.time_start && (
-                  <span className="text-slate-400 text-xs">· {fmtTime(ev.time_start)}</span>
-                )}
-              </div>
-
-              {/* CTA */}
-              {!isPast ? (
-                <button className="block w-full text-center py-3.5 px-6 bg-primary-light hover:bg-primary active:bg-primary-dark text-white font-bold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md cursor-pointer">
-                  Register Now
-                </button>
-              ) : (
-                <div className="text-center text-sm text-slate-400 py-2 font-medium">
-                  This event has passed.
-                </div>
-              )}
-
-              {/* Secondary actions */}
-              <div className="grid grid-cols-2 gap-2">
-                <button className="py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 cursor-pointer">
-                  Add to Calendar
-                </button>
-                <button className="py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 cursor-pointer">
-                  Share
-                </button>
-              </div>
-
-            </div>
-
-            {/* Instructor widget — profile-based (join table) */}
+            {/* Instructor widget */}
             {instructors.length > 0 && ev.show_instructors !== false && (
               <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 mt-4">
                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
@@ -347,11 +297,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                     >
                       {org.avatar_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={org.avatar_url}
-                          alt={org.full_name ?? 'Organizer'}
-                          className="w-8 h-8 rounded-full object-cover shrink-0"
-                        />
+                        <img src={org.avatar_url} alt={org.full_name ?? 'Organizer'} className="w-8 h-8 rounded-full object-cover shrink-0" />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-primary-light/15 flex items-center justify-center text-primary font-bold text-xs shrink-0">
                           {(org.full_name ?? '?')[0].toUpperCase()}

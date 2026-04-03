@@ -109,8 +109,12 @@ export interface Event {
   school_author_id: string | null;
   deleted_at: string | null;
   created_by: string | null;
+  short_description: string | null;
   show_organizers: boolean;
   show_instructors: boolean;
+  external_registration: boolean;
+  event_website: string | null;
+  unlimited_spots: boolean;
   created_at: string;
   updated_at: string;
 }

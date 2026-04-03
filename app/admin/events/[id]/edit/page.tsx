@@ -66,7 +66,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="p-6 lg:p-8">
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-6 flex items-start justify-between max-w-3xl">
         <div>
           <h1 className="text-2xl font-bold text-[#1B3A5C]">Edit Event</h1>
           <p className="text-sm text-[#6B7280] mt-0.5 truncate max-w-lg">{(data as Event).title}</p>
@@ -91,103 +91,135 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
         currentUserAvatar={(profileRow as Record<string, unknown> | null)?.avatar_url as string | null ?? null}
       />
 
-      {/* Audit History — Admin only */}
+      {/* Audit History — Admin only, collapsible */}
       {isAdmin && auditEntries.length > 0 && (
-        <div className="mt-10 max-w-3xl">
-          <h2 className="text-lg font-bold text-[#1B3A5C] mb-4">Event History</h2>
-          <div className="relative pl-6 border-l-2 border-[#E5E7EB]">
-            {auditEntries.map((entry) => {
-              const actionInfo = ACTION_LABELS[entry.action] ?? ACTION_LABELS.edited;
-              const performer = entry.profiles?.full_name || entry.profiles?.email || 'System';
-
-              return (
-                <div key={entry.id} className="relative mb-6 last:mb-0">
-                  {/* Dot on timeline */}
-                  <div className={`absolute -left-[25px] top-0.5 w-3 h-3 rounded-full border-2 border-white ${
-                    entry.action === 'created' ? 'bg-emerald-400' :
-                    entry.action === 'deleted' ? 'bg-red-400' :
-                    entry.action === 'status_changed' ? 'bg-amber-400' :
-                    'bg-blue-400'
-                  }`} />
-
-                  {/* Content */}
-                  <div className="bg-white border border-[#E5E7EB] rounded-lg p-3">
-                    <div className="flex items-start gap-2">
-                      <svg className={`w-4 h-4 mt-0.5 flex-shrink-0 ${actionInfo.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={actionInfo.icon} />
-                      </svg>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm text-[#374151]">
-                          <span className="font-semibold">{actionInfo.label}</span>
-                          {' by '}
-                          <span className="font-medium text-[#1B3A5C]">{performer}</span>
-                          {entry.performed_by_role && (
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 ml-1.5 capitalize">
-                              {entry.performed_by_role}
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-xs text-[#9CA3AF] mt-0.5">{formatDate(entry.created_at)}</p>
-
-                        {/* Show changed fields for 'edited' action */}
-                        {entry.action === 'edited' && entry.changes && (
-                          <div className="mt-2 text-xs text-[#6B7280] space-y-0.5">
-                            {Object.entries(entry.changes).map(([field, value]) => {
-                              const change = value as { old?: unknown; new?: unknown } | unknown;
-                              if (change && typeof change === 'object' && 'old' in change && 'new' in change) {
-                                return (
-                                  <p key={field}>
-                                    <span className="font-medium text-[#374151]">{field.replace(/_/g, ' ')}</span>
-                                    {': '}
-                                    <span className="line-through text-[#9CA3AF]">{String((change as { old: unknown }).old)}</span>
-                                    {' -> '}
-                                    <span className="text-[#374151]">{String((change as { new: unknown }).new)}</span>
-                                  </p>
-                                );
-                              }
-                              return (
-                                <p key={field}>
-                                  <span className="font-medium text-[#374151]">{field.replace(/_/g, ' ')}</span>
-                                  {': '}{String(value)}
-                                </p>
-                              );
-                            })}
-                          </div>
-                        )}
-
-                        {/* Show status change details */}
-                        {entry.action === 'status_changed' && entry.changes && (() => {
-                          const changes = entry.changes as Record<string, unknown>;
-                          const oldStatus = changes.old_status ? String(changes.old_status) : null;
-                          const newStatus = changes.new_status ? String(changes.new_status) : null;
-                          const rejectionReason = changes.rejection_reason ? String(changes.rejection_reason) : null;
-                          return (
-                            <div className="mt-2 text-xs text-[#6B7280]">
-                              {oldStatus && (
-                                <p>
-                                  Status changed from{' '}
-                                  <span className="font-medium capitalize">{oldStatus}</span>
-                                  {' to '}
-                                  <span className="font-medium capitalize">{newStatus}</span>
-                                </p>
-                              )}
-                              {rejectionReason && (
-                                <p className="mt-1 text-red-600">
-                                  Reason: {rejectionReason}
-                                </p>
-                              )}
-                            </div>
-                          );
-                        })()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <EventHistoryCollapsible auditEntries={auditEntries} />
       )}
     </div>
+  );
+}
+
+/* ── Collapsible Event History ─────────────────────────────────────────── */
+
+function formatFieldChange(field: string, value: unknown): string {
+  const labels: Record<string, string> = {
+    title: 'Title',
+    status: 'Status',
+    price: 'Price',
+    description: 'Description',
+    category: 'Category',
+    format: 'Format',
+    location: 'Location',
+    date: 'Date',
+    time_start: 'Start time',
+    time_end: 'End time',
+    spots_total: 'Total spots',
+    is_free: 'Free event',
+    featured_image_url: 'Featured image',
+    short_description: 'Short description',
+    external_registration: 'External registration',
+    event_website: 'Event website',
+    unlimited_spots: 'Unlimited spots',
+    show_organizers: 'Show organizers',
+    show_instructors: 'Show instructors',
+  };
+  const label = labels[field] || field.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
+  if (field === 'price') return `Price changed to: $${value}`;
+  return `${label} changed to: ${String(value)}`;
+}
+
+function EventHistoryCollapsible({ auditEntries }: { auditEntries: AuditEntryWithProfile[] }) {
+  'use client';
+  return (
+    <details className="mt-10 max-w-3xl group">
+      <summary className="flex items-center gap-2 cursor-pointer list-none select-none">
+        <svg
+          className="w-4 h-4 text-[#6B7280] transition-transform duration-200 group-open:rotate-90"
+          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+        <h2 className="text-lg font-bold text-[#1B3A5C]">Event History</h2>
+        <span className="text-xs text-[#9CA3AF] ml-1">({auditEntries.length} {auditEntries.length === 1 ? 'entry' : 'entries'})</span>
+      </summary>
+      <div className="relative pl-6 border-l-2 border-[#E5E7EB] mt-4">
+        {auditEntries.map((entry) => {
+          const actionInfo = ACTION_LABELS[entry.action] ?? ACTION_LABELS.edited;
+          const performer = entry.profiles?.full_name || entry.profiles?.email || 'System';
+
+          return (
+            <div key={entry.id} className="relative mb-6 last:mb-0">
+              <div className={`absolute -left-[25px] top-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                entry.action === 'created' ? 'bg-emerald-400' :
+                entry.action === 'deleted' ? 'bg-red-400' :
+                entry.action === 'status_changed' ? 'bg-amber-400' :
+                'bg-blue-400'
+              }`} />
+
+              <div className="bg-white border border-[#E5E7EB] rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <svg className={`w-4 h-4 mt-0.5 flex-shrink-0 ${actionInfo.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={actionInfo.icon} />
+                  </svg>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-[#374151]">
+                      <span className="font-semibold">{actionInfo.label}</span>
+                      {' by '}
+                      <span className="font-medium text-[#1B3A5C]">{performer}</span>
+                      {entry.performed_by_role && (
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 ml-1.5 capitalize">
+                          {entry.performed_by_role}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-xs text-[#9CA3AF] mt-0.5">{formatDate(entry.created_at)}</p>
+
+                    {entry.action === 'edited' && entry.changes && (
+                      <div className="mt-2 text-xs text-[#6B7280] space-y-0.5">
+                        {Object.entries(entry.changes).map(([field, value]) => {
+                          const change = value as { old?: unknown; new?: unknown } | unknown;
+                          if (change && typeof change === 'object' && 'old' in change && 'new' in change) {
+                            return (
+                              <p key={field}>{formatFieldChange(field, (change as { new: unknown }).new)}</p>
+                            );
+                          }
+                          return (
+                            <p key={field}>{formatFieldChange(field, value)}</p>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {entry.action === 'status_changed' && entry.changes && (() => {
+                      const changes = entry.changes as Record<string, unknown>;
+                      const oldStatus = changes.old_status ? String(changes.old_status) : null;
+                      const newStatus = changes.new_status ? String(changes.new_status) : null;
+                      const rejectionReason = changes.rejection_reason ? String(changes.rejection_reason) : null;
+                      return (
+                        <div className="mt-2 text-xs text-[#6B7280]">
+                          {oldStatus && (
+                            <p>
+                              Status changed from{' '}
+                              <span className="font-medium capitalize">{oldStatus}</span>
+                              {' to '}
+                              <span className="font-medium capitalize">{newStatus}</span>
+                            </p>
+                          )}
+                          {rejectionReason && (
+                            <p className="mt-1 text-red-600">
+                              Reason: {rejectionReason}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </details>
   );
 }

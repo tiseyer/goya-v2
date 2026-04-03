@@ -10,6 +10,7 @@ import { logAdminEventAction } from '@/app/admin/events/actions';
 import { registerMediaItemAction } from '@/app/actions/media';
 import OrganizerPicker from '@/app/components/OrganizerPicker';
 import InstructorPicker from '@/app/components/InstructorPicker';
+import AttendeePicker from './AttendeePicker';
 
 const GooglePlacesAutocomplete = dynamic(() => import('@/app/components/GooglePlacesAutocomplete'), { ssr: false });
 
@@ -72,12 +73,13 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
   const [onlinePlatformName, setOnlinePlatformName] = useState(event?.online_platform_name ?? '');
   const [onlinePlatformUrl, setOnlinePlatformUrl] = useState(event?.online_platform_url ?? '');
   const [description,setDesc]     = useState(event?.description ?? '');
+  const [shortDescription, setShortDescription] = useState(event?.short_description ?? '');
   const [price,     setPrice]     = useState(String(event?.price ?? '0'));
-  const [isFree,    setIsFree]    = useState(event?.is_free   ?? false);
+  const [isFree,    setIsFree]    = useState(event?.is_free   ?? true);
   const [spotsTotal,setSpotsTotal]= useState(String(event?.spots_total ?? ''));
-  const [spotsRem,  setSpotsRem]  = useState(String(event?.spots_remaining ?? ''));
-  const [registrationRequired, setRegistrationRequired] = useState(event?.registration_required ?? false);
-  const [websiteUrl, setWebsiteUrl] = useState(event?.website_url ?? '');
+  const [unlimitedSpots, setUnlimitedSpots] = useState(event?.unlimited_spots ?? true);
+  const [externalRegistration, setExternalRegistration] = useState(event?.external_registration ?? false);
+  const [eventWebsite, setEventWebsite] = useState(event?.event_website ?? '');
 
   // Organizer state — stored IDs exclude the current user (added in payload)
   const [organizerIds, setOrganizerIds] = useState<string[]>(
@@ -222,12 +224,13 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         online_platform_name: format === 'Online' || format === 'Hybrid' ? onlinePlatformName.trim() || null : null,
         online_platform_url:  format === 'Online' || format === 'Hybrid' ? onlinePlatformUrl.trim() || null : null,
         description:        description.trim() || null,
+        short_description:  shortDescription.trim() || null,
         price:              isFree ? 0 : parseFloat(price) || 0,
         is_free:            isFree,
-        registration_required: registrationRequired,
-        spots_total:        spotsTotal ? parseInt(spotsTotal, 10) : null,
-        spots_remaining:    spotsRem   ? parseInt(spotsRem, 10)   : null,
-        website_url:        websiteUrl.trim() || null,
+        unlimited_spots:    unlimitedSpots,
+        spots_total:        unlimitedSpots ? null : (spotsTotal ? parseInt(spotsTotal, 10) : null),
+        external_registration: externalRegistration,
+        event_website:      externalRegistration ? (eventWebsite.trim() || null) : null,
         featured_image_url: imageUrl,
         show_organizers:    showOrganizers,
         show_instructors:   showInstructors,
@@ -422,100 +425,23 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         </div>
       </FormSection>
 
-      {/* ── Instructors ─────────────────────────────────────────────────── */}
-      <FormSection title="Instructors" description="Add instructors leading this event.">
-        <InstructorPicker
-          value={instructorIds}
-          onChange={setInstructorIds}
-          currentUserRole={userRole ?? 'admin'}
-          currentUserId={currentUserId ?? ''}
-        />
-        <label className="flex items-center gap-2 cursor-pointer mt-3">
-          <input
-            type="checkbox"
-            checked={showInstructors}
-            onChange={e => setShowInstructors(e.target.checked)}
-            className="w-4 h-4 rounded accent-[#4E87A0]"
-          />
-          <span className="text-xs text-foreground-secondary">Show instructors on event page</span>
-        </label>
-      </FormSection>
-
-      {/* ── Registration ────────────────────────────────────────────────── */}
-      <FormSection title="Registration" description="Pricing and capacity settings.">
-        <div className="space-y-4">
-          {/* Registration Required toggle */}
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox" checked={registrationRequired} onChange={e => setRegistrationRequired(e.target.checked)}
-              className="w-4 h-4 rounded accent-primary"
-            />
-            <span className="text-sm text-foreground">Registration required</span>
-          </label>
-
-          {/* Price / Spots — only shown when registration is required */}
-          <AnimatedField show={registrationRequired}>
-            <div className="space-y-4 pt-1">
-              {/* Price */}
-              <div className="space-y-2">
-                <label className={LABEL}>Price</label>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox" checked={isFree} onChange={e => setIsFree(e.target.checked)}
-                      className="w-4 h-4 rounded accent-primary"
-                    />
-                    <span className="text-sm text-foreground">This event is free</span>
-                  </label>
-                </div>
-                <AnimatedField show={!isFree}>
-                  <div className="relative max-w-[180px] pt-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary text-sm">$</span>
-                    <input
-                      type="number" min="0" step="0.01" value={price}
-                      onChange={e => setPrice(e.target.value)}
-                      className={`${INPUT} pl-7`} placeholder="0.00"
-                    />
-                  </div>
-                </AnimatedField>
-              </div>
-
-              {/* Spots */}
-              <div className="grid grid-cols-2 gap-4 max-w-xs">
-                <div>
-                  <label className={LABEL}>Total Spots</label>
-                  <input
-                    type="number" min="0" value={spotsTotal}
-                    onChange={e => setSpotsTotal(e.target.value)}
-                    className={INPUT} placeholder="Unlimited"
-                  />
-                </div>
-                <div>
-                  <label className={LABEL}>Spots Remaining</label>
-                  <input
-                    type="number" min="0" value={spotsRem}
-                    onChange={e => setSpotsRem(e.target.value)}
-                    className={INPUT} placeholder="--"
-                  />
-                </div>
-              </div>
-            </div>
-          </AnimatedField>
-
-          {/* Event Website — always visible */}
-          <div>
-            <label className={LABEL}>Event Website</label>
-            <input
-              type="url" value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)}
-              className={INPUT} placeholder="https://example.com"
-            />
-          </div>
-        </div>
-      </FormSection>
-
       {/* ── Details ─────────────────────────────────────────────────────── */}
       <FormSection title="Details" description="Description and featured imagery.">
         <div className="space-y-4">
+          {/* Short Description */}
+          <div>
+            <label className={LABEL}>Short Description</label>
+            <input
+              type="text"
+              value={shortDescription}
+              onChange={e => setShortDescription(e.target.value)}
+              maxLength={160}
+              className={INPUT}
+              placeholder="A brief summary shown in calendar invites and previews (max 160 chars)"
+            />
+            <p className="text-xs text-foreground-tertiary mt-1">{shortDescription.length}/160</p>
+          </div>
+
           {/* Description */}
           <div>
             <label className={LABEL}>Description</label>
@@ -571,9 +497,103 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
         </div>
       </FormSection>
 
+      {/* ── Registration ────────────────────────────────────────────────── */}
+      <FormSection title="Registration" description="Pricing, capacity, and registration settings.">
+        <div className="space-y-5">
+          {/* Section 1: External Registration */}
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox" checked={externalRegistration} onChange={e => setExternalRegistration(e.target.checked)}
+                className="w-4 h-4 rounded accent-primary"
+              />
+              <span className="text-sm text-foreground">External registration required</span>
+            </label>
+            <AnimatedField show={externalRegistration}>
+              <div className="pt-2 pl-6">
+                <label className={LABEL}>Event Website</label>
+                <input
+                  type="url" value={eventWebsite} onChange={e => setEventWebsite(e.target.value)}
+                  className={INPUT} placeholder="https://example.com"
+                />
+              </div>
+            </AnimatedField>
+          </div>
+
+          <div className="border-t border-goya-border" />
+
+          {/* Section 2: Price */}
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox" checked={isFree} onChange={e => setIsFree(e.target.checked)}
+                className="w-4 h-4 rounded accent-primary"
+              />
+              <span className="text-sm text-foreground">This event is free</span>
+            </label>
+            <AnimatedField show={!isFree}>
+              <div className="pt-2 pl-6">
+                <label className={LABEL}>Price</label>
+                <div className="relative max-w-[180px]">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-tertiary text-sm">$</span>
+                  <input
+                    type="number" min="0" step="0.01" value={price}
+                    onChange={e => setPrice(e.target.value)}
+                    className={`${INPUT} pl-7`} placeholder="0.00"
+                  />
+                </div>
+              </div>
+            </AnimatedField>
+          </div>
+
+          <div className="border-t border-goya-border" />
+
+          {/* Section 3: Spot Availability */}
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox" checked={unlimitedSpots} onChange={e => setUnlimitedSpots(e.target.checked)}
+                className="w-4 h-4 rounded accent-primary"
+              />
+              <span className="text-sm text-foreground">Unlimited spots available</span>
+            </label>
+            <AnimatedField show={!unlimitedSpots}>
+              <div className="pt-2 pl-6 max-w-[180px]">
+                <label className={LABEL}>Total Spots</label>
+                <input
+                  type="number" min="1" value={spotsTotal}
+                  onChange={e => setSpotsTotal(e.target.value)}
+                  className={INPUT} placeholder="e.g. 30"
+                />
+              </div>
+            </AnimatedField>
+          </div>
+        </div>
+      </FormSection>
+
+      {/* ── Instructors ─────────────────────────────────────────────────── */}
+      <FormSection title="Instructors" description="Add up to 5 instructors for this event. These are the people who are visible in the content.">
+        <InstructorPicker
+          value={instructorIds}
+          onChange={setInstructorIds}
+          currentUserRole={userRole ?? 'admin'}
+          currentUserId={currentUserId ?? ''}
+        />
+        <p className="text-xs text-foreground-tertiary mt-2">Only teachers, wellness practitioners, and school owners can be added.</p>
+        <label className="flex items-center gap-2 cursor-pointer mt-3">
+          <input
+            type="checkbox"
+            checked={showInstructors}
+            onChange={e => setShowInstructors(e.target.checked)}
+            className="w-4 h-4 rounded accent-[#4E87A0]"
+          />
+          <span className="text-xs text-foreground-secondary">Show instructors on event page</span>
+        </label>
+      </FormSection>
+
       {/* ── Organizers ──────────────────────────────────────────────────── */}
       {currentUserId && currentUserName && (
-        <FormSection title="Organizers" description="Add up to 5 co-organizers for this event.">
+        <FormSection title="Organizers" description="Add up to 5 co-organizers for this event. These are the people who can edit it.">
           <OrganizerPicker
             currentUserId={currentUserId}
             currentUserName={currentUserName}
@@ -582,6 +602,7 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
             value={organizerIds}
             onChange={setOrganizerIds}
           />
+          <p className="text-xs text-foreground-tertiary mt-2">Only teachers, wellness practitioners, and school owners can be added.</p>
           <label className="flex items-center gap-2 cursor-pointer mt-3">
             <input
               type="checkbox"
@@ -591,6 +612,19 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
             />
             <span className="text-xs text-foreground-secondary">Show organizers on event page</span>
           </label>
+        </FormSection>
+      )}
+
+      {/* ── Attendees (edit mode only) ─────────────────────────────────── */}
+      {isEdit && event?.id && (
+        <FormSection title="Attendees" description="Members who have joined this event.">
+          <AttendeePicker
+            eventId={event.id}
+            unlimitedSpots={unlimitedSpots}
+            spotsTotal={unlimitedSpots ? null : (spotsTotal ? parseInt(spotsTotal, 10) : null)}
+            currentUserRole={userRole ?? 'admin'}
+            currentUserId={currentUserId ?? ''}
+          />
         </FormSection>
       )}
 

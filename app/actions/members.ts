@@ -21,6 +21,7 @@ export async function searchMembers(
     userId?: string;
     excludeIds?: string[];
     limit?: number;
+    roleFilter?: string[];
   } = {}
 ): Promise<MemberSearchResult[]> {
   if (!query || query.trim().length < 2) return [];
@@ -56,9 +57,13 @@ export async function searchMembers(
       .neq('id', user.id)
       .limit(limit);
 
+    // Filter by role if specified (e.g. instructor/organizer pickers exclude students)
+    if (options.roleFilter && options.roleFilter.length > 0) {
+      q = q.in('role', options.roleFilter);
+    }
+
     // Exclude already-selected IDs
     if (excludeIds.length > 0) {
-      // Filter out excluded IDs one by one since .not('id', 'in', ...) needs specific syntax
       for (const id of excludeIds) {
         q = q.neq('id', id);
       }

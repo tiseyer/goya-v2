@@ -759,6 +759,42 @@ export type Database = {
         }
         Relationships: []
       }
+      event_attendees: {
+        Row: {
+          event_id: string
+          id: string
+          joined_at: string | null
+          profile_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          joined_at?: string | null
+          profile_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          joined_at?: string | null
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_attendees_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_audit_log: {
         Row: {
           action: string
@@ -848,6 +884,39 @@ export type Database = {
           },
         ]
       }
+      event_instructors: {
+        Row: {
+          created_at: string
+          event_id: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_instructors_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_instructors_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
           created_at: string | null
@@ -895,6 +964,8 @@ export type Database = {
           description: string | null
           end_date: string | null
           event_type: string
+          event_website: string | null
+          external_registration: boolean
           featured_image_url: string | null
           format: string
           id: string
@@ -910,12 +981,16 @@ export type Database = {
           registration_required: boolean | null
           rejection_reason: string | null
           school_author_id: string | null
+          short_description: string | null
+          show_instructors: boolean
+          show_organizers: boolean
           spots_remaining: number | null
           spots_total: number | null
           status: string | null
           time_end: string
           time_start: string
           title: string
+          unlimited_spots: boolean
           updated_at: string | null
           website_url: string | null
         }
@@ -930,6 +1005,8 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           event_type?: string
+          event_website?: string | null
+          external_registration?: boolean
           featured_image_url?: string | null
           format: string
           id?: string
@@ -945,12 +1022,16 @@ export type Database = {
           registration_required?: boolean | null
           rejection_reason?: string | null
           school_author_id?: string | null
+          short_description?: string | null
+          show_instructors?: boolean
+          show_organizers?: boolean
           spots_remaining?: number | null
           spots_total?: number | null
           status?: string | null
           time_end: string
           time_start: string
           title: string
+          unlimited_spots?: boolean
           updated_at?: string | null
           website_url?: string | null
         }
@@ -965,6 +1046,8 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           event_type?: string
+          event_website?: string | null
+          external_registration?: boolean
           featured_image_url?: string | null
           format?: string
           id?: string
@@ -980,12 +1063,16 @@ export type Database = {
           registration_required?: boolean | null
           rejection_reason?: string | null
           school_author_id?: string | null
+          short_description?: string | null
+          show_instructors?: boolean
+          show_organizers?: boolean
           spots_remaining?: number | null
           spots_total?: number | null
           status?: string | null
           time_end?: string
           time_start?: string
           title?: string
+          unlimited_spots?: boolean
           updated_at?: string | null
           website_url?: string | null
         }
