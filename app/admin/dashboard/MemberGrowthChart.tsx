@@ -78,7 +78,7 @@ export default function MemberGrowthChart() {
       <div className="h-[300px]">
         {loading ? (
           <div className="h-full flex items-center justify-center">
-            <div className="w-5 h-5 border-2 border-slate-300 border-t-[#345c83] rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-slate-300 border-t-[var(--goya-primary)] rounded-full animate-spin" />
           </div>
         ) : data.length === 0 ? (
           <div className="h-full flex items-center justify-center text-sm text-slate-400">

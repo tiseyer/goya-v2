@@ -94,7 +94,7 @@ interface SearchResultRowProps {
 export default function SearchResultRow({ result, isHighlighted, onClick }: SearchResultRowProps) {
   const containerClass = [
     'flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-l-2',
-    isHighlighted ? 'bg-[#345c83]/5 dark:bg-[#345c83]/15 border-[#345c83]' : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-800',
+    isHighlighted ? 'bg-[var(--goya-primary)]/5 dark:bg-[var(--goya-primary)]/15 border-[var(--goya-primary)]' : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-800',
   ].join(' ');
 
   // Left avatar/icon
@@ -139,7 +139,7 @@ export default function SearchResultRow({ result, isHighlighted, onClick }: Sear
   if (result.category === 'members') {
     rightIcons = (
       <div className="flex items-center gap-1 ml-auto">
-        <IconMessageCircle size={16} className="text-slate-400 hover:text-[#345c83] transition-colors" title="Send message" />
+        <IconMessageCircle size={16} className="text-slate-400 hover:text-[var(--goya-primary)] transition-colors" title="Send message" />
         {mapsUrl && (
           <a
             href={mapsUrl}
@@ -148,7 +148,7 @@ export default function SearchResultRow({ result, isHighlighted, onClick }: Sear
             onClick={(e) => e.stopPropagation()}
             title="Get directions"
           >
-            <IconMapPin size={16} className="text-slate-400 hover:text-[#345c83] transition-colors" />
+            <IconMapPin size={16} className="text-slate-400 hover:text-[var(--goya-primary)] transition-colors" />
           </a>
         )}
       </div>

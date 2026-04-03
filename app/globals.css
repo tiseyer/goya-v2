@@ -19,6 +19,7 @@
   --goya-primary:       #345c83;
   --goya-primary-light: #4a7aab;
   --goya-primary-dark:  #2a4d6e;
+  --goya-primary-muted: #6E88B0;
   --goya-primary-50:    #eef4f9;
   --goya-primary-100:   #d6e7f1;
   --goya-primary-200:   #afd0e4;
@@ -31,7 +32,8 @@
   /* Surfaces */
   --goya-surface:       #ffffff;
   --goya-surface-muted: #f8f9fa;
-  --goya-surface-warm:  #f5f4f2;
+  --goya-surface-warm:  #F2E0D0;
+  --goya-surface-warm-hover: #ead4c0;
 
   /* Borders */
   --goya-border:        #e2e8f0;
@@ -107,8 +109,12 @@
   --color-accent-light:   var(--goya-accent-light);
   --color-accent-50:      var(--goya-accent-50);
 
+  --color-primary-muted:  var(--goya-primary-muted);
+
   --color-surface:        var(--goya-surface);
   --color-surface-muted:  var(--goya-surface-muted);
+  --color-surface-warm:   var(--goya-surface-warm);
+  --color-surface-warm-hover: var(--goya-surface-warm-hover);
 
   --color-goya-border:    var(--goya-border);
   --color-goya-border-muted: var(--goya-border-muted);

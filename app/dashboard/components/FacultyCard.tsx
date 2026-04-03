@@ -39,7 +39,7 @@ export function FacultyCard({ faculty }: FacultyCardProps) {
 
           {profile ? (
             <>
-              <p className="text-xs text-slate-500 mt-0.5 truncate">
+              <p className="text-xs text-[var(--color-primary-muted)] mt-0.5 truncate">
                 {faculty.position ?? 'Faculty Member'}
               </p>
               {faculty.is_principal_trainer && (

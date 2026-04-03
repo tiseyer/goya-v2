@@ -259,17 +259,19 @@ export default function PageHero({
             ))}
           </div>
         )}
-        {/* Dot-grid texture */}
+        {/* Dot-grid texture (Blue Mirage tint) */}
         <div
-          className="absolute inset-0 opacity-[0.08]"
+          className="absolute inset-0 opacity-[0.10]"
           style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+            backgroundImage: 'radial-gradient(circle at 1px 1px, #6E88B0 1px, transparent 0)',
             backgroundSize: '28px 28px',
           }}
           aria-hidden="true"
         />
         {/* Soft glow top-right */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary-light/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true" />
+        {/* Warm overlay (Amber Smoke at 6% opacity) */}
+        <div className="absolute inset-0 bg-[var(--color-surface-warm)]/[0.06] pointer-events-none" aria-hidden="true" />
         {/* Background glow center */}
         <div className="absolute pointer-events-none inset-x-0 top-0 h-[220px] overflow-hidden" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-white opacity-[0.05] rounded-full blur-3xl" />

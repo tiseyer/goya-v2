@@ -125,7 +125,7 @@ export default function ProfileSidebar({
                 href={buildSocialUrl('website', profile.website)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[#345c83]/10 flex items-center justify-center transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[var(--goya-primary)]/10 flex items-center justify-center transition-colors"
                 aria-label="Website"
               >
                 <Globe className="w-5 h-5 text-slate-600" />
@@ -136,7 +136,7 @@ export default function ProfileSidebar({
                 href={buildSocialUrl('instagram', profile.instagram)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[#345c83]/10 flex items-center justify-center transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[var(--goya-primary)]/10 flex items-center justify-center transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24">
@@ -149,7 +149,7 @@ export default function ProfileSidebar({
                 href={buildSocialUrl('tiktok', profile.tiktok)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[#345c83]/10 flex items-center justify-center transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[var(--goya-primary)]/10 flex items-center justify-center transition-colors"
                 aria-label="TikTok"
               >
                 <Video className="w-5 h-5 text-slate-600" />
@@ -160,7 +160,7 @@ export default function ProfileSidebar({
                 href={buildSocialUrl('facebook', profile.facebook)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[#345c83]/10 flex items-center justify-center transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[var(--goya-primary)]/10 flex items-center justify-center transition-colors"
                 aria-label="Facebook"
               >
                 <svg className="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@ export default function ProfileSidebar({
                 href={buildSocialUrl('youtube', profile.youtube)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[#345c83]/10 flex items-center justify-center transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-100 hover:bg-[var(--goya-primary)]/10 flex items-center justify-center transition-colors"
                 aria-label="YouTube"
               >
                 <svg className="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24">

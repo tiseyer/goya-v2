@@ -40,7 +40,7 @@ export default function DashboardStudent({
             showAllHref="/members?role=teacher"
             showAllLabel="Show all teachers"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   Discover yoga teachers in the GOYA community.{' '}
                   <Link href="/members?role=teacher" className="text-[var(--goya-primary)] hover:underline">
@@ -62,11 +62,12 @@ export default function DashboardStudent({
 
           {/* Courses — growth */}
           <HorizontalCarousel
+            className="bg-surface-warm rounded-2xl p-6 -mx-2"
             title="Keep practicing, keep growing"
             showAllHref="/academy"
             showAllLabel="Explore all courses"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   Browse courses from GOYA teachers.{' '}
                   <Link href="/academy" className="text-[var(--goya-primary)] hover:underline">
@@ -89,7 +90,7 @@ export default function DashboardStudent({
             showAllHref="/events"
             showAllLabel="Browse events"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   No events yet — check back soon.{' '}
                   <Link href="/events" className="text-[var(--goya-primary)] hover:underline">

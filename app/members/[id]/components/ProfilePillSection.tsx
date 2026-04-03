@@ -23,8 +23,8 @@ export function ProfilePillSection({ label, items, formatType }: ProfilePillSect
         {items.map((item) => {
           const className =
             formatType === 'format'
-              ? `rounded-full px-3 py-1 text-sm font-medium ${FORMAT_COLORS[item] ?? 'bg-[#345c83]/10 text-[#345c83]'}`
-              : 'rounded-full bg-[#345c83]/10 text-[#345c83] px-3 py-1 text-sm font-medium';
+              ? `rounded-full px-3 py-1 text-sm font-medium ${FORMAT_COLORS[item] ?? 'bg-[var(--goya-primary)]/10 text-[var(--goya-primary)]'}`
+              : 'rounded-full bg-[var(--goya-primary)]/10 text-[var(--goya-primary)] px-3 py-1 text-sm font-medium';
           return (
             <span key={item} className={className}>
               {item}

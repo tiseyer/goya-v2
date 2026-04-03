@@ -128,7 +128,7 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
       {/* Loading spinner while range change re-fetches */}
       {isPending && (
         <div className="flex items-center justify-center py-8">
-          <div className="w-5 h-5 border-2 border-slate-300 border-t-[#345c83] rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-slate-300 border-t-[var(--goya-primary)] rounded-full animate-spin" />
         </div>
       )}
 
@@ -358,7 +358,7 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-2">
                         <div
-                          className="bg-[#345c83] h-2 rounded-full transition-all"
+                          className="bg-[var(--goya-primary)] h-2 rounded-full transition-all"
                           style={{ width: `${Math.min(pct, 100)}%` }}
                         />
                       </div>
@@ -380,7 +380,7 @@ function VisitorsAnalyticsInner(props: VisitorsAnalyticsClientProps) {
 
 export default function VisitorsAnalyticsClient(props: VisitorsAnalyticsClientProps) {
   return (
-    <Suspense fallback={<div className="h-40 flex items-center justify-center"><div className="w-5 h-5 border-2 border-slate-300 border-t-[#345c83] rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="h-40 flex items-center justify-center"><div className="w-5 h-5 border-2 border-slate-300 border-t-[var(--goya-primary)] rounded-full animate-spin" /></div>}>
       <VisitorsAnalyticsInner {...props} />
     </Suspense>
   )

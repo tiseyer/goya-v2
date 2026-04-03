@@ -94,7 +94,7 @@ function GA4Fallback() {
         </p>
         <Link
           href="/admin/settings"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#1B3A5C] text-white text-sm font-medium rounded-lg hover:bg-[#345c83] transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#1B3A5C] text-white text-sm font-medium rounded-lg hover:bg-[var(--goya-primary)] transition-colors"
         >
           Go to Settings
         </Link>

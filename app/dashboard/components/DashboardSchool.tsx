@@ -17,7 +17,7 @@ function KpiCard({ value, label }: { value: number | string; label: string }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5 text-center">
       <p className="text-3xl font-bold text-slate-900">{value}</p>
-      <p className="text-sm text-slate-500 mt-1">{label}</p>
+      <p className="text-sm text-[var(--color-primary-muted)] mt-1">{label}</p>
     </div>
   )
 }
@@ -103,7 +103,7 @@ export default function DashboardSchool({
               </Link>
             </div>
             {faculty.length === 0 ? (
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   No faculty members yet.{' '}
                   <Link href={facultySettingsHref} className="text-[var(--goya-primary)] hover:underline">
@@ -128,7 +128,7 @@ export default function DashboardSchool({
             showAllHref="/academy"
             showAllLabel="View all courses"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   No courses yet.{' '}
                   <Link href="/settings/my-courses" className="text-[var(--goya-primary)] hover:underline">
@@ -145,11 +145,12 @@ export default function DashboardSchool({
 
           {/* Events carousel */}
           <HorizontalCarousel
+            className="bg-surface-warm rounded-2xl p-6 -mx-2"
             title="Upcoming events"
             showAllHref="/events"
             showAllLabel="Browse events"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   No events yet.{' '}
                   <Link href="/events" className="text-[var(--goya-primary)] hover:underline">

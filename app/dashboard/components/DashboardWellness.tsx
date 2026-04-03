@@ -62,7 +62,7 @@ export default function DashboardWellness({
             showAllHref="/academy"
             showAllLabel="Explore all courses"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   Courses from the GOYA community.{' '}
                   <Link href="/academy" className="text-[var(--goya-primary)] hover:underline">
@@ -79,11 +79,12 @@ export default function DashboardWellness({
 
           {/* Events — wellness & healing */}
           <HorizontalCarousel
+            className="bg-surface-warm rounded-2xl p-6 -mx-2"
             title="Wellness & healing events"
             showAllHref="/events"
             showAllLabel="Browse events"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   No events yet.{' '}
                   <Link href="/events" className="text-[var(--goya-primary)] hover:underline">
@@ -104,7 +105,7 @@ export default function DashboardWellness({
             showAllHref="/members?role=teacher"
             showAllLabel="Browse teachers"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   Discover yoga teachers in the community.{' '}
                   <Link href="/members?role=teacher" className="text-[var(--goya-primary)] hover:underline">

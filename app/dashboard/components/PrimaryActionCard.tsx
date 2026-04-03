@@ -19,7 +19,7 @@ export function PrimaryActionCard({
     <Card variant="default" padding="lg" className={className}>
       <h3 className="text-lg font-bold text-slate-900">{headline}</h3>
       {description && (
-        <p className="text-sm text-slate-500 mt-1">{description}</p>
+        <p className="text-sm text-[var(--color-primary-muted)] mt-1">{description}</p>
       )}
       <a
         href={ctaHref}

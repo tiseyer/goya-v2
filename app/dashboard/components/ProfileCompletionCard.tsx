@@ -22,7 +22,7 @@ export function ProfileCompletionCard({ completion, className }: ProfileCompleti
           style={{ width: `${completion.score}%` }}
         />
       </div>
-      <p className="text-sm font-medium text-slate-500 mt-1">{completion.score}% complete</p>
+      <p className="text-sm font-medium text-[var(--color-primary-muted)] mt-1">{completion.score}% complete</p>
 
       {/* Checklist of missing fields */}
       {completion.missing.length > 0 && (

@@ -176,7 +176,7 @@ function SortableProductRow({
         <div className="flex items-center gap-1">
           <a
             href={`/admin/shop/products/${product.id}`}
-            className="p-1.5 rounded text-[#9CA3AF] hover:text-[#345c83] hover:bg-blue-50 transition-colors"
+            className="p-1.5 rounded text-[#9CA3AF] hover:text-[var(--goya-primary)] hover:bg-blue-50 transition-colors"
             title="View product details"
             aria-label={`View ${product.name}`}
           >

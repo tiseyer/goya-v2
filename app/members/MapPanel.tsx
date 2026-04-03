@@ -16,7 +16,7 @@ interface Props {
 function addInitials(el: HTMLElement, member: { name: string }) {
   const span = document.createElement('span');
   span.textContent = member.name.split(' ').map(n => n[0]).join('').slice(0, 2);
-  span.style.cssText = 'font-size:13px;font-weight:700;color:var(--goya-primary,#345c83);';
+  span.style.cssText = 'font-size:13px;font-weight:700;color:var(--goya-primary);';
   el.appendChild(span);
 }
 

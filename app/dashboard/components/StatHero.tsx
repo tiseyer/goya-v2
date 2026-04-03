@@ -18,7 +18,7 @@ export function StatHero({ label, value, suffix, className }: StatHeroProps) {
   return (
     <div className={`text-center p-4 ${className ?? ''}`}>
       <p className="text-4xl font-bold text-slate-900">{displayValue}</p>
-      <p className="text-sm text-slate-500 mt-1">{label}</p>
+      <p className="text-sm text-[var(--color-primary-muted)] mt-1">{label}</p>
     </div>
   )
 }

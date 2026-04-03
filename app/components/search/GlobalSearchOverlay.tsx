@@ -348,7 +348,7 @@ export default function GlobalSearchOverlay() {
     }`}>
       <IconSearch
         size={20}
-        className={query ? 'text-[#345c83]' : 'text-slate-400 dark:text-slate-500'}
+        className={query ? 'text-[var(--goya-primary)]' : 'text-slate-400 dark:text-slate-500'}
       />
       <input
         ref={isMobile ? mobileInputRef : inputRef}

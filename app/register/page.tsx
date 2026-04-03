@@ -57,7 +57,7 @@ const STEPS = [
 ];
 
 // ─── shared input style ────────────────────────────────────────────────────────
-const INPUT = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#345c83]/20 focus:border-[#345c83] transition-colors';
+const INPUT = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--goya-primary)]/20 focus:border-[var(--goya-primary)] transition-colors';
 const LABEL = 'block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide';
 
 // ─── inner component (uses useSearchParams — requires Suspense boundary) ──────
@@ -128,9 +128,9 @@ function RegisterPageInner() {
                 <div className="flex flex-col items-center gap-1.5">
                   <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                     done
-                      ? 'bg-[#345c83] text-white'
+                      ? 'bg-[var(--goya-primary)] text-white'
                       : active
-                      ? 'bg-[#345c83] text-white ring-4 ring-[#345c83]/20'
+                      ? 'bg-[var(--goya-primary)] text-white ring-4 ring-[var(--goya-primary)]/20'
                       : 'bg-slate-200 text-slate-500'
                   }`}>
                     {done ? (
@@ -140,7 +140,7 @@ function RegisterPageInner() {
                     ) : s.n}
                   </div>
                   <span className={`text-[10px] font-semibold uppercase tracking-wider transition-colors ${
-                    active ? 'text-[#345c83]' : done ? 'text-slate-400' : 'text-slate-400'
+                    active ? 'text-[var(--goya-primary)]' : done ? 'text-slate-400' : 'text-slate-400'
                   }`}>
                     {s.label}
                   </span>
@@ -150,7 +150,7 @@ function RegisterPageInner() {
                   <div className="w-16 sm:w-24 mx-2 mb-5">
                     <div className="h-px relative overflow-hidden rounded-full bg-slate-200">
                       <div
-                        className="absolute inset-y-0 left-0 bg-[#345c83] transition-all duration-500"
+                        className="absolute inset-y-0 left-0 bg-[var(--goya-primary)] transition-all duration-500"
                         style={{ width: step > s.n ? '100%' : '0%' }}
                       />
                     </div>
@@ -183,12 +183,12 @@ function RegisterPageInner() {
                           onClick={() => setRole(r.value)}
                           className={`flex items-start gap-4 p-5 rounded-xl border-2 text-left transition-all duration-200 ${
                             selected
-                              ? 'border-[#345c83] bg-[#eef4f9]'
+                              ? 'border-[var(--goya-primary)] bg-[#eef4f9]'
                               : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                           }`}
                         >
                           {/* Icon */}
-                          <div className={`mt-0.5 shrink-0 transition-colors ${selected ? 'text-[#345c83]' : 'text-slate-400'}`}>
+                          <div className={`mt-0.5 shrink-0 transition-colors ${selected ? 'text-[var(--goya-primary)]' : 'text-slate-400'}`}>
                             {r.icon}
                           </div>
                           {/* Text */}
@@ -200,7 +200,7 @@ function RegisterPageInner() {
                           </div>
                           {/* Checkmark */}
                           <div className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 ${
-                            selected ? 'bg-[#345c83] border-[#345c83]' : 'border-slate-300'
+                            selected ? 'bg-[var(--goya-primary)] border-[var(--goya-primary)]' : 'border-slate-300'
                           }`}>
                             {selected && (
                               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,7 +220,7 @@ function RegisterPageInner() {
                   <button
                     disabled={!role}
                     onClick={() => setStep(2)}
-                    className="w-full bg-[#345c83] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[#1e3a52] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="w-full bg-[var(--goya-primary)] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[var(--goya-primary-dark)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     Continue &rarr;
                   </button>
@@ -234,7 +234,7 @@ function RegisterPageInner() {
                     <h1 className="text-xl font-bold text-slate-900 mb-1.5">Create your account</h1>
                     <p className="text-slate-500 text-sm">
                       Joining as{' '}
-                      <span className="text-[#345c83] font-semibold">{role}</span>
+                      <span className="text-[var(--goya-primary)] font-semibold">{role}</span>
                     </p>
                   </div>
 
@@ -329,7 +329,7 @@ function RegisterPageInner() {
 
                     <label className="flex items-start gap-3 cursor-pointer group">
                       <div className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center border-2 shrink-0 transition-all ${
-                        form.agreed ? 'bg-[#345c83] border-[#345c83]' : 'border-slate-300 group-hover:border-slate-400'
+                        form.agreed ? 'bg-[var(--goya-primary)] border-[var(--goya-primary)]' : 'border-slate-300 group-hover:border-slate-400'
                       }`}
                         onClick={() => setForm(f => ({ ...f, agreed: !f.agreed }))}
                       >
@@ -341,9 +341,9 @@ function RegisterPageInner() {
                       </div>
                       <span className="text-xs text-slate-500 leading-relaxed pt-0.5">
                         I agree to the{' '}
-                        <Link href="/terms" className="text-[#345c83] hover:underline">Terms of Use</Link>
+                        <Link href="/terms" className="text-[var(--goya-primary)] hover:underline">Terms of Use</Link>
                         {' '}and{' '}
-                        <Link href="/privacy" className="text-[#345c83] hover:underline">Privacy Policy</Link>
+                        <Link href="/privacy" className="text-[var(--goya-primary)] hover:underline">Privacy Policy</Link>
                       </span>
                     </label>
                   </div>
@@ -398,7 +398,7 @@ function RegisterPageInner() {
                         }
                         setStep(3);
                       }}
-                      className="flex-1 bg-[#345c83] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[#1e3a52] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="flex-1 bg-[var(--goya-primary)] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[var(--goya-primary-dark)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       {loading ? 'Creating Account\u2026' : 'Create Account \u2192'}
                     </button>
@@ -411,8 +411,8 @@ function RegisterPageInner() {
                 <div className="text-center py-4">
                   {/* Checkmark */}
                   <div className="relative w-20 h-20 mx-auto mb-7">
-                    <div className="absolute inset-0 bg-[#345c83]/20 rounded-full animate-ping" style={{ animationDuration: '1.5s', animationIterationCount: 1 }} />
-                    <div className="relative w-20 h-20 bg-[#345c83] rounded-full flex items-center justify-center shadow-lg shadow-[#345c83]/30">
+                    <div className="absolute inset-0 bg-[var(--goya-primary)]/20 rounded-full animate-ping" style={{ animationDuration: '1.5s', animationIterationCount: 1 }} />
+                    <div className="relative w-20 h-20 bg-[var(--goya-primary)] rounded-full flex items-center justify-center shadow-lg shadow-[var(--goya-primary)]/30">
                       <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
@@ -429,7 +429,7 @@ function RegisterPageInner() {
                   <div className="flex flex-col gap-3">
                     <Link
                       href="/members"
-                      className="bg-[#345c83] text-white px-6 py-3.5 rounded-xl font-bold text-sm hover:bg-[#1e3a52] transition-colors inline-flex items-center justify-center gap-2"
+                      className="bg-[var(--goya-primary)] text-white px-6 py-3.5 rounded-xl font-bold text-sm hover:bg-[var(--goya-primary-dark)] transition-colors inline-flex items-center justify-center gap-2"
                     >
                       Explore Members
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -454,7 +454,7 @@ function RegisterPageInner() {
         {step < 3 && (
           <p className="text-center text-slate-400 text-xs mt-6">
             Already have an account?{' '}
-            <Link href="/sign-in" className="text-[#345c83] hover:underline font-semibold">Sign in</Link>
+            <Link href="/sign-in" className="text-[var(--goya-primary)] hover:underline font-semibold">Sign in</Link>
           </p>
         )}
 
@@ -478,7 +478,7 @@ export default function RegisterPage() {
   return (
     <Suspense fallback={
       <div className="h-screen flex items-center justify-center bg-[#f8f9fa]">
-        <div className="w-8 h-8 border-2 border-[#345c83] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[var(--goya-primary)] border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <RegisterPageInner />

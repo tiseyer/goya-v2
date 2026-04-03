@@ -64,7 +64,7 @@ export default function DashboardTeacher({
             showAllHref="/academy"
             showAllLabel="Explore all courses"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   Courses from the GOYA community.{' '}
                   <Link href="/academy" className="text-[var(--goya-primary)] hover:underline">
@@ -79,13 +79,14 @@ export default function DashboardTeacher({
               : null}
           </HorizontalCarousel>
 
-          {/* Events — connect */}
+          {/* Events ��� connect */}
           <HorizontalCarousel
+            className="bg-surface-warm rounded-2xl p-6 -mx-2"
             title="Connect, collaborate, grow"
             showAllHref="/events"
             showAllLabel="Browse events"
             emptyState={
-              <Card variant="flat" padding="lg">
+              <Card variant="flat" padding="lg" className="bg-[var(--color-surface-warm)]">
                 <p className="text-sm text-slate-500">
                   No events yet.{' '}
                   <Link href="/events" className="text-[var(--goya-primary)] hover:underline">
