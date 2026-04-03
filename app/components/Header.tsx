@@ -1025,31 +1025,41 @@ export default function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-0.5">
-            {!authLoading && isLoggedIn && (
-              <Link
-                href="/dashboard"
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                  pathname === '/dashboard'
-                    ? 'text-[#1B3A5C] bg-slate-100'
-                    : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
-                }`}
-              >
-                Dashboard
-              </Link>
+            {authLoading ? (
+              <>
+                {[80, 64, 72, 64].map((w, i) => (
+                  <div key={i} className="h-[34px] rounded-lg bg-slate-100 animate-pulse" style={{ width: `${w}px` }} />
+                ))}
+              </>
+            ) : (
+              <>
+                {isLoggedIn && (
+                  <Link
+                    href="/dashboard"
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                      pathname === '/dashboard'
+                        ? 'text-[#1B3A5C] bg-slate-100'
+                        : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+                    }`}
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                {(isLoggedIn ? NAV_LINKS_LOGGED_IN : NAV_LINKS_LOGGED_OUT).map(({ href, label }) => (
+                  <Link
+                    key={label}
+                    href={href}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                      pathname === href
+                        ? 'text-[#1B3A5C] bg-slate-100'
+                        : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </>
             )}
-            {(isLoggedIn ? NAV_LINKS_LOGGED_IN : NAV_LINKS_LOGGED_OUT).map(({ href, label }) => (
-              <Link
-                key={label}
-                href={href}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                  pathname === href
-                    ? 'text-[#1B3A5C] bg-slate-100'
-                    : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
-                }`}
-              >
-                {label}
-              </Link>
-            ))}
           </nav>
 
           {/* Right side */}
@@ -1153,34 +1163,44 @@ export default function Header() {
       {/* ── Mobile nav overlay (hamburger) ─────────────────────────────────── */}
       {navOpen && (
         <div className="lg:hidden bg-white border-t border-[#E5E7EB] px-4 py-4 space-y-1">
-          {!authLoading && isLoggedIn && (
-            <Link
-              href="/dashboard"
-              onClick={() => setNavOpen(false)}
-              className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                pathname === '/dashboard'
-                  ? 'text-[#1B3A5C] bg-slate-100'
-                  : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
-              }`}
-            >
-              Dashboard
-            </Link>
+          {authLoading ? (
+            <>
+              {[128, 96, 112, 96].map((w, i) => (
+                <div key={i} className="h-10 rounded-lg bg-slate-100 animate-pulse" style={{ width: `${w}px` }} />
+              ))}
+            </>
+          ) : (
+            <>
+              {isLoggedIn && (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setNavOpen(false)}
+                  className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    pathname === '/dashboard'
+                      ? 'text-[#1B3A5C] bg-slate-100'
+                      : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              )}
+              {(isLoggedIn ? NAV_LINKS_LOGGED_IN : NAV_LINKS_LOGGED_OUT).map(({ href, label }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  onClick={() => setNavOpen(false)}
+                  className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    pathname === href
+                      ? 'text-[#1B3A5C] bg-slate-100'
+                      : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
+                  }`}
+                >
+                  {label}
+                </Link>
+              ))}
+              {isLoggedIn && <MobileCartToggle onNavClose={() => setNavOpen(false)} />}
+            </>
           )}
-          {(isLoggedIn ? NAV_LINKS_LOGGED_IN : NAV_LINKS_LOGGED_OUT).map(({ href, label }) => (
-            <Link
-              key={label}
-              href={href}
-              onClick={() => setNavOpen(false)}
-              className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                pathname === href
-                  ? 'text-[#1B3A5C] bg-slate-100'
-                  : 'text-[#374151] hover:text-[#1B3A5C] hover:bg-slate-50'
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
-          {isLoggedIn && <MobileCartToggle onNavClose={() => setNavOpen(false)} />}
           {!isLoggedIn && !authLoading && (
             <div className="pt-2 border-t border-[#E5E7EB] mt-2 space-y-2">
               <Link
