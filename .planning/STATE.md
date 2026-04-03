@@ -109,9 +109,10 @@ None.
 | 260403-lkf | Fix PageHero save — correct page_hero_content schema and regenerate types | 2026-04-03 | 323d3d1, 720be3c | [260403-lkf-fix-pagehero-save-create-missing-page-he](./quick/260403-lkf-fix-pagehero-save-create-missing-page-he/) |
 | 260403-ly5 | Fix PageHero edit mode layout — variables and buttons to fixed panels | 2026-04-03 | 5434734 | [260403-ly5-fix-pagehero-edit-mode-layout-variables-](./quick/260403-ly5-fix-pagehero-edit-mode-layout-variables-/) |
 | 260403-mah | Fix PageHero edit UI — pill visibility, contained edit panels, DB seed | 2026-04-03 | 6dd95a0, d982994 | [260403-mah-fix-pagehero-edit-ui-overhaul-pill-resto](./quick/260403-mah-fix-pagehero-edit-ui-overhaul-pill-resto/) |
+| 260403-n8u | PageHero dot grid opacity doubled + FOFC prevention on load | 2026-04-03 | 48ecc5c | [260403-n8u-pagehero-dot-grid-visibility-no-flash-of](./quick/260403-n8u-pagehero-dot-grid-visibility-no-flash-of/) |
 
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Completed quick task 260403-mah: Fix PageHero edit UI — pill visibility, contained edit panels, DB seed
+Stopped at: Completed quick task 260403-n8u: PageHero dot grid opacity doubled + FOFC prevention on load
 Resume file: None
