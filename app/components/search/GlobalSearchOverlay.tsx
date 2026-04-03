@@ -13,7 +13,6 @@ import type { SearchResult, SearchCategory } from '@/app/components/search/types
 import SearchFilterPills from '@/app/components/search/SearchFilterPills';
 import SearchResultRow from '@/app/components/search/SearchResultRow';
 import MatteaSearchHint from '@/app/components/search/MatteaSearchHint';
-import { isQuestion } from '@/lib/search/detect-intent';
 
 // ─── Inline SVG icons ─────────────────────────────────────────────────────────
 
@@ -49,12 +48,9 @@ export default function GlobalSearchOverlay() {
   const [mounted, setMounted] = useState(false);
   const [cache, setCache] = useState<Record<string, SearchResult[]>>({});
 
-  // Mattea AI hint state
+  // Mattea AI hint state — minimal implementation
   const [matteaAnswer, setMatteaAnswer] = useState<string | null>(null);
   const [matteaLoading, setMatteaLoading] = useState(false);
-  const matteaAbortRef = useRef<AbortController | null>(null);
-  const matteaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastFetchedQuestion = useRef('');
 
   const inputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
@@ -75,7 +71,6 @@ export default function GlobalSearchOverlay() {
       setLoading(false);
       setMatteaAnswer(null);
       setMatteaLoading(false);
-      lastFetchedQuestion.current = '';
       setTimeout(() => {
         inputRef.current?.focus();
         mobileInputRef.current?.focus();
@@ -139,64 +134,43 @@ export default function GlobalSearchOverlay() {
     }
   }, [cache]);
 
-  // Mattea: 1200ms debounce, min 15 chars, ref-based dedup, abort on change
+  // Mattea: simplest possible — 1200ms debounce on raw query
   useEffect(() => {
-    // Clear pending timer on every keystroke
-    if (matteaTimerRef.current) {
-      clearTimeout(matteaTimerRef.current);
-      matteaTimerRef.current = null;
-    }
+    const q = (query || '').trim();
 
-    // If query is too short or not a question, conditionally clear
-    if (!isQuestion(query) || query.trim().length < 15) {
-      if (query.trim().length < 8) {
-        setMatteaAnswer(null);
-        setMatteaLoading(false);
-        lastFetchedQuestion.current = '';
-      }
+    // Clear answer if query is very short
+    if (q.length < 8) {
+      setMatteaAnswer(null);
+      setMatteaLoading(false);
       return;
     }
 
-    // Set 1200ms timer — fires after user stops typing
-    matteaTimerRef.current = setTimeout(async () => {
-      const question = query.trim();
+    // Only fire for question-like queries >= 15 chars
+    const isQ = q.length >= 15 && (
+      q.includes('?') ||
+      /^(how |what |when |where |why |who |can |is |are |do |does |will |wie |was |wo |gibt es)/i.test(q)
+    );
 
-      // Don't re-fetch same question (ref avoids stale closure)
-      if (question === lastFetchedQuestion.current) return;
+    if (!isQ) return;
 
-      // Cancel any in-flight request
-      if (matteaAbortRef.current) matteaAbortRef.current.abort();
-      matteaAbortRef.current = new AbortController();
-
+    const timer = setTimeout(async () => {
       setMatteaLoading(true);
-      lastFetchedQuestion.current = question;
-
       try {
         const res = await fetch('/api/search/mattea-hint', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question }),
-          signal: matteaAbortRef.current.signal,
+          body: JSON.stringify({ question: q }),
         });
-
-        if (!res.ok) { setMatteaLoading(false); return; }
-
         const data = await res.json();
-        if (data.answer) {
-          setMatteaAnswer(data.answer);
-        }
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === 'AbortError') return;
-        console.error('[Mattea] Fetch error:', err);
+        if (data.answer) setMatteaAnswer(data.answer);
+      } catch {
+        // silent fail
       } finally {
         setMatteaLoading(false);
       }
     }, 1200);
 
-    return () => {
-      if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => clearTimeout(timer);
   }, [query]);
 
   // Debounced input handler — normal search only (200ms)
@@ -216,7 +190,7 @@ export default function GlobalSearchOverlay() {
   }
 
   // Whether the Mattea hint is visible (adds 1 to the navigable items)
-  const showMatteaHint = query.trim().length >= 15 && isQuestion(query) && (matteaLoading || !!matteaAnswer);
+  const showMatteaHint = (matteaLoading || !!matteaAnswer);
   const matteaOffset = showMatteaHint ? 1 : 0;
   const totalItems = results.length + matteaOffset;
 
