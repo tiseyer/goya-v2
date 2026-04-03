@@ -435,6 +435,39 @@ export type Database = {
         }
         Relationships: []
       }
+      course_attendees: {
+        Row: {
+          course_id: string
+          created_at: string
+          profile_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          profile_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_attendees_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_attendees_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_audit_log: {
         Row: {
           action: string
@@ -524,6 +557,39 @@ export type Database = {
           },
         ]
       }
+      course_instructors: {
+        Row: {
+          course_id: string
+          created_at: string
+          profile_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          profile_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_instructors_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_instructors_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           access: string | null
@@ -540,9 +606,13 @@ export type Database = {
           id: string
           instructor: string | null
           level: string | null
+          organizer_ids: string[]
           rejection_reason: string | null
           school_author_id: string | null
           short_description: string | null
+          show_attendees: boolean
+          show_instructors: boolean
+          show_organizers: boolean
           status: string | null
           thumbnail_url: string | null
           title: string
@@ -563,9 +633,13 @@ export type Database = {
           id?: string
           instructor?: string | null
           level?: string | null
+          organizer_ids?: string[]
           rejection_reason?: string | null
           school_author_id?: string | null
           short_description?: string | null
+          show_attendees?: boolean
+          show_instructors?: boolean
+          show_organizers?: boolean
           status?: string | null
           thumbnail_url?: string | null
           title: string
@@ -586,9 +660,13 @@ export type Database = {
           id?: string
           instructor?: string | null
           level?: string | null
+          organizer_ids?: string[]
           rejection_reason?: string | null
           school_author_id?: string | null
           short_description?: string | null
+          show_attendees?: boolean
+          show_instructors?: boolean
+          show_organizers?: boolean
           status?: string | null
           thumbnail_url?: string | null
           title?: string
@@ -1845,6 +1923,33 @@ export type Database = {
           started_at?: string | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      page_hero_content: {
+        Row: {
+          pill: string | null
+          slug: string
+          subtitle: string | null
+          title: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          pill?: string | null
+          slug: string
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          pill?: string | null
+          slug?: string
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -3171,6 +3276,7 @@ export type Database = {
         | "wellness_practitioner"
         | "moderator"
         | "admin"
+        | "superuser"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3304,6 +3410,7 @@ export const Constants = {
         "wellness_practitioner",
         "moderator",
         "admin",
+        "superuser",
       ],
     },
   },
