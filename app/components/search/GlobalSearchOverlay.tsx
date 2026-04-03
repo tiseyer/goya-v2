@@ -49,11 +49,12 @@ export default function GlobalSearchOverlay() {
   const [mounted, setMounted] = useState(false);
   const [cache, setCache] = useState<Record<string, SearchResult[]>>({});
 
-  // Mattea AI hint state — separate 1200ms debounce, min 15 chars
+  // Mattea AI hint state
   const [matteaAnswer, setMatteaAnswer] = useState<string | null>(null);
   const [matteaLoading, setMatteaLoading] = useState(false);
-  const [matteaDebouncedQuery, setMatteaDebouncedQuery] = useState('');
+  const [lastMatteaQuery, setLastMatteaQuery] = useState('');
   const matteaAbortRef = useRef<AbortController | null>(null);
+  const matteaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
@@ -74,7 +75,7 @@ export default function GlobalSearchOverlay() {
       setLoading(false);
       setMatteaAnswer(null);
       setMatteaLoading(false);
-      setMatteaDebouncedQuery('');
+      setLastMatteaQuery('');
       setTimeout(() => {
         inputRef.current?.focus();
         mobileInputRef.current?.focus();
@@ -138,53 +139,51 @@ export default function GlobalSearchOverlay() {
     }
   }, [cache]);
 
-  // Mattea 1200ms debounce — separate from normal search debounce
-  const matteaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Mattea: single effect with 1200ms debounce, min 15 chars, abort on change
   useEffect(() => {
-    // Clear Mattea when query is too short or not a question
-    if (query.trim().length < 15 || !isQuestion(query)) {
-      setMatteaAnswer(null);
-      setMatteaLoading(false);
-      setMatteaDebouncedQuery('');
-      matteaAbortRef.current?.abort();
-      if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current);
+    if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current);
+
+    // If query is not a question or too short, clear (but keep answer if >= 10 chars)
+    if (!isQuestion(query) || query.trim().length < 15) {
+      if (query.trim().length < 10) {
+        setMatteaAnswer(null);
+        setMatteaLoading(false);
+      }
       return;
     }
-    // Set 1200ms debounce for Mattea
-    if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current);
-    matteaTimerRef.current = setTimeout(() => {
-      setMatteaDebouncedQuery(query);
-    }, 1200);
-    return () => { if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current); };
-  }, [query]);
 
-  // Fetch Mattea hint when debounced query changes
-  useEffect(() => {
-    if (!matteaDebouncedQuery || matteaDebouncedQuery.trim().length < 15 || !isQuestion(matteaDebouncedQuery)) return;
+    // Fire Mattea after 1200ms of no typing
+    matteaTimerRef.current = setTimeout(async () => {
+      const trimmed = query.trim();
+      if (trimmed === lastMatteaQuery) return;
 
-    matteaAbortRef.current?.abort();
-    const controller = new AbortController();
-    matteaAbortRef.current = controller;
-    setMatteaLoading(true);
+      if (matteaAbortRef.current) matteaAbortRef.current.abort();
+      matteaAbortRef.current = new AbortController();
+      setMatteaLoading(true);
 
-    (async () => {
       try {
         const res = await fetch('/api/search/mattea-hint', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: matteaDebouncedQuery.trim() }),
-          signal: controller.signal,
+          body: JSON.stringify({ question: trimmed }),
+          signal: matteaAbortRef.current.signal,
         });
         if (!res.ok) { setMatteaLoading(false); return; }
         const data = await res.json();
-        if (data.answer) setMatteaAnswer(data.answer);
-      } catch (err) {
+        if (data.answer) {
+          setMatteaAnswer(data.answer);
+          setLastMatteaQuery(trimmed);
+        }
+      } catch (err: unknown) {
         if (err instanceof Error && err.name === 'AbortError') return;
       } finally {
         setMatteaLoading(false);
       }
-    })();
-  }, [matteaDebouncedQuery]);
+    }, 1200);
+
+    return () => { if (matteaTimerRef.current) clearTimeout(matteaTimerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
 
   // Debounced input handler — normal search only (200ms)
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
