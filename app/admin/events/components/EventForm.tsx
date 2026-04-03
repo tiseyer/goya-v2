@@ -75,10 +75,7 @@ export default function EventForm({ event, userRole, currentUserId, currentUserN
   const [description,setDesc]     = useState(event?.description ?? '');
   const [shortDescription, setShortDescription] = useState(event?.short_description ?? '');
   const [price,     setPrice]     = useState(String(event?.price ?? ''));
-  const [hasPrice,  setHasPrice]  = useState(() => {
-    const p = event?.price;
-    return p !== null && p !== undefined && p > 0;
-  });
+  const [hasPrice,  setHasPrice]  = useState(!!(event && event.price && event.price > 0));
   const [spotsTotal,setSpotsTotal]= useState(String(event?.spots_total ?? ''));
   const [limitedSpots, setLimitedSpots] = useState(event?.unlimited_spots === false);
   const [externalRegistration, setExternalRegistration] = useState(event?.external_registration ?? false);

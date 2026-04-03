@@ -22,6 +22,7 @@ export async function searchMembers(
     excludeIds?: string[];
     limit?: number;
     roleFilter?: string[];
+    excludeRoles?: string[];
   } = {}
 ): Promise<MemberSearchResult[]> {
   if (!query || query.trim().length < 2) return [];
@@ -61,6 +62,13 @@ export async function searchMembers(
     if (options.roleFilter && options.roleFilter.length > 0) {
       const roleOr = options.roleFilter.map(r => `role.ilike.${r}`).join(',');
       q = q.or(roleOr);
+    }
+
+    // Exclude specific roles (case-insensitive)
+    if (options.excludeRoles && options.excludeRoles.length > 0) {
+      for (const r of options.excludeRoles) {
+        q = q.not('role', 'ilike', r);
+      }
     }
 
     // Exclude already-selected IDs
@@ -114,6 +122,13 @@ export async function searchMembers(
   if (options.roleFilter && options.roleFilter.length > 0) {
     const roleOr = options.roleFilter.map(r => `role.ilike.${r}`).join(',');
     connQ = connQ.or(roleOr);
+  }
+
+  // Exclude specific roles (case-insensitive)
+  if (options.excludeRoles && options.excludeRoles.length > 0) {
+    for (const r of options.excludeRoles) {
+      connQ = connQ.not('role', 'ilike', r);
+    }
   }
 
   const { data, error } = await connQ;

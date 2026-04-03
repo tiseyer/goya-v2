@@ -115,7 +115,7 @@ export default function InstructorPicker({
             userId: currentUserId,
             excludeIds,
             limit: 10,
-            roleFilter: ['teacher', 'wellness_practitioner'],
+            excludeRoles: ['student'],
           });
           setResults(data);
           setShowDropdown(data.length > 0);
