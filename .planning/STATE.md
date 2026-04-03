@@ -5,9 +5,9 @@ milestone_name: Global Search
 status: active
 stopped_at: null
 last_updated: "2026-04-03T12:00:00.000Z"
-last_activity: 2026-04-03 - Milestone v1.19 started
+last_activity: 2026-04-03 - Roadmap created (phases 51-54)
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 51 — Search Overlay UI (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-03 — Milestone v1.19 started
+Status: Roadmap defined, ready to plan Phase 51
+Last activity: 2026-04-03 — Roadmap created (phases 51-54)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -43,7 +43,10 @@ Progress: [░░░░░░░░░░] 0%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| — | — | — | — |
+| 51. Search Overlay UI | TBD | — | — |
+| 52. Search API + Page Registry | TBD | — | — |
+| 53. Header Integration | TBD | — | — |
+| 54. Performance + Polish | TBD | — | — |
 
 *Updated after each plan completion*
 
@@ -57,15 +60,17 @@ Recent decisions affecting current work:
 - School is NOT a separate role — school owners have role='teacher' AND principal_trainer_school_id IS NOT NULL
 - All data fetching server-side in page.tsx via Promise.all — section components receive props, do no internal fetching
 - PUBLIC_PROFILE_COLUMNS constant required — never use select('*') for profile fetches (security)
-- Own-profile detection must use supabase.auth.getUser() server-side — current page.tsx hard-codes isOwnProfile=false, must be fixed in Phase 47
+- Own-profile detection must use supabase.auth.getUser() server-side
 - deriveProfileVisibility() must gate map/address before any JSX — privacy rules are server-side only
 
 ### Research Notes
 
-- Mapbox: static vs GL JS decision needed at Phase 50 plan time — Static Images API is zero-JS, recommended unless interactivity required
-- Video facade: extract lib/video.ts shared utility from existing VideoRenderer.tsx + lesson player patterns
-- profile-covers Supabase Storage bucket: create in Phase 47 alongside migration
-- Confirm practice_format column name and allowed values in profiles table before writing deriveProfileVisibility()
+- Search overlay: mount SearchOverlay at layout level (not per-page) so the keyboard shortcut works everywhere — one instance, controlled by a global state atom or context
+- Page registry: static TypeScript file (not DB) — defines routes with role[] visibility arrays; teacher/school pages filtered by checking profiles.principal_trainer_school_id
+- Debounce: use useCallback + useRef pattern (no extra library needed) — 200ms window resets on every keystroke
+- Caching: Map<string, SearchResult[]> in component state, keyed by trimmed lowercase query; check cache before firing fetch
+- Admin member search: extend /api/search to accept searchField param ('name' | 'email' | 'mrn') — gated by role check server-side
+- has_full_address: derive from profiles.location_place_id IS NOT NULL AND practice_format IN ('in-person', 'hybrid') — same logic as deriveProfileVisibility()
 
 ### Blockers/Concerns
 
@@ -93,5 +98,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Completed quick task 260403-cxz: Move instructor to sidebar and add organizers widget
+Stopped at: Roadmap created for v1.19 Global Search (phases 51-54)
 Resume file: None

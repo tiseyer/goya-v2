@@ -468,3 +468,78 @@ Plans:
 | 48. Hero + Sidebar | 2/2 | Complete | 2026-04-02 |
 | 49. Content Sections | 2/2 | Complete | 2026-04-02 |
 | 50. Media | 1/1 | Complete | 2026-04-02 |
+
+---
+
+## v1.19 Global Search (Phases 51-54)
+
+**Milestone Goal:** macOS Spotlight-style global search overlay across all platform entities — members, events, courses, and pages — with role-aware results, keyboard navigation, debounced input, and result caching.
+
+### Phases
+
+- [ ] **Phase 51: Search Overlay UI** - SearchOverlay component: desktop modal + mobile full-screen, category filter pills, keyboard navigation, grouped result rows with contextual actions
+- [ ] **Phase 52: Search API + Page Registry** - /api/search route with per-category Supabase queries (members, events, courses) + static page registry with role-based visibility
+- [ ] **Phase 53: Header Integration** - Wire SearchOverlay into the nav header (search icon click + Cmd+K / Ctrl+K keyboard shortcut)
+- [ ] **Phase 54: Performance + Polish** - Debounced input (200ms), loading skeletons, result caching keyed by query string, empty/no-result states
+
+## Phase Details
+
+### Phase 51: Search Overlay UI
+**Goal**: Users can open a search overlay, type a query, filter by category, navigate results with the keyboard, and click through to any result — fully functional as a UI component before the real API is wired up
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: SRCH-01, SRCH-02, SRCH-03, SRCH-04, SRCH-05, SRCH-06, SRCH-07, SRCH-08
+**Success Criteria** (what must be TRUE):
+  1. Clicking the search icon in the nav header opens a centered modal overlay on desktop; on mobile it opens full-screen with the input anchored at the bottom
+  2. The overlay closes when the user presses Escape, clicks the X button, or clicks the dark backdrop outside the modal
+  3. Category filter pills (All / Members / Events / Courses / Pages) are visible and clicking one filters the displayed results to that category
+  4. Pressing the down arrow moves highlight to the next result, up arrow moves to the previous, and pressing Enter on a highlighted result navigates to it
+  5. Results are visually grouped by category with the best match shown at the top; member rows show a message icon, and members with a full address show a map/directions icon
+  6. When the overlay opens (by any method), the search input is immediately focused and ready to receive keyboard input
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 52: Search API + Page Registry
+**Goal**: A search query to /api/search returns categorized results from members, events, courses, and the static page registry — role-aware so admins/moderators see more results than regular users
+**Depends on**: Phase 51 (overlay component exists to consume the API)
+**Requirements**: SAPI-01, SAPI-02, SAPI-03, SAPI-04, SAPI-05, SAPI-06, SAPI-07, PREG-01, PREG-02
+**Success Criteria** (what must be TRUE):
+  1. Searching "yoga" returns up to 20 member results containing full_name, avatar_url, role, city, country, and has_full_address — with ilike matching against full_name
+  2. Searching a keyword returns up to 20 event results matching on title, tags, or description; and up to 20 course results matching on title, tags, or description
+  3. The page registry is a static data structure mapping all navigable platform pages (e.g., /dashboard, /members, /events, /academy, /settings, /admin/*) with role visibility rules; a query matching a page title returns that page in results
+  4. A regular member searching by email or MRN returns no member results for those fields; an admin or moderator searching by email or MRN does return matching member results
+  5. Admin and moderator users see admin-only pages (e.g., /admin/users, /admin/inbox) in page search results; regular members do not see those pages
+  6. Teacher or school-owner users see their own school's settings page in page search results; other users do not see that page
+**Plans**: TBD
+
+### Phase 53: Header Integration
+**Goal**: Users can open the search overlay from anywhere on the platform using the keyboard shortcut Cmd+K (Mac) or Ctrl+K (Windows/Linux), in addition to clicking the header search icon
+**Depends on**: Phase 51 (SearchOverlay component), Phase 52 (API route)
+**Requirements**: INTG-01
+**Success Criteria** (what must be TRUE):
+  1. Pressing Cmd+K on Mac or Ctrl+K on Windows/Linux from any authenticated page opens the search overlay and focuses the input, regardless of which element currently has focus
+  2. The keyboard shortcut does not interfere with browser-native Ctrl+K behavior (address bar) — the event is captured and prevented from propagating
+  3. The search icon in the nav header opens the same overlay that the keyboard shortcut opens — both triggers share one SearchOverlay instance mounted at layout level
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 54: Performance + Polish
+**Goal**: The search experience is snappy and honest — input is debounced so the API is not hammered on every keystroke, results are cached so repeated queries are instant, and every non-result state shows a clear, helpful message
+**Depends on**: Phase 51, Phase 52, Phase 53
+**Requirements**: INTG-02, INTG-03, INTG-04
+**Success Criteria** (what must be TRUE):
+  1. Typing rapidly into the search input triggers only one API call after the user pauses for 200ms — not one call per keystroke; during the debounce window and during the fetch a loading skeleton is visible in the results area
+  2. Typing the same query a second time does not trigger a new API call — the cached results are displayed immediately from component state
+  3. An empty input shows a contextual placeholder state ("Search members, events, courses, pages…"); a query with no results shows a "No results for '[query]'" message; a query that is too short (< 2 characters) shows a "Keep typing…" prompt
+**Plans**: TBD
+**UI hint**: yes
+
+## Progress
+
+**Execution Order:** 51 -> 52 -> 53 -> 54
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 51. Search Overlay UI | 0/TBD | Not started | - |
+| 52. Search API + Page Registry | 0/TBD | Not started | - |
+| 53. Header Integration | 0/TBD | Not started | - |
+| 54. Performance + Polish | 0/TBD | Not started | - |

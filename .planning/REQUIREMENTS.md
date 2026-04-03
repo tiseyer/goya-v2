@@ -65,13 +65,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | — |
+| SRCH-01 | Phase 51 | Pending |
+| SRCH-02 | Phase 51 | Pending |
+| SRCH-03 | Phase 51 | Pending |
+| SRCH-04 | Phase 51 | Pending |
+| SRCH-05 | Phase 51 | Pending |
+| SRCH-06 | Phase 51 | Pending |
+| SRCH-07 | Phase 51 | Pending |
+| SRCH-08 | Phase 51 | Pending |
+| SAPI-01 | Phase 52 | Pending |
+| SAPI-02 | Phase 52 | Pending |
+| SAPI-03 | Phase 52 | Pending |
+| SAPI-04 | Phase 52 | Pending |
+| SAPI-05 | Phase 52 | Pending |
+| SAPI-06 | Phase 52 | Pending |
+| SAPI-07 | Phase 52 | Pending |
+| PREG-01 | Phase 52 | Pending |
+| PREG-02 | Phase 52 | Pending |
+| INTG-01 | Phase 53 | Pending |
+| INTG-02 | Phase 54 | Pending |
+| INTG-03 | Phase 54 | Pending |
+| INTG-04 | Phase 54 | Pending |
 
 **Coverage:**
 - v1.19 requirements: 20 total
-- Mapped to phases: 0
-- Unmapped: 20
+- Mapped to phases: 20
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after initial definition*
+*Last updated: 2026-04-03 after roadmap created (phases 51-54)*
