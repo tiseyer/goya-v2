@@ -41,6 +41,9 @@ export interface ChatSession {
   user_id: string | null
   anonymous_id: string | null
   is_escalated: boolean
+  started_from: 'chat_widget' | 'search_hint' | 'help_page'
+  user_feedback: 'up' | 'down' | null
+  feedback_at: string | null
   created_at: string
   updated_at: string
 }
@@ -80,6 +83,8 @@ export interface SupportTicket {
   anonymous_id: string | null
   question_summary: string
   status: TicketStatus
+  ticket_type: 'human_escalation' | 'unanswered_question'
+  rejection_reason: string | null
   created_at: string
   resolved_at: string | null
   resolved_by: string | null

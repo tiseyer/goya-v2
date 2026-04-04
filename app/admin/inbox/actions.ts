@@ -365,6 +365,8 @@ export async function listSupportTickets(
         anonymous_id: r.anonymous_id,
         question_summary: r.question_summary,
         status: r.status as TicketStatus,
+        ticket_type: (r.ticket_type ?? 'human_escalation') as 'human_escalation' | 'unanswered_question',
+        rejection_reason: r.rejection_reason ?? null,
         created_at: r.created_at,
         resolved_at: r.resolved_at,
         resolved_by: r.resolved_by,

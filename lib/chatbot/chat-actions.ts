@@ -20,6 +20,7 @@ export async function getOrCreateSession(params: {
   userId?: string
   anonymousId?: string
   existingSessionId?: string
+  started_from?: 'chat_widget' | 'search_hint' | 'help_page'
 }): Promise<{ session_id: string; messages: HistoryMessage[] }> {
   const supabase = getSupabaseService()
 
@@ -54,6 +55,7 @@ export async function getOrCreateSession(params: {
       user_id: params.userId ?? null,
       anonymous_id: params.anonymousId ?? null,
       is_escalated: false,
+      started_from: params.started_from ?? 'chat_widget',
     })
     .select('id')
     .single()
