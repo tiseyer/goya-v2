@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Analytics } from '@/lib/analytics/events';
+import { isPasswordStrong } from '@/lib/password-rules';
+import PasswordStrengthChecker from '@/app/components/ui/PasswordStrengthChecker';
 
 // ─── types & data ──────────────────────────────────────────────────────────────
 
@@ -88,7 +90,7 @@ function RegisterPageInner() {
     form.firstName.trim() &&
     form.lastName.trim() &&
     form.email.trim() &&
-    form.password.length >= 8 &&
+    isPasswordStrong(form.password) &&
     form.country &&
     form.agreed;
 
@@ -308,9 +310,7 @@ function RegisterPageInner() {
                         onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                         className={INPUT}
                       />
-                      {form.password.length > 0 && form.password.length < 8 && (
-                        <p className="text-xs text-rose-500 mt-1.5">Password must be at least 8 characters</p>
-                      )}
+                      <PasswordStrengthChecker password={form.password} />
                     </div>
 
                     <div>

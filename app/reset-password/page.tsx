@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { isPasswordStrong } from '@/lib/password-rules';
+import PasswordStrengthChecker from '@/app/components/ui/PasswordStrengthChecker';
 
 const INPUT = 'w-full px-4 py-3 rounded-xl bg-[#1a2744] border border-white/15 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2dd4bf]/40 focus:border-[#2dd4bf] transition-colors';
 const LABEL = 'block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide';
@@ -63,8 +65,8 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setFormError('');
 
-    if (password.length < 8) {
-      setFormError('Password must be at least 8 characters.');
+    if (!isPasswordStrong(password)) {
+      setFormError('Password does not meet all requirements.');
       return;
     }
     if (password !== confirm) {
@@ -153,9 +155,7 @@ export default function ResetPasswordPage() {
                   required
                   autoFocus
                 />
-                {password.length > 0 && password.length < 8 && (
-                  <p className="text-xs text-rose-400 mt-1.5">Password must be at least 8 characters</p>
-                )}
+                <PasswordStrengthChecker password={password} />
               </div>
               <div>
                 <label className={LABEL}>Confirm Password</label>
@@ -173,7 +173,7 @@ export default function ResetPasswordPage() {
 
               <button
                 type="submit"
-                disabled={submitting || !password || !confirm}
+                disabled={submitting || !isPasswordStrong(password) || !confirm || password !== confirm}
                 className="w-full py-3 bg-[#2dd4bf] text-[#1a2744] font-bold rounded-xl hover:bg-[#14b8a6] transition-colors disabled:opacity-60"
               >
                 {submitting ? 'Updating…' : 'Update password'}

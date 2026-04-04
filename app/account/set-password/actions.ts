@@ -2,14 +2,16 @@
 
 import { redirect } from 'next/navigation'
 import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
+import { validatePasswordServer } from '@/lib/password-rules'
 
 export async function setNewPassword(formData: FormData) {
   const password = String(formData.get('password') || '')
   const confirmPassword = String(formData.get('confirmPassword') || '')
 
-  // Validation
-  if (!password || password.length < 8) {
-    return { error: 'Password must be at least 8 characters' }
+  // Validation — enforces all 5 strength rules server-side
+  const strengthError = validatePasswordServer(password)
+  if (strengthError) {
+    return { error: strengthError }
   }
   if (password !== confirmPassword) {
     return { error: 'Passwords do not match' }
