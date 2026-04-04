@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Header from "./components/Header";
@@ -80,6 +80,9 @@ export default async function RootLayout({
 
   const impersonationState = await getImpersonationState();
 
+  const cookieStore = await cookies();
+  const isPasswordResetLocked = cookieStore.get('password_reset_pending')?.value === 'true';
+
   return (
     <html lang="en" suppressHydrationWarning>
       <ThemeColorProvider />
@@ -91,17 +94,26 @@ export default async function RootLayout({
           <ConsentGatedScripts ga4Id={ga4Id} clarityId={clarityId} />
 
           <ImpersonationBanner state={impersonationState} />
-          {!hideNav && <Header />}
-          <main className={`${!hideNav ? (impersonationState.isImpersonating ? 'pt-26' : 'pt-16') : ''} flex-1`}>
+          {isPasswordResetLocked ? (
+            <header className="fixed top-0 left-0 right-0 z-50 bg-[#1e2e56] border-b border-white/10">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/GOYA Logo White.png" alt="GOYA" className="h-8" />
+              </div>
+            </header>
+          ) : !hideNav ? (
+            <Header />
+          ) : null}
+          <main className={`${isPasswordResetLocked ? 'pt-16' : !hideNav ? (impersonationState.isImpersonating ? 'pt-26' : 'pt-16') : ''} flex-1`}>
             {children}
           </main>
-          {showFooter && <Footer />}
+          {!isPasswordResetLocked && showFooter && <Footer />}
 
-          {/* Chat widget — hidden on admin pages, lazy-loaded */}
-          {!isAdmin && <ChatWidgetLoader />}
+          {/* Chat widget — hidden on admin pages and password reset, lazy-loaded */}
+          {!isAdmin && !isPasswordResetLocked && <ChatWidgetLoader />}
 
           {/* Cookie consent banner + floating button */}
-          {!isAdmin && <CookieConsent />}
+          {!isAdmin && !isPasswordResetLocked && <CookieConsent />}
         </ClientProviders>
 
         {/* Vercel Analytics — always on (necessary/first-party) */}
