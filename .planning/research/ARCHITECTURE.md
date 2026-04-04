@@ -1,357 +1,466 @@
-# Architecture Patterns: Profile Page Redesign (v1.18)
+# Architecture Research
 
-**Domain:** Public member profile page — `/members/[id]`
-**Researched:** 2026-04-01
-**Source confidence:** HIGH — all findings verified directly from codebase
-
----
-
-## Existing Page Structure (What Gets Replaced)
-
-`app/members/[id]/page.tsx` is a server component with `force-dynamic` that:
-
-1. Fetches the profile via `getSupabaseService()` (service role, bypasses RLS)
-2. Fetches affiliated school(s) if `principal_trainer_school_id` or `faculty_school_ids` is set
-3. Renders a two-column layout: main (bio + connections) / sidebar (social links + school card + member card + ConnectButton)
-4. Hero section is a fixed-height `bg-primary` banner with avatar, role badge, name, and location
-
-**What's missing from the current page (target features for v1.18):**
-- Cover image (currently a plain bg-primary background)
-- Intro video embed
-- Role-specific pill sections (teaching styles, languages, practice format, etc.)
-- Events and courses carousels
-- Mapbox inline map
-- Designation badges in sidebar
-- Own-profile editing nudge / completion banner
-- Faculty grid for school-affiliated teachers
-- Facebook/TikTok social links (stored but not rendered)
+**Domain:** Device authentication (2FA) — fingerprint + OTP integrated into existing Next.js 16 + Supabase SSR auth
+**Researched:** 2026-04-04
+**Confidence:** HIGH — all integration points verified from live codebase
 
 ---
 
-## Data Model: `profiles` Table
-
-All columns verified from `lib/types.ts` and migrations `001_profiles.sql`, `002_profile_fields.sql`, `20260326_extend_onboarding.sql`, `20260355_add_wp_roles_to_profiles.sql`, `20260376_school_owner_schema.sql`.
-
-### Identity & Display
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | uuid | Primary key |
-| `email` | text | Not shown publicly |
-| `full_name` | text | Fallback display name |
-| `first_name` | text | Preferred — use with `last_name` |
-| `last_name` | text | |
-| `username` | text | Slug-style handle |
-| `mrn` | text | Member registration number |
-| `role` | text | `student`, `teacher`, `wellness_practitioner`, `moderator`, `admin` |
-| `avatar_url` | text | Profile photo URL |
-| `bio` | text | Free-text bio |
-| `introduction` | text | Short intro text (distinct from bio) |
-| `created_at` | timestamptz | "Member since" date |
-
-### Location
-| Column | Type | Notes |
-|--------|------|-------|
-| `location` | text | Free-form location string (legacy) |
-| `city` | text | Structured city |
-| `country` | text | Structured country |
-| `practice_format` | text | `online`, `in_person`, `hybrid` — drives map visibility |
-
-### Social Links
-| Column | Type | Notes |
-|--------|------|-------|
-| `website` | text | |
-| `instagram` | text | Handle or full URL |
-| `facebook` | text | |
-| `tiktok` | text | |
-| `youtube` | text | Channel handle or URL |
-| `youtube_intro_url` | text | Intro/reel video URL (YouTube or Vimeo) |
-| `phone` | text | Not shown publicly |
-
-### Shared Role Fields
-| Column | Type | Notes |
-|--------|------|-------|
-| `languages` | text[] | Spoken/teaching languages |
-
-### Teacher-Specific
-| Column | Type | Notes |
-|--------|------|-------|
-| `teacher_status` | text | Certification status |
-| `teaching_styles` | text[] | e.g. Hatha, Vinyasa |
-| `years_teaching` | text | |
-| `teaching_focus_arr` | text[] | Specializations |
-| `influences_arr` | text[] | Influences/lineage |
-| `other_org_member` | boolean | Member of other orgs |
-| `other_org_names` | text[] | |
-| `certificate_url` | text | |
-| `principal_trainer_school_id` | uuid | FK → schools.id; set = school owner |
-| `faculty_school_ids` | uuid[] | Schools where member is faculty |
-
-### Student-Specific
-| Column | Type | Notes |
-|--------|------|-------|
-| `practice_level` | text | Beginner/Intermediate/Advanced |
-| `practice_styles` | text[] | Yoga styles practiced |
-
-### Wellness Practitioner-Specific
-| Column | Type | Notes |
-|--------|------|-------|
-| `wellness_designations` | text[] | Credential types |
-| `wellness_focus` | text[] | Practice focus areas |
-| `wellness_org_name` | text | |
-| `wellness_regulatory_body` | boolean | |
-
-### Verification & Subscription
-| Column | Type | Notes |
-|--------|------|-------|
-| `is_verified` | boolean | |
-| `verification_status` | text | `unverified`, `pending`, `verified`, `rejected` |
-| `subscription_status` | text | `member`, `guest` |
-
----
-
-## School Ownership Model
-
-**Critical:** There is no `role = 'school'`. School owners are teachers with `principal_trainer_school_id IS NOT NULL`.
+## System Overview
 
 ```
-profiles.role = 'teacher' AND profiles.principal_trainer_school_id IS NOT NULL
-  → person is a school owner (Principal Trainer)
-
-profiles.faculty_school_ids = [uuid, ...]
-  → person is faculty at one or more approved schools
+┌─────────────────────────────────────────────────────────────────────────┐
+│  LOGIN FLOW (email/OAuth code → /auth/callback)                         │
+│                                                                         │
+│  1. exchangeCodeForSession()   ← no change                              │
+│  2. getUser()                  ← no change                              │
+│  3. [NEW] read goya_device_fp cookie from request                       │
+│  4. [NEW] query trusted_devices (service role)                          │
+│     ├── found + is_active=true  → redirect to original `next` param    │
+│     │                             update last_used_at (fire-and-forget) │
+│     └── not found (or no cookie)→ set device_pending_verification='true'│
+│                                  redirect to /verify-device?next=...   │
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼ (unrecognised device)
+┌──────────────────────────────────────────────────────────────────────┐
+│  MIDDLEWARE (middleware.ts — modified)                               │
+│                                                                      │
+│  [NEW] device_pending_verification cookie lock                       │
+│    mirrors password_reset_pending block exactly:                     │
+│    cookie=true + user  → allow /verify-device only                  │
+│    cookie=true + !user → clear cookie, redirect /sign-in            │
+└──────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  /verify-device  (new page — client component)                       │
+│                                                                      │
+│  useEffect on mount → POST /api/device/send-code                     │
+│  User enters 6-digit OTP                                             │
+│  Submit → POST /api/device/verify-code { code, fingerprint, name }  │
+│    success: clear cookie client-side, router.push(next)             │
+│    failure: show error, allow resend after cooldown                  │
+└──────────────────────────────────────────────────────────────────────┘
+          │
+          ▼ (admin view)
+┌──────────────────────────────────────────────────────────────────────┐
+│  /admin/users/[id]?tab=devices  (new tab, server-rendered)           │
+│                                                                      │
+│  Server fetch: trusted_devices WHERE profile_id = id                 │
+│  List: device name, fingerprint (masked), trusted_at,               │
+│        last_used_at, is_active badge                                 │
+│  Revoke: RevokeDeviceButton → POST /api/admin/devices/[id]/revoke   │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
-School data lives in the `schools` table. Relevant columns for the profile page:
-- `id`, `name`, `slug`, `status` (must be `'approved'` to show link)
-- `logo_url`, `bio`, `cover_image_url`
-- `location_city`, `location_country`, `location_lat`, `location_lng`
-- `course_delivery_format`, `practice_styles`, `languages`
-- `established_year`, `lineage`
+---
 
-Faculty members live in `school_faculty` table (columns: `id`, `school_id`, `profile_id`, `position`, `is_principal_trainer`, `status`). Status must be `'active'` to show in a faculty grid.
+## Component Boundaries
 
-Designation badges come from `school_designations` table (columns: `school_id`, `designation_type`, `status`). Valid types: `CYS200`, `CYS300`, `CYS500`, `CCYS`, `CPYS`, `CMS`, `CYYS`, `CRYS`.
+| Component | New or Modified | Responsibility |
+|-----------|----------------|----------------|
+| `app/auth/callback/route.ts` | Modified | After `getUser()`: read fp cookie, check `trusted_devices`, gate or allow redirect |
+| `middleware.ts` | Modified | Add `device_pending_verification` cookie lock block after `password_reset_pending` block |
+| `app/layout.tsx` | Modified | Mount `<DeviceFingerprintSetter />` client component so fp cookie exists before login |
+| `app/components/DeviceFingerprintSetter.tsx` | New | Client component: on mount, reads cookie; if absent, computes fingerprint and writes cookie |
+| `lib/device/fingerprint.ts` | New | Pure client-side util: UA + screen + timezone → SHA-256 hex digest |
+| `app/verify-device/page.tsx` | New | OTP entry page; auto-sends code on mount via API route |
+| `app/api/device/send-code/route.ts` | New | Auth-gated POST: generate 6-digit code, store hash in DB, send via Resend |
+| `app/api/device/verify-code/route.ts` | New | Auth-gated POST: validate code hash, insert `trusted_devices`, return success |
+| `app/api/admin/devices/[deviceId]/revoke/route.ts` | New | Admin POST: set `trusted_devices.is_active = false`, log audit event |
+| `app/admin/users/[id]/page.tsx` | Modified | Add `devices` tab to tab array; conditional fetch; render `UserDevicesSection` |
+| `app/admin/users/[id]/UserDevicesSection.tsx` | New | Server component: list trusted devices with `RevokeDeviceButton` per row |
+| `app/admin/users/[id]/RevokeDeviceButton.tsx` | New | Client component: POST revoke, `router.refresh()` on success (mirrors `RemoveConnectionButton`) |
+| DB: `trusted_devices` | New | `id, profile_id, fingerprint, device_name, trusted_at, last_used_at, is_active, created_at` |
+| DB: `device_verification_codes` | New | `id, profile_id, code_hash, expires_at, used_at, created_at` |
 
 ---
 
-## Reusable Components Already Built
+## Data Flow: Login → Fingerprint Check → OTP → Trust
 
-### From `app/dashboard/components/`
+```
+User submits login form
+        ↓
+Supabase magic link / OAuth code issued
+        ↓
+GET /auth/callback?code=…&next=/dashboard
+        ↓
+[existing] exchangeCodeForSession(code)
+  → session cookies written to `response` (NextResponse.redirect)
+        ↓
+[existing] getUser()  → user.id available
+        ↓
+[existing] role/invite handling (unchanged)
+        ↓
+[existing] logAuditEvent (unchanged — fires regardless of device trust)
+        ↓
+[NEW] if next !== '/reset-password':        ← skip device check for recovery flow
+  fp = request.cookies.get('goya_device_fp')?.value
+  trusted = fp
+    ? await checkTrustedDevice(user.id, fp)   ← service role query
+    : false
+  if (!trusted):
+    response.cookies.set('device_pending_verification', 'true', {
+      httpOnly: false, sameSite: 'lax', path: '/', maxAge: 600, secure: prod
+    })
+    return NextResponse.redirect('/verify-device?next=<encoded>')
+  else if (fp && trusted):
+    fire-and-forget: UPDATE trusted_devices SET last_used_at = now()
+      WHERE profile_id = user.id AND fingerprint = fp
+        ↓
+[existing] return response  ← only reached if trusted (or recovery flow)
+```
 
-| Component | File | What It Does | Props |
-|-----------|------|--------------|-------|
-| `HorizontalCarousel` | `HorizontalCarousel.tsx` | Embla + CSS snap-x carousel wrapper | `title`, `showAllHref`, `children`, `emptyState`, `loading` |
-| `EventCard` | `EventCard.tsx` | 280px wide card for an `EventRow` | `event: EventRow` |
-| `FacultyCard` | `FacultyCard.tsx` | 280px wide card for a `FacultyRow` — links to `/directory/[id]` | `faculty: FacultyRow` |
-
-**NOTE:** `EventCard` depends on `EventRow` from `lib/dashboard/queries.ts`. `FacultyCard` depends on `FacultyRow` from the same file. Both types are already exported and stable.
-
-**No `CourseCard` exists in the dashboard components.** The dashboard uses inline rendering for courses. A dedicated `CourseCard` component will need to be created for the profile page carousels.
-
-### From `app/components/`
-
-| Component | File | What It Does | Props |
-|-----------|------|--------------|-------|
-| `ConnectButton` | `ConnectButton.tsx` | Role-aware connect/request/accept flow | `memberId`, `memberName`, `memberPhoto`, `firstName`, `viewerRole`, `profileRole`, `isOwnProfile`, `isOwnSchool?` |
-| `MessageButton` | `MessageButton.tsx` | Opens DM to member | (verify props) |
-| `ConnectionsSection` | `ConnectionsSection.tsx` | Shows accepted connections list (own profile only currently) | `profileMemberId`, `isOwnProfile?` |
-| `PageContainer` | `ui/PageContainer.tsx` | Standard max-w-7xl content width wrapper | `className?` |
-
-### Data Fetch Utilities in `lib/dashboard/queries.ts`
-
-All query functions are `server-only` and accept a `SupabaseClient`:
-
-| Function | Returns | Reuse for profile page? |
-|----------|---------|-------------------------|
-| `fetchUpcomingEvents(supabase, limit?)` | `EventRow[]` | YES — for events carousel |
-| `fetchRecentCourses(supabase, limit?)` | `CourseRow[]` | YES — for courses carousel |
-| `fetchAcceptedConnections(supabase, userId, limit?)` | `AcceptedConnection[]` | YES — for connections display |
-| `fetchSchoolFaculty(supabase, schoolId, limit?)` | `FacultyRow[]` | YES — for faculty grid on teacher profiles |
-| `fetchUserInProgressCourses(supabase, userId, limit?)` | `InProgressCourseRow[]` | Possibly — for own profile only |
-
-**Important:** `fetchUpcomingEvents` and `fetchRecentCourses` return platform-wide data, not member-specific data. For the profile page you need events/courses *created by* the profile owner. New query variants will be needed:
-- `fetchMemberEvents(supabase, userId, limit?)` — filter by `created_by = userId` and `status = 'published'`
-- `fetchMemberCourses(supabase, userId, limit?)` — filter by `created_by = userId` and `status = 'published'`
+```
+/verify-device loads
+        ↓
+useEffect → POST /api/device/send-code
+  server: getUser() → confirm session
+          generate crypto.randomInt(100000, 999999) → 6-digit code
+          hash = SHA-256(code)
+          INSERT device_verification_codes { profile_id, code_hash, expires_at: now+10min }
+          sendEmailFromTemplate('device_otp', { code, firstName })
+          return { ok: true }
+        ↓
+User types 6-digit code → Submit
+        ↓
+POST /api/device/verify-code { code, fingerprint, deviceName }
+  server: getUser()
+          hash = SHA-256(code)
+          SELECT device_verification_codes
+            WHERE profile_id = user.id
+              AND code_hash = hash
+              AND expires_at > now()
+              AND used_at IS NULL
+          not found / expired → 400 { error: 'Invalid or expired code' }
+          found:
+            UPDATE device_verification_codes SET used_at = now()
+            INSERT trusted_devices { profile_id, fingerprint, device_name, trusted_at, is_active: true }
+            return { ok: true }
+        ↓
+Client on success:
+  document.cookie = 'device_pending_verification=; maxAge=0; path=/'
+  router.push(next ?? '/dashboard')
+```
 
 ---
 
-## Data Fetching Pattern
+## Cookie Architecture
 
-### Established Pattern (from `app/dashboard/page.tsx`)
+### New cookie: `device_pending_verification`
 
-The dashboard page uses server-side-only data fetching with `Promise.all`:
+Mirrors `password_reset_pending` in every attribute (verified from `/auth/callback` lines 43-50).
+
+| Attribute | Value | Rationale |
+|-----------|-------|-----------|
+| `httpOnly` | `false` | Client must clear it after successful OTP (same as `password_reset_pending`) |
+| `sameSite` | `lax` | Consistent with all existing auth cookies |
+| `path` | `/` | Global scope so middleware can read it on any route |
+| `maxAge` | `600` | 10-minute safety net — matches OTP expiry |
+| `secure` | `process.env.NODE_ENV === 'production'` | Matches existing pattern |
+
+### New cookie: `goya_device_fp`
+
+Long-lived client-written fingerprint. **Not a secret** — just a stable identifier.
+
+| Attribute | Value | Rationale |
+|-----------|-------|-----------|
+| `httpOnly` | `false` | Must be written by JavaScript (client-side fingerprinting) |
+| `sameSite` | `lax` | Consistent with platform cookies |
+| `path` | `/` | Must be readable by `/auth/callback` route handler via `request.cookies` |
+| `maxAge` | `31_536_000` (1 year) | Long-lived trust signal — survives session expiry |
+| `secure` | production only | Matches existing pattern |
+
+### Supabase SSR cookie non-interference
+
+`goya_device_fp` is a **custom cookie**, entirely separate from `sb-*` Supabase session cookies. In `/auth/callback`, the `setAll` callback in `createServerClient` only handles Supabase auth cookies. The fp cookie is read via `request.cookies.get('goya_device_fp')` before the Supabase client is constructed — no conflict. The fp cookie is written by `DeviceFingerprintSetter` on the preceding page load, not during the callback.
+
+---
+
+## Modified File: `/auth/callback/route.ts`
+
+Insert device check block **after** `logAuditEvent` and **before** `return response` (line 129 in the current file).
 
 ```typescript
-// page.tsx (server component, force-dynamic)
-const serviceClient = getSupabaseService()  // service role — bypasses RLS
+// [NEW] Device trust check — skip for recovery flow
+if (next !== '/reset-password') {
+  const fp = request.cookies.get('goya_device_fp')?.value
+  const trusted = fp ? await checkTrustedDevice(user!.id, fp) : false
 
-const [profile, events, courses, faculty] = await Promise.all([
-  serviceClient.from('profiles').select(...).eq('id', id).single(),
-  fetchMemberEvents(serviceClient, id),
-  fetchMemberCourses(serviceClient, id),
-  fetchSchoolFaculty(serviceClient, schoolId),  // conditional
-])
+  if (!trusted) {
+    response.cookies.set('device_pending_verification', 'true', {
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 600,
+      secure: process.env.NODE_ENV === 'production',
+    })
+    const verifyUrl = new URL('/verify-device', origin)
+    verifyUrl.searchParams.set('next', next)
+    return NextResponse.redirect(verifyUrl)
+  }
+
+  if (fp) {
+    // Fire-and-forget last_used_at update
+    void getSupabaseService()
+      .from('trusted_devices' as any)
+      .update({ last_used_at: new Date().toISOString() })
+      .eq('profile_id', user!.id)
+      .eq('fingerprint', fp)
+  }
+}
+
+return response
 ```
 
-**Use service role client** (same as current profile page). The middleware enforces authentication. Service role avoids JWT expiry causing false 404s on shared/bookmarked profile links.
-
-### Viewer Identity
-
-The redesigned page needs to know the logged-in user's ID and role for:
-- Showing/hiding the own-profile editing nudge
-- Passing `viewerRole` and `isOwnProfile` to `ConnectButton`
-
-Get this via `getEffectiveUserId()` and `getEffectiveClient()` from `lib/supabase/getEffectiveUserId`. These return `null` / unauthenticated client gracefully — profile pages must handle unauthenticated viewers.
+`checkTrustedDevice` is a small helper in `lib/device/checkTrustedDevice.ts` (new file):
 
 ```typescript
-// Safe pattern for pages that are public but auth-aware
-import { createClient } from '@/lib/supabase/server'
-
-const supabase = await createClient()
-const { data: { user } } = await supabase.auth.getUser()
-const viewerId = user?.id ?? null
+// lib/device/checkTrustedDevice.ts
+export async function checkTrustedDevice(userId: string, fingerprint: string): Promise<boolean> {
+  const service = getSupabaseService()
+  const { data } = await (service as any)
+    .from('trusted_devices')
+    .select('id')
+    .eq('profile_id', userId)
+    .eq('fingerprint', fingerprint)
+    .eq('is_active', true)
+    .maybeSingle()
+  return Boolean(data)
+}
 ```
 
 ---
 
-## Privacy Rules (From v1.18 Milestone Spec)
+## Modified File: `middleware.ts`
 
-| Address visibility | Condition |
-|-------------------|-----------|
-| Full address hidden | `role = 'student'` — never show precise address |
-| Full address hidden | `practice_format = 'online'` — no physical presence |
-| City + Country only | `role = 'teacher'` with `practice_format = 'in_person'` or `'hybrid'` |
-| Map shown | `practice_format = 'in_person'` or `'hybrid'`, non-student |
+Insert one block immediately **after** the `passwordResetPending` block (after line 256 in the current file). Also add `/verify-device` to `MAINTENANCE_BYPASS_PATHS`.
 
-These rules need to be enforced server-side before passing address data to client components.
-
----
-
-## Component Architecture for New Profile Page
-
-### Recommended Layout
-
-```
-app/members/[id]/page.tsx          ← server component, all data fetching
-  └─ ProfileHero                   ← new component (cover, avatar, name, badge, actions)
-  └─ [2-col grid]
-       ├─ Left column (lg:col-span-2)
-       │    ├─ ProfileBio           ← thin wrapper around existing bio text
-       │    ├─ ProfilePills         ← new component, role-specific pill sections
-       │    ├─ ProfileVideo         ← new component, YouTube/Vimeo embed
-       │    ├─ HorizontalCarousel   ← reuse from dashboard (events)
-       │    ├─ HorizontalCarousel   ← reuse from dashboard (courses)
-       │    └─ ProfileMap           ← new component (Mapbox inline map)
-       └─ Sidebar (lg:col-span-1)
-            ├─ MemberCard           ← existing inline markup → extract to component
-            ├─ ConnectButton        ← reuse existing
-            ├─ MessageButton        ← reuse existing
-            ├─ DesignationBadges    ← new component
-            ├─ SocialLinks          ← existing inline markup → extract, add FB/TikTok
-            └─ SchoolAffiliation    ← existing inline markup → polish
+```typescript
+// ─── Device verification lock ──────────────────────────────────────────────
+const devicePendingVerification = request.cookies.get('device_pending_verification')?.value === 'true'
+if (devicePendingVerification && user) {
+  if (pathname !== '/verify-device' && !pathname.startsWith('/verify-device/')) {
+    return NextResponse.redirect(new URL('/verify-device', request.url))
+  }
+}
+if (devicePendingVerification && !user) {
+  // Stale cookie — clear and redirect to sign-in
+  const clearResponse = NextResponse.redirect(new URL('/sign-in', request.url))
+  clearResponse.cookies.set('device_pending_verification', '', { maxAge: 0, path: '/' })
+  return clearResponse
+}
 ```
 
-### New Components to Build
-
-| Component | Data Source | Role Gating |
-|-----------|-------------|-------------|
-| `ProfileHero` | `profile.*`, `cover_image_url` | None |
-| `ProfilePills` | `teaching_styles`, `practice_styles`, `wellness_designations`, `languages`, `practice_format` | Role-branched |
-| `ProfileVideo` | `youtube_intro_url` | None |
-| `ProfileMap` | `city`, `country`, `practice_format` + future lat/lng | Hide for students and online-only |
-| `DesignationBadges` | `user_designations` table or `school_designations` | None |
-| `OwnProfileNudge` | `viewerId === profile.id`, completion score | Only own profile |
-| `CourseCard` | `CourseRow` from new `fetchMemberCourses` | None |
+`/verify-device` must **not** be in `PUBLIC_PATHS` (it requires an active session). Add it only to `MAINTENANCE_BYPASS_PATHS` so maintenance mode does not block a user mid-verification. The auth enforcement at the bottom of middleware will redirect unauthenticated users to `/sign-in` naturally.
 
 ---
 
-## Role-Specific Pill Sections
+## Admin: Devices Tab Integration
 
-Based on the `Profile` type and milestone spec:
+### `app/admin/users/[id]/page.tsx` — three changes
 
-| Role | Pills Section Label | Fields |
-|------|--------------------|----|
-| `teacher` | Teaching Styles | `teaching_styles[]` |
-| `teacher` | Teaching Focus | `teaching_focus_arr[]` |
-| `teacher` | Influences | `influences_arr[]` |
-| `teacher` | Languages | `languages[]` |
-| `student` | Practice Styles | `practice_styles[]` |
-| `student` | Languages | `languages[]` |
-| `wellness_practitioner` | Specialisms | `wellness_focus[]` |
-| `wellness_practitioner` | Credentials | `wellness_designations[]` |
-| All | Practice Format | `practice_format` (single badge) |
+1. Add to tab array:
+   ```typescript
+   { key: 'devices', label: 'Devices' }
+   ```
+
+2. Add conditional fetch (mirrors `connections` pattern at lines 50-63):
+   ```typescript
+   let devices: TrustedDevice[] = []
+   if (tab === 'devices') {
+     const { data } = await (getSupabaseService() as any)
+       .from('trusted_devices')
+       .select('id, device_name, fingerprint, trusted_at, last_used_at, is_active')
+       .eq('profile_id', id)
+       .order('trusted_at', { ascending: false })
+     devices = data || []
+   }
+   ```
+
+3. Add tab content render:
+   ```typescript
+   {tab === 'devices' && (
+     <UserDevicesSection devices={devices} userId={id} />
+   )}
+   ```
+
+### `UserDevicesSection.tsx` — server component
+
+Receives `devices: TrustedDevice[]` and `userId: string` as props. Renders a list/table identical in style to the connections tab. Each row has device name, masked fingerprint (first 8 chars + `…`), trusted_at date, last_used_at date, `is_active` badge, and a `RevokeDeviceButton`. Pattern is identical to the `RemoveConnectionButton` pattern already in the file.
+
+### `RevokeDeviceButton.tsx` — client component
+
+```typescript
+'use client'
+// POST /api/admin/devices/[deviceId]/revoke
+// On success: router.refresh()
+// Shows disabled state while in-flight
+// Mirrors RemoveConnectionButton exactly
+```
 
 ---
 
-## Connection Between Profile Page and School Pages
+## Recommended Project Structure (new files only)
 
-The existing profile page already handles school affiliation display:
-- If `principal_trainer_school_id` is set → fetch that school, show "Visit School" card
-- If `faculty_school_ids` is set → fetch those schools (array), show one card per school
+```
+app/
+├── components/
+│   └── DeviceFingerprintSetter.tsx       # client component: compute + write fp cookie
+├── verify-device/
+│   └── page.tsx                           # OTP entry page
+├── api/
+│   └── device/
+│       ├── send-code/
+│       │   └── route.ts                   # POST: generate OTP, email it
+│       └── verify-code/
+│           └── route.ts                   # POST: validate, insert trusted_devices
+│   └── admin/
+│       └── devices/
+│           └── [deviceId]/
+│               └── revoke/
+│                   └── route.ts           # POST: revoke trusted device
+└── admin/
+    └── users/
+        └── [id]/
+            ├── UserDevicesSection.tsx     # server component: device list
+            └── RevokeDeviceButton.tsx     # client component: revoke action
 
-The v1.18 redesign should also show a "Faculty at" section linking to school profiles when a teacher is faculty at one or more approved schools. The existing fetch logic in `page.tsx` (lines 54–71) can be reused with minor refactoring.
+lib/
+└── device/
+    ├── fingerprint.ts                     # SHA-256 fingerprint utility (client-safe)
+    └── checkTrustedDevice.ts              # server-only DB lookup helper
+```
+
+---
+
+## Architectural Patterns
+
+### Pattern 1: Cookie-lock gate (existing pattern — extended)
+
+**What:** A short-lived `httpOnly: false` cookie acts as a "pending action" gate in middleware. Middleware enforces it by redirecting all non-allowed paths back to the pending-action page. The page clears the cookie client-side after the action completes.
+
+**When to use:** Any multi-step auth flow requiring a secondary action before full navigation. Already used for `password_reset_pending` and the impersonation cookie.
+
+**Trade-offs:** Simple — no DB lookup in middleware (just a cookie read). Cannot be forged to escape the gate (cookie is set server-side in the route handler). Edge case: user clears cookies mid-flow → lands at sign-in, which is acceptable.
+
+### Pattern 2: Service role lookup in the callback route handler
+
+**What:** `getSupabaseService()` is used in `/auth/callback` to query `trusted_devices` after session establishment. The session is just-established via `exchangeCodeForSession`, so the anon key client has it, but using service role is consistent with the existing pattern in this file (faculty invite claim, profile fetch at lines 64-109).
+
+**Trade-offs:** Simpler than constructing a second session-bearing client. Service role is already imported in this file. Not for general use — scoped to the route handler.
+
+### Pattern 3: Tab-gated server fetch (existing pattern — extended)
+
+**What:** The admin user detail page conditionally fetches data based on `?tab=` search param. Data is only fetched when the tab is active.
+
+**When to use:** All admin detail tabs. Already the pattern for `connections` (lines 50-63). Add `devices` as a fourth conditional block.
+
+---
+
+## Build Order
+
+Ordered by dependency chain:
+
+| Step | What | Depends on |
+|------|------|-----------|
+| 1 | DB migrations: `trusted_devices` + `device_verification_codes` + RLS + indexes | Nothing — first |
+| 2 | `lib/device/fingerprint.ts` | Nothing — pure util |
+| 3 | `lib/device/checkTrustedDevice.ts` | Step 1 (tables exist) |
+| 4 | `DeviceFingerprintSetter` client component + root layout mount | Step 2 |
+| 5 | `/auth/callback` modification | Steps 1, 3, 4 (cookie must be set before callback runs) |
+| 6 | `middleware.ts` modification | Step 5 (establishes cookie name and gate route) |
+| 7 | `app/api/device/send-code` route | Step 1; `sendEmailFromTemplate` (already exists) |
+| 8 | `app/api/device/verify-code` route | Steps 1, 7 |
+| 9 | `/verify-device` page | Steps 6, 7, 8 |
+| 10 | `UserDevicesSection` + `RevokeDeviceButton` | Step 1 |
+| 11 | `app/api/admin/devices/[deviceId]/revoke` | Step 1 |
+| 12 | Admin user detail `devices` tab | Steps 1, 10, 11 |
+| 13 | Email template `device_otp` in `email_templates` DB | Can be done any time after step 1 |
+
+Steps 4-6 and 7-9 can proceed in parallel after step 1 is done. Steps 10-12 are fully independent of 4-9.
+
+---
+
+## Anti-Patterns
+
+### Anti-Pattern 1: Computing the fingerprint server-side from headers
+
+**What people do:** Read `User-Agent` from request headers in `/auth/callback` and hash it.
+
+**Why it's wrong:** UA alone is a weak fingerprint — many users share identical UA strings. Screen resolution and timezone (client-only values) dramatically reduce collision probability. More importantly, the `goya_device_fp` cookie must be **stable across sessions** — not regenerated on each login. It needs to be set once by a client component and persist for 1 year.
+
+**Do this instead:** `DeviceFingerprintSetter` computes `SHA-256(UA + screenWidth + screenHeight + colorDepth + timezone)` client-side on every page load. It reads the existing cookie first; only writes if absent.
+
+### Anti-Pattern 2: Storing the raw fingerprint string in the cookie
+
+**What people do:** Store the raw `UA|1920|1080|24|Europe/Berlin` string for debugging.
+
+**Why it's wrong:** Unnecessarily exposes device characteristics. The cookie value should be opaque.
+
+**Do this instead:** Cookie value = SHA-256 hex digest. `trusted_devices.fingerprint` = same hex digest. Comparison is direct equality of two hex strings.
+
+### Anti-Pattern 3: Moving the device trust check into middleware
+
+**What people do:** Add a `trusted_devices` DB lookup to middleware to avoid the callback detour.
+
+**Why it's wrong:** Middleware runs on the Edge runtime. `getSupabaseService()` is a Node.js-only client. The anon-key Edge client could be used, but that requires `trusted_devices` to have permissive RLS for the authenticated user — that RLS has to be written carefully and adds complexity. More critically, at middleware execution time for normal page navigation the user's device fp cookie already exists and is trusted — the middleware check would run on every request for every authenticated user, not just at login. This is unnecessary load.
+
+**Do this instead:** Middleware only enforces the cookie lock (no DB lookup — just `request.cookies.get(...)`). The device check happens once per login in the route handler.
+
+### Anti-Pattern 4: Storing the raw OTP code in the database
+
+**What people do:** INSERT the 6-digit code directly as a `code` column.
+
+**Why it's wrong:** A plain 6-digit code in a database row is trivially exploitable if the DB or logs are compromised.
+
+**Do this instead:** Store `SHA-256(code)` as `code_hash`. On verify, hash the incoming code and compare. The raw code only ever exists in memory and in the email.
+
+### Anti-Pattern 5: Skipping the `used_at` column on verification codes
+
+**What people do:** DELETE the row on successful verification.
+
+**Why it's wrong:** Deletion prevents replay detection. If the same code is submitted twice (race condition or retry), a second verification would find no row and fail silently — acceptable, but you lose audit trail.
+
+**Do this instead:** SET `used_at = now()` and keep the row. The lookup query filters `WHERE used_at IS NULL`.
+
+---
+
+## Scaling Considerations
+
+| Scale | Architecture Adjustments |
+|-------|--------------------------|
+| 0–1k users | Current approach: synchronous lookup in callback, no caching needed |
+| 1k–100k users | Add composite index: `trusted_devices(profile_id, fingerprint, is_active)`. Add to migration from day one. |
+| 100k+ users | Add daily cron to hard-delete `device_verification_codes` rows older than 24 hours. Add to existing cron routes in `app/api/cron/`. |
 
 ---
 
 ## Integration Points Summary
 
-| Integration | Mechanism | Status |
-|-------------|-----------|--------|
-| Profile data fetch | `getSupabaseService()` + `.from('profiles').select(...)` | EXISTS — extend field list |
-| School affiliation | Service role fetch of `schools` table via `principal_trainer_school_id` / `faculty_school_ids` | EXISTS — reuse |
-| Faculty grid | `fetchSchoolFaculty()` from `lib/dashboard/queries.ts` | EXISTS — reuse |
-| Events carousel | New `fetchMemberEvents()` (mirror of `fetchUpcomingEvents` with `created_by` filter) | NEEDS CREATION |
-| Courses carousel | New `fetchMemberCourses()` (mirror of `fetchRecentCourses` with `created_by` filter) | NEEDS CREATION |
-| Connect button | `ConnectButton` component — needs `viewerRole` from server | EXISTS — reuse |
-| Message button | `MessageButton` component | EXISTS — reuse |
-| Completion nudge | `getProfileCompletion()` from `lib/dashboard/profileCompletion.ts` | EXISTS — reuse |
-| Carousel wrapper | `HorizontalCarousel` from `app/dashboard/components/` | EXISTS — reuse |
-| Event card | `EventCard` from `app/dashboard/components/` | EXISTS — reuse |
-| Faculty card | `FacultyCard` from `app/dashboard/components/` | EXISTS — reuse |
-| Course card | None exists yet | NEEDS CREATION |
-| Intro video | New `ProfileVideo` component | NEEDS CREATION |
-| Mapbox map | New `ProfileMap` component | NEEDS CREATION |
-| Designation badges | New component querying `user_designations` or `school_designations` | NEEDS CREATION |
-
----
-
-## Anti-Patterns to Avoid
-
-### Anti-Pattern 1: Checking `role === 'school'`
-**What goes wrong:** There is no `'school'` value in `profiles.role`. School owners are teachers.
-**Instead:** Check `profile.role === 'teacher' && Boolean(profile.principal_trainer_school_id)`
-
-### Anti-Pattern 2: Client-side data fetching for profile data
-**What goes wrong:** Causes flash of loading state on page load, leaks service role patterns to client.
-**Instead:** Fetch all profile data in `page.tsx` server component via `Promise.all`, pass as props.
-
-### Anti-Pattern 3: Showing address or map for students or online-only profiles
-**What goes wrong:** Privacy violation per product spec.
-**Instead:** Gate map/address display on `practice_format !== 'online' && role !== 'student'` server-side.
-
-### Anti-Pattern 4: Using `<img>` instead of `next/image` for avatar and cover
-**What goes wrong:** Current page uses `<img>` (with eslint-disable). The redesign should move to `next/image`.
-**Instead:** Use `<Image>` from `next/image` for all profile media. Add external image domains to `next.config`.
-
-### Anti-Pattern 5: Hardcoding max-width or padding on page sections
-**What goes wrong:** Misalignment with header/footer.
-**Instead:** Wrap all content sections in `<PageContainer>` as per CLAUDE.md layout standard.
+| Integration Point | Existing File | Change Type | Key Detail |
+|-------------------|--------------|-------------|------------|
+| Auth callback | `app/auth/callback/route.ts` | Modified | Add device check block after `logAuditEvent`, before `return response` |
+| Middleware lock | `middleware.ts` | Modified | New `device_pending_verification` block after `passwordResetPending` block |
+| Root layout fp setter | `app/layout.tsx` | Modified | Mount `<DeviceFingerprintSetter />` (client component, no visible UI) |
+| Admin user detail tabs | `app/admin/users/[id]/page.tsx` | Modified | Add 4th tab `devices`; conditional fetch; render `UserDevicesSection` |
+| Email system | `lib/email/send.ts` | None — use as-is | Call `sendEmailFromTemplate('device_otp', { code, firstName })` |
+| Supabase service client | `lib/supabase/service.ts` | None — use as-is | Used for all server-side device table queries |
+| Audit logging | `lib/audit.ts` | None — use as-is | Log `admin.device_revoked` events in revoke route |
 
 ---
 
 ## Sources
 
-- `app/members/[id]/page.tsx` — current page implementation (lines 1–297)
-- `lib/types.ts` — Profile interface (lines 14–71)
-- `lib/dashboard/queries.ts` — All query function signatures and return types
-- `lib/dashboard/profileCompletion.ts` — Completion scoring logic
-- `app/dashboard/page.tsx` — Server-side data fetch pattern reference
-- `app/dashboard/components/HorizontalCarousel.tsx` — Carousel component API
-- `app/dashboard/components/EventCard.tsx` — EventCard component API
-- `app/dashboard/components/FacultyCard.tsx` — FacultyCard component API
-- `app/components/ConnectButton.tsx` — ConnectButton props and role-pair logic
-- `app/components/ConnectionsSection.tsx` — Connections display (own-profile only limitation)
-- `supabase/migrations/002_profile_fields.sql` — Early profile columns + schools table creation
-- `supabase/migrations/20260326_extend_onboarding.sql` — Extended profile columns (social, location, role-specific)
-- `supabase/migrations/20260376_school_owner_schema.sql` — school_faculty, school_designations, schools extensions, profiles.faculty_school_ids
-- `.planning/PROJECT.md` — v1.18 milestone spec, v1.17 dashboard redesign context
+- `app/auth/callback/route.ts` (live): verified `exchangeCodeForSession` → `getUser()` → conditional cookie set (`password_reset_pending`) → `return response` flow
+- `middleware.ts` (live): verified `password_reset_pending` lock block (lines 244–256) as the direct model for the new lock
+- `app/admin/users/[id]/page.tsx` (live): verified tab array pattern, `tab === 'connections'` conditional fetch (lines 50–63), `?tab=` search param URL pattern
+- `lib/email/send.ts` (live): verified `sendEmailFromTemplate` signature and graceful template-missing handling
+- `lib/supabase/service.ts` (live): verified service role singleton pattern
+- `app/api/admin/impersonate/route.ts` (live): verified admin role-check pattern (`isAdminOrAbove`) for admin API routes
+- Confidence: HIGH — all patterns derived from existing production code, not assumptions
+
+---
+*Architecture research for: Device authentication v1.24*
+*Researched: 2026-04-04*
