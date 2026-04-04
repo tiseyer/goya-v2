@@ -113,9 +113,10 @@ None.
 | 260404-h63 | Create 4 test users with full dummy profiles, connections, credits, school | 2026-04-04 | a83e640 | [260404-h63-create-4-test-users-with-full-dummy-prof](./quick/260404-h63-create-4-test-users-with-full-dummy-prof/) |
 | 260404-hht | Add test user slots to Admin Settings + profile dropdown quick-switch | 2026-04-04 | 1974a8f, 916e2e4 | [260404-hht-add-test-user-slots-to-admin-settings-ad](./quick/260404-hht-add-test-user-slots-to-admin-settings-ad/) |
 | 260404-jep | Fix password reset PKCE flow — server-side code exchange via /auth/callback | 2026-04-04 | ecb6a4b | [260404-jep-fix-password-reset-pkce-flow-exchange-co](./quick/260404-jep-fix-password-reset-pkce-flow-exchange-co/) |
+| 260404-jhf | Fix test user slot search — dedicated action searches name+email, inline role data, email shown in dropdown | 2026-04-04 | 7a2b4dc, fa86608 | [260404-jhf-fix-test-user-slot-search-broken-api-ret](./quick/260404-jhf-fix-test-user-slot-search-broken-api-ret/) |
 
 ## Session Continuity
 
 Last session: 2026-04-04
-Stopped at: Completed quick task 260404-jep: Fix password reset PKCE flow — awaiting human-verify checkpoint
+Stopped at: Completed quick task 260404-jhf: Fix test user slot search broken API return
 Resume file: None
