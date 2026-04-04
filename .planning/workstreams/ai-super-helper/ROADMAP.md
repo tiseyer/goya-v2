@@ -79,8 +79,10 @@ Plans:
   3. An admin clicking "Add to FAQ" after reviewing the streamed answer publishes a new FAQ entry; if an identical question already exists in the FAQ, the admin sees a warning before proceeding
   4. An admin clicking "Mattea won't answer this" with a rejection reason marks the ticket resolved without creating a FAQ entry
   5. The admin Support Tickets view has a source filter that separates "User submitted" tickets from "Chatbot escalated" tickets
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — Unanswered detection + auto-ticket creation + source filter (UNQ-01, UNQ-05)
+- [ ] 04-02-PLAN.md — Generate-answer API + admin resolution UI (UNQ-02, UNQ-03, UNQ-04)
 
 ### Phase 5: Conversation History
 **Goal**: Users on the Help page can see and reload their previous conversations, and start fresh when needed
@@ -100,5 +102,5 @@ Plans:
 | 1. Schema & Infrastructure | 0/2 | Planning complete | - |
 | 2. Source Tracking | 0/1 | Planning complete | - |
 | 3. Feedback | 0/2 | Planning complete | - |
-| 4. Unanswered Question Pipeline | 0/TBD | Not started | - |
+| 4. Unanswered Question Pipeline | 0/2 | Planning complete | - |
 | 5. Conversation History | 0/TBD | Not started | - |
