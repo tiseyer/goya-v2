@@ -599,7 +599,10 @@ Plans:
   3. The /verify-device page shows "New Device Detected", a masked email address, and a 6-digit OTP input (using the input-otp component) with auto-advance and paste-to-fill; the OTP is sent automatically on page load without any manual trigger
   4. The Resend button is disabled for 60 seconds after each send with a visible countdown; after 60 seconds it becomes clickable again
   5. A "Not you? Sign out" link is visible on the verify page and signs the user out, clearing the pending cookie and redirecting to the sign-in page
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 57-01-PLAN.md — Auth callback device trust check + middleware pending-verification lock
+- [ ] 57-02-PLAN.md — /verify-device server page + VerifyDeviceClient OTP component
 **UI hint**: yes
 
 ### Phase 58: Admin Devices Tab
