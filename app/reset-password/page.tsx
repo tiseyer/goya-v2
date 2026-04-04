@@ -19,28 +19,35 @@ export default function ResetPasswordPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    // PKCE flow: Supabase sends ?code=... in the URL
-    const code = new URLSearchParams(window.location.search).get('code');
+    // Safety net: if any old links still carry ?code= directly to this page,
+    // redirect through /auth/callback for server-side code exchange.
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
     if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        setStatus(error ? 'error' : 'ready');
-      });
+      window.location.href = `/auth/callback?code=${encodeURIComponent(code)}&next=/reset-password`;
       return;
     }
 
-    // Implicit flow: Supabase fires PASSWORD_RECOVERY via onAuthStateChange
+    // Listen for PASSWORD_RECOVERY event (fires when session has recovery grant)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') setStatus('ready');
+      if (event === 'PASSWORD_RECOVERY') {
+        setStatus('ready');
+      }
     });
 
-    // No code and no PASSWORD_RECOVERY event after a short wait → invalid link
-    const timeout = setTimeout(() => {
-      setStatus(prev => prev === 'loading' ? 'error' : prev);
-    }, 3000);
+    // Check for existing session established by /auth/callback redirect
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        // Session exists from the server-side callback — user can reset password
+        setStatus('ready');
+      } else {
+        // No session, no code — invalid access
+        setStatus('error');
+      }
+    });
 
     return () => {
       subscription.unsubscribe();
-      clearTimeout(timeout);
     };
   }, []);
 
