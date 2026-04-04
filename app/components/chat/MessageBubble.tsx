@@ -1,10 +1,13 @@
 'use client'
 
+import React from 'react'
+
 interface MessageBubbleProps {
   role: 'user' | 'assistant' | 'escalation' | 'rate-limit'
   content: string
   avatarUrl?: string | null
   isStreaming?: boolean
+  feedbackSlot?: React.ReactNode  // slot for FeedbackButtons, rendered below assistant bubbles
 }
 
 export default function MessageBubble({
@@ -12,6 +15,7 @@ export default function MessageBubble({
   content,
   avatarUrl,
   isStreaming = false,
+  feedbackSlot,
 }: MessageBubbleProps) {
   if (role === 'user') {
     return (
@@ -34,7 +38,7 @@ export default function MessageBubble({
     : 'bg-[var(--goya-surface)] border border-[var(--goya-border)] rounded-xl rounded-tl-sm px-4 py-2 text-sm'
 
   return (
-    <div className="animate-[stepIn_220ms_ease] mr-auto max-w-[75%] flex flex-row gap-2">
+    <div className="animate-[stepIn_220ms_ease] mr-auto max-w-[75%] flex flex-row gap-2 group">
       {/* Avatar */}
       {avatarUrl ? (
         <img
@@ -48,17 +52,20 @@ export default function MessageBubble({
         </div>
       )}
 
-      {/* Bubble */}
-      <div className={bubbleClass}>
-        {content}
-        {isStreaming && (
-          <span
-            className="inline-block ml-0.5 text-[var(--goya-primary)] animate-pulse"
-            aria-hidden="true"
-          >
-            |
-          </span>
-        )}
+      {/* Bubble + feedback slot */}
+      <div className="flex flex-col">
+        <div className={bubbleClass}>
+          {content}
+          {isStreaming && (
+            <span
+              className="inline-block ml-0.5 text-[var(--goya-primary)] animate-pulse"
+              aria-hidden="true"
+            >
+              |
+            </span>
+          )}
+        </div>
+        {feedbackSlot && <div>{feedbackSlot}</div>}
       </div>
     </div>
   )

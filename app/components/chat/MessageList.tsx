@@ -3,11 +3,13 @@
 import { useEffect, useRef } from 'react'
 import MessageBubble from './MessageBubble'
 import TypingIndicator from './TypingIndicator'
+import FeedbackButtons from './FeedbackButtons'
 
 interface Message {
   id: string
   role: 'user' | 'assistant' | 'escalation' | 'rate-limit'
   content: string
+  message_id?: string
 }
 
 interface MessageListProps {
@@ -15,6 +17,7 @@ interface MessageListProps {
   avatarUrl: string | null
   isTyping: boolean
   isStreaming: boolean
+  sessionId?: string | null   // for feedback API calls
 }
 
 const GREETING = "Namaste! I'm Mattea, your GOYA guide. How can I help you today?"
@@ -24,6 +27,7 @@ export default function MessageList({
   avatarUrl,
   isTyping,
   isStreaming,
+  sessionId,
 }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -40,7 +44,7 @@ export default function MessageList({
       className="flex-1 flex flex-col gap-3 overflow-y-auto scrollbar-none px-4 py-4"
       aria-live="polite"
     >
-      {/* Greeting always shown as first assistant message */}
+      {/* Greeting always shown as first assistant message — no feedback button */}
       <MessageBubble
         role="assistant"
         content={GREETING}
@@ -52,6 +56,7 @@ export default function MessageList({
         const isLastAssistant =
           index === messages.length - 1 &&
           (msg.role === 'assistant' || msg.role === 'escalation' || msg.role === 'rate-limit')
+
         return (
           <MessageBubble
             key={msg.id}
@@ -59,6 +64,14 @@ export default function MessageList({
             content={msg.content}
             avatarUrl={msg.role !== 'user' ? avatarUrl : undefined}
             isStreaming={isLastAssistant && isStreaming}
+            feedbackSlot={
+              msg.role === 'assistant' ? (
+                <FeedbackButtons
+                  sessionId={sessionId ?? null}
+                  visible={!(isLastAssistant && isStreaming)}
+                />
+              ) : undefined
+            }
           />
         )
       })}

@@ -184,6 +184,7 @@ export default function ChatPanel({
         avatarUrl={avatarUrl}
         isTyping={isTyping}
         isStreaming={isStreaming}
+        sessionId={sessionId}
       />
 
       <ChatInput

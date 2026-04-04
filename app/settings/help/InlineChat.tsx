@@ -8,6 +8,7 @@ import {
 } from '@/lib/chatbot/chat-actions'
 import MessageBubble from '@/app/components/chat/MessageBubble'
 import TypingIndicator from '@/app/components/chat/TypingIndicator'
+import FeedbackButtons from '@/app/components/chat/FeedbackButtons'
 import { PromptInputBox } from '@/app/components/ui/ai-prompt-box'
 import { useChatStream, type StreamMessage } from '@/lib/chatbot/useChatStream'
 
@@ -141,6 +142,14 @@ export default function InlineChat({ initialQuestion }: InlineChatProps) {
             role={msg.role}
             content={msg.content}
             isStreaming={msg.id === streamingMsgId}
+            feedbackSlot={
+              msg.role === 'assistant' && msg.id !== 'greeting' ? (
+                <FeedbackButtons
+                  sessionId={sessionId}
+                  visible={msg.id !== streamingMsgId}
+                />
+              ) : undefined
+            }
           />
         ))}
         {isTyping && <TypingIndicator />}
