@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ArrowLeft, Send } from 'lucide-react'
 import type { SupportTicket, TicketStatus, ChatMessage } from '@/lib/chatbot/types'
 import { updateTicketStatus, replyToTicket } from './actions'
+import UnansweredPanel from './UnansweredPanel'
 
 interface Props {
   ticket: SupportTicket
@@ -35,6 +36,7 @@ function formatTime(iso: string): string {
 }
 
 export default function TicketViewer({ ticket, messages: initialMessages, adminUserId, onBack, onStatusChange }: Props) {
+  const [localTicket, setLocalTicket] = useState<SupportTicket>(ticket)
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(initialMessages)
   const [replyContent, setReplyContent] = useState('')
   const [sending, setSending] = useState(false)
@@ -45,27 +47,34 @@ export default function TicketViewer({ ticket, messages: initialMessages, adminU
 
   async function handleStatusChange(newStatus: TicketStatus) {
     setStatusBusy(true)
-    const result = await updateTicketStatus(ticket.id, newStatus, adminUserId)
+    const result = await updateTicketStatus(localTicket.id, newStatus, adminUserId)
     if (result.success) {
-      onStatusChange({ ...ticket, status: newStatus })
+      const updated = { ...localTicket, status: newStatus }
+      setLocalTicket(updated)
+      onStatusChange(updated)
     }
     setStatusBusy(false)
   }
 
+  function handleUnansweredResolved(updatedTicket: SupportTicket) {
+    setLocalTicket(updatedTicket)
+    onStatusChange(updatedTicket)
+  }
+
   async function handleSend() {
     const trimmed = replyContent.trim()
-    if (!trimmed || !ticket.session_id) return
+    if (!trimmed || !localTicket.session_id) return
 
     setSending(true)
     setSendError(null)
 
-    const result = await replyToTicket(ticket.id, ticket.session_id, trimmed, adminUserId)
+    const result = await replyToTicket(localTicket.id, localTicket.session_id, trimmed, adminUserId)
 
     if (result.success) {
       // Add the reply to the local messages list as an assistant message
       const newMessage: ChatMessage = {
         id: `local-${Date.now()}`,
-        session_id: ticket.session_id,
+        session_id: localTicket.session_id,
         role: 'assistant',
         content: trimmed,
         created_at: new Date().toISOString(),
@@ -93,11 +102,11 @@ export default function TicketViewer({ ticket, messages: initialMessages, adminU
           </button>
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-[#1B3A5C] truncate">
-              Ticket: {ticket.question_summary}
+              Ticket: {localTicket.question_summary}
             </h3>
           </div>
-          <span className={`inline-block text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 ${STATUS_STYLES[ticket.status]}`}>
-            {STATUS_LABELS[ticket.status]}
+          <span className={`inline-block text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 ${STATUS_STYLES[localTicket.status]}`}>
+            {STATUS_LABELS[localTicket.status]}
           </span>
         </div>
 
@@ -108,9 +117,9 @@ export default function TicketViewer({ ticket, messages: initialMessages, adminU
             <button
               key={s}
               onClick={() => handleStatusChange(s)}
-              disabled={statusBusy || ticket.status === s}
+              disabled={statusBusy || localTicket.status === s}
               className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-colors disabled:opacity-40 ${
-                ticket.status === s
+                localTicket.status === s
                   ? `${STATUS_STYLES[s]} opacity-70 cursor-default`
                   : 'border-slate-200 text-slate-600 hover:bg-slate-100'
               }`}
@@ -153,8 +162,28 @@ export default function TicketViewer({ ticket, messages: initialMessages, adminU
           })}
       </div>
 
+      {/* UnansweredPanel — active resolution workflow */}
+      {localTicket.ticket_type === 'unanswered_question' && localTicket.status !== 'resolved' && (
+        <UnansweredPanel
+          ticket={localTicket}
+          adminUserId={adminUserId}
+          onResolved={handleUnansweredResolved}
+        />
+      )}
+
+      {/* Resolved unanswered ticket — read-only summary */}
+      {localTicket.ticket_type === 'unanswered_question' && localTicket.status === 'resolved' && (
+        <div className="px-5 py-3 border-t border-[#E5E7EB] bg-green-50/50">
+          <p className="text-sm text-green-700 font-medium">
+            {localTicket.rejection_reason
+              ? `Rejected: ${localTicket.rejection_reason}`
+              : 'Resolved — added to FAQ'}
+          </p>
+        </div>
+      )}
+
       {/* Reply section */}
-      {ticket.session_id ? (
+      {localTicket.session_id ? (
         <div className="px-5 py-4 border-t border-[#E5E7EB] bg-slate-50">
           {sendError && (
             <p className="text-xs text-rose-600 mb-2">{sendError}</p>
