@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       admin_secrets: {
@@ -58,6 +83,62 @@ export type Database = {
           {
             foreignKeyName: "admin_secrets_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_test_user_slots: {
+        Row: {
+          admin_user_id: string
+          created_at: string | null
+          slot_1: string | null
+          slot_2: string | null
+          slot_3: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string | null
+          slot_1?: string | null
+          slot_2?: string | null
+          slot_3?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string | null
+          slot_1?: string | null
+          slot_2?: string | null
+          slot_3?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_test_user_slots_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_test_user_slots_slot_1_fkey"
+            columns: ["slot_1"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_test_user_slots_slot_2_fkey"
+            columns: ["slot_2"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_test_user_slots_slot_3_fkey"
+            columns: ["slot_3"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -202,27 +283,36 @@ export type Database = {
           anonymous_id: string | null
           created_at: string
           expires_at: string | null
+          feedback_at: string | null
           id: string
           is_escalated: boolean
           last_message_at: string
+          started_from: string
+          user_feedback: string | null
           user_id: string | null
         }
         Insert: {
           anonymous_id?: string | null
           created_at?: string
           expires_at?: string | null
+          feedback_at?: string | null
           id?: string
           is_escalated?: boolean
           last_message_at?: string
+          started_from?: string
+          user_feedback?: string | null
           user_id?: string | null
         }
         Update: {
           anonymous_id?: string | null
           created_at?: string
           expires_at?: string | null
+          feedback_at?: string | null
           id?: string
           is_escalated?: boolean
           last_message_at?: string
+          started_from?: string
+          user_feedback?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -767,6 +857,47 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      device_verification_codes: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          device_fingerprint: string
+          expires_at: string
+          hashed_code: string
+          id: string
+          invalidated: boolean
+          profile_id: string
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          device_fingerprint: string
+          expires_at: string
+          hashed_code: string
+          id?: string
+          invalidated?: boolean
+          profile_id: string
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          device_fingerprint?: string
+          expires_at?: string
+          hashed_code?: string
+          id?: string
+          invalidated?: boolean
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_verification_codes_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_log: {
         Row: {
@@ -3048,10 +3179,12 @@ export type Database = {
           created_at: string
           id: string
           question_summary: string
+          rejection_reason: string | null
           resolved_at: string | null
           resolved_by: string | null
           session_id: string | null
           status: string
+          ticket_type: string
           user_id: string | null
         }
         Insert: {
@@ -3059,10 +3192,12 @@ export type Database = {
           created_at?: string
           id?: string
           question_summary: string
+          rejection_reason?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
           session_id?: string | null
           status?: string
+          ticket_type?: string
           user_id?: string | null
         }
         Update: {
@@ -3070,10 +3205,12 @@ export type Database = {
           created_at?: string
           id?: string
           question_summary?: string
+          rejection_reason?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
           session_id?: string | null
           status?: string
+          ticket_type?: string
           user_id?: string | null
         }
         Relationships: [
@@ -3094,6 +3231,44 @@ export type Database = {
           {
             foreignKeyName: "support_tickets_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trusted_devices: {
+        Row: {
+          created_at: string
+          device_fingerprint: string
+          device_name: string | null
+          id: string
+          ip_address: string | null
+          last_used_at: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_fingerprint: string
+          device_name?: string | null
+          id?: string
+          ip_address?: string | null
+          last_used_at?: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          device_fingerprint?: string
+          device_name?: string | null
+          id?: string
+          ip_address?: string | null
+          last_used_at?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trusted_devices_profile_id_fkey"
+            columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -3402,6 +3577,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       user_role: [
