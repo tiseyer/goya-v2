@@ -8,12 +8,7 @@ import {
   getOrCreateSession,
   deleteSession,
 } from '@/lib/chatbot/chat-actions'
-
-interface Message {
-  id: string
-  role: 'user' | 'assistant' | 'escalation' | 'rate-limit'
-  content: string
-}
+import { useChatStream } from '@/lib/chatbot/useChatStream'
 
 interface ChatPanelProps {
   isOpen: boolean
@@ -36,14 +31,19 @@ export default function ChatPanel({
   anonymousId,
   initialSessionId,
 }: ChatPanelProps) {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [isTyping, setIsTyping] = useState(false)
-  const [isStreaming, setIsStreaming] = useState(false)
-  const [isEscalated, setIsEscalated] = useState(false)
-  const [isRateLimited, setIsRateLimited] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
-  const abortControllerRef = useRef<AbortController | null>(null)
+
+  const { messages, setMessages, isTyping, isStreaming, isEscalated, isRateLimited, sendMessage, abort } = useChatStream({
+    sessionId,
+    anonymousId,
+    onSessionUpdate: (newSessionId) => {
+      setSessionId(newSessionId)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LS_KEY, newSessionId)
+      }
+    },
+  })
 
   // Restore or create session when panel opens
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function ChatPanel({
 
         // Restore conversation history
         if (result.messages.length > 0) {
-          const restored: Message[] = result.messages
+          const restored = result.messages
             .filter(m => m.role === 'user' || m.role === 'assistant')
             .map(m => ({
               id: m.id,
@@ -114,176 +114,13 @@ export default function ChatPanel({
   // Abort in-flight request on unmount
   useEffect(() => {
     return () => {
-      abortControllerRef.current?.abort()
+      abort()
     }
-  }, [])
-
-  async function handleSend(text: string) {
-    if (isEscalated || isRateLimited) return
-
-    // Optimistic: add user message immediately
-    const userMsg: Message = {
-      id: crypto.randomUUID(),
-      role: 'user',
-      content: text,
-    }
-    setMessages(prev => [...prev, userMsg])
-    setIsTyping(true)
-
-    abortControllerRef.current?.abort()
-    const controller = new AbortController()
-    abortControllerRef.current = controller
-
-    try {
-      const res = await fetch('/api/chatbot/message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session_id: sessionId,
-          message: text,
-          anonymous_id: anonymousId,
-        }),
-        signal: controller.signal,
-      })
-
-      if (res.status === 429) {
-        setIsRateLimited(true)
-        setIsTyping(false)
-        setMessages(prev => [
-          ...prev,
-          {
-            id: crypto.randomUUID(),
-            role: 'rate-limit',
-            content:
-              "You've reached the message limit for this hour. Please check back soon.",
-          },
-        ])
-        return
-      }
-
-      if (!res.ok) {
-        setIsTyping(false)
-        setMessages(prev => [
-          ...prev,
-          {
-            id: crypto.randomUUID(),
-            role: 'assistant',
-            content: 'Something went wrong. Please try again.',
-          },
-        ])
-        return
-      }
-
-      if (!res.body) {
-        setIsTyping(false)
-        return
-      }
-
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-      let assistantMsgId: string | null = null
-
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
-        buffer = lines.pop() ?? ''
-
-        for (const line of lines) {
-          if (!line.trim()) continue
-
-          let data: { type: string; content?: string; message?: string; session_id?: string }
-          try {
-            data = JSON.parse(line)
-          } catch {
-            continue
-          }
-
-          if (data.type === 'token') {
-            if (!assistantMsgId) {
-              // First token: switch from typing indicator to streaming
-              setIsTyping(false)
-              setIsStreaming(true)
-              assistantMsgId = crypto.randomUUID()
-              setMessages(prev => [
-                ...prev,
-                { id: assistantMsgId!, role: 'assistant', content: data.content ?? '' },
-              ])
-            } else {
-              // Subsequent tokens: append to existing assistant message
-              const targetId = assistantMsgId
-              setMessages(prev =>
-                prev.map(m =>
-                  m.id === targetId
-                    ? { ...m, content: m.content + (data.content ?? '') }
-                    : m,
-                ),
-              )
-            }
-          } else if (data.type === 'done') {
-            setIsStreaming(false)
-            if (data.session_id && data.session_id !== sessionId) {
-              setSessionId(data.session_id)
-              if (typeof window !== 'undefined') {
-                localStorage.setItem(LS_KEY, data.session_id)
-              }
-            }
-          } else if (data.type === 'escalation') {
-            setIsEscalated(true)
-            setIsTyping(false)
-            setIsStreaming(false)
-            if (data.session_id) {
-              setSessionId(data.session_id)
-              if (typeof window !== 'undefined') {
-                localStorage.setItem(LS_KEY, data.session_id)
-              }
-            }
-            setMessages(prev => [
-              ...prev,
-              {
-                id: crypto.randomUUID(),
-                role: 'escalation',
-                content: data.message ?? "I'll connect you with a human team member shortly.",
-              },
-            ])
-          } else if (data.type === 'error') {
-            setIsTyping(false)
-            setIsStreaming(false)
-            setMessages(prev => [
-              ...prev,
-              {
-                id: crypto.randomUUID(),
-                role: 'assistant',
-                content: data.message ?? 'Something went wrong. Please try again.',
-              },
-            ])
-          }
-        }
-      }
-    } catch (err) {
-      // Ignore AbortError (user navigated away or started new chat)
-      if (err instanceof Error && err.name === 'AbortError') return
-      setMessages(prev => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: 'Something went wrong. Please try again.',
-        },
-      ])
-    } finally {
-      setIsTyping(false)
-      setIsStreaming(false)
-    }
-  }
+  }, [abort])
 
   async function handleNewChat() {
     // Abort any in-flight request
-    abortControllerRef.current?.abort()
+    abort()
 
     // Delete existing session from DB
     if (sessionId) {
@@ -301,10 +138,6 @@ export default function ChatPanel({
 
     // Reset state
     setMessages([])
-    setIsEscalated(false)
-    setIsRateLimited(false)
-    setIsTyping(false)
-    setIsStreaming(false)
 
     // Create a fresh session
     try {
@@ -354,7 +187,7 @@ export default function ChatPanel({
       />
 
       <ChatInput
-        onSend={handleSend}
+        onSend={sendMessage}
         disabled={isEscalated || isRateLimited || isTyping || isStreaming}
       />
     </div>
