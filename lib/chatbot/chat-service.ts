@@ -9,6 +9,19 @@ import type { ChatStreamResult } from './types'
 const ESCALATION_RESPONSE =
   "That's a great question -- I'll check with our team and get back to you, usually within 48 hours."
 
+const UNANSWERED_PHRASES = [
+  "i don't have information on",
+  "i'm not sure about",
+  "this falls outside",
+  "please contact support",
+  "i cannot help with",
+]
+
+function detectUnanswered(responseText: string): boolean {
+  const lower = responseText.toLowerCase()
+  return UNANSWERED_PHRASES.some((phrase) => lower.includes(phrase))
+}
+
 function encodeChunk(data: Record<string, unknown>): Uint8Array {
   return new TextEncoder().encode(JSON.stringify(data) + '\n')
 }
@@ -231,6 +244,17 @@ export async function streamChatResponse(params: {
             .select('id')
             .single()
 
+          // Auto-detect unanswered question
+          if (detectUnanswered(fullContent)) {
+            await supabase.from('support_tickets').insert({
+              session_id: resolvedSessionId,
+              user_id: userId ?? null,
+              question_summary: message,
+              status: 'open',
+              ticket_type: 'unanswered_question',
+            })
+          }
+
           controller.enqueue(encodeChunk({ type: 'done', session_id: resolvedSessionId, message_id: openaiMsg?.id ?? null }))
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Something went wrong'
@@ -286,6 +310,17 @@ export async function streamChatResponse(params: {
             })
             .select('id')
             .single()
+
+          // Auto-detect unanswered question
+          if (detectUnanswered(fullContent)) {
+            await supabase.from('support_tickets').insert({
+              session_id: resolvedSessionId,
+              user_id: userId ?? null,
+              question_summary: message,
+              status: 'open',
+              ticket_type: 'unanswered_question',
+            })
+          }
 
           controller.enqueue(encodeChunk({ type: 'done', session_id: resolvedSessionId, message_id: anthropicMsg?.id ?? null }))
         } catch (err) {
