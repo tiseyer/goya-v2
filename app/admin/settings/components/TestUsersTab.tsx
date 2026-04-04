@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import {
   DndContext,
   closestCenter,
@@ -67,8 +68,18 @@ function SortableSlot({
   const [results, setResults] = useState<TestSlotSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputWrapperRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const updateDropdownPosition = useCallback(() => {
+    if (inputWrapperRef.current) {
+      const rect = inputWrapperRef.current.getBoundingClientRect();
+      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    }
+  }, []);
 
   const runSearch = useCallback(async (q: string) => {
     if (q.trim().length < 2) {
@@ -81,12 +92,13 @@ function SortableSlot({
       const data = await searchProfilesForTestSlots(q);
       setResults(data);
       setDropdownOpen(true);
+      updateDropdownPosition();
     } catch {
       setResults([]);
     } finally {
       setSearching(false);
     }
-  }, []);
+  }, [updateDropdownPosition]);
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -110,7 +122,10 @@ function SortableSlot({
   // Close dropdown on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const inContainer = containerRef.current?.contains(target);
+      const inDropdown = dropdownRef.current?.contains(target);
+      if (!inContainer && !inDropdown) {
         setDropdownOpen(false);
       }
     }
@@ -156,13 +171,14 @@ function SortableSlot({
             </div>
           ) : (
             /* Search input */
-            <div ref={containerRef} className="relative">
-              <div className="relative">
+            <div ref={containerRef}>
+              <div ref={inputWrapperRef} className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF] pointer-events-none" />
                 <input
                   type="text"
                   value={query}
                   onChange={handleQueryChange}
+                  onFocus={updateDropdownPosition}
                   placeholder="Search by name or email…"
                   className="w-full pl-9 pr-3 py-2.5 text-sm border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4E87A0] focus:border-transparent bg-white text-[#1B3A5C] placeholder:text-[#9CA3AF]"
                 />
@@ -173,8 +189,12 @@ function SortableSlot({
                 )}
               </div>
 
-              {dropdownOpen && results.length > 0 && (
-                <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-[#E5E7EB] rounded-lg shadow-lg overflow-hidden">
+              {dropdownOpen && dropdownPos && results.length > 0 && createPortal(
+                <div
+                  ref={dropdownRef}
+                  style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width, zIndex: 9999 }}
+                  className="bg-white border border-[#E5E7EB] rounded-lg shadow-lg overflow-hidden"
+                >
                   {results.map(r => (
                     <button
                       key={r.id}
@@ -192,13 +212,19 @@ function SortableSlot({
                       </div>
                     </button>
                   ))}
-                </div>
+                </div>,
+                document.body
               )}
 
-              {dropdownOpen && results.length === 0 && !searching && query.trim().length >= 2 && (
-                <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-[#E5E7EB] rounded-lg shadow-lg px-3 py-3 text-sm text-[#9CA3AF]">
+              {dropdownOpen && dropdownPos && results.length === 0 && !searching && query.trim().length >= 2 && createPortal(
+                <div
+                  ref={dropdownRef}
+                  style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width, zIndex: 9999 }}
+                  className="bg-white border border-[#E5E7EB] rounded-lg shadow-lg px-3 py-3 text-sm text-[#9CA3AF]"
+                >
                   No results found
-                </div>
+                </div>,
+                document.body
               )}
             </div>
           )}
