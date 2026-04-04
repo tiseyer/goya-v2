@@ -94,14 +94,14 @@ Plans:
   3. A "New conversation" button resets the chat area to the empty starting state without deleting the history list
 **Plans:** 1 plan
 Plans:
-- [ ] 05-01-PLAN.md — Server action + conversation dropdown + load history + new chat (HIST-01, HIST-02, HIST-03)
+- [x] 05-01-PLAN.md — Server action + conversation dropdown + load history + new chat (HIST-01, HIST-02, HIST-03)
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Schema & Infrastructure | 0/2 | Planning complete | - |
-| 2. Source Tracking | 0/1 | Planning complete | - |
-| 3. Feedback | 0/2 | Planning complete | - |
-| 4. Unanswered Question Pipeline | 0/2 | Planning complete | - |
-| 5. Conversation History | 0/1 | Planning complete | - |
+| 1. Schema & Infrastructure | 2/2 | Done | 2026-04-03 |
+| 2. Source Tracking | 1/1 | Done | 2026-04-03 |
+| 3. Feedback | 2/2 | Done | 2026-04-03 |
+| 4. Unanswered Question Pipeline | 2/2 | Done | 2026-04-04 |
+| 5. Conversation History | 1/1 | Done | 2026-04-03 |
