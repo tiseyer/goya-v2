@@ -16,7 +16,8 @@ import { useSearch } from '@/app/context/SearchContext';
 import { switchContext } from '@/app/actions/context';
 import { getNotifications, markNotificationsRead, getUnreadNotificationCount } from '@/lib/messaging';
 import type { AppNotification } from '@/lib/types';
-import { isAdminOrMod, displayRole } from '@/lib/roles';
+import { isAdminOrMod, isAdminOrAbove, displayRole } from '@/lib/roles';
+import { GraduationCap, Flower2, Stethoscope, School as SchoolIcon, User as UserIcon } from 'lucide-react';
 
 interface ContextSchool {
   id: string
@@ -24,6 +25,13 @@ interface ContextSchool {
   slug: string
   logo_url: string | null
   status: string
+}
+
+interface TestSlot {
+  userId: string;
+  firstName: string;
+  role: string;
+  hasPrincipalSchool: boolean;
 }
 
 // ─── config ───────────────────────────────────────────────────────────────────
@@ -376,6 +384,15 @@ function MessagesWidget() {
 
 // ─── User menu ────────────────────────────────────────────────────────────────
 
+function QuickSwitchRoleIcon({ role, hasPrincipalSchool }: { role: string; hasPrincipalSchool: boolean }) {
+  const cls = 'w-4 h-4';
+  if (role === 'student') return <GraduationCap className={cls} />;
+  if (role === 'teacher' && hasPrincipalSchool) return <SchoolIcon className={cls} />;
+  if (role === 'teacher') return <Flower2 className={cls} />;
+  if (role === 'wellness_practitioner') return <Stethoscope className={cls} />;
+  return <UserIcon className={cls} />;
+}
+
 function UserMenu({
   userName,
   userMrn,
@@ -394,6 +411,8 @@ function UserMenu({
   availableSchools,
   activeSchoolId,
   onSwitchContext,
+  testSlots,
+  onQuickSwitch,
 }: {
   userName: string;
   userMrn: string;
@@ -412,6 +431,8 @@ function UserMenu({
   availableSchools: ContextSchool[];
   activeSchoolId: string | null;
   onSwitchContext: (target: string) => void;
+  testSlots?: TestSlot[];
+  onQuickSwitch?: (targetUserId: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -635,6 +656,26 @@ function UserMenu({
             <ThemeInline isAdmin={isAdminOrMod(userRole)} />
           </div>
 
+          {/* Quick Switch — admin test user shortcuts */}
+          {!isImpersonating && isAdminOrAbove(userRole) && testSlots && testSlots.length > 0 && (
+            <div className="border-t border-[#E5E7EB] px-4 py-2">
+              <p className="text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1.5">Quick Switch</p>
+              <div className="flex w-full bg-surface-muted rounded-lg p-1">
+                {testSlots.map(slot => (
+                  <button
+                    key={slot.userId}
+                    onClick={() => { setOpen(false); onQuickSwitch?.(slot.userId); }}
+                    title={slot.firstName}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-foreground-tertiary hover:text-foreground-secondary transition-all duration-150 cursor-pointer hover:bg-surface hover:shadow-sm"
+                  >
+                    <QuickSwitchRoleIcon role={slot.role} hasPrincipalSchool={slot.hasPrincipalSchool} />
+                    <span className="text-[11px] font-medium truncate">{slot.firstName}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Logout */}
           <div className="border-t border-[#E5E7EB] py-1.5">
             <button
@@ -821,6 +862,7 @@ export default function Header() {
   const [maintenanceActive, setMaintenanceActive] = useState(false);
   const [availableSchools, setAvailableSchools] = useState<ContextSchool[]>([]);
   const [activeSchoolId, setActiveSchoolId] = useState<string | null>(null);
+  const [testSlots, setTestSlots] = useState<TestSlot[]>([]);
   const { isImpersonating, targetProfile, adminProfile } = useImpersonation();
 
   function checkMaintenance(role: string | undefined) {
@@ -902,6 +944,44 @@ export default function Header() {
     }
   }
 
+  async function fetchTestSlots(userId: string, role: string | undefined) {
+    if (!isAdminOrAbove(role) || isImpersonating) {
+      setTestSlots([]);
+      return;
+    }
+    const { data: row } = await supabase
+      .from('admin_test_user_slots')
+      .select('slot_1, slot_2, slot_3')
+      .eq('admin_user_id', userId)
+      .single();
+    if (!row) return;
+
+    const slotIds = [row.slot_1, row.slot_2, row.slot_3].filter(Boolean) as string[];
+    if (slotIds.length === 0) return;
+
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, role, principal_trainer_school_id')
+      .in('id', slotIds);
+
+    const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+    const slots: TestSlot[] = [row.slot_1, row.slot_2, row.slot_3]
+      .filter(Boolean)
+      .map((id: string) => {
+        const p = profileMap.get(id) as any;
+        if (!p) return null;
+        return {
+          userId: p.id,
+          firstName: (p.full_name ?? '').split(/\s+/)[0] || 'User',
+          role: p.role ?? 'student',
+          hasPrincipalSchool: !!p.principal_trainer_school_id,
+        } as TestSlot;
+      })
+      .filter(Boolean) as TestSlot[];
+
+    setTestSlots(slots);
+  }
+
   useEffect(() => {
     // Use onAuthStateChange as the single source of truth to avoid race
     // conditions between getUser() and the auth listener that cause nav
@@ -915,6 +995,7 @@ export default function Header() {
             setAuthLoading(false);
             checkMaintenance(p?.role);
             fetchSchoolContext(session.user!.id, p?.role);
+            fetchTestSlots(session.user!.id, p?.role);
           });
       } else {
         setProfile(null);
@@ -922,6 +1003,7 @@ export default function Header() {
         setMaintenanceActive(false);
         setAvailableSchools([]);
         setActiveSchoolId(null);
+        setTestSlots([]);
       }
     });
     return () => subscription.unsubscribe();
@@ -932,6 +1014,23 @@ export default function Header() {
   const userName = profile?.full_name ?? '';
   const userMrn = profile?.mrn ?? '';
   const userInitials = getInitials(profile?.full_name, user?.email);
+
+  async function handleQuickSwitch(targetUserId: string) {
+    try {
+      const res = await fetch('/api/admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUserId }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (err) {
+      console.error('Quick switch failed:', err);
+    }
+  }
+
   const handleLogout = () => {
     // Clear context cookie on logout
     document.cookie = 'goya_active_context=; path=/; max-age=0';
@@ -1052,6 +1151,8 @@ export default function Header() {
                   availableSchools={availableSchools}
                   activeSchoolId={activeSchoolId}
                   onSwitchContext={handleSwitchContext}
+                  testSlots={testSlots}
+                  onQuickSwitch={handleQuickSwitch}
                 />
               </>
             ) : (
