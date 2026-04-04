@@ -325,7 +325,7 @@ export async function listSupportTickets(
 
     let query = supabase
       .from('support_tickets')
-      .select('id, session_id, user_id, anonymous_id, question_summary, status, ticket_type, created_at, resolved_at, resolved_by')
+      .select('id, session_id, user_id, anonymous_id, question_summary, status, ticket_type, rejection_reason, created_at, resolved_at, resolved_by')
       .order('created_at', { ascending: false })
 
     if (statusFilter && statusFilter !== 'all') {
@@ -817,4 +817,242 @@ export async function rejectCourse(
   // 6. Revalidate
   revalidatePath('/admin/inbox')
   return { success: true }
+}
+
+// --- Phase 04 (ai-super-helper): Unanswered Question Resolution ---
+
+/**
+ * Publish an unanswered ticket as a FAQ entry and resolve the ticket.
+ * Returns { success: false, error: 'duplicate', existingId } if a similar FAQ already exists.
+ */
+export async function addToFaq(
+  ticketId: string,
+  question: string,
+  answer: string,
+  adminUserId: string,
+): Promise<{ success: true } | { success: false; error: 'duplicate'; existingId: string } | { success: false; error: string }> {
+  try {
+    if (!UUID_REGEX.test(ticketId)) {
+      return { success: false, error: 'Invalid ticket ID format' }
+    }
+    if (!question || !question.trim()) {
+      return { success: false, error: 'Question is required' }
+    }
+    if (!answer || !answer.trim()) {
+      return { success: false, error: 'Answer is required' }
+    }
+
+    // Auth guard — require admin role
+    const supabase = await createSupabaseServerActionClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const serviceClient = getSupabaseService()
+    const { data: adminProfile } = await serviceClient
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!adminProfile || !isAdminOrAbove(adminProfile.role)) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    // Check for duplicate FAQ question
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existingFaq } = await (serviceClient as any)
+      .from('faq_items')
+      .select('id')
+      .ilike('question', question.trim())
+      .limit(1)
+      .maybeSingle()
+
+    if (existingFaq) {
+      return { success: false, error: 'duplicate', existingId: existingFaq.id }
+    }
+
+    // Insert new FAQ item as published directly
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: faqError } = await (serviceClient as any)
+      .from('faq_items')
+      .insert({
+        question: question.trim(),
+        answer: answer.trim(),
+        status: 'published',
+        created_by: adminUserId,
+      })
+
+    if (faqError) {
+      return { success: false, error: faqError.message }
+    }
+
+    // Resolve the ticket
+    const now = new Date().toISOString()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: ticketError } = await (serviceClient as any)
+      .from('support_tickets')
+      .update({
+        status: 'resolved',
+        resolved_at: now,
+        resolved_by: adminUserId,
+      })
+      .eq('id', ticketId)
+
+    if (ticketError) {
+      return { success: false, error: ticketError.message }
+    }
+
+    revalidatePath('/admin/inbox')
+    revalidatePath('/admin/chatbot')
+    return { success: true }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Same as addToFaq but skips the duplicate check.
+ * Called when admin confirms they want to proceed despite a duplicate warning.
+ */
+export async function addToFaqForce(
+  ticketId: string,
+  question: string,
+  answer: string,
+  adminUserId: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    if (!UUID_REGEX.test(ticketId)) {
+      return { success: false, error: 'Invalid ticket ID format' }
+    }
+    if (!question || !question.trim()) {
+      return { success: false, error: 'Question is required' }
+    }
+    if (!answer || !answer.trim()) {
+      return { success: false, error: 'Answer is required' }
+    }
+
+    // Auth guard — require admin role
+    const supabase = await createSupabaseServerActionClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const serviceClient = getSupabaseService()
+    const { data: adminProfile } = await serviceClient
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!adminProfile || !isAdminOrAbove(adminProfile.role)) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    // Insert new FAQ item as published (no duplicate check)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: faqError } = await (serviceClient as any)
+      .from('faq_items')
+      .insert({
+        question: question.trim(),
+        answer: answer.trim(),
+        status: 'published',
+        created_by: adminUserId,
+      })
+
+    if (faqError) {
+      return { success: false, error: faqError.message }
+    }
+
+    // Resolve the ticket
+    const now = new Date().toISOString()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: ticketError } = await (serviceClient as any)
+      .from('support_tickets')
+      .update({
+        status: 'resolved',
+        resolved_at: now,
+        resolved_by: adminUserId,
+      })
+      .eq('id', ticketId)
+
+    if (ticketError) {
+      return { success: false, error: ticketError.message }
+    }
+
+    revalidatePath('/admin/inbox')
+    revalidatePath('/admin/chatbot')
+    return { success: true }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Reject an unanswered question ticket without creating a FAQ entry.
+ * Marks the ticket resolved with a rejection reason.
+ */
+export async function rejectUnanswered(
+  ticketId: string,
+  rejectionReason: string,
+  adminUserId: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    if (!UUID_REGEX.test(ticketId)) {
+      return { success: false, error: 'Invalid ticket ID format' }
+    }
+    if (!rejectionReason || !rejectionReason.trim()) {
+      return { success: false, error: 'Rejection reason is required' }
+    }
+
+    // Auth guard — require admin role
+    const supabase = await createSupabaseServerActionClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const serviceClient = getSupabaseService()
+    const { data: adminProfile } = await serviceClient
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!adminProfile || !isAdminOrAbove(adminProfile.role)) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    const now = new Date().toISOString()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: ticketError } = await (serviceClient as any)
+      .from('support_tickets')
+      .update({
+        status: 'resolved',
+        rejection_reason: rejectionReason.trim(),
+        resolved_at: now,
+        resolved_by: adminUserId,
+      })
+      .eq('id', ticketId)
+
+    if (ticketError) {
+      return { success: false, error: ticketError.message }
+    }
+
+    revalidatePath('/admin/inbox')
+    return { success: true }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
 }
