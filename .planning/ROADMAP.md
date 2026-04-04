@@ -572,7 +572,10 @@ Plans:
   3. lib/device/fingerprint.ts generates a SHA-256 hash from screen dimensions, color depth, timezone, and language — with no User-Agent in the hash input
   4. A DeviceFingerprintSetter client component is mounted in root layout.tsx; it writes the computed fingerprint to a goya_device_fp cookie (365-day maxAge, SameSite=Lax, httpOnly=false) on every page load if the cookie is absent
   5. lib/device/checkTrustedDevice.ts accepts a profile_id and fingerprint string and queries trusted_devices using the service-role client; it returns true only when a matching row exists with last_used_at within the past 90 days
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 55-01-PLAN.md — Database migration: trusted_devices and device_verification_codes tables with RLS and indexes
+- [ ] 55-02-PLAN.md — lib/device/ module (fingerprint, parseDeviceName, checkTrustedDevice) + DeviceFingerprintSetter in root layout
 
 ### Phase 56: OTP API Routes
 **Goal**: The send and verify API routes are correct, secure, and independently testable before any UI or login flow integration
@@ -616,7 +619,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 55. Database Foundation + Fingerprint Algorithm | 0/TBD | Not started | - |
+| 55. Database Foundation + Fingerprint Algorithm | 0/2 | In progress | - |
 | 56. OTP API Routes | 0/TBD | Not started | - |
 | 57. Auth Callback + Middleware + Verify Page | 0/TBD | Not started | - |
 | 58. Admin Devices Tab | 0/TBD | Not started | - |
