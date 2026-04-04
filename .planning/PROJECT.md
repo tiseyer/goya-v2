@@ -8,22 +8,24 @@ GOYA v2 is a professional community platform for yoga and wellness practitioners
 
 Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## Current Milestone: v1.19 Global Search
+## Current Milestone: v1.24 Device Authentication (2FA)
 
-**Goal:** macOS Spotlight-style global search overlay across all platform entities — members, events, courses, and pages — with role-aware results and keyboard navigation.
+**Goal:** When a user logs in from an unrecognized device, require email OTP verification before granting full access. Trusted devices skip OTP on future logins. Admins can view and revoke trusted devices.
 
 **Target features:**
-- Search overlay UI component (desktop centered modal + mobile full-screen) with category filter pills, keyboard navigation, grouped results
-- Search API route with per-category Supabase queries (members, events, courses) and static page registry
-- Page registry with role-based visibility (admin/moderator pages hidden from regular users)
-- Header integration (search icon click + Cmd+K / Ctrl+K keyboard shortcut)
-- Debounced input, loading skeletons, result caching, empty/no-result states
-- Admin search extensions: search by email, MRN, subscription/order IDs
-- Contextual result row actions (message icon, map/directions for members with full address)
+- Database: trusted_devices + device_verification_codes tables with RLS
+- Client-side device fingerprinting (UA + screen + timezone → SHA-256 hash) with long-lived cookie
+- Login flow gate in /auth/callback: check trusted device → redirect to /verify-device if unrecognized
+- /verify-device page with 6-digit OTP input, auto-send on load, resend cooldown
+- API routes: send code (via Resend email) and verify code (mark trusted + insert device)
+- Middleware lock: device_pending_verification cookie restricts navigation to /verify-device only
+- Admin "Devices" tab on user detail page: list trusted devices with revoke action
 
 ## Current State
 
-**As of v1.19 (2026-04-03):** Global Search shipped. macOS Spotlight-style search overlay (desktop modal + mobile full-screen) with Cmd+K/Ctrl+K shortcut, 6 category filter pills (Members, Events, Courses, Products, Pages, Help), keyboard navigation, debounced API search via /api/search route using service role Supabase client, role-aware page registry, admin extensions (email/MRN search), contextual member actions (message icon, Google Maps directions), result caching, loading skeletons, full dark mode support.
+**As of v1.24 (2026-04-04):** Starting Device Authentication (2FA) milestone. Previous v1.19 Global Search shipped.
+
+**Previous v1.19 (2026-04-03):** Global Search shipped. macOS Spotlight-style search overlay (desktop modal + mobile full-screen) with Cmd+K/Ctrl+K shortcut, 6 category filter pills, keyboard navigation, debounced API search, role-aware page registry, admin extensions (email/MRN search), contextual member actions, result caching, loading skeletons, full dark mode support.
 
 **Previous v1.18 (2026-04-02):** User Profile Redesign shipped. Complete rebuild of /members/[id] with cover image hero, 120px avatar, role badge, intro video (YouTube facade), role-specific pill sections (4 types), school affiliation + faculty grid + community section, Mapbox GL JS map (privacy-gated), events + courses carousels, sidebar with membership card + designations + social icons, own-profile edit button + completion nudge. Server-side privacy enforcement via deriveProfileVisibility().
 
@@ -320,4 +322,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after v1.20 Event Detail & Admin Form Overhaul workstream started*
+*Last updated: 2026-04-04 after v1.24 Device Authentication milestone started*
