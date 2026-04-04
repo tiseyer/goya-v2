@@ -113,7 +113,7 @@ export async function streamChatResponse(params: {
     await supabase.from('support_tickets').insert({
       session_id: resolvedSessionId,
       user_id: userId ?? null,
-      question: message,
+      question_summary: message,
       status: 'open',
     })
 
