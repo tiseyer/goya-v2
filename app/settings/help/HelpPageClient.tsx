@@ -9,6 +9,8 @@ import {
   getAnonymousId,
   deleteSession,
   getChatHistory,
+  listUserConversations,
+  type ConversationSummary,
 } from '@/lib/chatbot/chat-actions'
 import MessageBubble from '@/app/components/chat/MessageBubble'
 import TypingIndicator from '@/app/components/chat/TypingIndicator'
@@ -22,13 +24,6 @@ interface Message {
 interface ChatbotConfig {
   name: string
   avatarUrl: string | null
-}
-
-interface ConversationSummary {
-  id: string
-  created_at: string
-  last_message_at: string
-  first_message: string
 }
 
 const LS_KEY = 'goya_help_chat_session_id'
@@ -50,6 +45,7 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
   const [conversations, setConversations] = useState<ConversationSummary[]>([])
   const [showConversations, setShowConversations] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [isHistoricalView, setIsHistoricalView] = useState(false)
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const abortRef = useRef<AbortController | null>(null)
@@ -152,11 +148,8 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
 
   async function loadConversations(userId: string) {
     try {
-      const res = await fetch(`/api/chatbot/config`) // We'll use a simpler approach
-      // For now, conversations dropdown will be powered by getChatHistory via server action
-      // This is a placeholder — we'll populate from chat_sessions
-      void res
-      void userId
+      const convos = await listUserConversations(userId)
+      setConversations(convos)
     } catch {
       // silent
     }
@@ -295,6 +288,7 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
     setIsTyping(false)
     setIsStreaming(false)
     setConfirmDelete(false)
+    setIsHistoricalView(false)
     autoSubmittedRef.current = false
 
     try {
@@ -302,6 +296,10 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
       const result = await getOrCreateSession({ userId: userId ?? undefined, anonymousId: anonymousId ?? undefined, started_from: 'help_page' })
       setSessionId(result.session_id)
       if (typeof window !== 'undefined') localStorage.setItem(LS_KEY, result.session_id)
+      // Refresh conversation list so the previous conversation appears
+      if (userId) {
+        loadConversations(userId)
+      }
     } catch {
       // silent
     }
@@ -330,6 +328,20 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
 
   const lastMessage = messages[messages.length - 1]
   const streamingMsgId = isStreaming ? lastMessage?.id : null
+
+  function relativeDate(dateStr: string): string {
+    const now = new Date()
+    const d = new Date(dateStr)
+    const diffMs = now.getTime() - d.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    if (diffMins < 1) return 'just now'
+    if (diffMins < 60) return `${diffMins}m ago`
+    const diffHours = Math.floor(diffMins / 60)
+    if (diffHours < 24) return `${diffHours}h ago`
+    const diffDays = Math.floor(diffHours / 24)
+    if (diffDays < 7) return `${diffDays}d ago`
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
 
   return (
     <div>
@@ -433,21 +445,26 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
               value={chatInput}
               onChange={e => setChatInput(e.target.value)}
               placeholder={`Ask ${config.name} a follow-up...`}
-              disabled={isEscalated || isRateLimited}
+              disabled={isEscalated || isRateLimited || isHistoricalView}
               className="w-full px-4 py-3 pr-12 text-sm rounded-xl border border-[var(--goya-border)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--goya-primary)]/30 focus:border-[var(--goya-primary)] placeholder:text-slate-400 disabled:opacity-50 transition-all"
             />
             <button
               type="submit"
-              disabled={!chatInput.trim() || isTyping || isStreaming || isEscalated || isRateLimited}
+              disabled={!chatInput.trim() || isTyping || isStreaming || isEscalated || isRateLimited || isHistoricalView}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--goya-primary)] text-white disabled:opacity-30 hover:bg-[var(--goya-primary)]/90 transition-colors"
             >
               <ArrowUp size={16} />
             </button>
           </form>
+          {isHistoricalView && (
+            <p className="text-xs text-slate-400 mt-1 ml-1">
+              Viewing a previous conversation. Click &quot;New chat&quot; to start fresh.
+            </p>
+          )}
         </div>
       )}
 
-      {/* Conversation history dropdown — placeholder for future */}
+      {/* Conversation history dropdown */}
       {conversations.length > 0 && (
         <div className="mb-6">
           <button
@@ -472,6 +489,7 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
                     setMessages(restored)
                     setChatStarted(true)
                     setSessionId(conv.id)
+                    setIsHistoricalView(true)
                     if (typeof window !== 'undefined') localStorage.setItem(LS_KEY, conv.id)
                     setShowConversations(false)
                   }}
@@ -479,7 +497,7 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
                 >
                   <p className="text-sm text-foreground truncate">{conv.first_message}</p>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    {new Date(conv.last_message_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {relativeDate(conv.last_message_at)}
                   </p>
                 </button>
               ))}
