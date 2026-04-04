@@ -11,6 +11,13 @@ export interface HistoryMessage {
   created_at: string
 }
 
+export interface ConversationSummary {
+  id: string
+  created_at: string
+  last_message_at: string
+  first_message: string
+}
+
 /**
  * Get or create a chat session, returning the session ID and any existing messages.
  * If existingSessionId is provided and valid, restores the conversation.
@@ -86,6 +93,61 @@ export async function getChatHistory(sessionId: string): Promise<HistoryMessage[
   }
 
   return (data ?? []) as HistoryMessage[]
+}
+
+/**
+ * List a user's help-page conversations, most recent first, with first message preview.
+ * Empty sessions (no messages) are excluded.
+ */
+export async function listUserConversations(userId: string): Promise<ConversationSummary[]> {
+  const supabase = getSupabaseService()
+
+  // Get user's help-page sessions, most recent first
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: sessions, error } = await (supabase as any)
+    .from('chat_sessions')
+    .select('id, created_at')
+    .eq('user_id', userId)
+    .eq('started_from', 'help_page')
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  if (error || !sessions || sessions.length === 0) return []
+
+  // For each session, get first user message and last message timestamp
+  const results: ConversationSummary[] = []
+
+  for (const session of sessions) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: firstMsg } = await (supabase as any)
+      .from('chat_messages')
+      .select('content, created_at')
+      .eq('session_id', session.id)
+      .eq('role', 'user')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .single()
+
+    if (!firstMsg) continue // skip empty sessions
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: lastMsg } = await (supabase as any)
+      .from('chat_messages')
+      .select('created_at')
+      .eq('session_id', session.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    results.push({
+      id: session.id,
+      created_at: session.created_at,
+      last_message_at: lastMsg?.created_at ?? session.created_at,
+      first_message: firstMsg.content,
+    })
+  }
+
+  return results
 }
 
 /**
