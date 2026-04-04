@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Ticket } from 'lucide-react'
+import { Ticket, Bot } from 'lucide-react'
 import type { SupportTicket, TicketStatus, ChatMessage } from '@/lib/chatbot/types'
 import { listSupportTickets, updateTicketStatus } from './actions'
 import { getConversationMessages } from '../chatbot/chatbot-actions'
@@ -46,23 +46,37 @@ const NEXT_STATUS: Record<TicketStatus, TicketStatus> = {
 }
 
 type FilterOption = TicketStatus | 'all'
+type SourceFilter = 'all' | 'human_escalation' | 'unanswered_question'
 
 export default function SupportTicketsTab({ initialTickets, adminUserId }: Props) {
   const [tickets, setTickets] = useState<SupportTicket[]>(initialTickets)
   const [statusFilter, setStatusFilter] = useState<FilterOption>('all')
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all')
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState<string | null>(null)
 
-  async function handleFilterChange(newFilter: FilterOption) {
-    setStatusFilter(newFilter)
+  async function refreshTickets(newStatusFilter: FilterOption, newSourceFilter: SourceFilter) {
     setLoading(true)
-    const result = await listSupportTickets(newFilter === 'all' ? undefined : newFilter)
+    const result = await listSupportTickets(
+      newStatusFilter === 'all' ? undefined : newStatusFilter,
+      newSourceFilter === 'all' ? undefined : newSourceFilter,
+    )
     if (result.success) {
       setTickets(result.tickets)
     }
     setLoading(false)
+  }
+
+  async function handleStatusFilterChange(newFilter: FilterOption) {
+    setStatusFilter(newFilter)
+    await refreshTickets(newFilter, sourceFilter)
+  }
+
+  async function handleSourceFilterChange(newSource: SourceFilter) {
+    setSourceFilter(newSource)
+    await refreshTickets(statusFilter, newSource)
   }
 
   async function handleView(ticket: SupportTicket) {
@@ -127,13 +141,22 @@ export default function SupportTicketsTab({ initialTickets, adminUserId }: Props
       <div className="flex items-center gap-3 mb-4">
         <select
           value={statusFilter}
-          onChange={(e) => handleFilterChange(e.target.value as FilterOption)}
+          onChange={(e) => handleStatusFilterChange(e.target.value as FilterOption)}
           className="text-sm border border-[#E5E7EB] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00B5A3] bg-white text-[#374151]"
         >
           <option value="all">All Tickets</option>
           <option value="open">Open</option>
           <option value="in_progress">In Progress</option>
           <option value="resolved">Resolved</option>
+        </select>
+        <select
+          value={sourceFilter}
+          onChange={(e) => handleSourceFilterChange(e.target.value as SourceFilter)}
+          className="text-sm border border-[#E5E7EB] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00B5A3] bg-white text-[#374151]"
+        >
+          <option value="all">All Sources</option>
+          <option value="human_escalation">User submitted</option>
+          <option value="unanswered_question">Chatbot escalated</option>
         </select>
         {loading && <span className="text-sm text-slate-400">Loading...</span>}
       </div>
@@ -159,6 +182,7 @@ export default function SupportTicketsTab({ initialTickets, adminUserId }: Props
                   <th className="text-left px-5 py-3">User</th>
                   <th className="text-left px-5 py-3">Issue</th>
                   <th className="text-left px-5 py-3">Created</th>
+                  <th className="text-left px-5 py-3">Source</th>
                   <th className="text-left px-5 py-3">Status</th>
                   <th className="text-left px-5 py-3">Actions</th>
                 </tr>
@@ -189,6 +213,18 @@ export default function SupportTicketsTab({ initialTickets, adminUserId }: Props
                       </td>
                       <td className="px-5 py-3 text-sm text-slate-500">
                         {relativeDate(ticket.created_at)}
+                      </td>
+                      <td className="px-5 py-3">
+                        {ticket.ticket_type === 'unanswered_question' ? (
+                          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                            <Bot size={11} />
+                            Chatbot
+                          </span>
+                        ) : (
+                          <span className="inline-block text-xs px-2.5 py-1 rounded-full font-semibold bg-slate-50 text-slate-700 border border-slate-200">
+                            User
+                          </span>
+                        )}
                       </td>
                       <td className="px-5 py-3">
                         <span

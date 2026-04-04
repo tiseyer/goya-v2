@@ -318,17 +318,22 @@ export async function rejectCreditEntry(
  */
 export async function listSupportTickets(
   statusFilter?: TicketStatus | 'all',
+  ticketTypeFilter?: 'all' | 'human_escalation' | 'unanswered_question',
 ): Promise<{ success: true; tickets: SupportTicket[] } | { success: false; error: string }> {
   try {
     const supabase = getSupabaseService() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
     let query = supabase
       .from('support_tickets')
-      .select('id, session_id, user_id, anonymous_id, question_summary, status, created_at, resolved_at, resolved_by')
+      .select('id, session_id, user_id, anonymous_id, question_summary, status, ticket_type, created_at, resolved_at, resolved_by')
       .order('created_at', { ascending: false })
 
     if (statusFilter && statusFilter !== 'all') {
       query = query.eq('status', statusFilter)
+    }
+
+    if (ticketTypeFilter && ticketTypeFilter !== 'all') {
+      query = query.eq('ticket_type', ticketTypeFilter)
     }
 
     const { data: rows, error } = await query
