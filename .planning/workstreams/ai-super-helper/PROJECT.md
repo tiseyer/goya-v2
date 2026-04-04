@@ -1,7 +1,7 @@
 ---
 project: GOYA v2 — Mattea Intelligence System
 created: 2026-04-03
-last_updated: 2026-04-03
+last_updated: 2026-04-04
 ---
 
 # GOYA v2 — Mattea Intelligence System
@@ -29,16 +29,19 @@ Mattea becomes smarter over time: users give feedback, unanswered questions beco
 
 **Existing DB tables:** `chatbot_conversations`, `support_tickets`, `chatbot_faq` (exact names to be verified by schema research)
 
-## Current Milestone: v1.23 Mattea Intelligence System
+## Shipped: v1.23 Mattea Intelligence System (2026-04-04)
 
-**Goal:** Add feedback, conversation history, unanswered question escalation, and source tracking to Mattea.
-
-**Target features:**
-- Conversation history on Help page (load previous chats)
+**Delivered:**
+- Conversation history on Help page (load/resume previous chats)
 - Thumbs up/down feedback on every Mattea response (all 3 surfaces)
-- Unanswered question → support ticket pipeline with admin resolution (Add to FAQ / Reject)
+- Unanswered question → support ticket pipeline (auto-detect, Add to FAQ, Reject with reason)
 - Source tracking (started_from: widget/search/help page)
 - Admin visibility: feedback column, source column, ticket source filter
+- Shared `useChatStream` hook (replaced 3 duplicated stream loops)
+- Fixed `question_summary` column bug in chat-service.ts
+- `message_id` in streaming done chunks for feedback targeting
+
+**Stats:** 5 phases, 8 plans, 19 requirements — all delivered
 
 ## Key Decisions
 
