@@ -2,7 +2,7 @@
 milestone: v1.23
 milestone_name: Mattea Intelligence System
 created: 2026-04-04
-last_updated: 2026-04-04
+last_updated: 2026-04-03
 ---
 
 # Requirements — v1.23 Mattea Intelligence System
@@ -60,22 +60,22 @@ None deferred.
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| FEED-01 | — | Pending |
-| FEED-02 | — | Pending |
-| FEED-03 | — | Pending |
-| FEED-04 | — | Pending |
-| SRC-01 | — | Pending |
-| SRC-02 | — | Pending |
-| UNQ-01 | — | Pending |
-| UNQ-02 | — | Pending |
-| UNQ-03 | — | Pending |
-| UNQ-04 | — | Pending |
-| UNQ-05 | — | Pending |
-| HIST-01 | — | Pending |
-| HIST-02 | — | Pending |
-| HIST-03 | — | Pending |
+| INFRA-01 | Phase 1 | Pending |
+| INFRA-02 | Phase 1 | Pending |
+| INFRA-03 | Phase 1 | Pending |
+| INFRA-04 | Phase 1 | Pending |
+| INFRA-05 | Phase 1 | Pending |
+| SRC-01 | Phase 2 | Pending |
+| SRC-02 | Phase 2 | Pending |
+| FEED-01 | Phase 3 | Pending |
+| FEED-02 | Phase 3 | Pending |
+| FEED-03 | Phase 3 | Pending |
+| FEED-04 | Phase 3 | Pending |
+| UNQ-01 | Phase 4 | Pending |
+| UNQ-02 | Phase 4 | Pending |
+| UNQ-03 | Phase 4 | Pending |
+| UNQ-04 | Phase 4 | Pending |
+| UNQ-05 | Phase 4 | Pending |
+| HIST-01 | Phase 5 | Pending |
+| HIST-02 | Phase 5 | Pending |
+| HIST-03 | Phase 5 | Pending |
