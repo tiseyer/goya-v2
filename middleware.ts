@@ -14,6 +14,14 @@ const PROTECTED_PATHS = [
   '/dashboard', '/admin', '/profile', '/connections', '/members',
 ]
 
+// Paths allowed while device verification is pending
+const DEVICE_VERIFICATION_ALLOWED = [
+  '/verify-device',
+  '/sign-in',
+  '/sign-out',
+  '/auth/callback',
+]
+
 // Paths that bypass maintenance mode (auth + maintenance page itself)
 const MAINTENANCE_BYPASS_PATHS = [
   '/maintenance',
@@ -205,7 +213,8 @@ export async function middleware(request: NextRequest) {
   // For `/`, check if auth cookie exists — only then do full auth to redirect logged-in users
   const hasAuthCookie = pathname === '/' && request.cookies.getAll().some(c => c.name.startsWith('sb-'))
   const passwordResetPending = request.cookies.get('password_reset_pending')?.value === 'true'
-  if (!maintenanceActive && !isProtectedPath && !passwordResetPending && !(pathname === '/' && hasAuthCookie)) {
+  const devicePendingVerification = request.cookies.get('device_pending_verification')?.value
+  if (!maintenanceActive && !isProtectedPath && !passwordResetPending && !devicePendingVerification && !(pathname === '/' && hasAuthCookie)) {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set('x-pathname', pathname)
     const res = NextResponse.next({ request: { headers: requestHeaders } })
@@ -252,6 +261,22 @@ export async function middleware(request: NextRequest) {
     // Cookie exists but no session — clear stale cookie and redirect to sign-in
     const clearResponse = NextResponse.redirect(new URL('/sign-in', request.url))
     clearResponse.cookies.set('password_reset_pending', '', { maxAge: 0, path: '/' })
+    return clearResponse
+  }
+
+  // ─── Device pending verification lock ────────────────────────────────────────
+  if (devicePendingVerification && user) {
+    const allowed =
+      DEVICE_VERIFICATION_ALLOWED.some(p => pathname === p || pathname.startsWith(p + '/')) ||
+      pathname.startsWith('/api/device-verification/')
+    if (!allowed) {
+      return NextResponse.redirect(new URL('/verify-device', request.url))
+    }
+  }
+  if (devicePendingVerification && !user) {
+    // Cookie exists but session expired — clear stale cookie and redirect to sign-in
+    const clearResponse = NextResponse.redirect(new URL('/sign-in', request.url))
+    clearResponse.cookies.set('device_pending_verification', '', { maxAge: 0, path: '/' })
     return clearResponse
   }
 
