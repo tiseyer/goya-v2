@@ -7,22 +7,34 @@ interface FeedbackButtonsProps {
   sessionId: string | null
   visible: boolean     // false while streaming, true after done
   compact?: boolean    // smaller variant for search hints
+  onBeforeSubmit?: () => Promise<string | null>  // returns sessionId — called when sessionId is null
 }
 
-export default function FeedbackButtons({ sessionId, visible, compact: _compact }: FeedbackButtonsProps) {
+export default function FeedbackButtons({ sessionId, visible, compact: _compact, onBeforeSubmit }: FeedbackButtonsProps) {
   const [feedback, setFeedback] = useState<'helpful' | 'not_helpful' | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   if (!visible) return null
 
   async function handleClick(value: 'helpful' | 'not_helpful') {
-    if (submitting || feedback !== null || !sessionId) return
+    if (submitting || feedback !== null) return
 
     setSubmitting(true)
+
+    let targetSessionId = sessionId
+    if (!targetSessionId && onBeforeSubmit) {
+      targetSessionId = await onBeforeSubmit()
+    }
+
+    if (!targetSessionId) {
+      setSubmitting(false)
+      return
+    }
+
     setFeedback(value)
 
     try {
-      await fetch(`/api/chatbot/conversations/${sessionId}/feedback`, {
+      await fetch(`/api/chatbot/conversations/${targetSessionId}/feedback`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ feedback: value }),
@@ -34,7 +46,7 @@ export default function FeedbackButtons({ sessionId, visible, compact: _compact 
     }
   }
 
-  const disabled = submitting || feedback !== null || !sessionId
+  const disabled = submitting || feedback !== null || (!sessionId && !onBeforeSubmit)
 
   return (
     <div className="flex items-center gap-1 mt-1.5 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity">

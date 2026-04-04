@@ -461,7 +461,7 @@ export async function listConversations(
     // Fetch all sessions ordered by last_message_at DESC
     let query = supabase
       .from('chat_sessions')
-      .select('id, user_id, anonymous_id, is_escalated, started_from, created_at, last_message_at')
+      .select('id, user_id, anonymous_id, is_escalated, started_from, user_feedback, created_at, last_message_at')
       .order('last_message_at', { ascending: false })
 
     // Apply filter
@@ -524,6 +524,7 @@ export async function listConversations(
         created_at: s.created_at,
         last_message_at: s.last_message_at,
         message_count: countMap[s.id] ?? 0,
+        user_feedback: s.user_feedback ?? null,
       }
     })
 
