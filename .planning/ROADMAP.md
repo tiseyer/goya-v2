@@ -614,7 +614,9 @@ Plans:
   2. Each device row shows device name (e.g., "Chrome on macOS"), IP address, first seen date, and last seen date
   3. Clicking "Revoke" on a device row hard-deletes that trusted_devices record; the row disappears from the list immediately
   4. GET /api/admin/users/[id]/devices and DELETE /api/admin/users/[id]/devices/[deviceId] exist as admin-only routes verified via admin role check on every request
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 58-01-PLAN.md — API routes + DevicesTable components + Devices tab wiring
 **UI hint**: yes
 
 ## Progress
