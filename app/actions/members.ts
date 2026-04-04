@@ -142,6 +142,55 @@ export async function searchMembers(
   return (data ?? []) as MemberSearchResult[];
 }
 
+// ─── Test slot search ─────────────────────────────────────────────────────────
+
+export interface TestSlotSearchResult {
+  id: string;
+  full_name: string;
+  email: string;
+  role: string;
+  principal_trainer_school_id: string | null;
+}
+
+/**
+ * Search profiles by name OR email for test user slot assignment.
+ * Admin/moderator only. Returns role and school info inline (no secondary fetch needed).
+ */
+export async function searchProfilesForTestSlots(
+  query: string
+): Promise<TestSlotSearchResult[]> {
+  if (!query || query.trim().length < 2) return [];
+
+  const supabase = await createSupabaseServerActionClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const service = getSupabaseService() as ReturnType<typeof getSupabaseService>;
+
+  // Role check: only admin/moderator may use this action
+  const { data: callerProfile } = await (service as any)
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!isAdminOrMod(callerProfile?.role)) return [];
+
+  const q = query.trim();
+  const { data, error } = await (service as any)
+    .from('profiles')
+    .select('id, full_name, email, role, principal_trainer_school_id')
+    .or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
+    .limit(10);
+
+  if (error) {
+    console.error('searchProfilesForTestSlots error:', error);
+    return [];
+  }
+
+  return (data ?? []) as TestSlotSearchResult[];
+}
+
 /**
  * Fetch profiles by IDs — used to hydrate organizer chips on form load.
  */
