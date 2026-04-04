@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquare, ThumbsUp, ThumbsDown } from 'lucide-react'
 import type { ConversationListItem, ChatMessage } from '@/lib/chatbot/types'
 import { listConversations, getConversationMessages } from './chatbot-actions'
 import ConversationViewer from './ConversationViewer'
@@ -132,6 +132,7 @@ export default function ConversationsTab({ initialConversations }: Props) {
                   <th className="text-left px-5 py-3">Messages</th>
                   <th className="text-left px-5 py-3">Escalated</th>
                   <th className="text-left px-5 py-3">Source</th>
+                  <th className="text-left px-5 py-3">Feedback</th>
                   <th className="text-left px-5 py-3">Actions</th>
                 </tr>
               </thead>
@@ -179,6 +180,21 @@ export default function ConversationsTab({ initialConversations }: Props) {
                             : conv.started_from === 'search_hint' ? 'Search'
                             : 'Help Page'}
                         </span>
+                      </td>
+                      <td className="px-5 py-3">
+                        {conv.user_feedback === 'up' ? (
+                          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium bg-green-50 text-green-700 border border-green-200">
+                            <ThumbsUp className="w-3 h-3" />
+                            Helpful
+                          </span>
+                        ) : conv.user_feedback === 'down' ? (
+                          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium bg-red-50 text-red-700 border border-red-200">
+                            <ThumbsDown className="w-3 h-3" />
+                            Not helpful
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-300">—</span>
+                        )}
                       </td>
                       <td className="px-5 py-3">
                         <button

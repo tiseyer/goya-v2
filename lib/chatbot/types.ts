@@ -75,6 +75,7 @@ export interface ConversationListItem {
   created_at: string
   last_message_at: string
   message_count: number
+  user_feedback: 'up' | 'down' | null
 }
 
 export interface SupportTicket {
