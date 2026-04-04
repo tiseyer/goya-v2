@@ -78,9 +78,10 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260404-mdz | Apply missing admin_test_user_slots migration (DB-only, no code changes) | 2026-04-04 | n/a | [260404-mdz-apply-missing-admin-test-user-slots-migr](./quick/260404-mdz-apply-missing-admin-test-user-slots-migr/) |
+| 260404-mma | Fix password reset: hide header during reset, fix redirect after success | 2026-04-04 | a0c47c6 | [260404-mma-fix-password-reset-hide-header-during-re](./quick/260404-mma-fix-password-reset-hide-header-during-re/) |
 
 ## Session Continuity
 
 Last session: 2026-04-04
-Stopped at: Completed quick task 260404-mdz: Apply missing admin_test_user_slots migration
+Stopped at: Completed quick task 260404-mma: Fix password reset — hide header + fix redirect
 Resume file: None — run /gsd:plan-phase 55 to begin
