@@ -4,7 +4,7 @@ milestone: v1.23
 milestone_name: Mattea Intelligence System
 status: in_progress
 created: 2026-04-03
-last_updated: 2026-04-04T09:03:43Z
+last_updated: 2026-04-04T09:09:19Z
 ---
 
 # Project State
@@ -19,18 +19,18 @@ See: .planning/workstreams/ai-super-helper/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 3 of 5 (Feedback)
-Plan: 1 of TBD in current phase (03-01 complete)
+Plan: 2 of TBD in current phase (03-02 complete)
 Status: In progress
-Last activity: 2026-04-04 — Plan 03-01 complete: thumbs up/down buttons wired to ChatPanel and InlineChat, PATCH feedback endpoint created
+Last activity: 2026-04-04 — Plan 03-02 complete: FeedbackButtons wired into MatteaSearchHint with lazy session capture; Feedback column added to admin Conversations table
 
-Progress: [██████░░░░] ~40%
+Progress: [███████░░░] ~50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: ~7 minutes
-- Total execution time: ~19 minutes
+- Total execution time: ~25 minutes
 
 **By Phase:**
 
@@ -38,10 +38,10 @@ Progress: [██████░░░░] ~40%
 |-------|-------|-------|----------|
 | 01-schema-infrastructure | 2 complete | ~11 min | ~5.5 min |
 | 02-source-tracking | 1 complete | ~8 min | ~8 min |
-| 03-feedback | 1 complete | ~8 min | ~8 min |
+| 03-feedback | 2 complete | ~14 min | ~7 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01, 01-02, 02-01, 03-01
+- Last 5 plans: 01-01, 01-02, 02-01, 03-01, 03-02
 - Trend: Steady ~8 min/plan
 
 *Updated after each plan completion*
@@ -67,6 +67,9 @@ Recent decisions affecting current work:
 - FeedbackButtons is self-contained — manages its own fetch state, no callback needed to parent
 - feedbackSlot render prop used on MessageBubble to avoid role-specific logic in the bubble itself
 - Greeting message excluded from feedback in InlineChat (static local, not a Mattea response)
+- Search hint session created lazily on first thumb click (ensureSession), not pre-created on render
+- sessionPromiseRef deduplicates concurrent ensureSession calls
+- onBeforeSubmit prop on FeedbackButtons enables dynamic session acquisition without breaking existing callers
 
 ### Pending Todos
 
@@ -74,11 +77,11 @@ None.
 
 ### Blockers/Concerns
 
-- Search hint (MatteaSearchHint) may not write session/message rows — must verify before Phase 3 feedback wiring. See Pitfall 10 in PITFALLS.md.
+- Search hint (MatteaSearchHint) — RESOLVED in 03-02. Session created lazily via ensureSession on first thumb click.
 - `npx supabase db push` is blocked by out-of-order local migrations; use `npx supabase db query --linked -f <file>` for future migrations in this workstream.
 
 ## Session Continuity
 
-Last session: 2026-04-04T09:03:43Z
-Stopped at: Plan 03-01 complete — all tasks committed (6a1688e, db0977b, 2cc1b46)
+Last session: 2026-04-04T09:09:19Z
+Stopped at: Plan 03-02 complete — all tasks committed (c67d7a6, a172123, cb2c0ae)
 Resume file: None — continue with next plan in phase 03
