@@ -3,7 +3,7 @@ title: Chatbot
 audience: ["admin"]
 section: admin
 order: 11
-last_updated: "2026-04-03"
+last_updated: "2026-04-04"
 ---
 
 # Chatbot
@@ -90,17 +90,30 @@ Click **Delete** on any row. You will be asked to confirm before the item is rem
 
 The Conversations tab shows a log of all chatbot conversations from both logged-in members and guest visitors.
 
-Each conversation shows the user (or "Guest"), the start time, and the last message preview.
+The table columns are: **User**, **Started**, **Last Message**, **Messages**, **Escalated**, **Source**, **Feedback**, and **Actions**.
 
 **Filters available:**
-- Date range
-- User type (logged-in vs. guest)
+- All conversations / Logged-in Users / Guests / Escalated (dropdown)
+- Search by name or guest ID
 
-Click a conversation row to expand and read the full message thread. This is useful for identifying gaps in the FAQ knowledge base — if users frequently ask questions the chatbot cannot answer well, add new FAQ items to address them.
+Click **View** on a conversation row to read the full message thread. This is useful for identifying gaps in the FAQ knowledge base — if users frequently ask questions the chatbot cannot answer well, add new FAQ items to address them.
 
 ### User Feedback (thumbs up / down)
 
-Users can rate Mattea's responses using thumbs up or thumbs down buttons that appear on assistant messages after streaming finishes. Feedback is per-conversation (not per-message). The rating is stored as **Helpful** (thumbs up) or **Not helpful** (thumbs down) on the conversation record. Conversations with negative feedback are useful for identifying improvement areas in the system prompt or FAQ knowledge base.
+Users can rate Mattea's responses using thumbs up or thumbs down buttons that appear on assistant messages. Feedback is available in:
+
+- **Chat widget** and **Help Page** — buttons appear after each assistant message finishes streaming.
+- **Search hint** (the AI answer card in the search bar) — buttons appear below the answer. Clicking a thumb creates the conversation session if one has not been started yet.
+
+Feedback is per-conversation (not per-message). The **Feedback** column in the Conversations table shows:
+
+| Badge | Meaning |
+|---|---|
+| Green **Helpful** | User clicked thumbs up |
+| Red **Not helpful** | User clicked thumbs down |
+| — | No feedback given |
+
+Conversations with negative feedback are useful for identifying improvement areas in the system prompt or FAQ knowledge base.
 
 ---
 
