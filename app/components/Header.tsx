@@ -1017,8 +1017,8 @@ export default function Header() {
         body: JSON.stringify({ targetUserId }),
       });
       const data = await res.json();
-      if (data.url) {
-        window.open(data.url, '_blank');
+      if (data.token) {
+        window.open(`/admin/impersonate?token=${encodeURIComponent(data.token)}`, '_blank');
       }
     } catch (err) {
       console.error('Quick switch failed:', err);
