@@ -17,7 +17,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GraduationCap, Flower2, Stethoscope, School, User, X, Search, GripVertical } from 'lucide-react';
-import { searchMembers } from '@/app/actions/members';
+import { searchProfilesForTestSlots } from '@/app/actions/members';
+import type { TestSlotSearchResult } from '@/app/actions/members';
 import { createBrowserClient } from '@supabase/ssr';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -27,12 +28,6 @@ interface SlotUser {
   full_name: string;
   role: string;
   principal_trainer_school_id: string | null;
-}
-
-interface SearchResult {
-  id: string;
-  full_name: string;
-  avatar_url: string | null;
 }
 
 // ─── Role icon ────────────────────────────────────────────────────────────────
@@ -69,7 +64,7 @@ function SortableSlot({
   };
 
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<TestSlotSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -83,7 +78,7 @@ function SortableSlot({
     }
     setSearching(true);
     try {
-      const data = await searchMembers(q, { role: 'admin' });
+      const data = await searchProfilesForTestSlots(q);
       setResults(data);
       setDropdownOpen(true);
     } catch {
@@ -100,30 +95,16 @@ function SortableSlot({
     debounceRef.current = setTimeout(() => runSearch(val), 300);
   };
 
-  const handleSelect = async (result: SearchResult) => {
+  const handleSelect = (result: TestSlotSearchResult) => {
     setDropdownOpen(false);
     setQuery('');
     setResults([]);
-
-    // Fetch full profile with role info
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    const { data: prof } = await supabase
-      .from('profiles')
-      .select('id, full_name, role, principal_trainer_school_id')
-      .eq('id', result.id)
-      .single();
-
-    if (prof) {
-      onSelect(slotIndex, {
-        id: prof.id,
-        full_name: prof.full_name ?? result.full_name,
-        role: prof.role ?? 'student',
-        principal_trainer_school_id: prof.principal_trainer_school_id ?? null,
-      });
-    }
+    onSelect(slotIndex, {
+      id: result.id,
+      full_name: result.full_name,
+      role: result.role,
+      principal_trainer_school_id: result.principal_trainer_school_id,
+    });
   };
 
   // Close dropdown on outside click
@@ -205,7 +186,10 @@ function SortableSlot({
                           {r.full_name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()}
                         </span>
                       </div>
-                      <span className="truncate">{r.full_name}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate font-medium">{r.full_name}</div>
+                        <div className="truncate text-xs text-[#9CA3AF]">{r.email}</div>
+                      </div>
                     </button>
                   ))}
                 </div>
