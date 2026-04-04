@@ -111,9 +111,10 @@ None.
 | 260403-mah | Fix PageHero edit UI — pill visibility, contained edit panels, DB seed | 2026-04-03 | 6dd95a0, d982994 | [260403-mah-fix-pagehero-edit-ui-overhaul-pill-resto](./quick/260403-mah-fix-pagehero-edit-ui-overhaul-pill-resto/) |
 | 260403-n8u | PageHero dot grid opacity doubled + FOFC prevention on load | 2026-04-03 | 48ecc5c | [260403-n8u-pagehero-dot-grid-visibility-no-flash-of](./quick/260403-n8u-pagehero-dot-grid-visibility-no-flash-of/) |
 | 260404-h63 | Create 4 test users with full dummy profiles, connections, credits, school | 2026-04-04 | a83e640 | [260404-h63-create-4-test-users-with-full-dummy-prof](./quick/260404-h63-create-4-test-users-with-full-dummy-prof/) |
+| 260404-hht | Add test user slots to Admin Settings + profile dropdown quick-switch | 2026-04-04 | 1974a8f, 916e2e4 | [260404-hht-add-test-user-slots-to-admin-settings-ad](./quick/260404-hht-add-test-user-slots-to-admin-settings-ad/) |
 
 ## Session Continuity
 
 Last session: 2026-04-04
-Stopped at: Completed quick task 260404-h63: Create 4 test users with full dummy profiles for UI testing
+Stopped at: Completed quick task 260404-hht: Add test user slots to Admin Settings — awaiting human-verify checkpoint
 Resume file: None
