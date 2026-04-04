@@ -6,15 +6,32 @@ export async function GET(request: Request) {
   const slug = searchParams.get('slug')
 
   if (!slug || slug.trim() === '') {
-    return NextResponse.json({ available: false })
+    return NextResponse.json({ available: false, resolvedSlug: '' })
+  }
+
+  const baseSlug = slug.trim()
+
+  // Build all candidate slugs in one array: base + base-2 through base-99
+  const candidates: string[] = [baseSlug]
+  for (let i = 2; i <= 99; i++) {
+    candidates.push(`${baseSlug}-${i}`)
   }
 
   const supabase = await createSupabaseServerClient()
-  const { data } = await supabase
+  const { data: taken } = await supabase
     .from('schools')
-    .select('id')
-    .eq('slug', slug)
-    .maybeSingle()
+    .select('slug')
+    .in('slug', candidates)
 
-  return NextResponse.json({ available: !data })
+  const takenSet = new Set((taken ?? []).map((row: { slug: string }) => row.slug))
+
+  // Find the first candidate not already taken
+  const resolvedSlug = candidates.find((c) => !takenSet.has(c))
+
+  if (!resolvedSlug) {
+    // All 99 suffixes taken — extremely unlikely
+    return NextResponse.json({ available: false, resolvedSlug: '' })
+  }
+
+  return NextResponse.json({ available: true, resolvedSlug })
 }

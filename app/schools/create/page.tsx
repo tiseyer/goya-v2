@@ -47,7 +47,7 @@ export default async function SchoolCreatePage() {
     <div className="min-h-screen bg-[#F7F8FA] py-12">
       <PageContainer>
         <Suspense fallback={<div className="animate-pulse h-96 bg-white rounded-2xl" />}>
-          <SchoolCreateWizard products={products ?? []} />
+          <SchoolCreateWizard products={products ?? []} userId={user.id} />
         </Suspense>
       </PageContainer>
     </div>

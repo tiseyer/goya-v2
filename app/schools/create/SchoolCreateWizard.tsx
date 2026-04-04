@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { generateSlug } from '@/lib/schools/slug'
@@ -19,11 +19,12 @@ interface Product {
 
 interface WizardDraft {
   schoolName: string
-  slug: string
   selectedTypes: string[]
 }
 
-const DRAFT_KEY = 'school-registration-draft'
+const OLD_DRAFT_KEY = 'school-registration-draft'
+const getDraftKey = (uid: string) => `school-registration-draft-${uid}`
+
 const ANNUAL_PRICE_EUR = 40
 const SIGNUP_PRICE_EUR = 99
 
@@ -91,75 +92,31 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
 
 // ── Step 1: School Name ──────────────────────────────────────────────────────
 
-type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'error'
+type SlugStatus = 'idle' | 'checking' | 'available' | 'error'
 
 function Step1SchoolName({
   schoolName,
-  slug,
+  resolvedSlug,
+  slugStatus,
   onSchoolNameChange,
-  onSlugChange,
   onContinue,
 }: {
   schoolName: string
-  slug: string
+  resolvedSlug: string
+  slugStatus: SlugStatus
   onSchoolNameChange: (v: string) => void
-  onSlugChange: (v: string) => void
   onContinue: () => void
 }) {
-  const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle')
-  const [slugEdited, setSlugEdited] = useState(false)
-  const [checkTimer, setCheckTimer] = useState<ReturnType<typeof setTimeout> | null>(null)
-
-  // Auto-generate slug from name (only if user hasn't manually edited it)
-  useEffect(() => {
-    if (!slugEdited && schoolName.length > 0) {
-      onSlugChange(generateSlug(schoolName))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schoolName, slugEdited])
-
-  // Debounced uniqueness check
-  const scheduleCheck = useCallback((slugValue: string) => {
-    if (checkTimer) clearTimeout(checkTimer)
-    if (!slugValue || slugValue.length < 1) {
-      setSlugStatus('idle')
-      return
-    }
-    setSlugStatus('checking')
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/schools/check-slug?slug=${encodeURIComponent(slugValue)}`)
-        const data = await res.json()
-        setSlugStatus(data.available ? 'available' : 'taken')
-      } catch {
-        setSlugStatus('error')
-      }
-    }, 500)
-    setCheckTimer(timer)
-  }, [checkTimer])
-
-  useEffect(() => {
-    if (slug) scheduleCheck(slug)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug])
-
-  function handleSlugChange(value: string) {
-    setSlugEdited(true)
-    // Sanitize: lowercase, hyphens only
-    const sanitized = value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-')
-    onSlugChange(sanitized)
-  }
-
   const canContinue =
     schoolName.trim().length >= 3 &&
-    slug.length >= 1 &&
+    resolvedSlug.length >= 1 &&
     slugStatus === 'available'
 
   return (
     <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-8 max-w-xl mx-auto">
       <h2 className="text-2xl font-bold text-[#1B3A5C] mb-2">Name Your School</h2>
       <p className="text-[#6B7280] text-sm mb-8">
-        Give your school a name and a unique URL slug.
+        Give your school a name. Your unique URL will be generated automatically.
       </p>
 
       <div className="space-y-6">
@@ -181,48 +138,37 @@ function Step1SchoolName({
           )}
         </div>
 
-        {/* Slug */}
-        <div>
-          <label className="block text-sm font-medium text-[#374151] mb-2">
-            School URL
-          </label>
-          <div className="flex items-center border border-[#E5E7EB] rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#1B3A5C]/20 focus-within:border-[#1B3A5C] transition-colors">
-            <span className="px-3 py-3 bg-[#F7F8FA] text-sm text-[#9CA3AF] border-r border-[#E5E7EB] whitespace-nowrap select-none">
-              goya.org/schools/
-            </span>
-            <input
-              type="text"
-              value={slug}
-              onChange={(e) => handleSlugChange(e.target.value)}
-              placeholder="my-yoga-school"
-              className="flex-1 px-3 py-3 outline-none text-sm bg-transparent"
-            />
-            <div className="px-3">
+        {/* Read-only URL preview */}
+        {schoolName.trim().length >= 3 && (
+          <div className="mt-4">
+            <p className="text-sm text-[#6B7280]">Your school URL:</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm font-medium text-[#1B3A5C]">
+                goya.org/schools/{resolvedSlug || '...'}
+              </p>
               {slugStatus === 'checking' && (
-                <svg className="animate-spin w-4 h-4 text-[#9CA3AF]" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin w-4 h-4 text-[#9CA3AF] flex-shrink-0" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                 </svg>
               )}
               {slugStatus === 'available' && (
-                <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               )}
-              {slugStatus === 'taken' && (
-                <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              {slugStatus === 'error' && (
+                <svg className="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
                 </svg>
               )}
             </div>
+            <div className="mt-1 text-xs">
+              {slugStatus === 'available' && <span className="text-green-600">Available</span>}
+              {slugStatus === 'error' && <span className="text-amber-500">Could not verify availability. Please try again.</span>}
+            </div>
           </div>
-          <div className="mt-1.5 text-xs">
-            {slugStatus === 'available' && <span className="text-green-600">Available</span>}
-            {slugStatus === 'taken' && <span className="text-red-500">This URL is already taken. Try a different name.</span>}
-            {slugStatus === 'error' && <span className="text-amber-500">Could not verify availability. Please try again.</span>}
-            {slugStatus === 'idle' && slug.length === 0 && <span className="text-[#9CA3AF]">A unique URL for your school</span>}
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="mt-8">
@@ -398,7 +344,13 @@ function Step2Designations({
 
 // ── Main Wizard ──────────────────────────────────────────────────────────────
 
-export default function SchoolCreateWizard({ products }: { products: Product[] }) {
+export default function SchoolCreateWizard({
+  products,
+  userId,
+}: {
+  products: Product[]
+  userId: string
+}) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -406,40 +358,82 @@ export default function SchoolCreateWizard({ products }: { products: Product[] }
   const step = stepParam === '2' ? 2 : 1
 
   const [schoolName, setSchoolName] = useState('')
-  const [slug, setSlug] = useState('')
+  const [resolvedSlug, setResolvedSlug] = useState('')
+  const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle')
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [paymentError, setPaymentError] = useState<string | null>(null)
+
+  const checkTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Track school registration start on wizard mount
   useEffect(() => {
     Analytics.schoolRegistrationStarted()
   }, [])
 
-  // Restore draft from localStorage on mount
+  // Restore draft from localStorage on mount (user-scoped key)
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(DRAFT_KEY)
+      // Clean up old unscoped key if it exists
+      localStorage.removeItem(OLD_DRAFT_KEY)
+
+      const saved = localStorage.getItem(getDraftKey(userId))
       if (saved) {
         const draft: WizardDraft = JSON.parse(saved)
         if (draft.schoolName) setSchoolName(draft.schoolName)
-        if (draft.slug) setSlug(draft.slug)
         if (draft.selectedTypes) setSelectedTypes(draft.selectedTypes)
       }
     } catch {
       // ignore
     }
-  }, [])
+  }, [userId])
 
-  // Save draft to localStorage on change
+  // Save draft to localStorage on change (user-scoped key, no slug)
   useEffect(() => {
     try {
-      const draft: WizardDraft = { schoolName, slug, selectedTypes }
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+      const draft: WizardDraft = { schoolName, selectedTypes }
+      localStorage.setItem(getDraftKey(userId), JSON.stringify(draft))
     } catch {
       // ignore
     }
-  }, [schoolName, slug, selectedTypes])
+  }, [schoolName, selectedTypes, userId])
+
+  // Debounced slug check: auto-generate slug from school name, resolve collisions via API
+  const scheduleSlugCheck = useCallback((name: string) => {
+    if (checkTimerRef.current) clearTimeout(checkTimerRef.current)
+
+    const trimmed = name.trim()
+    if (trimmed.length < 3) {
+      setResolvedSlug('')
+      setSlugStatus('idle')
+      return
+    }
+
+    const baseSlug = generateSlug(trimmed)
+    setResolvedSlug(baseSlug)
+    setSlugStatus('checking')
+
+    checkTimerRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/schools/check-slug?slug=${encodeURIComponent(baseSlug)}`)
+        const data = await res.json()
+        if (data.resolvedSlug) {
+          setResolvedSlug(data.resolvedSlug)
+          setSlugStatus(data.available ? 'available' : 'error')
+        } else {
+          setSlugStatus('error')
+        }
+      } catch {
+        setSlugStatus('error')
+      }
+    }, 500)
+  }, [])
+
+  // Trigger slug check whenever school name changes
+  useEffect(() => {
+    scheduleSlugCheck(schoolName)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schoolName])
 
   function goToStep(n: number) {
     const params = new URLSearchParams(searchParams.toString())
@@ -463,11 +457,11 @@ export default function SchoolCreateWizard({ products }: { products: Product[] }
     setPaymentError(null)
 
     try {
-      const result = await createSchoolCheckoutSession(schoolName, slug, selectedTypes)
+      const result = await createSchoolCheckoutSession(schoolName, resolvedSlug, selectedTypes)
 
       if ('url' in result) {
         // Clear draft before redirect
-        try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
+        try { localStorage.removeItem(getDraftKey(userId)) } catch { /* ignore */ }
         Analytics.schoolRegistrationCompleted(schoolName)
         window.location.href = result.url
       } else {
@@ -488,9 +482,9 @@ export default function SchoolCreateWizard({ products }: { products: Product[] }
       {step === 1 && (
         <Step1SchoolName
           schoolName={schoolName}
-          slug={slug}
+          resolvedSlug={resolvedSlug}
+          slugStatus={slugStatus}
           onSchoolNameChange={setSchoolName}
-          onSlugChange={setSlug}
           onContinue={() => goToStep(2)}
         />
       )}
