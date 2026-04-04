@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
@@ -9,7 +8,6 @@ const INPUT = 'w-full px-4 py-3 rounded-xl bg-[#1a2744] border border-white/15 t
 const LABEL = 'block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide';
 
 export default function ResetPasswordPage() {
-  const router = useRouter();
 
   // 'loading' = exchanging token, 'ready' = show form, 'error' = link invalid, 'success' = done
   const [status, setStatus] = useState<'loading' | 'ready' | 'error' | 'success'>('loading');
@@ -83,11 +81,19 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    // Clear the password reset lock cookie (not httpOnly so client can clear it)
-    document.cookie = 'password_reset_pending=; path=/; max-age=0';
-
     setStatus('success');
-    setTimeout(() => router.push('/dashboard'), 3000);
+
+    // Clear cookie server-side, then hard redirect
+    try {
+      await fetch('/api/auth/complete-reset', { method: 'POST' });
+    } catch {
+      // Even if API call fails, still try to redirect
+    }
+
+    // Hard redirect ensures middleware sees cleared cookie on the fresh request
+    setTimeout(() => {
+      window.location.href = '/dashboard';
+    }, 2000);
   }
 
   return (
