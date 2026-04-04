@@ -120,7 +120,7 @@ function SortableSlot({
 
   return (
     <div ref={setNodeRef} style={style} className="flex-1 min-w-0">
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm">
         {/* Slot header with drag handle */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-[#E5E7EB] bg-slate-50">
           <div
@@ -174,7 +174,7 @@ function SortableSlot({
               </div>
 
               {dropdownOpen && results.length > 0 && (
-                <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-[#E5E7EB] rounded-lg shadow-lg overflow-hidden">
+                <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-[#E5E7EB] rounded-lg shadow-lg overflow-hidden">
                   {results.map(r => (
                     <button
                       key={r.id}
@@ -196,7 +196,7 @@ function SortableSlot({
               )}
 
               {dropdownOpen && results.length === 0 && !searching && query.trim().length >= 2 && (
-                <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-[#E5E7EB] rounded-lg shadow-lg px-3 py-3 text-sm text-[#9CA3AF]">
+                <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-[#E5E7EB] rounded-lg shadow-lg px-3 py-3 text-sm text-[#9CA3AF]">
                   No results found
                 </div>
               )}
@@ -374,7 +374,7 @@ export default function TestUsersTab() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm">
         <div className="px-6 py-4 border-b border-[#E5E7EB]">
           <h2 className="text-base font-semibold text-[#1B3A5C]">Test User Shortcuts</h2>
           <p className="text-sm text-[#6B7280] mt-0.5">
