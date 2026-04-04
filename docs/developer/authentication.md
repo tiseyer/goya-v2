@@ -3,7 +3,7 @@ title: Authentication
 audience: ["developer"]
 section: developer
 order: 5
-last_updated: "2026-03-31"
+last_updated: "2026-04-04"
 ---
 
 # Authentication
@@ -18,6 +18,7 @@ GOYA v2 uses Supabase Auth for all session management. Authentication state is s
 - [Role System](#role-system)
 - [Checking Roles in Code](#checking-roles-in-code)
 - [Admin Impersonation](#admin-impersonation)
+- [Password Reset Lock Screen](#password-reset-lock-screen)
 - [Migrated Users — Password Reset Gate](#migrated-users--password-reset-gate)
 - [Maintenance Mode](#maintenance-mode)
 
@@ -168,6 +169,27 @@ const effectiveUserId = state.isImpersonating
   ? state.targetUserId
   : currentUser.id
 ```
+
+---
+
+## Password Reset Lock Screen
+
+When a user clicks a Supabase password-reset magic link, the `/auth/callback` route sets a `password_reset_pending=true` cookie. Middleware detects this cookie and locks the user to `/reset-password` on every request until the cookie is cleared.
+
+**Header behavior:** `app/layout.tsx` reads the `password_reset_pending` cookie (via `cookies()` from `next/headers`). When set, the full navigation header is replaced with a minimal header showing only the GOYA logo. Footer, chat widget, and cookie consent are also hidden — the page is intentionally self-contained.
+
+**After successful password update:**
+
+1. `app/reset-password/page.tsx` calls `supabase.auth.updateUser({ password })`.
+2. On success, it POSTs to `/api/auth/complete-reset` — a Route Handler that verifies the user is authenticated, then sets `password_reset_pending=` with `maxAge: 0` via a `Set-Cookie` response header. This clears the cookie server-side before the redirect.
+3. The page then does a hard redirect via `window.location.href = '/dashboard'` (not `router.push`). The hard redirect forces a new HTTP request, so middleware reads the fresh cookies without the stale `password_reset_pending` value.
+
+**Why not `router.push` or `document.cookie`?** Client-side navigation (soft redirect) reuses the existing request context. Middleware may still see the old cookie value in flight, causing an infinite redirect loop back to `/reset-password`. A hard redirect guarantees a clean request.
+
+**Files:**
+- `app/layout.tsx` — reads cookie, conditionally renders minimal logo-only header
+- `app/api/auth/complete-reset/route.ts` — POST endpoint that clears cookie via `Set-Cookie`
+- `app/reset-password/page.tsx` — calls complete-reset then `window.location.href`
 
 ---
 
