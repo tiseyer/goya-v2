@@ -16,6 +16,8 @@
 - ✅ **v1.16 Admin Color Settings** - Phases 41-42 (shipped 2026-04-01)
 - ✅ **v1.17 Dashboard Redesign** - Phases 43-46 (shipped 2026-04-02)
 - ✅ **v1.18 User Profile Redesign** - Phases 47-50 (shipped 2026-04-02)
+- ✅ **v1.19 Global Search** - Phases 51-54 (shipped 2026-04-03)
+- 🚧 **v1.24 Device Authentication (2FA)** - Phases 55-58 (in progress)
 
 ## Phases
 
@@ -544,3 +546,77 @@ Plans:
 | 52. Search API + Page Registry | 1/1 | Complete | 2026-04-03 |
 | 53. Header Integration | 1/1 | Complete | 2026-04-03 |
 | 54. Performance + Polish | 1/1 | Complete | 2026-04-03 |
+
+---
+
+## v1.24 Device Authentication (2FA) (Phases 55-58)
+
+**Milestone Goal:** When a user logs in from an unrecognized device, require email OTP verification before granting full access. Trusted devices skip OTP on future logins. Admins can view and revoke trusted devices per user.
+
+### Phases
+
+- [ ] **Phase 55: Database Foundation + Fingerprint Algorithm** - trusted_devices and device_verification_codes tables with RLS, lib/device/ module with fingerprint utility and trust-check helper, DeviceFingerprintSetter client component mounted in root layout
+- [ ] **Phase 56: OTP API Routes** - POST /api/device-verification/send (idempotent, hashed storage, Resend email) and POST /api/device-verification/verify (timingSafeEqual, attempt limit, trusted device insert)
+- [ ] **Phase 57: Auth Callback + Middleware + Verify Page** - Modified /auth/callback with device trust check, middleware lock for device_pending_verification cookie, /verify-device page with input-otp component and resend cooldown
+- [ ] **Phase 58: Admin Devices Tab** - Devices tab on admin user detail page listing trusted devices with revoke action and admin-only API routes
+
+## Phase Details
+
+### Phase 55: Database Foundation + Fingerprint Algorithm
+**Goal**: The database tables and the fingerprint algorithm are locked in — every downstream phase can query device trust without worrying about schema changes or hash instability
+**Depends on**: Nothing (first phase of milestone)
+**Requirements**: DB-01, DB-02, DB-03, FP-01, FP-02, FP-03, FP-04
+**Success Criteria** (what must be TRUE):
+  1. The trusted_devices table exists in Supabase with profile_id FK, device_fingerprint, device_name, ip_address, created_at, last_used_at columns and a unique(profile_id, device_fingerprint) constraint; RLS grants admin full access and users read-only access to their own rows
+  2. The device_verification_codes table exists with profile_id FK, hashed_code, device_fingerprint, expires_at, attempt_count, and invalidated columns
+  3. lib/device/fingerprint.ts generates a SHA-256 hash from screen dimensions, color depth, timezone, and language — with no User-Agent in the hash input
+  4. A DeviceFingerprintSetter client component is mounted in root layout.tsx; it writes the computed fingerprint to a goya_device_fp cookie (365-day maxAge, SameSite=Lax, httpOnly=false) on every page load if the cookie is absent
+  5. lib/device/checkTrustedDevice.ts accepts a profile_id and fingerprint string and queries trusted_devices using the service-role client; it returns true only when a matching row exists with last_used_at within the past 90 days
+**Plans**: TBD
+
+### Phase 56: OTP API Routes
+**Goal**: The send and verify API routes are correct, secure, and independently testable before any UI or login flow integration
+**Depends on**: Phase 55 (needs device_verification_codes table and service-role client)
+**Requirements**: OTP-02, OTP-03, OTP-04, OTP-06
+**Success Criteria** (what must be TRUE):
+  1. POST /api/device-verification/send generates a 6-digit code via crypto.randomInt, stores the SHA-256 hash (never plaintext) with a 10-minute expires_at, and sends an email via sendEmailFromTemplate — returning 200 with the code expiry timestamp
+  2. Calling POST /api/device-verification/send a second time within the expiry window does not send a second email; it returns the existing code's expiry (idempotent, multi-tab safe)
+  3. POST /api/device-verification/verify compares the submitted code using crypto.timingSafeEqual; on a match it inserts a trusted_devices row and clears the device_pending_verification cookie; on a mismatch it increments attempt_count and returns the remaining attempts
+  4. After 5 failed attempts the verification code is invalidated and further verify calls return an error without performing any comparison
+**Plans**: TBD
+
+### Phase 57: Auth Callback + Middleware + Verify Page
+**Goal**: Logging in from an unrecognized device redirects to /verify-device; the middleware locks navigation until verified; the verify page accepts OTP input with auto-send, resend cooldown, and escape to sign-out
+**Depends on**: Phase 55 (checkTrustedDevice helper), Phase 56 (send and verify API routes)
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, OTP-01, OTP-05
+**Success Criteria** (what must be TRUE):
+  1. A user logging in from a recognized trusted device is redirected to /dashboard as normal — no OTP prompt appears
+  2. A user logging in from an unrecognized device is redirected to /verify-device with a device_pending_verification cookie set; attempting to navigate to any other route (e.g., /dashboard) redirects back to /verify-device
+  3. The /verify-device page shows "New Device Detected", a masked email address, and a 6-digit OTP input (using the input-otp component) with auto-advance and paste-to-fill; the OTP is sent automatically on page load without any manual trigger
+  4. The Resend button is disabled for 60 seconds after each send with a visible countdown; after 60 seconds it becomes clickable again
+  5. A "Not you? Sign out" link is visible on the verify page and signs the user out, clearing the pending cookie and redirecting to the sign-in page
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 58: Admin Devices Tab
+**Goal**: Admins can view all trusted devices for any user and revoke individual devices from the user detail page
+**Depends on**: Phase 55 (trusted_devices table)
+**Requirements**: ADM-01, ADM-02, ADM-03, ADM-04
+**Success Criteria** (what must be TRUE):
+  1. The admin user detail page has a "Devices" tab (accessible via ?tab=devices) showing all trusted devices for that user
+  2. Each device row shows device name (e.g., "Chrome on macOS"), IP address, first seen date, and last seen date
+  3. Clicking "Revoke" on a device row hard-deletes that trusted_devices record; the row disappears from the list immediately
+  4. GET /api/admin/users/[id]/devices and DELETE /api/admin/users/[id]/devices/[deviceId] exist as admin-only routes verified via admin role check on every request
+**Plans**: TBD
+**UI hint**: yes
+
+## Progress
+
+**Execution Order:** 55 -> 56 -> 57 -> 58
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 55. Database Foundation + Fingerprint Algorithm | 0/TBD | Not started | - |
+| 56. OTP API Routes | 0/TBD | Not started | - |
+| 57. Auth Callback + Middleware + Verify Page | 0/TBD | Not started | - |
+| 58. Admin Devices Tab | 0/TBD | Not started | - |

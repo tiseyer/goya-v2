@@ -77,32 +77,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | — | Pending |
-| DB-02 | — | Pending |
-| DB-03 | — | Pending |
-| FP-01 | — | Pending |
-| FP-02 | — | Pending |
-| FP-03 | — | Pending |
-| FP-04 | — | Pending |
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| OTP-01 | — | Pending |
-| OTP-02 | — | Pending |
-| OTP-03 | — | Pending |
-| OTP-04 | — | Pending |
-| OTP-05 | — | Pending |
-| OTP-06 | — | Pending |
-| ADM-01 | — | Pending |
-| ADM-02 | — | Pending |
-| ADM-03 | — | Pending |
-| ADM-04 | — | Pending |
+| DB-01 | Phase 55 | Pending |
+| DB-02 | Phase 55 | Pending |
+| DB-03 | Phase 55 | Pending |
+| FP-01 | Phase 55 | Pending |
+| FP-02 | Phase 55 | Pending |
+| FP-03 | Phase 55 | Pending |
+| FP-04 | Phase 55 | Pending |
+| OTP-02 | Phase 56 | Pending |
+| OTP-03 | Phase 56 | Pending |
+| OTP-04 | Phase 56 | Pending |
+| OTP-06 | Phase 56 | Pending |
+| AUTH-01 | Phase 57 | Pending |
+| AUTH-02 | Phase 57 | Pending |
+| AUTH-03 | Phase 57 | Pending |
+| OTP-01 | Phase 57 | Pending |
+| OTP-05 | Phase 57 | Pending |
+| ADM-01 | Phase 58 | Pending |
+| ADM-02 | Phase 58 | Pending |
+| ADM-03 | Phase 58 | Pending |
+| ADM-04 | Phase 58 | Pending |
 
 **Coverage:**
 - v1 requirements: 20 total
-- Mapped to phases: 0
-- Unmapped: 20 ⚠️
+- Mapped to phases: 20
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-04*
-*Last updated: 2026-04-04 after initial definition*
+*Last updated: 2026-04-04 after roadmap creation — all 20 requirements mapped*
