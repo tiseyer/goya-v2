@@ -37,7 +37,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. A new support ticket created via chat escalation has a non-null `question_summary` value (the existing `question` column bug is gone)
   3. All three chat surfaces (ChatPanel, InlineChat, MatteaSearchHint) call the same `useChatStream` hook; no duplicated fetch/NDJSON-parse loop exists in any surface component
   4. The streaming `done` event payload includes a `message_id` field containing the server-assigned DB row ID of the persisted assistant message
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Migration + bug fix + getOrCreateSession update (INFRA-01, INFRA-02, INFRA-03)
+- [ ] 01-02-PLAN.md — useChatStream hook extraction + message_id wiring (INFRA-04, INFRA-05)
 
 ### Phase 2: Source Tracking
 **Goal**: Every conversation records which Mattea surface created it, and admins can see that source in the Conversations table
@@ -91,7 +94,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Schema & Infrastructure | 0/TBD | Not started | - |
+| 1. Schema & Infrastructure | 0/2 | Planning complete | - |
 | 2. Source Tracking | 0/TBD | Not started | - |
 | 3. Feedback | 0/TBD | Not started | - |
 | 4. Unanswered Question Pipeline | 0/TBD | Not started | - |
