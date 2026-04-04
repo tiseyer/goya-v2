@@ -116,9 +116,10 @@ None.
 | 260404-jhf | Fix test user slot search — dedicated action searches name+email, inline role data, email shown in dropdown | 2026-04-04 | 7a2b4dc, fa86608 | [260404-jhf-fix-test-user-slot-search-broken-api-ret](./quick/260404-jhf-fix-test-user-slot-search-broken-api-ret/) |
 | 260404-kfe | Lock user to /reset-password until new password set — cookie-based lock in callback, middleware, and reset page | 2026-04-04 | 98a95ad, 6a2d178 | [260404-kfe-lock-user-to-reset-password-page-until-n](./quick/260404-kfe-lock-user-to-reset-password-page-until-n/) |
 | 260404-kk9 | Fix school onboarding state isolation + auto-generated read-only slug with collision resolution | 2026-04-04 | 436301b | [260404-kk9-fix-school-onboarding-state-isolation-pe](./quick/260404-kk9-fix-school-onboarding-state-isolation-pe/) |
+| 260404-kmn | Fix test user slot search dropdown clipped by parent containers — remove overflow-hidden, raise z-index to z-50 | 2026-04-04 | 900e820 | [260404-kmn-fix-test-user-slot-search-dropdown-clipp](./quick/260404-kmn-fix-test-user-slot-search-dropdown-clipp/) |
 
 ## Session Continuity
 
 Last session: 2026-04-04
-Stopped at: Completed quick task 260404-kk9: Fix school onboarding state isolation + slug UX
+Stopped at: Completed quick task 260404-kmn: Fix test user slot search dropdown clipping
 Resume file: None
