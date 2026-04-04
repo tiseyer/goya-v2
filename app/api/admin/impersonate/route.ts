@@ -52,10 +52,10 @@ export async function POST(req: NextRequest) {
     email: targetUser.email,
   });
 
-  if (linkErr || !linkData?.properties?.action_link) {
+  if (linkErr || !linkData?.properties?.hashed_token) {
     console.error('generateLink error:', linkErr);
-    return NextResponse.json({ error: 'Failed to generate link' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to generate token' }, { status: 500 });
   }
 
-  return NextResponse.json({ url: linkData.properties.action_link });
+  return NextResponse.json({ token: linkData.properties.hashed_token });
 }
