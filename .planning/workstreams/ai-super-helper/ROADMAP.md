@@ -64,8 +64,10 @@ Plans:
   2. The same thumbs buttons appear and work identically in the search hint card and on the Help page chat
   3. Thumbs buttons are not clickable while a response is still streaming
   4. The admin Conversations table shows the feedback status (thumbs up / thumbs down / none) for each conversation
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 2 plans
+Plans:
+- [ ] 03-01-PLAN.md — Feedback API route + FeedbackButtons component + wire to ChatPanel and InlineChat (FEED-01, FEED-03)
+- [ ] 03-02-PLAN.md — Search hint feedback + admin Feedback column (FEED-02, FEED-04)
 
 ### Phase 4: Unanswered Question Pipeline
 **Goal**: When Mattea cannot answer confidently it automatically creates a support ticket; admins can publish the question as FAQ or reject it with a reason; admins can filter tickets by source
@@ -97,6 +99,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Schema & Infrastructure | 0/2 | Planning complete | - |
 | 2. Source Tracking | 0/1 | Planning complete | - |
-| 3. Feedback | 0/TBD | Not started | - |
+| 3. Feedback | 0/2 | Planning complete | - |
 | 4. Unanswered Question Pipeline | 0/TBD | Not started | - |
 | 5. Conversation History | 0/TBD | Not started | - |
