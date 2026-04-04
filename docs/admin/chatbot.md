@@ -3,7 +3,7 @@ title: Chatbot
 audience: ["admin"]
 section: admin
 order: 11
-last_updated: "2026-03-31"
+last_updated: "2026-04-03"
 ---
 
 # Chatbot
@@ -97,6 +97,10 @@ Each conversation shows the user (or "Guest"), the start time, and the last mess
 - User type (logged-in vs. guest)
 
 Click a conversation row to expand and read the full message thread. This is useful for identifying gaps in the FAQ knowledge base — if users frequently ask questions the chatbot cannot answer well, add new FAQ items to address them.
+
+### User Feedback (thumbs up / down)
+
+Users can rate Mattea's responses using thumbs up or thumbs down buttons that appear on assistant messages after streaming finishes. Feedback is per-conversation (not per-message). The rating is stored as **Helpful** (thumbs up) or **Not helpful** (thumbs down) on the conversation record. Conversations with negative feedback are useful for identifying improvement areas in the system prompt or FAQ knowledge base.
 
 ---
 
