@@ -555,7 +555,7 @@ Plans:
 
 ### Phases
 
-- [ ] **Phase 55: Database Foundation + Fingerprint Algorithm** - trusted_devices and device_verification_codes tables with RLS, lib/device/ module with fingerprint utility and trust-check helper, DeviceFingerprintSetter client component mounted in root layout
+- [x] **Phase 55: Database Foundation + Fingerprint Algorithm** - trusted_devices and device_verification_codes tables with RLS, lib/device/ module with fingerprint utility and trust-check helper, DeviceFingerprintSetter client component mounted in root layout (completed 2026-04-04)
 - [ ] **Phase 56: OTP API Routes** - POST /api/device-verification/send (idempotent, hashed storage, Resend email) and POST /api/device-verification/verify (timingSafeEqual, attempt limit, trusted device insert)
 - [ ] **Phase 57: Auth Callback + Middleware + Verify Page** - Modified /auth/callback with device trust check, middleware lock for device_pending_verification cookie, /verify-device page with input-otp component and resend cooldown
 - [ ] **Phase 58: Admin Devices Tab** - Devices tab on admin user detail page listing trusted devices with revoke action and admin-only API routes
@@ -572,9 +572,9 @@ Plans:
   3. lib/device/fingerprint.ts generates a SHA-256 hash from screen dimensions, color depth, timezone, and language — with no User-Agent in the hash input
   4. A DeviceFingerprintSetter client component is mounted in root layout.tsx; it writes the computed fingerprint to a goya_device_fp cookie (365-day maxAge, SameSite=Lax, httpOnly=false) on every page load if the cookie is absent
   5. lib/device/checkTrustedDevice.ts accepts a profile_id and fingerprint string and queries trusted_devices using the service-role client; it returns true only when a matching row exists with last_used_at within the past 90 days
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 55-01-PLAN.md — Database migration: trusted_devices and device_verification_codes tables with RLS and indexes
+- [x] 55-01-PLAN.md — Database migration: trusted_devices and device_verification_codes tables with RLS and indexes
 - [x] 55-02-PLAN.md — lib/device/ module (fingerprint, parseDeviceName, checkTrustedDevice) + DeviceFingerprintSetter in root layout
 
 ### Phase 56: OTP API Routes
@@ -586,7 +586,8 @@ Plans:
   2. Calling POST /api/device-verification/send a second time within the expiry window does not send a second email; it returns the existing code's expiry (idempotent, multi-tab safe)
   3. POST /api/device-verification/verify compares the submitted code using crypto.timingSafeEqual; on a match it inserts a trusted_devices row and clears the device_pending_verification cookie; on a mismatch it increments attempt_count and returns the remaining attempts
   4. After 5 failed attempts the verification code is invalidated and further verify calls return an error without performing any comparison
-**Plans**: TBD
+**Plans**: 1 plan
+- [ ] 56-01-PLAN.md — send & verify OTP routes (crypto hash, idempotency, timing-safe comparison, trusted device insert)
 
 ### Phase 57: Auth Callback + Middleware + Verify Page
 **Goal**: Logging in from an unrecognized device redirects to /verify-device; the middleware locks navigation until verified; the verify page accepts OTP input with auto-send, resend cooldown, and escape to sign-out
