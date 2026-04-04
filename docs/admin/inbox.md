@@ -3,7 +3,7 @@ title: Inbox
 audience: ["admin"]
 section: admin
 order: 2
-last_updated: "2026-03-31"
+last_updated: "2026-04-04"
 ---
 
 # Inbox
@@ -82,11 +82,24 @@ When the queue is empty, a green checkmark screen confirms "All caught up!"
 
 Shows support tickets generated through the GOYA chatbot. Only tickets with **open** status contribute to the badge count.
 
-Each ticket shows the subject, status, and creation date. Click a ticket to expand the conversation thread and reply or change its status.
+The ticket list can be filtered by two independent dropdowns:
+
+- **Status filter** — All Tickets / Open / In Progress / Resolved
+- **Source filter** — All Sources / User submitted / Chatbot escalated
+
+The **Source** column in the table identifies how the ticket was created:
+
+| Badge | Meaning |
+|---|---|
+| **User** (slate) | A member manually escalated to a human by asking for help (human escalation) |
+| **Chatbot** (purple, bot icon) | Mattea responded but could not answer the question — the ticket was auto-created |
 
 **Statuses:**
-- **open** — active ticket requiring attention
-- **closed** — resolved
+- **open** — active ticket requiring attention (amber)
+- **in_progress** — being worked on (blue)
+- **resolved** — closed (green)
+
+Click a ticket row to view the full conversation thread. From there you can reply inline or cycle the ticket status.
 
 ---
 

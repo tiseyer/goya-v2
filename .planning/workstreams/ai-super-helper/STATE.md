@@ -4,7 +4,7 @@ milestone: v1.23
 milestone_name: Mattea Intelligence System
 status: in_progress
 created: 2026-04-03
-last_updated: 2026-04-04T09:09:19Z
+last_updated: 2026-04-04T09:21:00Z
 ---
 
 # Project State
@@ -14,23 +14,23 @@ last_updated: 2026-04-04T09:09:19Z
 See: .planning/workstreams/ai-super-helper/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Mattea becomes smarter over time — feedback loops, unanswered question escalation to FAQ, and admin visibility into all AI surfaces
-**Current focus:** Phase 3 — Feedback
+**Current focus:** Phase 4 — Unanswered Question Pipeline
 
 ## Current Position
 
-Phase: 3 of 5 (Feedback)
-Plan: 2 of TBD in current phase (03-02 complete)
+Phase: 4 of 5 (Unanswered Question Pipeline)
+Plan: 1 of TBD in current phase (04-01 complete)
 Status: In progress
-Last activity: 2026-04-04 — Plan 03-02 complete: FeedbackButtons wired into MatteaSearchHint with lazy session capture; Feedback column added to admin Conversations table
+Last activity: 2026-04-04 — Plan 04-01 complete: Unanswered phrase detection auto-creates support tickets; source filter added to admin Support Tickets tab
 
-Progress: [███████░░░] ~50%
+Progress: [████████░░] ~60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: ~7 minutes
-- Total execution time: ~25 minutes
+- Total execution time: ~33 minutes
 
 **By Phase:**
 
@@ -39,9 +39,10 @@ Progress: [███████░░░] ~50%
 | 01-schema-infrastructure | 2 complete | ~11 min | ~5.5 min |
 | 02-source-tracking | 1 complete | ~8 min | ~8 min |
 | 03-feedback | 2 complete | ~14 min | ~7 min |
+| 04-unanswered-question-pipeline | 1 complete | ~8 min | ~8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01, 01-02, 02-01, 03-01, 03-02
+- Last 5 plans: 01-02, 02-01, 03-01, 03-02, 04-01
 - Trend: Steady ~8 min/plan
 
 *Updated after each plan completion*
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - Search hint session created lazily on first thumb click (ensureSession), not pre-created on render
 - sessionPromiseRef deduplicates concurrent ensureSession calls
 - onBeforeSubmit prop on FeedbackButtons enables dynamic session acquisition without breaking existing callers
+- UNANSWERED_PHRASES phrase matching runs post-stream on fullContent in both OpenAI and Anthropic branches; no confidence score API needed
+- ticketTypeFilter is a separate second param on listSupportTickets (not merged into statusFilter) to preserve backward compat with existing callers
 
 ### Pending Todos
 
@@ -82,6 +85,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-04T09:09:19Z
-Stopped at: Plan 03-02 complete — all tasks committed (c67d7a6, a172123, cb2c0ae)
-Resume file: None — continue with next plan in phase 03
+Last session: 2026-04-04T09:21:00Z
+Stopped at: Plan 04-01 complete — all tasks committed (084af0b, ca900f8)
+Resume file: None — continue with next plan in phase 04
