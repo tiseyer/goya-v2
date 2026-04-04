@@ -204,7 +204,8 @@ export async function middleware(request: NextRequest) {
   // Fast path: skip auth entirely for public paths when maintenance is off
   // For `/`, check if auth cookie exists — only then do full auth to redirect logged-in users
   const hasAuthCookie = pathname === '/' && request.cookies.getAll().some(c => c.name.startsWith('sb-'))
-  if (!maintenanceActive && !isProtectedPath && !(pathname === '/' && hasAuthCookie)) {
+  const passwordResetPending = request.cookies.get('password_reset_pending')?.value === 'true'
+  if (!maintenanceActive && !isProtectedPath && !passwordResetPending && !(pathname === '/' && hasAuthCookie)) {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set('x-pathname', pathname)
     const res = NextResponse.next({ request: { headers: requestHeaders } })
@@ -239,6 +240,20 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+
+  // ─── Password reset lock (recovery flow) ──────────────────────────────────
+  if (passwordResetPending && user) {
+    // Allow /reset-password only — redirect everything else back
+    if (pathname !== '/reset-password' && !pathname.startsWith('/reset-password/')) {
+      return NextResponse.redirect(new URL('/reset-password', request.url))
+    }
+  }
+  if (passwordResetPending && !user) {
+    // Cookie exists but no session — clear stale cookie and redirect to sign-in
+    const clearResponse = NextResponse.redirect(new URL('/sign-in', request.url))
+    clearResponse.cookies.set('password_reset_pending', '', { maxAge: 0, path: '/' })
+    return clearResponse
+  }
 
   // ─── Maintenance enforcement ─────────────────────────────────────────────────
   if (maintenanceActive && !isMaintenanceBypass) {

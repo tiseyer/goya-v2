@@ -1,19 +1,55 @@
 import { NextResponse } from 'next/server'
-import { createSupabaseServerActionClient } from '@/lib/supabaseServer'
+import type { NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { logAuditEvent } from '@/lib/audit'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/dashboard'
   const role = searchParams.get('role')
   const invite = searchParams.get('invite')
 
+  console.log('[auth/callback] HIT', { code: code ? `${code.slice(0, 8)}...` : null, next, role, invite })
+  console.log('[auth/callback] Cookies present:', request.cookies.getAll().map(c => c.name).join(', '))
+
   if (code) {
-    const supabase = await createSupabaseServerActionClient()
+    // Build redirect response first so cookies can be set directly on it
+    const redirectUrl = new URL(next, origin)
+    let response = NextResponse.redirect(redirectUrl)
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
+
     const { error } = await supabase.auth.exchangeCodeForSession(code)
+    console.log('[auth/callback] exchangeCodeForSession:', error ? `ERROR: ${error.message}` : 'SUCCESS')
     if (!error) {
+      // Set password reset pending cookie for recovery flow
+      if (next === '/reset-password') {
+        response.cookies.set('password_reset_pending', 'true', {
+          httpOnly: false, // Must be readable client-side for clearing after password update
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 600, // 10 minutes safety net
+          secure: process.env.NODE_ENV === 'production',
+        })
+      }
+
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         // If role query param exists (from register flow), store in user metadata
@@ -89,12 +125,14 @@ export async function GET(request: Request) {
         },
       })
 
-      // Redirect to next param (defaults to /dashboard)
-      // Flow player handles onboarding display via login trigger
-      return NextResponse.redirect(`${origin}${next}`)
+      // Return the response that has session cookies set on it
+      console.log('[auth/callback] Redirecting to:', redirectUrl.toString())
+      return response
+    } else {
+      console.error('[auth/callback] Code exchange failed:', error.message)
     }
   }
 
   // OAuth error — redirect to sign-in with error
-  return NextResponse.redirect(`${origin}/sign-in?error=auth_callback_error`)
+  return NextResponse.redirect(new URL('/sign-in?error=auth_callback_error', origin))
 }
