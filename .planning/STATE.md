@@ -115,9 +115,10 @@ None.
 | 260404-jep | Fix password reset PKCE flow — server-side code exchange via /auth/callback | 2026-04-04 | ecb6a4b | [260404-jep-fix-password-reset-pkce-flow-exchange-co](./quick/260404-jep-fix-password-reset-pkce-flow-exchange-co/) |
 | 260404-jhf | Fix test user slot search — dedicated action searches name+email, inline role data, email shown in dropdown | 2026-04-04 | 7a2b4dc, fa86608 | [260404-jhf-fix-test-user-slot-search-broken-api-ret](./quick/260404-jhf-fix-test-user-slot-search-broken-api-ret/) |
 | 260404-kfe | Lock user to /reset-password until new password set — cookie-based lock in callback, middleware, and reset page | 2026-04-04 | 98a95ad, 6a2d178 | [260404-kfe-lock-user-to-reset-password-page-until-n](./quick/260404-kfe-lock-user-to-reset-password-page-until-n/) |
+| 260404-kk9 | Fix school onboarding state isolation + auto-generated read-only slug with collision resolution | 2026-04-04 | 436301b | [260404-kk9-fix-school-onboarding-state-isolation-pe](./quick/260404-kk9-fix-school-onboarding-state-isolation-pe/) |
 
 ## Session Continuity
 
 Last session: 2026-04-04
-Stopped at: Completed quick task 260404-kfe: Lock user to reset-password page until new password set
+Stopped at: Completed quick task 260404-kk9: Fix school onboarding state isolation + slug UX
 Resume file: None
