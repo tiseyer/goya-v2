@@ -14,16 +14,16 @@ last_updated: 2026-04-04T09:21:00Z
 See: .planning/workstreams/ai-super-helper/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Mattea becomes smarter over time — feedback loops, unanswered question escalation to FAQ, and admin visibility into all AI surfaces
-**Current focus:** Phase 4 — Unanswered Question Pipeline
+**Current focus:** Phase 5 — Conversation History (complete)
 
 ## Current Position
 
-Phase: 4 of 5 (Unanswered Question Pipeline)
-Plan: 1 of TBD in current phase (04-01 complete)
+Phase: 5 of 5 (Conversation History)
+Plan: 1 of 1 in current phase (05-01 complete)
 Status: In progress
-Last activity: 2026-04-04 — Plan 04-01 complete: Unanswered phrase detection auto-creates support tickets; source filter added to admin Support Tickets tab
+Last activity: 2026-04-03 — Plan 05-01 complete: Conversation history dropdown on Help page; listUserConversations server action; read-only historical view
 
-Progress: [████████░░] ~60%
+Progress: [██████████] ~100%
 
 ## Performance Metrics
 
@@ -40,9 +40,10 @@ Progress: [████████░░] ~60%
 | 02-source-tracking | 1 complete | ~8 min | ~8 min |
 | 03-feedback | 2 complete | ~14 min | ~7 min |
 | 04-unanswered-question-pipeline | 1 complete | ~8 min | ~8 min |
+| 05-conversation-history | 1 complete | ~10 min | ~10 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02, 02-01, 03-01, 03-02, 04-01
+- Last 5 plans: 02-01, 03-01, 03-02, 04-01, 05-01
 - Trend: Steady ~8 min/plan
 
 *Updated after each plan completion*
@@ -73,6 +74,9 @@ Recent decisions affecting current work:
 - onBeforeSubmit prop on FeedbackButtons enables dynamic session acquisition without breaking existing callers
 - UNANSWERED_PHRASES phrase matching runs post-stream on fullContent in both OpenAI and Anthropic branches; no confidence score API needed
 - ticketTypeFilter is a separate second param on listSupportTickets (not merged into statusFilter) to preserve backward compat with existing callers
+- ConversationSummary interface exported from chat-actions.ts (single source of truth, removed local duplicate in HelpPageClient)
+- Historical view is read-only — isHistoricalView disables input and submit button; New Chat resets it
+- Empty sessions excluded from conversation history by checking for first user message
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-04T09:21:00Z
-Stopped at: Plan 04-01 complete — all tasks committed (084af0b, ca900f8)
-Resume file: None — continue with next plan in phase 04
+Last session: 2026-04-03T00:00:00Z
+Stopped at: Plan 05-01 complete — all tasks committed (c4ccdad, 28da814, 459bbe9)
+Resume file: None — workstream complete (all 5 phases done)
