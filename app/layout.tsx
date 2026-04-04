@@ -13,6 +13,7 @@ import CookieConsent from "./components/CookieConsent";
 import ChatWidgetLoader from "./components/chat/ChatWidgetLoader";
 import { getImpersonationState } from "@/lib/impersonation";
 import ThemeColorProvider from "@/app/components/ThemeColorProvider";
+import { DeviceFingerprintSetter } from "@/app/components/DeviceFingerprintSetter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -90,6 +91,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-background text-foreground flex flex-col`}
       >
         <ClientProviders impersonationState={impersonationState}>
+          <DeviceFingerprintSetter />
           {/* Analytics scripts — gated behind cookie consent */}
           <ConsentGatedScripts ga4Id={ga4Id} clarityId={clarityId} />
 

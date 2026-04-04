@@ -16,7 +16,7 @@ export async function checkTrustedDevice(
   const supabase = getSupabaseService()
   const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()
 
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from('trusted_devices')
     .select('id')
     .eq('profile_id', profileId)
