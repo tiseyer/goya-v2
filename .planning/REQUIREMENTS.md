@@ -28,11 +28,11 @@ Requirements for v1.24 milestone. Each maps to roadmap phases.
 
 ### OTP Verification
 
-- [ ] **OTP-01**: /verify-device page shows "New Device Detected" with masked email and 6-digit OTP input
+- [x] **OTP-01**: /verify-device page shows "New Device Detected" with masked email and 6-digit OTP input
 - [x] **OTP-02**: POST /api/device-verification/send generates code, hashes before storage, sends via Resend with device info in email
 - [x] **OTP-03**: POST /api/device-verification/verify validates code with timingSafeEqual, enforces max 5 attempts, marks trusted on success
 - [x] **OTP-04**: Send endpoint is idempotent — reuses unexpired code if called within recency window (multi-tab safe)
-- [ ] **OTP-05**: Resend link disabled for 60s cooldown, then clickable again
+- [x] **OTP-05**: Resend link disabled for 60s cooldown, then clickable again
 - [x] **OTP-06**: OTP codes expire after 10 minutes
 
 ### Admin Device Management
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-01 | Phase 57 | Complete |
 | AUTH-02 | Phase 57 | Complete |
 | AUTH-03 | Phase 57 | Complete |
-| OTP-01 | Phase 57 | Pending |
-| OTP-05 | Phase 57 | Pending |
+| OTP-01 | Phase 57 | Complete |
+| OTP-05 | Phase 57 | Complete |
 | ADM-01 | Phase 58 | Pending |
 | ADM-02 | Phase 58 | Pending |
 | ADM-03 | Phase 58 | Pending |

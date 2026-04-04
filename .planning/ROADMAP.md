@@ -557,7 +557,7 @@ Plans:
 
 - [x] **Phase 55: Database Foundation + Fingerprint Algorithm** - trusted_devices and device_verification_codes tables with RLS, lib/device/ module with fingerprint utility and trust-check helper, DeviceFingerprintSetter client component mounted in root layout (completed 2026-04-04)
 - [x] **Phase 56: OTP API Routes** - POST /api/device-verification/send (idempotent, hashed storage, Resend email) and POST /api/device-verification/verify (timingSafeEqual, attempt limit, trusted device insert) (completed 2026-04-04)
-- [ ] **Phase 57: Auth Callback + Middleware + Verify Page** - Modified /auth/callback with device trust check, middleware lock for device_pending_verification cookie, /verify-device page with input-otp component and resend cooldown
+- [x] **Phase 57: Auth Callback + Middleware + Verify Page** - Modified /auth/callback with device trust check, middleware lock for device_pending_verification cookie, /verify-device page with input-otp component and resend cooldown (completed 2026-04-04)
 - [ ] **Phase 58: Admin Devices Tab** - Devices tab on admin user detail page listing trusted devices with revoke action and admin-only API routes
 
 ## Phase Details
@@ -602,7 +602,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 57-01-PLAN.md — Auth callback device trust check + middleware pending-verification lock
-- [ ] 57-02-PLAN.md — /verify-device server page + VerifyDeviceClient OTP component
+- [x] 57-02-PLAN.md — /verify-device server page + VerifyDeviceClient OTP component
 **UI hint**: yes
 
 ### Phase 58: Admin Devices Tab
@@ -625,5 +625,5 @@ Plans:
 |-------|----------------|--------|-----------|
 | 55. Database Foundation + Fingerprint Algorithm | 1/2 | In Progress|  |
 | 56. OTP API Routes | 1/1 | Complete   | 2026-04-04 |
-| 57. Auth Callback + Middleware + Verify Page | 1/2 | In Progress|  |
+| 57. Auth Callback + Middleware + Verify Page | 2/2 | Complete   | 2026-04-04 |
 | 58. Admin Devices Tab | 0/TBD | Not started | - |
