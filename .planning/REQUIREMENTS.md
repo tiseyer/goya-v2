@@ -1,63 +1,75 @@
-# Requirements: GOYA v2 — v1.19 Global Search
+# Requirements: GOYA v2 — v1.24 Device Authentication (2FA)
 
-**Defined:** 2026-04-03
+**Defined:** 2026-04-04
 **Core Value:** Members stay professionally connected, credentialed, and engaged through a single trusted platform.
 
-## v1.19 Requirements
+## v1 Requirements
 
-Requirements for Global Search milestone. Each maps to roadmap phases.
+Requirements for v1.24 milestone. Each maps to roadmap phases.
 
-### Search Overlay UI
+### Database & Schema
 
-- [x] **SRCH-01**: User can open a centered search overlay by clicking the search icon in the nav header
-- [x] **SRCH-02**: User can close the overlay via Esc key, X button, or clicking outside the backdrop
-- [x] **SRCH-03**: User sees category filter pills (All / Members / Events / Courses / Pages) that toggle search scope
-- [x] **SRCH-04**: User can navigate results with arrow keys and open highlighted result with Enter
-- [x] **SRCH-05**: User sees results grouped by category with best match highlighted at top
-- [x] **SRCH-06**: User sees contextual action icons on result rows (message icon for members, map/directions icon for members with full address)
-- [x] **SRCH-07**: User on mobile sees a full-screen overlay with input at bottom and horizontally scrollable filter pills
-- [x] **SRCH-08**: Opening the overlay (via click or keyboard shortcut) auto-focuses the search input, ready to type immediately
+- [ ] **DB-01**: Trusted devices table stores user_id, device fingerprint, device name, IP, timestamps with unique(user_id, device_fingerprint) constraint
+- [ ] **DB-02**: Device verification codes table stores user_id, hashed code, device fingerprint, expiry, attempt count, used flag
+- [ ] **DB-03**: RLS policies enforce admin full access and user read-only on own trusted devices
 
-### Search API
+### Device Fingerprinting
 
-- [ ] **SAPI-01**: User can search members by full_name returning id, full_name, avatar_url, role, city, country, has_full_address
-- [ ] **SAPI-02**: User can search events by title, tags, description, and date patterns
-- [ ] **SAPI-03**: User can search courses by title, tags, description
-- [ ] **SAPI-04**: User can search pages from a role-filtered static page registry
-- [ ] **SAPI-05**: Admin/moderator can search members by email and MRN
-- [ ] **SAPI-06**: Admin/moderator sees admin-only pages in search results
-- [ ] **SAPI-07**: Search returns up to 20 results per category
+- [ ] **FP-01**: Client-side fingerprint generated from screen dimensions, color depth, timezone, and language (no userAgent in hash) via SHA-256
+- [ ] **FP-02**: Human-readable device name parsed from userAgent (browser + OS format: "Chrome on macOS")
+- [ ] **FP-03**: Fingerprint stored in long-lived cookie (365 days, SameSite=Lax, httpOnly=false)
+- [ ] **FP-04**: DeviceFingerprintSetter component mounted in root layout sets cookie on every page load
 
-### Page Registry
+### Login Flow
 
-- [ ] **PREG-01**: Static page registry maps all navigable pages with role visibility rules
-- [ ] **PREG-02**: Teacher/school users see school-related pages they own in search results
+- [ ] **AUTH-01**: Auth callback checks trusted_devices after session exchange — trusted devices proceed normally
+- [ ] **AUTH-02**: Unrecognized devices get device_pending_verification cookie and redirect to /verify-device
+- [ ] **AUTH-03**: Middleware locks user to /verify-device and /api/device-verification/* while pending cookie exists
 
-### Integration & Performance
+### OTP Verification
 
-- [ ] **INTG-01**: User can open search with Cmd+K (Mac) / Ctrl+K (Windows/Linux) from any page
-- [ ] **INTG-02**: Search input is debounced (200ms) with loading skeleton during fetch
-- [ ] **INTG-03**: User sees appropriate empty states ("Keep typing...", "No results", placeholder)
-- [ ] **INTG-04**: Results are cached in component state keyed by query string
+- [ ] **OTP-01**: /verify-device page shows "New Device Detected" with masked email and 6-digit OTP input
+- [ ] **OTP-02**: POST /api/device-verification/send generates code, hashes before storage, sends via Resend with device info in email
+- [ ] **OTP-03**: POST /api/device-verification/verify validates code with timingSafeEqual, enforces max 5 attempts, marks trusted on success
+- [ ] **OTP-04**: Send endpoint is idempotent — reuses unexpired code if called within recency window (multi-tab safe)
+- [ ] **OTP-05**: Resend link disabled for 60s cooldown, then clickable again
+- [ ] **OTP-06**: OTP codes expire after 10 minutes
+
+### Admin Device Management
+
+- [ ] **ADM-01**: Admin user detail page has "Devices" tab showing trusted devices list
+- [ ] **ADM-02**: Each device row shows device name, IP, first seen, last seen, and Revoke button
+- [ ] **ADM-03**: Revoke deletes the trusted device record (hard delete)
+- [ ] **ADM-04**: GET /api/admin/users/[id]/devices and DELETE /api/admin/users/[id]/devices/[deviceId] admin-only routes
 
 ## Future Requirements
 
-Deferred to future release. Tracked but not in current roadmap.
+Deferred beyond v1.24. Tracked but not in current roadmap.
 
-### Search Enhancements
+### Enhanced Security
 
-- **SRCH-F01**: Full-text search with PostgreSQL tsvector for better ranking
-- **SRCH-F02**: Recent searches history (persisted per user)
-- **SRCH-F03**: Text highlight — bold or accent-color the matched portion of result titles
+- **SEC-01**: SMS OTP as alternative delivery channel
+- **SEC-02**: TOTP authenticator app support (Google Authenticator, Authy)
+- **SEC-03**: WebAuthn/passkey support for passwordless device trust
+- **SEC-04**: Real-time active session viewer for users
+
+### User Self-Service
+
+- **SELF-01**: User can view and revoke their own trusted devices from Settings
+- **SELF-02**: User can set "trust this device" duration (30/60/90 days)
+- **SELF-03**: Email notification when a new device is trusted
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Full-text search (tsvector/pg_trgm) | ilike sufficient for v1; FTS is an optimization for later |
-| Search analytics/tracking | Not needed for MVP — can add when usage data matters |
-| Fuzzy/typo-tolerant search | Complexity not justified for v1; ilike covers exact substring |
-| Saved searches / bookmarks | Low priority — simple search covers core need |
+| SMS OTP delivery | Cost, complexity, phone number collection — email sufficient for v1 |
+| TOTP/authenticator apps | Significant UX complexity, requires QR setup flow |
+| WebAuthn/passkeys | Browser support inconsistent, complex implementation |
+| User self-service device management | Admin-only for v1; user settings page deferred |
+| Fingerprint using canvas/WebGL | Overkill — cookie is primary trust token, fingerprint is secondary hint |
+| FingerprintJS library | 40KB bundle for 40-60% accuracy; cookie-based approach is simpler and more reliable |
+| Soft-delete on device revoke | Hard delete is simpler; audit log captures the action if needed later |
 
 ## Traceability
 
@@ -65,33 +77,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SRCH-01 | Phase 51 | Complete |
-| SRCH-02 | Phase 51 | Complete |
-| SRCH-03 | Phase 51 | Complete |
-| SRCH-04 | Phase 51 | Complete |
-| SRCH-05 | Phase 51 | Complete |
-| SRCH-06 | Phase 51 | Complete |
-| SRCH-07 | Phase 51 | Complete |
-| SRCH-08 | Phase 51 | Complete |
-| SAPI-01 | Phase 52 | Complete |
-| SAPI-02 | Phase 52 | Complete |
-| SAPI-03 | Phase 52 | Complete |
-| SAPI-04 | Phase 52 | Complete |
-| SAPI-05 | Phase 52 | Complete |
-| SAPI-06 | Phase 52 | Complete |
-| SAPI-07 | Phase 52 | Complete |
-| PREG-01 | Phase 52 | Complete |
-| PREG-02 | Phase 52 | Complete |
-| INTG-01 | Phase 53 | Complete |
-| INTG-02 | Phase 54 | Complete |
-| INTG-03 | Phase 54 | Complete |
-| INTG-04 | Phase 54 | Complete |
+| DB-01 | — | Pending |
+| DB-02 | — | Pending |
+| DB-03 | — | Pending |
+| FP-01 | — | Pending |
+| FP-02 | — | Pending |
+| FP-03 | — | Pending |
+| FP-04 | — | Pending |
+| AUTH-01 | — | Pending |
+| AUTH-02 | — | Pending |
+| AUTH-03 | — | Pending |
+| OTP-01 | — | Pending |
+| OTP-02 | — | Pending |
+| OTP-03 | — | Pending |
+| OTP-04 | — | Pending |
+| OTP-05 | — | Pending |
+| OTP-06 | — | Pending |
+| ADM-01 | — | Pending |
+| ADM-02 | — | Pending |
+| ADM-03 | — | Pending |
+| ADM-04 | — | Pending |
 
 **Coverage:**
-- v1.19 requirements: 20 total
-- Mapped to phases: 20
-- Unmapped: 0
+- v1 requirements: 20 total
+- Mapped to phases: 0
+- Unmapped: 20 ⚠️
 
 ---
-*Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after roadmap created (phases 51-54)*
+*Requirements defined: 2026-04-04*
+*Last updated: 2026-04-04 after initial definition*
