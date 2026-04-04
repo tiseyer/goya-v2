@@ -29,11 +29,11 @@ Requirements for v1.24 milestone. Each maps to roadmap phases.
 ### OTP Verification
 
 - [ ] **OTP-01**: /verify-device page shows "New Device Detected" with masked email and 6-digit OTP input
-- [ ] **OTP-02**: POST /api/device-verification/send generates code, hashes before storage, sends via Resend with device info in email
-- [ ] **OTP-03**: POST /api/device-verification/verify validates code with timingSafeEqual, enforces max 5 attempts, marks trusted on success
-- [ ] **OTP-04**: Send endpoint is idempotent — reuses unexpired code if called within recency window (multi-tab safe)
+- [x] **OTP-02**: POST /api/device-verification/send generates code, hashes before storage, sends via Resend with device info in email
+- [x] **OTP-03**: POST /api/device-verification/verify validates code with timingSafeEqual, enforces max 5 attempts, marks trusted on success
+- [x] **OTP-04**: Send endpoint is idempotent — reuses unexpired code if called within recency window (multi-tab safe)
 - [ ] **OTP-05**: Resend link disabled for 60s cooldown, then clickable again
-- [ ] **OTP-06**: OTP codes expire after 10 minutes
+- [x] **OTP-06**: OTP codes expire after 10 minutes
 
 ### Admin Device Management
 
@@ -84,10 +84,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FP-02 | Phase 55 | Complete |
 | FP-03 | Phase 55 | Complete |
 | FP-04 | Phase 55 | Complete |
-| OTP-02 | Phase 56 | Pending |
-| OTP-03 | Phase 56 | Pending |
-| OTP-04 | Phase 56 | Pending |
-| OTP-06 | Phase 56 | Pending |
+| OTP-02 | Phase 56 | Complete |
+| OTP-03 | Phase 56 | Complete |
+| OTP-04 | Phase 56 | Complete |
+| OTP-06 | Phase 56 | Complete |
 | AUTH-01 | Phase 57 | Pending |
 | AUTH-02 | Phase 57 | Pending |
 | AUTH-03 | Phase 57 | Pending |

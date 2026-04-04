@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.24
 milestone_name: Device Authentication (2FA)
-status: executing
-stopped_at: Completed 55-02-PLAN.md — device fingerprint module and cookie setter
-last_updated: "2026-04-04T09:31:16.613Z"
+status: verifying
+stopped_at: Completed 56-otp-api-routes 56-01-PLAN.md
+last_updated: "2026-04-04T11:06:06.805Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 12
-  completed_phases: 5
-  total_plans: 11
-  completed_plans: 10
+  completed_phases: 7
+  total_plans: 12
+  completed_plans: 12
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 
 Phase: 55 (Database Foundation + Fingerprint Algorithm) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-04
 
 Progress: [░░░░░░░░░░] 0%
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 55-database-foundation-fingerprint-algorithm P02 | 2 | 2 tasks | 5 files |
+| Phase 56-otp-api-routes P01 | 15 | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 55-database-foundation-fingerprint-algorithm]: UA excluded from fingerprint hash — screen+timezone+language only to prevent Chrome auto-update storms (FP-01)
 - [Phase 55-database-foundation-fingerprint-algorithm]: goya_device_fp cookie: SameSite=Lax so fingerprint is sent on /auth/callback redirect
 - [Phase 55-database-foundation-fingerprint-algorithm]: checkTrustedDevice uses 'as any' cast because trusted_devices may not be in generated types until Plan 01 migration runs
+- [Phase 56-otp-api-routes]: Email send failures are non-fatal in /send — code is still usable and 200 is returned
+- [Phase 56-otp-api-routes]: Idempotency window is 2 minutes — calls within that window return existing expiresAt without new DB row or email
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-04T09:31:16.609Z
-Stopped at: Completed 55-02-PLAN.md — device fingerprint module and cookie setter
+Last session: 2026-04-04T11:06:06.802Z
+Stopped at: Completed 56-otp-api-routes 56-01-PLAN.md
 Resume file: None
