@@ -51,8 +51,9 @@ Plans:
   2. Using the search hint (Cmd+K) and sending a message results in a conversation row where `started_from = 'search_hint'`
   3. Chatting on the Help page results in a conversation row where `started_from = 'help_page'`
   4. The admin Conversations table shows a "Started from" column with the correct surface label for each row
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 1 plan
+Plans:
+- [ ] 02-01-PLAN.md — Wire started_from at all surfaces + admin column (SRC-01, SRC-02)
 
 ### Phase 3: Feedback
 **Goal**: Users can rate any Mattea response with thumbs up or down on all three surfaces, and admins can see the rating in the Conversations table
@@ -95,7 +96,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Schema & Infrastructure | 0/2 | Planning complete | - |
-| 2. Source Tracking | 0/TBD | Not started | - |
+| 2. Source Tracking | 0/1 | Planning complete | - |
 | 3. Feedback | 0/TBD | Not started | - |
 | 4. Unanswered Question Pipeline | 0/TBD | Not started | - |
 | 5. Conversation History | 0/TBD | Not started | - |
