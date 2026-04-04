@@ -1,5 +1,21 @@
 # Milestones
 
+## v1.23 Mattea Intelligence System (Shipped: 2026-04-04)
+
+**Phases completed:** 5 phases, 8 plans, 8 tasks
+
+**Key accomplishments:**
+
+- Migration `20260405_mattea_intelligence_schema.sql`
+- `lib/chatbot/useChatStream.ts`
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+
+---
+
 ## v1.18 User Profile Redesign (Shipped: 2026-04-02)
 
 **Phases completed:** 4 phases (47-50), 7 plans
