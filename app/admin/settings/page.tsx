@@ -7,6 +7,7 @@ import MaintenanceTab from './components/MaintenanceTab';
 import VersionsTab from './components/VersionsTab';
 import DangerZone from './components/DangerZone';
 import ColorsTab from './components/ColorsTab';
+import TestUsersTab from './components/TestUsersTab';
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
 
@@ -135,7 +136,7 @@ function GeneralTab() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-type Tab = 'general' | 'health' | 'maintenance' | 'versions' | 'colors';
+type Tab = 'general' | 'health' | 'maintenance' | 'versions' | 'colors' | 'test-users';
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'general',     label: 'General'     },
@@ -143,6 +144,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'health',      label: 'Health'      },
   { key: 'maintenance', label: 'Maintenance' },
   { key: 'versions',    label: 'Versions'    },
+  { key: 'test-users',  label: 'Test Users'  },
 ];
 
 function isValidTab(value: string | null): value is Tab {
@@ -193,6 +195,7 @@ export default function SettingsPage() {
       {tab === 'health'      && <HealthTab />}
       {tab === 'maintenance' && <MaintenanceTab />}
       {tab === 'versions'    && <VersionsTab />}
+      {tab === 'test-users'  && <TestUsersTab />}
     </div>
   );
 }
