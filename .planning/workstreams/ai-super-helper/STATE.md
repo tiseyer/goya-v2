@@ -4,7 +4,7 @@ milestone: v1.23
 milestone_name: Mattea Intelligence System
 status: in_progress
 created: 2026-04-03
-last_updated: 2026-04-04T08:52:53Z
+last_updated: 2026-04-04T09:03:43Z
 ---
 
 # Project State
@@ -14,23 +14,23 @@ last_updated: 2026-04-04T08:52:53Z
 See: .planning/workstreams/ai-super-helper/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Mattea becomes smarter over time — feedback loops, unanswered question escalation to FAQ, and admin visibility into all AI surfaces
-**Current focus:** Phase 2 — Source Tracking
+**Current focus:** Phase 3 — Feedback
 
 ## Current Position
 
-Phase: 2 of 5 (Source Tracking)
-Plan: 1 of TBD in current phase (02-01 complete)
+Phase: 3 of 5 (Feedback)
+Plan: 1 of TBD in current phase (03-01 complete)
 Status: In progress
-Last activity: 2026-04-04 — Plan 02-01 complete: started_from wired through all surfaces, admin Source column added
+Last activity: 2026-04-04 — Plan 03-01 complete: thumbs up/down buttons wired to ChatPanel and InlineChat, PATCH feedback endpoint created
 
-Progress: [█████░░░░░] ~30%
+Progress: [██████░░░░] ~40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: ~5.5 minutes
-- Total execution time: ~11 minutes
+- Total plans completed: 3
+- Average duration: ~7 minutes
+- Total execution time: ~19 minutes
 
 **By Phase:**
 
@@ -38,10 +38,11 @@ Progress: [█████░░░░░] ~30%
 |-------|-------|-------|----------|
 | 01-schema-infrastructure | 2 complete | ~11 min | ~5.5 min |
 | 02-source-tracking | 1 complete | ~8 min | ~8 min |
+| 03-feedback | 1 complete | ~8 min | ~8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01, 01-02, 02-01
-- Trend: —
+- Last 5 plans: 01-01, 01-02, 02-01, 03-01
+- Trend: Steady ~8 min/plan
 
 *Updated after each plan completion*
 
@@ -63,6 +64,9 @@ Recent decisions affecting current work:
 - useChatStream manages its own streaming state; callers receive setMessages to seed history
 - message_id emitted on escalation chunk too (not just done), so all assistant messages are DB-targetable
 - MatteaSearchHint is fire-and-forget and NOT a useChatStream consumer
+- FeedbackButtons is self-contained — manages its own fetch state, no callback needed to parent
+- feedbackSlot render prop used on MessageBubble to avoid role-specific logic in the bubble itself
+- Greeting message excluded from feedback in InlineChat (static local, not a Mattea response)
 
 ### Pending Todos
 
@@ -75,6 +79,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-04T08:52:53Z
-Stopped at: Plan 02-01 complete — all tasks committed (40787cb, 4e3d118)
-Resume file: None — continue with next plan in phase 02
+Last session: 2026-04-04T09:03:43Z
+Stopped at: Plan 03-01 complete — all tasks committed (6a1688e, db0977b, 2cc1b46)
+Resume file: None — continue with next plan in phase 03
