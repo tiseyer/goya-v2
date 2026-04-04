@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sparkles, Reply } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import FeedbackButtons from '@/app/components/chat/FeedbackButtons';
 
 const GERMAN_WORDS = ['wie', 'was', 'ich', 'ist', 'die', 'der', 'das', 'und', 'mit', 'für'];
 
@@ -28,6 +29,8 @@ export default function MatteaSearchHint({ query, answer, loading, isHighlighted
   const router = useRouter();
   const german = isGerman(query);
   const [config, setConfig] = useState<ChatbotConfig>({ name: 'Mattea', avatarUrl: null });
+  const [hintSessionId, setHintSessionId] = useState<string | null>(null);
+  const sessionPromiseRef = useRef<Promise<string | null> | null>(null);
 
   useEffect(() => {
     fetch('/api/chatbot/config')
@@ -47,14 +50,56 @@ export default function MatteaSearchHint({ query, answer, loading, isHighlighted
 
   const helpUrl = `/settings/help?q=${encodeURIComponent(query)}`;
 
+  async function ensureSession(): Promise<string | null> {
+    if (hintSessionId) return hintSessionId;
+
+    // Deduplicate: if already in-flight, return the same promise
+    if (sessionPromiseRef.current) return sessionPromiseRef.current;
+
+    sessionPromiseRef.current = (async () => {
+      try {
+        const res = await fetch('/api/chatbot/message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: query, started_from: 'search_hint' }),
+        });
+        if (!res.ok || !res.body) return null;
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() ?? '';
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const data = JSON.parse(line);
+              if (data.type === 'done' && data.session_id) {
+                setHintSessionId(data.session_id);
+                reader.cancel();
+                return data.session_id;
+              }
+            } catch { continue; }
+          }
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    })();
+
+    return sessionPromiseRef.current;
+  }
+
   async function handleContinue(e: React.MouseEvent) {
     e.stopPropagation();
     if (answer) {
-      fetch('/api/chatbot/message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: query, started_from: 'search_hint' }),
-      }).catch(() => {});
+      ensureSession(); // Fire and continue (don't await — navigate immediately)
     }
     if (onSelect) onSelect();
     router.push(helpUrl);
@@ -98,8 +143,28 @@ export default function MatteaSearchHint({ query, answer, loading, isHighlighted
             </p>
           ) : null}
 
-          {/* Reply button — only show when we have an answer */}
-          {answer && (
+          {/* Feedback buttons + Reply — only show when we have an answer */}
+          {answer && !loading && (
+            <div className="group mt-2 flex items-center gap-3">
+              <FeedbackButtons
+                sessionId={hintSessionId}
+                visible={true}
+                compact={true}
+                onBeforeSubmit={ensureSession}
+              />
+              <button
+                onClick={handleContinue}
+                type="button"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium bg-[#345c83] text-white hover:bg-[#2a4a6b] transition-colors"
+              >
+                <Reply size={14} />
+                {german ? 'Antworten' : 'Reply'}
+              </button>
+            </div>
+          )}
+
+          {/* Reply button shown during loading (no feedback yet) */}
+          {answer && loading && (
             <button
               onClick={handleContinue}
               type="button"
