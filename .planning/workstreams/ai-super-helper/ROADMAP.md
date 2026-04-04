@@ -92,8 +92,9 @@ Plans:
   1. A logged-in user on the Help page sees a list of their previous help-page conversations (not widget or search conversations) ordered by most recent
   2. Clicking a previous conversation loads its full message transcript into the chat area
   3. A "New conversation" button resets the chat area to the empty starting state without deleting the history list
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 1 plan
+Plans:
+- [ ] 05-01-PLAN.md — Server action + conversation dropdown + load history + new chat (HIST-01, HIST-02, HIST-03)
 
 ## Progress
 
@@ -103,4 +104,4 @@ Plans:
 | 2. Source Tracking | 0/1 | Planning complete | - |
 | 3. Feedback | 0/2 | Planning complete | - |
 | 4. Unanswered Question Pipeline | 0/2 | Planning complete | - |
-| 5. Conversation History | 0/TBD | Not started | - |
+| 5. Conversation History | 0/1 | Planning complete | - |
