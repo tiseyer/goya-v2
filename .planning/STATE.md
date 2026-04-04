@@ -114,9 +114,10 @@ None.
 | 260404-hht | Add test user slots to Admin Settings + profile dropdown quick-switch | 2026-04-04 | 1974a8f, 916e2e4 | [260404-hht-add-test-user-slots-to-admin-settings-ad](./quick/260404-hht-add-test-user-slots-to-admin-settings-ad/) |
 | 260404-jep | Fix password reset PKCE flow — server-side code exchange via /auth/callback | 2026-04-04 | ecb6a4b | [260404-jep-fix-password-reset-pkce-flow-exchange-co](./quick/260404-jep-fix-password-reset-pkce-flow-exchange-co/) |
 | 260404-jhf | Fix test user slot search — dedicated action searches name+email, inline role data, email shown in dropdown | 2026-04-04 | 7a2b4dc, fa86608 | [260404-jhf-fix-test-user-slot-search-broken-api-ret](./quick/260404-jhf-fix-test-user-slot-search-broken-api-ret/) |
+| 260404-kfe | Lock user to /reset-password until new password set — cookie-based lock in callback, middleware, and reset page | 2026-04-04 | 98a95ad, 6a2d178 | [260404-kfe-lock-user-to-reset-password-page-until-n](./quick/260404-kfe-lock-user-to-reset-password-page-until-n/) |
 
 ## Session Continuity
 
 Last session: 2026-04-04
-Stopped at: Completed quick task 260404-jhf: Fix test user slot search broken API return
+Stopped at: Completed quick task 260404-kfe: Lock user to reset-password page until new password set
 Resume file: None
