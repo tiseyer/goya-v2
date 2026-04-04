@@ -53,7 +53,7 @@ export default function MatteaSearchHint({ query, answer, loading, isHighlighted
       fetch('/api/chatbot/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: query, source: 'search_hint' }),
+        body: JSON.stringify({ message: query, started_from: 'search_hint' }),
       }).catch(() => {});
     }
     if (onSelect) onSelect();

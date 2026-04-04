@@ -68,6 +68,7 @@ export default function InlineChat({ initialQuestion }: InlineChatProps) {
           userId: userId ?? undefined,
           anonymousId: anonId ?? undefined,
           existingSessionId: storedSessionId ?? undefined,
+          started_from: 'help_page',
         })
 
         if (cancelled) return

@@ -25,8 +25,9 @@ export async function streamChatResponse(params: {
   message: string
   userId: string | null
   anonymousId: string | null
+  startedFrom?: 'chat_widget' | 'search_hint' | 'help_page'
 }): Promise<ChatStreamResult> {
-  const { sessionId, message, userId, anonymousId } = params
+  const { sessionId, message, userId, anonymousId, startedFrom } = params
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = getSupabaseService() as any
 
@@ -67,6 +68,7 @@ export async function streamChatResponse(params: {
         user_id: userId ?? null,
         anonymous_id: anonymousId ?? null,
         is_escalated: false,
+        started_from: startedFrom ?? 'chat_widget',
       })
       .select('id')
       .single()

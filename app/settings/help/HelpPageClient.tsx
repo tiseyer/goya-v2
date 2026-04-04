@@ -86,6 +86,7 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
           userId: userId ?? undefined,
           anonymousId: anonymousId ?? undefined,
           existingSessionId: storedSessionId ?? undefined,
+          started_from: 'help_page',
         })
 
         if (cancelled) return
@@ -298,7 +299,7 @@ export default function HelpPageClient({ initialQuestion }: { initialQuestion?: 
 
     try {
       const [userId, anonymousId] = await Promise.all([getCurrentUserId(), getAnonymousId()])
-      const result = await getOrCreateSession({ userId: userId ?? undefined, anonymousId: anonymousId ?? undefined })
+      const result = await getOrCreateSession({ userId: userId ?? undefined, anonymousId: anonymousId ?? undefined, started_from: 'help_page' })
       setSessionId(result.session_id)
       if (typeof window !== 'undefined') localStorage.setItem(LS_KEY, result.session_id)
     } catch {

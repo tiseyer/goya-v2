@@ -25,14 +25,14 @@ export const maxDuration = 60
 export async function POST(request: Request) {
   try {
     // Parse and validate body
-    let body: { session_id?: string; message?: unknown; anonymous_id?: string }
+    let body: { session_id?: string; message?: unknown; anonymous_id?: string; started_from?: string }
     try {
       body = await request.json()
     } catch {
       return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
-    const { session_id, anonymous_id } = body
+    const { session_id, anonymous_id, started_from } = body
     const message = body.message
 
     // Validate message
@@ -74,6 +74,7 @@ export async function POST(request: Request) {
       message: message.trim(),
       userId,
       anonymousId: anonymous_id ?? null,
+      startedFrom: (started_from as 'chat_widget' | 'search_hint' | 'help_page') ?? undefined,
     })
 
     // Escalation: return JSON directly (no stream needed)
