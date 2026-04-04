@@ -71,6 +71,7 @@ export interface ConversationListItem {
   user_name: string | null
   user_email: string | null
   is_escalated: boolean
+  started_from: 'chat_widget' | 'search_hint' | 'help_page'
   created_at: string
   last_message_at: string
   message_count: number

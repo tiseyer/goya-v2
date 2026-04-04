@@ -123,7 +123,7 @@ export default function ConversationsTab({ initialConversations }: Props) {
       {conversations.length > 0 && (
         <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px]">
+            <table className="w-full min-w-[800px]">
               <thead>
                 <tr className="bg-slate-50 text-xs font-semibold uppercase tracking-widest text-[#6B7280] border-b border-[#E5E7EB]">
                   <th className="text-left px-5 py-3">User</th>
@@ -131,6 +131,7 @@ export default function ConversationsTab({ initialConversations }: Props) {
                   <th className="text-left px-5 py-3">Last Message</th>
                   <th className="text-left px-5 py-3">Messages</th>
                   <th className="text-left px-5 py-3">Escalated</th>
+                  <th className="text-left px-5 py-3">Source</th>
                   <th className="text-left px-5 py-3">Actions</th>
                 </tr>
               </thead>
@@ -165,6 +166,19 @@ export default function ConversationsTab({ initialConversations }: Props) {
                             Escalated
                           </span>
                         ) : null}
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className={`inline-block text-xs px-2.5 py-1 rounded-full font-medium ${
+                          conv.started_from === 'chat_widget'
+                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                            : conv.started_from === 'search_hint'
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        }`}>
+                          {conv.started_from === 'chat_widget' ? 'Chat Widget'
+                            : conv.started_from === 'search_hint' ? 'Search'
+                            : 'Help Page'}
+                        </span>
                       </td>
                       <td className="px-5 py-3">
                         <button
