@@ -112,9 +112,10 @@ None.
 | 260403-n8u | PageHero dot grid opacity doubled + FOFC prevention on load | 2026-04-03 | 48ecc5c | [260403-n8u-pagehero-dot-grid-visibility-no-flash-of](./quick/260403-n8u-pagehero-dot-grid-visibility-no-flash-of/) |
 | 260404-h63 | Create 4 test users with full dummy profiles, connections, credits, school | 2026-04-04 | a83e640 | [260404-h63-create-4-test-users-with-full-dummy-prof](./quick/260404-h63-create-4-test-users-with-full-dummy-prof/) |
 | 260404-hht | Add test user slots to Admin Settings + profile dropdown quick-switch | 2026-04-04 | 1974a8f, 916e2e4 | [260404-hht-add-test-user-slots-to-admin-settings-ad](./quick/260404-hht-add-test-user-slots-to-admin-settings-ad/) |
+| 260404-jep | Fix password reset PKCE flow — server-side code exchange via /auth/callback | 2026-04-04 | ecb6a4b | [260404-jep-fix-password-reset-pkce-flow-exchange-co](./quick/260404-jep-fix-password-reset-pkce-flow-exchange-co/) |
 
 ## Session Continuity
 
 Last session: 2026-04-04
-Stopped at: Completed quick task 260404-hht: Add test user slots to Admin Settings — awaiting human-verify checkpoint
+Stopped at: Completed quick task 260404-jep: Fix password reset PKCE flow — awaiting human-verify checkpoint
 Resume file: None
