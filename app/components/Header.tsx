@@ -651,30 +651,24 @@ function UserMenu({
             </div>
           )}
 
-          {/* Theme quick switch */}
-          <div className="border-t border-[#E5E7EB] px-4 py-2">
+          {/* Theme quick switch + Quick Switch user shortcuts */}
+          <div className="border-t border-[#E5E7EB] px-4 py-2 space-y-1.5">
             <ThemeInline isAdmin={isAdminOrMod(userRole)} />
-          </div>
-
-          {/* Quick Switch — admin test user shortcuts */}
-          {!isImpersonating && isAdminOrAbove(userRole) && testSlots && testSlots.length > 0 && (
-            <div className="border-t border-[#E5E7EB] px-4 py-2">
-              <p className="text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1.5">Quick Switch</p>
+            {!isImpersonating && isAdminOrAbove(userRole) && testSlots && testSlots.length > 0 && (
               <div className="flex w-full bg-surface-muted rounded-lg p-1">
                 {testSlots.map(slot => (
                   <button
                     key={slot.userId}
                     onClick={() => { setOpen(false); onQuickSwitch?.(slot.userId); }}
                     title={slot.firstName}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-foreground-tertiary hover:text-foreground-secondary transition-all duration-150 cursor-pointer hover:bg-surface hover:shadow-sm"
+                    className="flex-1 flex items-center justify-center py-1.5 rounded-md text-foreground-tertiary hover:text-foreground-secondary transition-all duration-150 cursor-pointer hover:bg-surface hover:shadow-sm"
                   >
                     <QuickSwitchRoleIcon role={slot.role} hasPrincipalSchool={slot.hasPrincipalSchool} />
-                    <span className="text-[11px] font-medium truncate">{slot.firstName}</span>
                   </button>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Logout */}
           <div className="border-t border-[#E5E7EB] py-1.5">
