@@ -15,10 +15,10 @@ Requirements for v1.24 milestone. Each maps to roadmap phases.
 
 ### Device Fingerprinting
 
-- [ ] **FP-01**: Client-side fingerprint generated from screen dimensions, color depth, timezone, and language (no userAgent in hash) via SHA-256
-- [ ] **FP-02**: Human-readable device name parsed from userAgent (browser + OS format: "Chrome on macOS")
-- [ ] **FP-03**: Fingerprint stored in long-lived cookie (365 days, SameSite=Lax, httpOnly=false)
-- [ ] **FP-04**: DeviceFingerprintSetter component mounted in root layout sets cookie on every page load
+- [x] **FP-01**: Client-side fingerprint generated from screen dimensions, color depth, timezone, and language (no userAgent in hash) via SHA-256
+- [x] **FP-02**: Human-readable device name parsed from userAgent (browser + OS format: "Chrome on macOS")
+- [x] **FP-03**: Fingerprint stored in long-lived cookie (365 days, SameSite=Lax, httpOnly=false)
+- [x] **FP-04**: DeviceFingerprintSetter component mounted in root layout sets cookie on every page load
 
 ### Login Flow
 
@@ -80,10 +80,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DB-01 | Phase 55 | Pending |
 | DB-02 | Phase 55 | Pending |
 | DB-03 | Phase 55 | Pending |
-| FP-01 | Phase 55 | Pending |
-| FP-02 | Phase 55 | Pending |
-| FP-03 | Phase 55 | Pending |
-| FP-04 | Phase 55 | Pending |
+| FP-01 | Phase 55 | Complete |
+| FP-02 | Phase 55 | Complete |
+| FP-03 | Phase 55 | Complete |
+| FP-04 | Phase 55 | Complete |
 | OTP-02 | Phase 56 | Pending |
 | OTP-03 | Phase 56 | Pending |
 | OTP-04 | Phase 56 | Pending |
