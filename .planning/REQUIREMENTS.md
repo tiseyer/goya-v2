@@ -22,9 +22,9 @@ Requirements for v1.24 milestone. Each maps to roadmap phases.
 
 ### Login Flow
 
-- [ ] **AUTH-01**: Auth callback checks trusted_devices after session exchange — trusted devices proceed normally
-- [ ] **AUTH-02**: Unrecognized devices get device_pending_verification cookie and redirect to /verify-device
-- [ ] **AUTH-03**: Middleware locks user to /verify-device and /api/device-verification/* while pending cookie exists
+- [x] **AUTH-01**: Auth callback checks trusted_devices after session exchange — trusted devices proceed normally
+- [x] **AUTH-02**: Unrecognized devices get device_pending_verification cookie and redirect to /verify-device
+- [x] **AUTH-03**: Middleware locks user to /verify-device and /api/device-verification/* while pending cookie exists
 
 ### OTP Verification
 
@@ -88,9 +88,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OTP-03 | Phase 56 | Complete |
 | OTP-04 | Phase 56 | Complete |
 | OTP-06 | Phase 56 | Complete |
-| AUTH-01 | Phase 57 | Pending |
-| AUTH-02 | Phase 57 | Pending |
-| AUTH-03 | Phase 57 | Pending |
+| AUTH-01 | Phase 57 | Complete |
+| AUTH-02 | Phase 57 | Complete |
+| AUTH-03 | Phase 57 | Complete |
 | OTP-01 | Phase 57 | Pending |
 | OTP-05 | Phase 57 | Pending |
 | ADM-01 | Phase 58 | Pending |

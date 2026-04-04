@@ -601,7 +601,7 @@ Plans:
   5. A "Not you? Sign out" link is visible on the verify page and signs the user out, clearing the pending cookie and redirecting to the sign-in page
 **Plans**: 2 plans
 Plans:
-- [ ] 57-01-PLAN.md — Auth callback device trust check + middleware pending-verification lock
+- [x] 57-01-PLAN.md — Auth callback device trust check + middleware pending-verification lock
 - [ ] 57-02-PLAN.md — /verify-device server page + VerifyDeviceClient OTP component
 **UI hint**: yes
 
@@ -625,5 +625,5 @@ Plans:
 |-------|----------------|--------|-----------|
 | 55. Database Foundation + Fingerprint Algorithm | 1/2 | In Progress|  |
 | 56. OTP API Routes | 1/1 | Complete   | 2026-04-04 |
-| 57. Auth Callback + Middleware + Verify Page | 0/TBD | Not started | - |
+| 57. Auth Callback + Middleware + Verify Page | 1/2 | In Progress|  |
 | 58. Admin Devices Tab | 0/TBD | Not started | - |
