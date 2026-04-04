@@ -28,21 +28,31 @@ export default function ResetPasswordPage() {
       return;
     }
 
+    let settled = false;
+
     // Listen for PASSWORD_RECOVERY event (fires when session has recovery grant)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
+        settled = true;
         setStatus('ready');
       }
     });
 
     // Check for existing session established by /auth/callback redirect
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        // Session exists from the server-side callback — user can reset password
+    // Use getUser() instead of getSession() — getUser() validates with the server
+    // and is more reliable after a server-side code exchange redirect.
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (settled) return; // onAuthStateChange already handled it
+      if (user) {
         setStatus('ready');
       } else {
-        // No session, no code — invalid access
-        setStatus('error');
+        // No session — wait briefly for onAuthStateChange before giving up
+        // (cookies may still be propagating)
+        setTimeout(() => {
+          if (!settled) {
+            setStatus('error');
+          }
+        }, 2000);
       }
     });
 
@@ -73,8 +83,11 @@ export default function ResetPasswordPage() {
       return;
     }
 
+    // Clear the password reset lock cookie (not httpOnly so client can clear it)
+    document.cookie = 'password_reset_pending=; path=/; max-age=0';
+
     setStatus('success');
-    setTimeout(() => router.push('/sign-in'), 3000);
+    setTimeout(() => router.push('/dashboard'), 3000);
   }
 
   return (
@@ -171,7 +184,7 @@ export default function ResetPasswordPage() {
                 </svg>
               </div>
               <p className="text-white font-semibold mb-2">Password updated!</p>
-              <p className="text-slate-400 text-sm">Redirecting you to sign in…</p>
+              <p className="text-slate-400 text-sm">Redirecting you to your dashboard…</p>
             </div>
           )}
         </div>
