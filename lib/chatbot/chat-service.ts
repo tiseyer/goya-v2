@@ -98,12 +98,16 @@ export async function streamChatResponse(params: {
       content: message,
     })
 
-    // Save escalation response
-    await supabase.from('chat_messages').insert({
-      session_id: resolvedSessionId,
-      role: 'assistant',
-      content: ESCALATION_RESPONSE,
-    })
+    // Save escalation response and capture its ID
+    const { data: escalationMsg } = await supabase
+      .from('chat_messages')
+      .insert({
+        session_id: resolvedSessionId,
+        role: 'assistant',
+        content: ESCALATION_RESPONSE,
+      })
+      .select('id')
+      .single()
 
     // Create support ticket
     await supabase.from('support_tickets').insert({
@@ -127,6 +131,7 @@ export async function streamChatResponse(params: {
             type: 'escalation',
             message: ESCALATION_RESPONSE,
             session_id: resolvedSessionId,
+            message_id: escalationMsg?.id ?? null,
           }),
         )
         controller.close()
@@ -213,14 +218,18 @@ export async function streamChatResponse(params: {
             }
           }
 
-          // Save full assistant message after stream completes
-          await supabase.from('chat_messages').insert({
-            session_id: resolvedSessionId,
-            role: 'assistant',
-            content: fullContent,
-          })
+          // Save full assistant message after stream completes and capture its ID
+          const { data: openaiMsg } = await supabase
+            .from('chat_messages')
+            .insert({
+              session_id: resolvedSessionId,
+              role: 'assistant',
+              content: fullContent,
+            })
+            .select('id')
+            .single()
 
-          controller.enqueue(encodeChunk({ type: 'done', session_id: resolvedSessionId }))
+          controller.enqueue(encodeChunk({ type: 'done', session_id: resolvedSessionId, message_id: openaiMsg?.id ?? null }))
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Something went wrong'
           controller.enqueue(encodeChunk({ type: 'error', message }))
@@ -265,14 +274,18 @@ export async function streamChatResponse(params: {
             }
           }
 
-          // Save full assistant message after stream completes
-          await supabase.from('chat_messages').insert({
-            session_id: resolvedSessionId,
-            role: 'assistant',
-            content: fullContent,
-          })
+          // Save full assistant message after stream completes and capture its ID
+          const { data: anthropicMsg } = await supabase
+            .from('chat_messages')
+            .insert({
+              session_id: resolvedSessionId,
+              role: 'assistant',
+              content: fullContent,
+            })
+            .select('id')
+            .single()
 
-          controller.enqueue(encodeChunk({ type: 'done', session_id: resolvedSessionId }))
+          controller.enqueue(encodeChunk({ type: 'done', session_id: resolvedSessionId, message_id: anthropicMsg?.id ?? null }))
         } catch (err) {
           const errMessage = err instanceof Error ? err.message : 'Something went wrong'
           controller.enqueue(encodeChunk({ type: 'error', message: errMessage }))
