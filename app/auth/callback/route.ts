@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { getSupabaseService } from '@/lib/supabase/service'
 import { logAuditEvent } from '@/lib/audit'
+import { checkTrustedDevice } from '@/lib/device/checkTrustedDevice'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -52,6 +53,26 @@ export async function GET(request: NextRequest) {
 
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
+        // ─── Device trust check ────────────────────────────────────────────────
+        const fingerprint = request.cookies.get('goya_device_fp')?.value
+        if (fingerprint) {
+          const trusted = await checkTrustedDevice(user.id, fingerprint)
+          if (!trusted) {
+            const deviceRedirect = NextResponse.redirect(new URL('/verify-device', origin))
+            // Copy session cookies from response to deviceRedirect so user remains logged in
+            response.cookies.getAll().forEach(c => deviceRedirect.cookies.set(c.name, c.value))
+            deviceRedirect.cookies.set('device_pending_verification', `${user.id}|${fingerprint}`, {
+              httpOnly: true,
+              sameSite: 'lax',
+              path: '/',
+              maxAge: 600,
+              secure: process.env.NODE_ENV === 'production',
+            })
+            return deviceRedirect
+          }
+        }
+        // If no fingerprint cookie present: proceed normally (first-visit edge case)
+
         // If role query param exists (from register flow), store in user metadata
         if (role && role !== 'null') {
           await supabase.auth.updateUser({ data: { role } })
