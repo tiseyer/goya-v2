@@ -19,27 +19,27 @@ See: .planning/workstreams/ai-super-helper/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 1 of 5 (Schema & Infrastructure)
-Plan: 1 of TBD in current phase (01-01 complete)
+Plan: 2 of TBD in current phase (01-01 complete, 01-02 complete)
 Status: In progress
-Last activity: 2026-04-04 — Plan 01-01 complete: schema migration, bug fix, types, getOrCreateSession update
+Last activity: 2026-04-04 — Plan 01-02 complete: useChatStream hook extracted, message_id wired in all done chunks
 
-Progress: [██░░░░░░░░] ~10%
+Progress: [████░░░░░░] ~20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: ~8 minutes
-- Total execution time: ~8 minutes
+- Total plans completed: 2
+- Average duration: ~5.5 minutes
+- Total execution time: ~11 minutes
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-schema-infrastructure | 1 complete | ~8 min | ~8 min |
+| 01-schema-infrastructure | 2 complete | ~11 min | ~5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01
+- Last 5 plans: 01-01, 01-02
 - Trend: —
 
 *Updated after each plan completion*
@@ -59,6 +59,9 @@ Recent decisions affecting current work:
 - user_feedback is nullable (NULL = no feedback given)
 - rejection_reason is nullable (only set on rejection)
 - getOrCreateSession started_from is optional; existing callers not updated until Phase 2
+- useChatStream manages its own streaming state; callers receive setMessages to seed history
+- message_id emitted on escalation chunk too (not just done), so all assistant messages are DB-targetable
+- MatteaSearchHint is fire-and-forget and NOT a useChatStream consumer
 
 ### Pending Todos
 
@@ -72,5 +75,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-04
-Stopped at: Plan 01-01 complete — all tasks committed (b0f81e1, 15111e6)
-Resume file: None — continue with 01-02-PLAN.md
+Stopped at: Plan 01-02 complete — all tasks committed (5ce7e2f, 13be266)
+Resume file: None — continue with next plan in phase 01
